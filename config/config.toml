@@ -1,0 +1,58 @@
+# 运行模式(debug:调试,release:正式,test:测试)
+run_mode = "release"
+
+# HTTP监听地址(格式：0.0.0.0:8086)
+http_addr = ":8086"
+
+# 数据库表名前缀
+mysql_table_prefix = "g"
+
+# 日志配置
+[log]
+# 日志级别(0:panic,1:fatal,2:error,3:warn,4:info,5:debug)
+level = 5
+# 日志格式（text/json）
+format = "text"
+# 日志钩子(目前仅支持mysql,空表示不写入钩子)
+hook = "mysql"
+
+# mysql的日志钩子配置
+[log-mysql-hook]
+# 最大缓冲区数量
+max_buffer = 256
+# 最大工作线程数量
+max_thread = 2
+# 存储日志的表名
+table = "logger"
+
+# 会话配置
+[session]
+# 存储会话的cookie标识
+id = "gin_admin_session"
+# 会话签名
+sign = "GADM"
+# 会话存储方式（支持memory/mysql）
+store = "memory"
+
+# mysql数据库配置
+[mysql]
+# 启用跟踪日志
+trace = true
+# 连接地址(格式：127.0.0.1:3306)
+addr = "127.0.0.1:3306"
+# 用户名
+username = "root"
+# 密码
+password = "123456"
+# 数据库
+database = "ginadmin"
+# 设置连接可以被重新使用的最大时间量(单位：秒)
+max_lifetime = 7200
+# 设置打开连接到数据库的最大数量
+max_open_conns = 150
+# 设置空闲连接池中的最大连接数
+max_idle_conns = 50
+# 数据库表的存储引擎(InnoDB/MyISAM)
+engine = "InnoDB"
+# 数据库表的编码格式
+encoding = "UTF8"
