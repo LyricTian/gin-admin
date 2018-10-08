@@ -1,5 +1,5 @@
 # 运行模式(debug:调试,release:正式,test:测试)
-run_mode = "release"
+run_mode = "test"
 
 # HTTP监听地址(格式：0.0.0.0:8086)
 http_addr = ":8086"
