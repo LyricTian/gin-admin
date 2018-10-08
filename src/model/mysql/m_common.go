@@ -15,10 +15,7 @@ type Common struct {
 func (a *Common) Init(g *inject.Graph, db *mysql.DB) *Common {
 	a.Demo = new(Demo).Init(g, db, a)
 
-	err := db.CreateTablesIfNotExists()
-	if err != nil {
-		panic(err)
-	}
-
+	db.CreateTablesIfNotExists()
+	db.CreateIndex()
 	return a
 }

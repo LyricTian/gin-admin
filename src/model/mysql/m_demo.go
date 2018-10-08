@@ -24,7 +24,8 @@ func (a *Demo) Init(g *inject.Graph, db *mysql.DB, c *Common) *Demo {
 	a.Common = c
 
 	g.Provide(&inject.Object{Value: model.IDemo(a), Name: "IDemo"})
-	db.AddTableWithName(schema.Demo{}, a.TableName())
+	tbMap := db.AddTableWithName(schema.Demo{}, a.TableName())
+	tbMap.AddIndex("idx_code", "Btree", []string{"code"})
 	return a
 }
 
