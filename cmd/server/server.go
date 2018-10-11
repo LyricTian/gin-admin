@@ -49,13 +49,15 @@ func main() {
 		panic("加载配置文件发生错误：" + err.Error())
 	}
 
+	traceID := util.UUIDString()
+
 	// 初始化MySQL数据库
 	mysqlDB := initMySQL()
 
 	// 初始化日志
 	loggerHook := initLogger(mysqlDB.Db)
 
-	logger.System().Infof("服务已运行在[%s]模式下，版本号:%s，进程号：%d", viper.GetString("run_mode"), VERSION, os.Getpid())
+	logger.System(traceID).Infof("服务已运行在[%s]模式下，版本号:%s，进程号：%d", viper.GetString("run_mode"), VERSION, os.Getpid())
 
 	g := new(inject.Graph)
 
@@ -67,7 +69,7 @@ func main() {
 	g.Provide(&inject.Object{Value: apiCommon})
 
 	if err := g.Populate(); err != nil {
-		logger.System().Panicf("注入模块发生错误:%v", err)
+		logger.System(traceID).Panicf("注入模块发生错误:%v", err)
 	}
 
 	var state int32 = 1
@@ -80,18 +82,18 @@ func main() {
 	httpServer := initHTTPServer(apiCommon)
 
 	go func() {
-		logger.System().Infof("HTTP服务启动成功，端口监听在[%s]", viper.GetString("http_addr"))
+		logger.System(traceID).Infof("HTTP服务启动成功，端口监听在[%s]", viper.GetString("http_addr"))
 		ac <- httpServer.ListenAndServe()
 	}()
 
 	select {
 	case err := <-ac:
 		if err != nil && atomic.LoadInt32(&state) == 1 {
-			logger.System().Errorf("监听HTTP服务发生错误:%s", err.Error())
+			logger.System(traceID).Errorf("监听HTTP服务发生错误:%s", err.Error())
 		}
 	case sig := <-sc:
 		atomic.StoreInt32(&state, 0)
-		logger.System().Infof("获取到退出信号[%s]", sig.String())
+		logger.System(traceID).Infof("获取到退出信号[%s]", sig.String())
 	}
 
 	// 等待日志钩子写入完成
@@ -101,7 +103,7 @@ func main() {
 
 	// 关闭MySQL数据库
 	if err := mysqlDB.Close(); err != nil {
-		logger.System().Errorf("关闭数据库发生错误:%s", err.Error())
+		logger.System(traceID).Errorf("关闭数据库发生错误:%s", err.Error())
 	}
 
 	// 退出应用
@@ -114,8 +116,10 @@ func initHTTPServer(apiCommon *api.Common) *http.Server {
 
 	app := gin.New()
 
+	// 注册中间件
+	app.Use(context.WrapContext(router.TraceMiddleware))
 	app.Use(logger.Middleware("/api/"))
-	app.Use(context.WrapContext(router.Recovery))
+	app.Use(context.WrapContext(router.RecoveryMiddleware))
 
 	app.NoMethod(context.WrapContext(func(ctx *context.Context) {
 		ctx.ResError(fmt.Errorf("方法不允许"), 405)
@@ -125,7 +129,7 @@ func initHTTPServer(apiCommon *api.Common) *http.Server {
 		ctx.ResError(fmt.Errorf("资源不存在"), 404)
 	}))
 
-	// 注入/api/v1路由
+	// 注册/api/v1路由
 	router.APIV1Handler(app, apiCommon)
 
 	return &http.Server{
@@ -196,8 +200,9 @@ func initLogger(mysqlDB *sql.DB) logger.HookFlusher {
 		switch v {
 		case "mysql":
 			extraItems := []*mysqlhook.ExecExtraItem{
-				mysqlhook.NewExecExtraItem("type", "varchar(20)"),
-				mysqlhook.NewExecExtraItem("user_id", "varchar(36)"),
+				mysqlhook.NewExecExtraItem(logger.FieldKeyType, "varchar(20)"),
+				mysqlhook.NewExecExtraItem(logger.FieldKeyUserID, "varchar(36)"),
+				mysqlhook.NewExecExtraItem(logger.FieldKeyTraceID, "varchar(36)"),
 			}
 
 			var hookOpts []mysqlhook.Option

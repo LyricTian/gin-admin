@@ -49,6 +49,11 @@ func (a *Context) GetPageSize() uint {
 	return 10
 }
 
+// GetTraceID 获取追踪ID
+func (a *Context) GetTraceID() string {
+	return a.GetString(util.ContextKeyTraceID)
+}
+
 // GetUserID 获取当前用户ID
 func (a *Context) GetUserID() string {
 	return a.GetString(util.ContextKeyUserID)
@@ -88,7 +93,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 		}
 
 		if err != nil {
-			logger.System(a.GetUserID()).
+			logger.System(a.GetTraceID(), a.GetUserID()).
 				WithField("error", err.Error()).
 				Warnf("[请求错误] %s", message)
 		}
@@ -102,7 +107,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 				StackTrace() errors.StackTrace
 			}
 
-			entry := logger.System(a.GetUserID())
+			entry := logger.System(a.GetTraceID(), a.GetUserID())
 			if stack, ok := err.(stackTracer); ok {
 				entry = entry.WithField("error", fmt.Sprintf("%+v", stack.StackTrace()[:2]))
 			} else {

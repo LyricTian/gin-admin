@@ -16,8 +16,9 @@ import (
 
 // 定义日志中使用的键名
 const (
-	FieldKeyType   = "type"
-	FieldKeyUserID = "user_id"
+	FieldKeyTraceID = "trace_id"
+	FieldKeyType    = "type"
+	FieldKeyUserID  = "user_id"
 )
 
 var defaultOptions = options{
@@ -63,23 +64,23 @@ func Default() *Logger {
 }
 
 // System 系统日志
-func System(userID ...string) *logrus.Entry {
-	return logger().System(userID...)
+func System(traceID string, userID ...string) *logrus.Entry {
+	return logger().System(traceID, userID...)
 }
 
 // Access 访问日志
-func Access(userID ...string) *logrus.Entry {
-	return logger().Access(userID...)
+func Access(traceID string, userID ...string) *logrus.Entry {
+	return logger().Access(traceID, userID...)
 }
 
 // Operate 操作日志
-func Operate(userID ...string) *logrus.Entry {
-	return logger().Operate(userID...)
+func Operate(traceID string, userID ...string) *logrus.Entry {
+	return logger().Operate(traceID, userID...)
 }
 
 // Login 登录(登出)日志
-func Login(userID string) *logrus.Entry {
-	return logger().Login(userID)
+func Login(traceID string, userID string) *logrus.Entry {
+	return logger().Login(traceID, userID)
 }
 
 // New 创建日志实例
@@ -110,9 +111,10 @@ type Logger struct {
 	*logrus.Logger
 }
 
-func (a *Logger) typeEntry(fieldType string, userID ...string) *logrus.Entry {
+func (a *Logger) typeEntry(traceID, fieldType string, userID ...string) *logrus.Entry {
 	fields := logrus.Fields{
-		FieldKeyType: fieldType,
+		FieldKeyTraceID: traceID,
+		FieldKeyType:    fieldType,
 	}
 	if len(userID) > 0 {
 		fields[FieldKeyUserID] = userID[0]
@@ -121,23 +123,23 @@ func (a *Logger) typeEntry(fieldType string, userID ...string) *logrus.Entry {
 }
 
 // System 系统日志
-func (a *Logger) System(userID ...string) *logrus.Entry {
-	return a.typeEntry("system", userID...)
+func (a *Logger) System(traceID string, userID ...string) *logrus.Entry {
+	return a.typeEntry(traceID, "system", userID...)
 }
 
 // Access 访问日志
-func (a *Logger) Access(userID ...string) *logrus.Entry {
-	return a.typeEntry("access", userID...)
+func (a *Logger) Access(traceID string, userID ...string) *logrus.Entry {
+	return a.typeEntry(traceID, "access", userID...)
 }
 
 // Operate 操作日志
-func (a *Logger) Operate(userID ...string) *logrus.Entry {
-	return a.typeEntry("operate", userID...)
+func (a *Logger) Operate(traceID string, userID ...string) *logrus.Entry {
+	return a.typeEntry(traceID, "operate", userID...)
 }
 
 // Login 登录(登出)日志
-func (a *Logger) Login(userID string) *logrus.Entry {
-	return a.typeEntry("login", userID)
+func (a *Logger) Login(traceID string, userID string) *logrus.Entry {
+	return a.typeEntry(traceID, "login", userID)
 }
 
 // Middleware GIN的日志中间件
@@ -183,11 +185,15 @@ func Middleware(prefixes ...string) gin.HandlerFunc {
 		fields["status"] = c.Writer.Status()
 		fields["length"] = c.Writer.Size()
 
-		logger().Access(c.GetString(util.ContextKeyUserID)).
-			WithFields(fields).
-			Infof("[http] %s(%s) - %s - %s",
-				c.Request.URL.Path,
-				c.GetString(util.ContextKeyURLMemo),
-				c.Request.Method, c.ClientIP())
+		logger().Access(
+			c.GetString(util.ContextKeyTraceID),
+			c.GetString(util.ContextKeyUserID),
+		).WithFields(fields).Infof(
+			"[http] %s(%s) - %s - %s",
+			c.Request.URL.Path,
+			c.GetString(util.ContextKeyURLMemo),
+			c.Request.Method,
+			c.ClientIP(),
+		)
 	}
 }
