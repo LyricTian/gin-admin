@@ -6,6 +6,11 @@ import (
 	"io"
 )
 
+// UUIDString 创建UUID
+func UUIDString() string {
+	return MustUUID(NewUUID()).String()
+}
+
 // A UUID is a 128 bit (16 byte) Universal Unique IDentifier as defined in RFC
 // 4122.
 type UUID [16]byte

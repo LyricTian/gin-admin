@@ -131,6 +131,7 @@ func NewDB(opts ...Option) (*DB, error) {
 	}
 
 	dbMap := &DB{
+		logger: o.logger,
 		DbMap: &gorp.DbMap{
 			Db: db,
 			Dialect: gorp.MySQLDialect{
@@ -149,6 +150,7 @@ func NewDB(opts ...Option) (*DB, error) {
 // DB 数据库管理
 type DB struct {
 	*gorp.DbMap
+	logger Logger
 }
 
 // Close 关闭数据库连接
@@ -157,6 +159,41 @@ func (d *DB) Close() error {
 		return nil
 	}
 	return d.Db.Close()
+}
+
+// CreateTableIfNotExists 创建表
+func (d *DB) CreateTableIfNotExists(i interface{}, name string) {
+	tableMap := d.AddTableWithName(i, name)
+	query := tableMap.SqlForCreate(true)
+	_, err := d.Exec(query)
+	if err != nil {
+		d.logger.Printf("创建表[%s]发生错误:%s", query, err.Error())
+	}
+}
+
+// CreateTableIndex 创建索引
+func (d *DB) CreateTableIndex(table, idx string, unique bool, columns ...string) {
+	s := bytes.Buffer{}
+	s.WriteString("CREATE INDEX")
+	s.WriteByte(' ')
+	s.WriteString(idx)
+	s.WriteByte(' ')
+	s.WriteString("ON")
+	s.WriteByte(' ')
+	s.WriteString(table)
+	s.WriteByte(' ')
+	s.WriteByte('(')
+	s.WriteString(strings.Join(columns, ","))
+	s.WriteByte(')')
+	s.WriteByte(';')
+
+	_, err := d.Exec(s.String())
+	if err != nil {
+		errString := err.Error()
+		if !strings.HasPrefix(errString, "Error 1061:") {
+			d.logger.Printf("创建索引[%s]发生错误:%s", s.String(), errString)
+		}
+	}
 }
 
 // InsertSQL 获取插入SQL

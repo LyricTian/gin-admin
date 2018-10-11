@@ -1,10 +1,12 @@
 package util
 
 const (
-	// SessionKeyUserID 存储在session中的用户ID键
+	// SessionKeyUserID 存储在session中的键(用户ID)
 	SessionKeyUserID = "user_id"
-	// ContextKeyUserID 存储到上下文中的用户ID键
+	// ContextKeyUserID 存储上下文中的键(用户ID)
 	ContextKeyUserID = "user_id"
 	// ContextKeyURLMemo 存储上下文中的键(请求URL说明)
 	ContextKeyURLMemo = "url_memo"
+	// ContextKeyTraceID 存储上下文中的键(跟踪ID)
+	ContextKeyTraceID = "trace_id"
 )

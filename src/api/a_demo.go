@@ -19,6 +19,7 @@ func (a *Demo) QueryList(ctx *context.Context) {
 		ctx.ResInternalServerError(err)
 		return
 	}
+
 	ctx.ResList(items)
 }
 

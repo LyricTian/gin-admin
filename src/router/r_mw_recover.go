@@ -7,9 +7,7 @@ import (
 	"gin-admin/src/logger"
 	"io/ioutil"
 	"net/http"
-	"net/http/httputil"
 	"runtime"
-	"time"
 )
 
 var (
@@ -17,19 +15,17 @@ var (
 	centerDot = []byte("·")
 	dot       = []byte(".")
 	slash     = []byte("/")
-	reset     = string([]byte{27, 91, 48, 109})
 )
 
-// Recovery recover
-func Recovery(ctx *context.Context) {
+// RecoveryMiddleware 崩溃恢复
+func RecoveryMiddleware(ctx *context.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			stack := stack(3)
-			httprequest, _ := httputil.DumpRequest(ctx.Request, false)
 
-			logger.System().
-				WithField("stack", fmt.Sprintf("\n%s\n%s\n%s%s", string(httprequest), err, stack, reset)).
-				Errorf("[Recovery] %s panic recovered", time.Now().Format("2006/01/02 - 15:04:05"))
+			logger.Access(ctx.GetTraceID(), ctx.GetUserID()).
+				WithField("stack", string(stack)).
+				Errorf("[Recover]: %s", err)
 
 			ctx.Abort()
 			ctx.ResError(nil, http.StatusInternalServerError)
