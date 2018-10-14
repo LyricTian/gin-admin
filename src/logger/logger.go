@@ -2,6 +2,7 @@ package logger
 
 import (
 	"bytes"
+	"fmt"
 	"gin-admin/src/util"
 	"io/ioutil"
 	"mime"
@@ -181,7 +182,7 @@ func Middleware(prefixes ...string) gin.HandlerFunc {
 		}
 		c.Next()
 
-		fields["time_consuming"] = time.Since(start) / 1e6
+		fields["time_consuming"] = fmt.Sprintf("%dms", time.Since(start).Nanoseconds()/1e6)
 		fields["status"] = c.Writer.Status()
 		fields["length"] = c.Writer.Size()
 

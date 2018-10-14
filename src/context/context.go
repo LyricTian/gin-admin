@@ -135,6 +135,19 @@ func (a *Context) ResSuccess(obj interface{}) {
 	a.JSON(http.StatusOK, obj)
 }
 
+// ResPage 响应分页数据
+func (a *Context) ResPage(total int64, list interface{}) {
+	obj := gin.H{
+		"list": list,
+		"pagination": gin.H{
+			"total":    total,
+			"current":  a.GetPageIndex(),
+			"pageSize": a.GetPageSize(),
+		},
+	}
+	a.ResSuccess(obj)
+}
+
 // ResList 响应列表数据
 func (a *Context) ResList(list interface{}) {
 	a.ResSuccess(gin.H{"list": list})

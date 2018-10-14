@@ -174,7 +174,13 @@ func (d *DB) CreateTableIfNotExists(i interface{}, name string) {
 // CreateTableIndex 创建索引
 func (d *DB) CreateTableIndex(table, idx string, unique bool, columns ...string) {
 	s := bytes.Buffer{}
-	s.WriteString("CREATE INDEX")
+	s.WriteString("CREATE")
+	s.WriteByte(' ')
+	if unique {
+		s.WriteString("UNIQUE")
+		s.WriteByte(' ')
+	}
+	s.WriteString("INDEX")
 	s.WriteByte(' ')
 	s.WriteString(idx)
 	s.WriteByte(' ')

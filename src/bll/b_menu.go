@@ -1,0 +1,49 @@
+package bll
+
+import (
+	"gin-admin/src/model"
+	"gin-admin/src/schema"
+	"gin-admin/src/util"
+	"time"
+)
+
+// Menu 菜单管理
+type Menu struct {
+	MenuModel model.IMenu `inject:"IMenu"`
+}
+
+// QueryPage 查询分页数据
+func (a *Menu) QueryPage(params schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error) {
+	return a.MenuModel.QueryPage(params, pageIndex, pageSize)
+}
+
+// Get 查询指定数据
+func (a *Menu) Get(recordID string) (*schema.Menu, error) {
+	return a.MenuModel.Get(recordID)
+}
+
+// Create 创建数据
+func (a *Menu) Create(item *schema.Menu) error {
+	item.ID = 0
+	item.RecordID = util.UUIDString()
+	item.Created = time.Now().Unix()
+	item.Deleted = 0
+	return a.MenuModel.Create(item)
+}
+
+// Update 更新数据
+func (a *Menu) Update(recordID string, item *schema.Menu) error {
+	info := util.StructToMap(item)
+	delete(info, "id")
+	delete(info, "record_id")
+	delete(info, "creator")
+	delete(info, "created")
+	delete(info, "deleted")
+
+	return a.MenuModel.Update(recordID, info)
+}
+
+// Delete 删除数据
+func (a *Menu) Delete(recordID string) error {
+	return a.MenuModel.Delete(recordID)
+}
