@@ -10,6 +10,5 @@ import (
 func APIV1Handler(r *gin.Engine, c *api.Common) {
 	v1 := r.Group("/api/v1")
 
-	APIDemoRouter(v1, c.DemoAPI)
 	APIMenuRouter(v1, c.MenuAPI)
 }
