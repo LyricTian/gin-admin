@@ -182,7 +182,7 @@ func Middleware(prefixes ...string) gin.HandlerFunc {
 		}
 		c.Next()
 
-		fields["time_consuming"] = fmt.Sprintf("%dms", time.Since(start).Nanoseconds()/1e6)
+		fields["time"] = fmt.Sprintf("%dms", time.Since(start).Nanoseconds()/1e6)
 		fields["status"] = c.Writer.Status()
 		fields["length"] = c.Writer.Size()
 
