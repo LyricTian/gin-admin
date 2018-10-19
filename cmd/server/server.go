@@ -29,7 +29,10 @@ import (
 // VERSION 当前服务版本号
 const VERSION = "1.0.0"
 
-var configFile string
+var (
+	configFile string
+	traceID    = util.UUIDString()
+)
 
 func init() {
 	flag.StringVar(&configFile, "config", "", "配置文件(.json,.yaml,.toml)")
@@ -48,8 +51,6 @@ func main() {
 	if err := viper.ReadInConfig(); err != nil {
 		panic("加载配置文件发生错误：" + err.Error())
 	}
-
-	traceID := util.UUIDString()
 
 	// 初始化MySQL数据库
 	mysqlDB := initMySQL()
@@ -117,7 +118,7 @@ func initHTTPServer(apiCommon *api.Common) *http.Server {
 	app := gin.New()
 
 	// 注册中间件
-	app.Use(context.WrapContext(router.TraceMiddleware))
+	app.Use(router.TraceMiddleware("/api/"))
 	app.Use(logger.Middleware("/api/"))
 	app.Use(context.WrapContext(router.RecoveryMiddleware))
 
