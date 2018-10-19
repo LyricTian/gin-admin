@@ -1,6 +1,7 @@
 package context
 
 import (
+	"context"
 	"fmt"
 	"gin-admin/src/logger"
 	"gin-admin/src/util"
@@ -24,6 +25,14 @@ func WrapContext(ctx func(*Context), memo ...string) gin.HandlerFunc {
 // Context 定义上下文
 type Context struct {
 	*gin.Context
+}
+
+// NewContext 创建上线文实例
+func (a *Context) NewContext() context.Context {
+	parent := context.Background()
+	parent = util.NewTraceIDContext(parent, a.GetTraceID())
+
+	return parent
 }
 
 // GetPageIndex 获取分页的页索引

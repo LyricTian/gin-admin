@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
 	"gin-admin/src/model"
 	"gin-admin/src/schema"
@@ -42,7 +43,7 @@ func (a *Menu) TableName() string {
 }
 
 // QueryPage 查询分页数据
-func (a *Menu) QueryPage(param schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error) {
+func (a *Menu) QueryPage(ctx context.Context, param schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error) {
 	var (
 		where = "WHERE deleted=0"
 		args  []interface{}
@@ -83,7 +84,7 @@ func (a *Menu) QueryPage(param schema.MenuQueryParam, pageIndex, pageSize uint) 
 }
 
 // QuerySelect 查询选择数据
-func (a *Menu) QuerySelect(param schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error) {
+func (a *Menu) QuerySelect(ctx context.Context, param schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error) {
 	var (
 		where = "WHERE deleted=0"
 		args  []interface{}
@@ -109,7 +110,7 @@ func (a *Menu) QuerySelect(param schema.MenuSelectQueryParam) ([]*schema.MenuSel
 }
 
 // Get 查询指定数据
-func (a *Menu) Get(recordID string) (*schema.Menu, error) {
+func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	var item schema.Menu
 	fields := "id,record_id,code,name,type,sequence,icon,uri,level_code,parent_id,status,creator,created"
 
@@ -121,7 +122,7 @@ func (a *Menu) Get(recordID string) (*schema.Menu, error) {
 }
 
 // Create 创建数据
-func (a *Menu) Create(item *schema.Menu) error {
+func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
 	err := a.DB.Insert(item)
 	if err != nil {
 		return errors.Wrap(err, "创建数据发生错误")
@@ -130,7 +131,7 @@ func (a *Menu) Create(item *schema.Menu) error {
 }
 
 // Update 更新数据
-func (a *Menu) Update(recordID string, info map[string]interface{}) error {
+func (a *Menu) Update(ctx context.Context, recordID string, info map[string]interface{}) error {
 	_, err := a.DB.UpdateByPK(a.TableName(),
 		map[string]interface{}{"record_id": recordID},
 		info)
@@ -141,7 +142,7 @@ func (a *Menu) Update(recordID string, info map[string]interface{}) error {
 }
 
 // Delete 删除数据
-func (a *Menu) Delete(recordID string) error {
+func (a *Menu) Delete(ctx context.Context, recordID string) error {
 	_, err := a.DB.UpdateByPK(a.TableName(),
 		map[string]interface{}{"record_id": recordID},
 		map[string]interface{}{"deleted": time.Now().Unix()})
