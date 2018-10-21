@@ -27,7 +27,7 @@ type Context struct {
 	*gin.Context
 }
 
-// NewContext 创建上线文实例
+// NewContext 创建上下文实例
 func (a *Context) NewContext() context.Context {
 	parent := context.Background()
 	parent = util.NewTraceIDContext(parent, a.GetTraceID())
