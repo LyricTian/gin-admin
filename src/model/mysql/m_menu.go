@@ -112,7 +112,7 @@ func (a *Menu) QuerySelect(ctx context.Context, param schema.MenuSelectQueryPara
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	var item schema.Menu
-	fields := "id,record_id,code,name,type,sequence,icon,uri,level_code,parent_id,status,creator,created"
+	fields := "id,record_id,code,name,type,sequence,icon,uri,level_code,parent_id,status,creator,created,deleted"
 
 	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND record_id=?", fields, a.TableName()), recordID)
 	if err != nil {
