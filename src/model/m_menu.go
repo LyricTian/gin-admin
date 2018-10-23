@@ -13,10 +13,18 @@ type IMenu interface {
 	QuerySelect(ctx context.Context, param schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error)
 	// Get 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Menu, error)
+	// 检查编号是否存在
+	CheckCode(ctx context.Context, code string, typ int, parentID string) (bool, error)
+	// 根据父级查询分级码
+	QueryLevelCodesByParentID(parentID string) ([]string, error)
+	// 检查子级是否存在
+	CheckChild(ctx context.Context, parentID string) (bool, error)
 	// Create 创建数据
 	Create(ctx context.Context, item *schema.Menu) error
 	// Update 更新数据
 	Update(ctx context.Context, recordID string, info map[string]interface{}) error
+	// 更新数据
+	UpdateWithLevelCode(ctx context.Context, recordID string, info map[string]interface{}, oldLevelCode, newLevelCode string) error
 	// Delete 删除数据
 	Delete(ctx context.Context, recordID string) error
 }

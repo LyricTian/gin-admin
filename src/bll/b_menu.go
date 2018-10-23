@@ -5,12 +5,16 @@ import (
 	"gin-admin/src/model"
 	"gin-admin/src/schema"
 	"gin-admin/src/util"
+	"sync"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // Menu 菜单管理
 type Menu struct {
 	MenuModel model.IMenu `inject:"IMenu"`
+	lock      sync.RWMutex
 }
 
 // QueryPage 查询分页数据
@@ -25,6 +29,29 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 
 // Create 创建数据
 func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
+	if item.Code != "" {
+		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.Type, item.ParentID)
+		if err != nil {
+			return err
+		} else if exists {
+			return errors.New("菜单编号已经存在")
+		}
+	}
+
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
+	levelCodes, err := a.MenuModel.QueryLevelCodesByParentID(item.ParentID)
+	if err != nil {
+		return err
+	}
+
+	levelCode := util.GetLevelCode(levelCodes)
+	if len(levelCode) == 0 {
+		return errors.New("无效的分级码")
+	}
+
+	item.LevelCode = levelCode
 	item.ID = 0
 	item.RecordID = util.UUIDString()
 	item.Created = time.Now().Unix()
@@ -34,17 +61,56 @@ func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
 
 // Update 更新数据
 func (a *Menu) Update(ctx context.Context, recordID string, item *schema.Menu) error {
+	oldItem, err := a.MenuModel.Get(ctx, recordID)
+	if err != nil {
+		return err
+	} else if oldItem == nil {
+		return errors.New("无效的参数")
+	} else if item.Code != "" && item.Code != oldItem.Code {
+		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.Type, item.ParentID)
+		if err != nil {
+			return err
+		} else if exists {
+			return errors.New("菜单编号已经存在")
+		}
+	}
+
 	info := util.StructToMap(item)
 	delete(info, "id")
 	delete(info, "record_id")
+	delete(info, "level_code")
 	delete(info, "creator")
 	delete(info, "created")
 	delete(info, "deleted")
+
+	if item.ParentID != oldItem.ParentID {
+		a.lock.Lock()
+		defer a.lock.Unlock()
+
+		levelCodes, err := a.MenuModel.QueryLevelCodesByParentID(item.ParentID)
+		if err != nil {
+			return err
+		}
+
+		levelCode := util.GetLevelCode(levelCodes)
+		if len(levelCode) == 0 {
+			return errors.New("无效的分级码")
+		}
+
+		return a.MenuModel.UpdateWithLevelCode(ctx, recordID, info, oldItem.LevelCode, levelCode)
+	}
 
 	return a.MenuModel.Update(ctx, recordID, info)
 }
 
 // Delete 删除数据
 func (a *Menu) Delete(ctx context.Context, recordID string) error {
+	exists, err := a.MenuModel.CheckChild(ctx, recordID)
+	if err != nil {
+		return err
+	} else if exists {
+		return errors.New("含有子级菜单，不能删除")
+	}
+
 	return a.MenuModel.Delete(ctx, recordID)
 }

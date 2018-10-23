@@ -121,6 +121,46 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	return &item, nil
 }
 
+// CheckCode 检查编号是否存在
+func (a *Menu) CheckCode(ctx context.Context, code string, typ int, parentID string) (bool, error) {
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND code=? AND type=? AND parent_id=?", a.TableName())
+
+	n, err := a.DB.SelectInt(query, code, typ, parentID)
+	if err != nil {
+		return false, errors.Wrap(err, "检查编号是否存在发生错误")
+	}
+	return n > 0, nil
+}
+
+// QueryLevelCodesByParentID 根据父级查询分级码
+func (a *Menu) QueryLevelCodesByParentID(parentID string) ([]string, error) {
+	query := fmt.Sprintf("SELECT level_code FROM %s WHERE deleted=0 AND (parent_id=? OR record_id=?) ORDER BY level_code", a.TableName())
+
+	var items []*schema.Menu
+	_, err := a.DB.Select(&items, query, parentID, parentID)
+	if err != nil {
+		return nil, errors.Wrap(err, "根据父级查询分级码发生错误")
+	}
+
+	levelCodes := make([]string, len(items))
+	for i, item := range items {
+		levelCodes[i] = item.LevelCode
+	}
+
+	return levelCodes, nil
+}
+
+// CheckChild 检查子级是否存在
+func (a *Menu) CheckChild(ctx context.Context, parentID string) (bool, error) {
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND parent_id=?", a.TableName())
+
+	n, err := a.DB.SelectInt(query, parentID)
+	if err != nil {
+		return false, errors.Wrap(err, "检查子级是否存在发生错误")
+	}
+	return n > 0, nil
+}
+
 // Create 创建数据
 func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
 	err := a.DB.Insert(item)
@@ -137,6 +177,33 @@ func (a *Menu) Update(ctx context.Context, recordID string, info map[string]inte
 		info)
 	if err != nil {
 		return errors.Wrap(err, "更新数据发生错误")
+	}
+	return nil
+}
+
+// UpdateWithLevelCode 更新数据
+func (a *Menu) UpdateWithLevelCode(ctx context.Context, recordID string, info map[string]interface{}, oldLevelCode, newLevelCode string) error {
+	tran, err := a.DB.Begin()
+	if err != nil {
+		return errors.Wrapf(err, "更新数据发生错误")
+	}
+
+	_, err = a.DB.UpdateByPKWithTran(tran, a.TableName(), map[string]interface{}{"record_id": recordID}, info)
+	if err != nil {
+		tran.Rollback()
+		return errors.Wrapf(err, "更新数据发生错误")
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET level_code=concat('%s',substr(level_code,%d)) WHERE deleted=0 AND level_code LIKE '%s%%' ORDER BY level_code", a.TableName(), newLevelCode, len(oldLevelCode)+1, oldLevelCode)
+	_, err = tran.Exec(query)
+	if err != nil {
+		tran.Rollback()
+		return errors.Wrapf(err, "更新数据发生错误")
+	}
+
+	err = tran.Commit()
+	if err != nil {
+		return errors.Wrapf(err, "更新数据提交事物发生错误")
 	}
 	return nil
 }
