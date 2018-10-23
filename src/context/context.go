@@ -119,10 +119,8 @@ func (a *Context) ResError(err error, status int, code ...int) {
 			entry := logger.System(a.GetTraceID(), a.GetUserID())
 			if stack, ok := err.(stackTracer); ok {
 				entry = entry.WithField("error", fmt.Sprintf("%+v", stack.StackTrace()[:2]))
-			} else {
-				entry = entry.WithField("error", err.Error())
 			}
-			entry.Errorf("[服务器错误] %s", message)
+			entry.Errorf("[服务器错误] %s", err.Error())
 		}
 	}
 

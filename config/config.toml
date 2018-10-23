@@ -37,7 +37,7 @@ store = "memory"
 # mysql数据库配置
 [mysql]
 # 启用跟踪日志
-trace = false
+trace = true
 # 连接地址(格式：127.0.0.1:3306)
 addr = "127.0.0.1:3306"
 # 用户名
