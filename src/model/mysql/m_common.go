@@ -14,6 +14,5 @@ type Common struct {
 // Init 初始化
 func (a *Common) Init(g *inject.Graph, db *mysql.DB) *Common {
 	a.Menu = new(Menu).Init(g, db, a)
-
 	return a
 }
