@@ -22,6 +22,17 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, page
 	return a.MenuModel.QueryPage(ctx, params, pageIndex, pageSize)
 }
 
+// QueryTree 查询菜单树
+func (a *Menu) QueryTree(ctx context.Context, params schema.MenuSelectQueryParam) ([]map[string]interface{}, error) {
+	items, err := a.MenuModel.QuerySelect(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+
+	treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
+	return treeData, nil
+}
+
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	return a.MenuModel.Get(ctx, recordID)

@@ -8,9 +8,9 @@ import (
 // IMenu 菜单管理
 type IMenu interface {
 	// 查询分页数据
-	QueryPage(ctx context.Context, param schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error)
+	QueryPage(ctx context.Context, params schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error)
 	// 查询选择数据
-	QuerySelect(ctx context.Context, param schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error)
+	QuerySelect(ctx context.Context, params schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error)
 	// Get 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Menu, error)
 	// 检查编号是否存在

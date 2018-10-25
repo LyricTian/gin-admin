@@ -18,6 +18,8 @@ func (a *Menu) Query(ctx *context.Context) {
 	switch ctx.Query("type") {
 	case "page":
 		a.QueryPage(ctx)
+	case "tree":
+		a.QueryTree(ctx)
 	default:
 		ctx.ResBadRequest(nil)
 	}
@@ -41,6 +43,22 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 	}
 
 	ctx.ResPage(total, items)
+}
+
+// QueryTree 查询菜单树
+func (a *Menu) QueryTree(ctx *context.Context) {
+	params := schema.MenuSelectQueryParam{
+		Name:   ctx.Query("name"),
+		Status: util.S(ctx.Query("status")).Int(),
+	}
+
+	treeData, err := a.MenuBll.QueryTree(ctx.NewContext(), params)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+
+	ctx.ResList(treeData)
 }
 
 // Get 查询指定数据

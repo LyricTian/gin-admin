@@ -43,25 +43,25 @@ func (a *Menu) TableName() string {
 }
 
 // QueryPage 查询分页数据
-func (a *Menu) QueryPage(ctx context.Context, param schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error) {
+func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error) {
 	var (
 		where = "WHERE deleted=0"
 		args  []interface{}
 	)
 
-	if v := param.Name; v != "" {
+	if v := params.Name; v != "" {
 		where = fmt.Sprintf("%s AND name LIKE ?", where)
 		args = append(args, "%"+v+"%")
 	}
-	if v := param.ParentID; v != "" {
+	if v := params.ParentID; v != "" {
 		where = fmt.Sprintf("%s AND parent_id=?", where)
 		args = append(args, v)
 	}
-	if v := param.Status; v > 0 {
+	if v := params.Status; v > 0 {
 		where = fmt.Sprintf("%s AND status=?", where)
 		args = append(args, v)
 	}
-	if v := param.Type; v > 0 {
+	if v := params.Type; v > 0 {
 		where = fmt.Sprintf("%s AND type=?", where)
 		args = append(args, v)
 	}
@@ -84,17 +84,17 @@ func (a *Menu) QueryPage(ctx context.Context, param schema.MenuQueryParam, pageI
 }
 
 // QuerySelect 查询选择数据
-func (a *Menu) QuerySelect(ctx context.Context, param schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error) {
+func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error) {
 	var (
 		where = "WHERE deleted=0"
 		args  []interface{}
 	)
 
-	if v := param.Name; v != "" {
+	if v := params.Name; v != "" {
 		where = fmt.Sprintf("%s AND name LIKE ?", where)
 		args = append(args, "%"+v+"%")
 	}
-	if v := param.Status; v > 0 {
+	if v := params.Status; v > 0 {
 		where = fmt.Sprintf("%s AND status=?", where)
 		args = append(args, v)
 	}
