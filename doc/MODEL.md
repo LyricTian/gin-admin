@@ -39,8 +39,7 @@
 | id      | 自增 ID    | 数值     | 主键 |
 | role_id | 角色 ID    | 字符串   |      |
 | menu_id | 菜单 ID    | 字符串   |      |
-| created | 创建时间戳 | 数值     |      |
-| creator | 创建人     | 字符串   |      |
+| deleted | 删除时间戳 | 数值     |      |
 
 ## 用户管理(`user`)
 
@@ -63,8 +62,7 @@
 | id      | 自增 ID    | 数值     | 主键 |
 | user_id | 用户 ID    | 字符串   |      |
 | role_id | 角色 ID    | 字符串   |      |
-| created | 创建时间戳 | 数值     |      |
-| creator | 创建人     | 字符串   |      |
+| deleted | 删除时间戳 | 数值     |      |
 
 ## 日志管理(`logger`)
 

@@ -47,8 +47,8 @@ type MenuSelectQueryParam struct {
 
 // MenuSelectQueryResult 菜单选择查询结果
 type MenuSelectQueryResult struct {
-	RecordID  string `json:"record_id" db:"record_id" structs:"record_id"`    // 记录内码(uuid)
-	Name      string `json:"name" db:"name" structs:"name"`                   // 菜单名称
-	LevelCode string `json:"level_code" db:"level_code" structs:"level_code"` // 分级码
-	ParentID  string `json:"parent_id" db:"parent_id" structs:"parent_id"`    // 父级内码
+	RecordID  string `json:"record_id" db:"record_id"`   // 记录内码(uuid)
+	Name      string `json:"name" db:"name"`             // 菜单名称
+	LevelCode string `json:"level_code" db:"level_code"` // 分级码
+	ParentID  string `json:"parent_id" db:"parent_id"`   // 父级内码
 }

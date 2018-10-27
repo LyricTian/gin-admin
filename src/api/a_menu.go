@@ -128,3 +128,23 @@ func (a *Menu) DeleteMany(ctx *context.Context) {
 
 	ctx.ResOK()
 }
+
+// Enable 启用数据
+func (a *Menu) Enable(ctx *context.Context) {
+	err := a.MenuBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 1)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+	ctx.ResOK()
+}
+
+// Disable 禁用数据
+func (a *Menu) Disable(ctx *context.Context) {
+	err := a.MenuBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 2)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+	ctx.ResOK()
+}
