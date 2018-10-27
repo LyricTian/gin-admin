@@ -53,10 +53,7 @@ func SetFormat(format string) Option {
 }
 
 func logger() *Logger {
-	if internalLogger == nil {
-		internalLogger = New()
-	}
-	return internalLogger
+	return New()
 }
 
 // Default 获取默认日志实例

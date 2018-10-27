@@ -4,15 +4,12 @@ run_mode = "test"
 # HTTP监听地址(格式：0.0.0.0:8086)
 http_addr = ":8086"
 
-# 数据库表名前缀
-mysql_table_prefix = "g"
-
 # 日志配置
 [log]
 # 日志级别(0:panic,1:fatal,2:error,3:warn,4:info,5:debug)
 level = 5
 # 日志格式（text/json）
-format = "json"
+format = "text"
 # 日志钩子(目前仅支持mysql,空表示不写入钩子)
 hook = "mysql"
 
@@ -56,3 +53,5 @@ max_idle_conns = 50
 engine = "InnoDB"
 # 数据库表的编码格式
 encoding = "UTF8"
+# 数据库表名前缀
+table_prefix = "g"

@@ -10,7 +10,6 @@ import (
 
 	"github.com/facebookgo/inject"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 // Demo 示例程序
@@ -38,7 +37,7 @@ func (a *Demo) Init(g *inject.Graph, db *mysql.DB, c *Common) *Demo {
 
 // TableName 表名
 func (a *Demo) TableName() string {
-	return fmt.Sprintf("%s_%s", viper.GetString("mysql_table_prefix"), "demo")
+	return a.Common.TableName("demo")
 }
 
 // QueryPage 查询分页数据

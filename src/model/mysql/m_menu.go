@@ -10,7 +10,6 @@ import (
 
 	"github.com/facebookgo/inject"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 // Menu 菜单管理
@@ -39,7 +38,7 @@ func (a *Menu) Init(g *inject.Graph, db *mysql.DB, c *Common) *Menu {
 
 // TableName 表名
 func (a *Menu) TableName() string {
-	return fmt.Sprintf("%s_%s", viper.GetString("mysql_table_prefix"), "menu")
+	return a.Common.TableName("menu")
 }
 
 // QueryPage 查询分页数据
