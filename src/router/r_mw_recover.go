@@ -23,7 +23,7 @@ func RecoveryMiddleware(ctx *context.Context) {
 		if err := recover(); err != nil {
 			stack := stack(3)
 
-			logger.Access(ctx.GetTraceID(), ctx.GetUserID()).
+			logger.System(ctx.GetTraceID(), ctx.GetUserID()).
 				WithField("stack", string(stack)).
 				Errorf("[Recover]: %s", err)
 
