@@ -125,3 +125,11 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 
 	return a.MenuModel.Delete(ctx, recordID)
 }
+
+// UpdateStatus 更新状态
+func (a *Menu) UpdateStatus(ctx context.Context, recordID string, status int) error {
+	info := map[string]interface{}{
+		"status": status,
+	}
+	return a.MenuModel.Update(ctx, recordID, info)
+}
