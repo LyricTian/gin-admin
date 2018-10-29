@@ -183,13 +183,17 @@ func Middleware(prefixes ...string) gin.HandlerFunc {
 		fields["status"] = c.Writer.Status()
 		fields["length"] = c.Writer.Size()
 
+		memo := c.Request.URL.Path
+		if v := c.GetString(util.ContextKeyURLMemo); v != "" {
+			memo = fmt.Sprintf("%s(%s)", memo, v)
+		}
+
 		logger().Access(
 			c.GetString(util.ContextKeyTraceID),
 			c.GetString(util.ContextKeyUserID),
 		).WithFields(fields).Infof(
-			"[http] %s(%s) - %s - %s",
-			c.Request.URL.Path,
-			c.GetString(util.ContextKeyURLMemo),
+			"[http] %s - %s - %s",
+			memo,
 			c.Request.Method,
 			c.ClientIP(),
 		)

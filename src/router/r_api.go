@@ -8,7 +8,17 @@ import (
 
 // APIV1Handler /api/v1路由
 func APIV1Handler(r *gin.Engine, c *api.Common) {
-	v1 := r.Group("/api/v1")
+	relativePath := "/api/v1"
+	v1 := r.Group(relativePath,
+		VerifySessionMiddleware(
+			[]string{relativePath + "/"},
+			[]string{
+				relativePath + "/login",
+				relativePath + "/logout",
+			},
+		))
+
+	// 注册路由
 	APIRoleRouter(v1, c.RoleAPI)
 	APIDemoRouter(v1, c.DemoAPI)
 	APIMenuRouter(v1, c.MenuAPI)
