@@ -7,6 +7,7 @@ import (
 
 // V interface{}类型转换
 type V interface {
+	Bytes() []byte
 	String() string
 	Int64() int64
 	Int() int
@@ -30,6 +31,10 @@ func (t *t) String() string {
 		return ""
 	}
 	return fmt.Sprint(t.v)
+}
+
+func (t *t) Bytes() []byte {
+	return []byte(t.String())
 }
 
 func (t *t) Int64() int64 {

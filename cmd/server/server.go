@@ -61,7 +61,6 @@ func main() {
 	logger.System(traceID).Infof("服务已运行在[%s]模式下，版本号:%s，进程号：%d", viper.GetString("run_mode"), VERSION, os.Getpid())
 
 	g := new(inject.Graph)
-
 	// 注入mysql存储
 	new(model.Common).Init(g, mysqlDB)
 
@@ -76,12 +75,10 @@ func main() {
 	var state int32 = 1
 	ac := make(chan error)
 	sc := make(chan os.Signal, 1)
-
 	signal.Notify(sc, syscall.SIGTERM, syscall.SIGQUIT)
 
 	// 开启HTTP监听
-	httpServer := initHTTPServer(apiCommon)
-
+	httpServer := initHTTPServer(apiCommon, mysqlDB)
 	go func() {
 		logger.System(traceID).Infof("HTTP服务启动成功，端口监听在[%s]", viper.GetString("http_addr"))
 		ac <- httpServer.ListenAndServe()
@@ -112,15 +109,20 @@ func main() {
 }
 
 // 初始化HTTP服务
-func initHTTPServer(apiCommon *api.Common) *http.Server {
+func initHTTPServer(apiCommon *api.Common, db *mysql.DB) *http.Server {
 	gin.SetMode(viper.GetString("run_mode"))
 
 	app := gin.New()
 
 	// 注册中间件
-	app.Use(router.TraceMiddleware("/api/"))
-	app.Use(logger.Middleware("/api/"))
+	apiPrefixes := []string{
+		"/api/",
+	}
+
+	app.Use(router.TraceMiddleware(apiPrefixes...))
+	app.Use(logger.Middleware(apiPrefixes...))
 	app.Use(context.WrapContext(router.RecoveryMiddleware))
+	app.Use(router.SessionMiddleware(db, apiPrefixes...))
 
 	app.NoMethod(context.WrapContext(func(ctx *context.Context) {
 		ctx.ResError(fmt.Errorf("方法不允许"), 405)
