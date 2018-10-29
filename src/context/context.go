@@ -22,6 +22,11 @@ func WrapContext(ctx func(*Context), memo ...string) gin.HandlerFunc {
 	}
 }
 
+// NewContext 创建上下文实例
+func NewContext(c *gin.Context) *Context {
+	return &Context{c}
+}
+
 // Context 定义上下文
 type Context struct {
 	*gin.Context
@@ -132,6 +137,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 		obj["code"] = code[0]
 	}
 	a.JSON(status, gin.H{"error": obj})
+	a.Abort()
 }
 
 // ResSuccess 响应成功

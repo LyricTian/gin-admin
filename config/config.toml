@@ -42,7 +42,7 @@ expired = 120
 # mysql数据库配置
 [mysql]
 # 启用跟踪日志
-trace = true
+trace = false
 # 连接地址(格式：127.0.0.1:3306)
 addr = "127.0.0.1:3306"
 # 用户名
