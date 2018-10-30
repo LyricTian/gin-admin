@@ -36,6 +36,7 @@ type Context struct {
 func (a *Context) NewContext() context.Context {
 	parent := context.Background()
 	parent = util.NewTraceIDContext(parent, a.GetTraceID())
+	parent = util.NewUserIDContext(parent, a.GetUserID())
 
 	return parent
 }
