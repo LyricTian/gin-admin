@@ -146,6 +146,7 @@ func (a *Context) ResSuccess(obj interface{}) {
 		obj = gin.H{}
 	}
 	a.JSON(http.StatusOK, obj)
+	a.Abort()
 }
 
 // ResPage 响应分页数据
