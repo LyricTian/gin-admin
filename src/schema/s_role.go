@@ -38,8 +38,9 @@ type RoleQueryResult struct {
 
 // RoleSelectQueryParam 角色选择查询条件
 type RoleSelectQueryParam struct {
-	Name   string // 角色名称
-	Status int    // 状态(1:启用 2:停用)
+	RecordIDs []string // 记录ID列表
+	Name      string   // 角色名称
+	Status    int      // 状态(1:启用 2:停用)
 }
 
 // RoleSelectQueryResult 角色选择查询结果

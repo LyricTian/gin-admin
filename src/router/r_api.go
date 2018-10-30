@@ -22,4 +22,5 @@ func APIV1Handler(r *gin.Engine, c *api.Common) {
 	APIRoleRouter(v1, c.RoleAPI)
 	APIDemoRouter(v1, c.DemoAPI)
 	APIMenuRouter(v1, c.MenuAPI)
+	APIUserRouter(v1, c.UserAPI)
 }

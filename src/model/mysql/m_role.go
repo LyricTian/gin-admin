@@ -99,10 +99,19 @@ func (a *Role) QuerySelect(ctx context.Context, params schema.RoleSelectQueryPar
 		args = append(args, params.Status)
 	}
 
+	if len(params.RecordIDs) > 0 {
+		where = fmt.Sprintf("%s AND record_id IN(?)", where)
+		args = append(args, params.RecordIDs)
+	}
+
 	query := fmt.Sprintf("SELECT record_id,name FROM %s %s", a.TableName(), where)
+	query, args, err := a.DB.In(query, args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "查询选择数据发生错误")
+	}
 
 	var items []*schema.RoleSelectQueryResult
-	_, err := a.DB.Select(&items, query, args...)
+	_, err = a.DB.Select(&items, query, args...)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询选择数据发生错误")
 	}
