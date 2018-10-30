@@ -78,6 +78,6 @@ func VerifySessionMiddleware(allowPrefixes, skipPrefixes []string) gin.HandlerFu
 			return
 		}
 		c.Set(util.SessionKeyUserID, userID)
-		ctx.Next()
+		c.Next()
 	}
 }

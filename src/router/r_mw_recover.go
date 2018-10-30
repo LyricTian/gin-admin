@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"runtime"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -18,7 +20,8 @@ var (
 )
 
 // RecoveryMiddleware 崩溃恢复
-func RecoveryMiddleware(ctx *context.Context) {
+func RecoveryMiddleware(c *gin.Context) {
+	ctx := context.NewContext(c)
 	defer func() {
 		if err := recover(); err != nil {
 			stack := stack(3)
@@ -27,7 +30,6 @@ func RecoveryMiddleware(ctx *context.Context) {
 				WithField("stack", string(stack)).
 				Errorf("[Recover]: %s", err)
 
-			ctx.Abort()
 			ctx.ResError(nil, http.StatusInternalServerError)
 		}
 	}()

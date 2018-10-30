@@ -121,7 +121,7 @@ func initHTTPServer(apiCommon *api.Common, db *mysql.DB) *http.Server {
 
 	app.Use(router.TraceMiddleware(apiPrefixes...))
 	app.Use(logger.Middleware(apiPrefixes...))
-	app.Use(context.WrapContext(router.RecoveryMiddleware))
+	app.Use(router.RecoveryMiddleware)
 	app.Use(router.SessionMiddleware(db, apiPrefixes...))
 
 	app.NoMethod(context.WrapContext(func(ctx *context.Context) {
