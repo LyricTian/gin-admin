@@ -2,6 +2,7 @@ package logger
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"gin-admin/src/util"
 	"io/ioutil"
@@ -61,9 +62,19 @@ func Default() *Logger {
 	return logger()
 }
 
+// SystemWithContext 系统日志
+func SystemWithContext(ctx context.Context) *logrus.Entry {
+	return System(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
+}
+
 // System 系统日志
 func System(traceID string, userID ...string) *logrus.Entry {
 	return logger().System(traceID, userID...)
+}
+
+// AccessWithContext 访问日志
+func AccessWithContext(ctx context.Context) *logrus.Entry {
+	return Access(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
 }
 
 // Access 访问日志
@@ -71,9 +82,19 @@ func Access(traceID string, userID ...string) *logrus.Entry {
 	return logger().Access(traceID, userID...)
 }
 
+// OperateWithContext 操作日志
+func OperateWithContext(ctx context.Context) *logrus.Entry {
+	return Operate(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
+}
+
 // Operate 操作日志
 func Operate(traceID string, userID ...string) *logrus.Entry {
 	return logger().Operate(traceID, userID...)
+}
+
+// LoginWithContext 登录(登出)日志
+func LoginWithContext(ctx context.Context) *logrus.Entry {
+	return Login(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
 }
 
 // Login 登录(登出)日志
