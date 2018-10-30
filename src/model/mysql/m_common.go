@@ -11,6 +11,7 @@ import (
 
 // Common mysql存储模块
 type Common struct {
+	User *User
 	Role *Role
 	Demo *Demo
 	Menu *Menu
@@ -18,6 +19,7 @@ type Common struct {
 
 // Init 初始化
 func (a *Common) Init(g *inject.Graph, db *mysql.DB) *Common {
+	a.User = new(User).Init(g, db, a)
 	a.Role = new(Role).Init(g, db, a)
 	a.Demo = new(Demo).Init(g, db, a)
 	a.Menu = new(Menu).Init(g, db, a)
