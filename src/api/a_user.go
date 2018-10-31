@@ -50,6 +50,10 @@ func (a *User) Get(ctx *context.Context) {
 		ctx.ResInternalServerError(err)
 		return
 	}
+
+	// 清空密码
+	item.Password = ""
+
 	ctx.ResSuccess(item)
 }
 

@@ -24,7 +24,7 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, page
 	}
 
 	for i, item := range items {
-		user, err := a.UserModel.Get(ctx, item.RecordID)
+		user, err := a.UserModel.Get(ctx, item.RecordID, true)
 		if err == nil && user != nil {
 			roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
 			if err == nil {
@@ -42,7 +42,7 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, page
 
 // Get 查询指定数据
 func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
-	return a.UserModel.Get(ctx, recordID)
+	return a.UserModel.Get(ctx, recordID, true)
 }
 
 // Create 创建数据
@@ -64,7 +64,7 @@ func (a *User) Create(ctx context.Context, item *schema.User) error {
 
 // Update 更新数据
 func (a *User) Update(ctx context.Context, recordID string, item *schema.User) error {
-	oldItem, err := a.UserModel.Get(ctx, recordID)
+	oldItem, err := a.UserModel.Get(ctx, recordID, false)
 	if err != nil {
 		return err
 	} else if oldItem == nil {

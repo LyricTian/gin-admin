@@ -10,9 +10,11 @@ type IUser interface {
 	// 查询分页数据
 	QueryPage(ctx context.Context, params schema.UserQueryParam, pageIndex, pageSize uint) (int64, []*schema.UserQueryResult, error)
 	// 查询指定数据
-	Get(ctx context.Context, recordID string) (*schema.User, error)
+	Get(ctx context.Context, recordID string, includeRoleIDs bool) (*schema.User, error)
 	// 检查用户名
 	CheckUserName(ctx context.Context, userName string) (bool, error)
+	// 根据用户名查询指定数据
+	GetByUserName(ctx context.Context, userName string, includeRoleIDs bool) (*schema.User, error)
 	// 创建数据
 	Create(ctx context.Context, item *schema.User) error
 	// 更新数据
