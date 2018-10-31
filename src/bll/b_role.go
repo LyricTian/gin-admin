@@ -40,7 +40,7 @@ func (a *Role) Create(ctx context.Context, item *schema.Role) error {
 	}
 
 	item.ID = 0
-	item.RecordID = util.UUIDString()
+	item.RecordID = util.NewUUID()
 	item.Created = time.Now().Unix()
 	item.Deleted = 0
 	return a.RoleModel.Create(ctx, item)
