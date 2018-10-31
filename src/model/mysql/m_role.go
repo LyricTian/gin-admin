@@ -119,7 +119,7 @@ func (a *Role) QuerySelect(ctx context.Context, params schema.RoleSelectQueryPar
 }
 
 // Get 查询指定数据
-func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
+func (a *Role) Get(ctx context.Context, recordID string, includeMenuIDs bool) (*schema.Role, error) {
 	var item schema.Role
 	fields := "id,record_id,name,memo,status,creator,created,deleted"
 
@@ -128,11 +128,13 @@ func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
 		return nil, errors.Wrap(err, "查询指定数据发生错误")
 	}
 
-	menuIDs, err := a.QueryMenuIDs(ctx, recordID)
-	if err != nil {
-		return nil, err
+	if includeMenuIDs {
+		menuIDs, err := a.QueryMenuIDs(ctx, recordID)
+		if err != nil {
+			return nil, err
+		}
+		item.MenuIDs = menuIDs
 	}
-	item.MenuIDs = menuIDs
 
 	return &item, nil
 }

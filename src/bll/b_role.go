@@ -27,7 +27,7 @@ func (a *Role) QuerySelect(ctx context.Context, params schema.RoleSelectQueryPar
 
 // Get 查询指定数据
 func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
-	return a.RoleModel.Get(ctx, recordID)
+	return a.RoleModel.Get(ctx, recordID, true)
 }
 
 // Create 创建数据
@@ -48,7 +48,7 @@ func (a *Role) Create(ctx context.Context, item *schema.Role) error {
 
 // Update 更新数据
 func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) error {
-	oldItem, err := a.RoleModel.Get(ctx, recordID)
+	oldItem, err := a.RoleModel.Get(ctx, recordID, false)
 	if err != nil {
 		return err
 	} else if oldItem == nil {

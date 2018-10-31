@@ -94,20 +94,22 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, page
 }
 
 // Get 查询指定数据
-func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
+func (a *User) Get(ctx context.Context, recordID string, includeRoleIDs bool) (*schema.User, error) {
 	var item schema.User
-	fields := "id,record_id,user_name,real_name,status,creator,created,deleted"
+	fields := "id,record_id,user_name,real_name,password,status,creator,created,deleted"
 
 	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND record_id=?", fields, a.TableName()), recordID)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询指定数据发生错误")
 	}
 
-	roleIDs, err := a.QueryRoleIDs(ctx, recordID)
-	if err != nil {
-		return nil, err
+	if includeRoleIDs {
+		roleIDs, err := a.QueryRoleIDs(ctx, item.RecordID)
+		if err != nil {
+			return nil, err
+		}
+		item.RoleIDs = roleIDs
 	}
-	item.RoleIDs = roleIDs
 
 	return &item, nil
 }
@@ -138,6 +140,27 @@ func (a *User) CheckUserName(ctx context.Context, userName string) (bool, error)
 		return false, errors.Wrap(err, "检查用户名发生错误")
 	}
 	return n > 0, nil
+}
+
+// GetByUserName 根据用户名查询指定数据
+func (a *User) GetByUserName(ctx context.Context, userName string, includeRoleIDs bool) (*schema.User, error) {
+	var item schema.User
+	fields := "id,record_id,user_name,real_name,password,status,creator,created,deleted"
+
+	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND user_name=?", fields, a.TableName()), userName)
+	if err != nil {
+		return nil, errors.Wrap(err, "根据用户名查询指定数据发生错误")
+	}
+
+	if includeRoleIDs {
+		roleIDs, err := a.QueryRoleIDs(ctx, item.RecordID)
+		if err != nil {
+			return nil, err
+		}
+		item.RoleIDs = roleIDs
+	}
+
+	return &item, nil
 }
 
 // Create 创建数据
