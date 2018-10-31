@@ -26,7 +26,7 @@ func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 // Create 创建数据
 func (a *Demo) Create(ctx context.Context, item *schema.Demo) error {
 	item.ID = 0
-	item.RecordID = util.UUIDString()
+	item.RecordID = util.NewUUID()
 	item.Created = time.Now().Unix()
 	item.Deleted = 0
 	return a.DemoModel.Create(ctx, item)
