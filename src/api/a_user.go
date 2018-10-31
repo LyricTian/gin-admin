@@ -51,9 +51,6 @@ func (a *User) Get(ctx *context.Context) {
 		return
 	}
 
-	// 清空密码
-	item.Password = ""
-
 	ctx.ResSuccess(item)
 }
 

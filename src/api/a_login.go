@@ -24,22 +24,69 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
-	user, err := a.LoginBll.Verify(ctx.NewContext(), item.UserName, item.Password)
+	nctx := ctx.NewContext()
+	userInfo, err := a.LoginBll.Verify(nctx, item.UserName, item.Password)
 	if err != nil {
-		logger.LoginWithContext(ctx.NewContext()).Errorf("登录发生错误：%s", err.Error())
+		logger.LoginWithContext(nctx).Errorf("登录发生错误：%s", err.Error())
+
+		status := "error"
+		if err == bll.ErrInvalidPassword ||
+			err == bll.ErrInvalidUserName ||
+			err == bll.ErrUserDisable {
+			status = "fail"
+		}
+
+		ctx.ResSuccess(gin.H{"status": status})
+		return
+	}
+
+	// 更新会话
+	store, err := ginsession.Refresh(ctx.Context)
+	if err != nil {
+		logger.LoginWithContext(nctx).Errorf("登录发生错误：%s", err.Error())
 		ctx.ResSuccess(gin.H{"status": "error"})
 		return
 	}
 
-	// 保存会话
-	store := ginsession.FromContext(ctx.Context)
-	store.Set(util.SessionKeyUserID, user.RecordID)
+	store.Set(util.SessionKeyUserID, userInfo.RecordID)
 	err = store.Save()
 	if err != nil {
-		logger.LoginWithContext(ctx.NewContext()).Errorf("登录发生错误：%s", err.Error())
+		logger.LoginWithContext(nctx).Errorf("登录发生错误：%s", err.Error())
 		ctx.ResSuccess(gin.H{"status": "error"})
 		return
 	}
+	logger.LoginWithContext(nctx).Infof("登入系统")
 
 	ctx.ResSuccess(gin.H{"status": "success"})
+}
+
+// Logout 用户登出
+func (a *Login) Logout(ctx *context.Context) {
+	nctx := ctx.NewContext()
+
+	userID := ctx.GetUserID()
+	if userID != "" {
+		store := ginsession.FromContext(ctx.Context)
+		err := store.Flush()
+		if err != nil {
+			logger.LoginWithContext(nctx).Errorf("登出发生错误：%s", err.Error())
+			ctx.ResInternalServerError(err)
+			return
+		}
+		logger.LoginWithContext(nctx).Infof("登出系统")
+	}
+
+	ctx.ResOK()
+}
+
+// GetCurrentUserInfo 获取当前用户信息
+func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
+	userID := ctx.GetUserID()
+
+	info, err := a.LoginBll.GetCurrentUserInfo(ctx.NewContext(), userID)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+	ctx.ResSuccess(info)
 }
