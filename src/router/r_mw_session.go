@@ -63,17 +63,18 @@ func VerifySessionMiddleware(allowPrefixes, skipPrefixes []string) gin.HandlerFu
 			return
 		}
 
-		for _, prefix := range skipPrefixes {
-			if strings.HasPrefix(c.Request.URL.Path, prefix) {
-				c.Next()
-				return
-			}
-		}
-
 		ctx := context.NewContext(c)
 		store := ginsession.FromContext(c)
 		userID, ok := store.Get(util.SessionKeyUserID)
 		if !ok || userID == nil {
+
+			for _, prefix := range skipPrefixes {
+				if strings.HasPrefix(c.Request.URL.Path, prefix) {
+					c.Next()
+					return
+				}
+			}
+
 			ctx.ResError(fmt.Errorf("用户未登录"), http.StatusUnauthorized, 9999)
 			return
 		}

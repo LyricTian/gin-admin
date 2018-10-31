@@ -25,7 +25,7 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, page
 
 	for i, item := range items {
 		user, err := a.UserModel.Get(ctx, item.RecordID, true)
-		if err == nil && user != nil {
+		if err == nil && user != nil && len(user.RoleIDs) > 0 {
 			roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
 			if err == nil {
 				roleNames := make([]string, len(roleItems))
@@ -42,7 +42,13 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, page
 
 // Get 查询指定数据
 func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
-	return a.UserModel.Get(ctx, recordID, true)
+	item, err := a.UserModel.Get(ctx, recordID, true)
+	if err != nil {
+		return nil, err
+	} else if item != nil && item.Password != "" {
+		item.Password = ""
+	}
+	return item, nil
 }
 
 // Create 创建数据
