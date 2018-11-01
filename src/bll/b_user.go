@@ -62,7 +62,7 @@ func (a *User) Create(ctx context.Context, item *schema.User) error {
 
 	item.Password = util.SHA1HashString(item.Password)
 	item.ID = 0
-	item.RecordID = util.NewUUID()
+	item.RecordID = util.MustUUID()
 	item.Created = time.Now().Unix()
 	item.Deleted = 0
 	return a.UserModel.Create(ctx, item)

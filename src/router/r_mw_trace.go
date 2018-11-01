@@ -25,7 +25,7 @@ func TraceMiddleware(prefixes ...string) gin.HandlerFunc {
 
 		traceID := c.Query("X-Request-Id")
 		if traceID == "" {
-			traceID = util.NewUUID()
+			traceID = util.MustUUID()
 		}
 		c.Set(util.ContextKeyTraceID, traceID)
 		c.Next()
