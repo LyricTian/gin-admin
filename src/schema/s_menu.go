@@ -43,12 +43,17 @@ type MenuQueryResult struct {
 type MenuSelectQueryParam struct {
 	Name   string // 菜单名称
 	Status int    // 状态(1:启用 2:停用)
+	UserID string // 用户ID
 }
 
 // MenuSelectQueryResult 菜单选择查询结果
 type MenuSelectQueryResult struct {
-	RecordID  string `json:"record_id" db:"record_id"`   // 记录内码(uuid)
-	Name      string `json:"name" db:"name"`             // 菜单名称
-	LevelCode string `json:"level_code" db:"level_code"` // 分级码
-	ParentID  string `json:"parent_id" db:"parent_id"`   // 父级内码
+	RecordID  string `json:"record_id" db:"record_id" structs:"record_id"`    // 记录内码(uuid)
+	Code      string `json:"code" db:"code,size:50" structs:"code"`           // 菜单编号
+	Name      string `json:"name" db:"name" structs:"name"`                   // 菜单名称
+	LevelCode string `json:"level_code" db:"level_code" structs:"level_code"` // 分级码
+	ParentID  string `json:"parent_id" db:"parent_id" structs:"parent_id"`    // 父级内码
+	Type      int    `json:"type" db:"type" structs:"type"`                   // 菜单类型(10：系统 20：模块 30：功能 40：动作)
+	Icon      string `json:"icon" db:"icon,size:200" structs:"icon"`          // 菜单图标
+	URI       string `json:"uri" db:"uri,size:200" structs:"uri"`             // 跳转链接
 }
