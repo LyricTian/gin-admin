@@ -4,17 +4,29 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"io"
 	"reflect"
 	"strings"
 
 	"github.com/fatih/structs"
 )
 
-// NewUUID create a UUID, reference: https://github.com/google/uuid
-func NewUUID() string {
+// MustUUID 创建一个UUID，如果有错误，则抛出panic
+func MustUUID() string {
+	uuid, err := NewUUID()
+	if err != nil {
+		panic("创建UUID发生错误: " + err.Error())
+	}
+	return uuid
+}
+
+// NewUUID 创建UUID，参考：https://github.com/google/uuid
+func NewUUID() (string, error) {
 	var buf [16]byte
-	io.ReadFull(rand.Reader, buf[:])
+	_, err := rand.Read(buf[:])
+	if err != nil {
+		return "", err
+	}
+
 	buf[6] = (buf[6] & 0x0f) | 0x40
 	buf[8] = (buf[8] & 0x3f) | 0x80
 
@@ -29,7 +41,7 @@ func NewUUID() string {
 	dst[23] = '-'
 	hex.Encode(dst[24:], buf[10:])
 
-	return string(dst)
+	return string(dst), nil
 }
 
 // StructToMap 将结构体转换为字典

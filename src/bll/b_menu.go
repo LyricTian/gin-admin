@@ -64,7 +64,7 @@ func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
 
 	item.LevelCode = levelCode
 	item.ID = 0
-	item.RecordID = util.NewUUID()
+	item.RecordID = util.MustUUID()
 	item.Created = time.Now().Unix()
 	item.Deleted = 0
 	return a.MenuModel.Create(ctx, item)
