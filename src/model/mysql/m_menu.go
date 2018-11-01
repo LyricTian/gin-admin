@@ -97,9 +97,17 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 		where = fmt.Sprintf("%s AND status=?", where)
 		args = append(args, v)
 	}
+	if v := params.UserID; v != "" {
+		where = fmt.Sprintf("%s AND record_id IN(SELECT menu_id FROM %s WHERE deleted=0 AND role_id IN(SELECT role_id FROM %s WHERE deleted=0 AND user_id=?))",
+			where,
+			a.Common.Role.RoleMenuTableName(),
+			a.Common.User.UserRoleTableName(),
+		)
+		args = append(args, v)
+	}
 
 	var items []*schema.MenuSelectQueryResult
-	fields := "record_id,name,level_code,parent_id"
+	fields := "record_id,code,name,level_code,parent_id,type,icon,uri"
 	_, err := a.DB.Select(&items, fmt.Sprintf("SELECT %s FROM %s %s ORDER BY sequence,id", fields, a.TableName(), where), args...)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询选择数据发生错误")

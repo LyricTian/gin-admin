@@ -70,3 +70,49 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (map[stri
 
 	return info, nil
 }
+
+// QueryCurrentUserMenus 查询当前用户菜单
+func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map[string]interface{}, error) {
+	items, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{UserID: userID, Status: 1})
+	if err != nil {
+		return nil, err
+	}
+
+	treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
+	if treeData != nil {
+		a.convertMenuActionTree(&treeData)
+	}
+
+	return treeData, nil
+}
+
+// 遍历菜单树，将功能的下级菜单转换为动作数组
+func (a *Login) convertMenuActionTree(child *[]map[string]interface{}) {
+	for _, c := range *child {
+		if util.T(c["type"]).Int() == 30 {
+			children, ok := c["children"]
+			if ok {
+				delete(c, "children")
+				childActions := *children.(*[]map[string]interface{})
+				actions := make([]map[string]interface{}, len(childActions))
+
+				for i, c := range childActions {
+					actions[i] = map[string]interface{}{
+						"record_id": c["record_id"],
+						"code":      c["code"],
+						"name":      c["name"],
+						"icon":      c["icon"],
+						"uri":       c["uri"],
+					}
+				}
+
+				c["actions"] = actions
+			}
+			continue
+		}
+
+		if children, ok := c["children"]; ok {
+			a.convertMenuActionTree(children.(*[]map[string]interface{}))
+		}
+	}
+}

@@ -90,3 +90,15 @@ func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
 	}
 	ctx.ResSuccess(info)
 }
+
+// QueryCurrentUserMenus 查询当前用户菜单
+func (a *Login) QueryCurrentUserMenus(ctx *context.Context) {
+	userID := ctx.GetUserID()
+
+	menus, err := a.LoginBll.QueryCurrentUserMenus(ctx.NewContext(), userID)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+	ctx.ResList(menus)
+}
