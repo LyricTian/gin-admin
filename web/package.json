@@ -1,0 +1,111 @@
+{
+  "name": "gin-admin",
+  "version": "0.1.0",
+  "description": "RBAC管理系统",
+  "private": true,
+  "scripts": {
+    "start": "umi dev",
+    "start:no-mock": "cross-env MOCK=none umi dev",
+    "build": "umi build",
+    "analyze": "cross-env ANALYZE=1 umi build",
+    "lint:style": "stylelint \"src/**/*.less\" --syntax less",
+    "lint": "eslint --ext .js src mock tests && npm run lint:style",
+    "lint:fix": "eslint --fix --ext .js src mock tests && npm run lint:style",
+    "lint-staged": "lint-staged",
+    "lint-staged:js": "eslint --ext .js",
+    "tslint": "npm run tslint:fix",
+    "tslint:fix": "tslint --fix 'src/**/*.ts*'",
+    "test": "umi test",
+    "test:component": "umi test ./src/components",
+    "test:all": "node ./tests/run-tests.js",
+    "prettier": "prettier --write './src/**/*'"
+  },
+  "dependencies": {
+    "@antv/data-set": "^0.9.6",
+    "@babel/runtime": "^7.1.2",
+    "antd": "^3.10.0",
+    "bizcharts": "^3.2.2",
+    "bizcharts-plugin-slider": "^2.0.3",
+    "classnames": "^2.2.6",
+    "dva": "^2.4.0",
+    "enquire-js": "^0.2.1",
+    "hash.js": "^1.1.5",
+    "lodash": "^4.17.10",
+    "lodash-decorators": "^6.0.0",
+    "memoize-one": "^4.0.0",
+    "moment": "^2.22.2",
+    "numeral": "^2.0.6",
+    "nzh": "^1.0.3",
+    "omit.js": "^1.0.0",
+    "path-to-regexp": "^2.4.0",
+    "prop-types": "^15.5.10",
+    "qs": "^6.5.2",
+    "rc-animate": "^2.4.4",
+    "react": "^16.5.1",
+    "react-container-query": "^0.11.0",
+    "react-copy-to-clipboard": "^5.0.1",
+    "react-document-title": "^2.0.3",
+    "react-dom": "^16.5.1",
+    "react-fittext": "^1.0.0",
+    "react-router-dom": "^4.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.4.16",
+    "@types/react-dom": "^16.0.9",
+    "antd-pro-merge-less": "^0.0.9",
+    "antd-theme-webpack-plugin": "^1.1.8",
+    "babel-eslint": "^10.0.1",
+    "cross-env": "^5.1.1",
+    "cross-port-killer": "^1.0.1",
+    "enzyme": "^3.7.0",
+    "eslint": "^5.4.0",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-plugin-babel": "^5.1.0",
+    "eslint-plugin-compat": "^2.6.2",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-markdown": "^1.0.0-beta.6",
+    "eslint-plugin-react": "^7.11.1",
+    "tslint": "^5.10.0",
+    "tslint-config-prettier": "^1.10.0",
+    "tslint-react": "^3.6.0",
+    "gh-pages": "^2.0.1",
+    "husky": "^1.1.2",
+    "lint-staged": "^7.2.0",
+    "merge-umi-mock-data": "^0.0.3",
+    "mockjs": "^1.0.1-beta3",
+    "prettier": "1.14.3",
+    "pro-download": "^1.0.1",
+    "stylelint": "^9.4.0",
+    "stylelint-config-prettier": "^4.0.0",
+    "stylelint-config-standard": "^18.0.0",
+    "umi": "^2.2.1",
+    "umi-plugin-ga": "^1.1.3",
+    "umi-plugin-react": "^1.2.0"
+  },
+  "optionalDependencies": {
+    "puppeteer": "^1.10.0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,less}": [
+      "prettier --write",
+      "git add"
+    ],
+    "**/*.{js,jsx}": "npm run lint-staged:js",
+    "**/*.less": "stylelint --syntax less"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 10"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-staged"
+    }
+  }
+}
