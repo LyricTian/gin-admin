@@ -97,6 +97,16 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 		where = fmt.Sprintf("%s AND status=?", where)
 		args = append(args, v)
 	}
+	if v := params.SystemCode; v != "" {
+		menu, err := a.GetByCodeAndType(ctx, v, 10)
+		if err != nil {
+			return nil, err
+		} else if menu != nil {
+			where = fmt.Sprintf("%s AND level_code!=? AND level_code LIKE ?", where)
+			args = append(args, menu.LevelCode, menu.LevelCode+"%")
+		}
+	}
+
 	if v := params.UserID; v != "" {
 		where = fmt.Sprintf("%s AND record_id IN(SELECT menu_id FROM %s WHERE deleted=0 AND role_id IN(SELECT role_id FROM %s WHERE deleted=0 AND user_id=?))",
 			where,
@@ -114,6 +124,18 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 	}
 
 	return items, nil
+}
+
+// GetByCodeAndType 根据编号和类型查询指定数据
+func (a *Menu) GetByCodeAndType(ctx context.Context, code string, typ int) (*schema.Menu, error) {
+	var item schema.Menu
+	fields := "id,record_id,code,name,type,sequence,icon,uri,level_code,parent_id,status,creator,created,deleted"
+
+	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND code=? AND type=?", fields, a.TableName()), code, typ)
+	if err != nil {
+		return nil, errors.Wrap(err, "根据编号和类型查询指定数据发生错误")
+	}
+	return &item, nil
 }
 
 // Get 查询指定数据

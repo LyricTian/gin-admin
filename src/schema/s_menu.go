@@ -41,9 +41,10 @@ type MenuQueryResult struct {
 
 // MenuSelectQueryParam 菜单选择查询条件
 type MenuSelectQueryParam struct {
-	Name   string // 菜单名称
-	Status int    // 状态(1:启用 2:停用)
-	UserID string // 用户ID
+	Name       string // 菜单名称
+	Status     int    // 状态(1:启用 2:停用)
+	UserID     string // 用户ID
+	SystemCode string // 系统编号
 }
 
 // MenuSelectQueryResult 菜单选择查询结果

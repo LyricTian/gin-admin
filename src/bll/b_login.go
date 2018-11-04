@@ -7,6 +7,7 @@ import (
 	"gin-admin/src/util"
 
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 // 定义错误
@@ -73,7 +74,11 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (map[stri
 
 // QueryCurrentUserMenus 查询当前用户菜单
 func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map[string]interface{}, error) {
-	items, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{UserID: userID, Status: 1})
+	items, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
+		UserID:     userID,
+		Status:     1,
+		SystemCode: viper.GetString("system_code"),
+	})
 	if err != nil {
 		return nil, err
 	}
