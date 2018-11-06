@@ -75,9 +75,9 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (map[stri
 // QueryCurrentUserMenus 查询当前用户菜单
 func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map[string]interface{}, error) {
 	items, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
-		UserID:     userID,
-		Status:     1,
-		SystemCode: viper.GetString("system_code"),
+		UserID:   userID,
+		Status:   1,
+		RootPath: viper.GetString("system_path"),
 	})
 	if err != nil {
 		return nil, err
