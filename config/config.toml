@@ -4,8 +4,8 @@ run_mode = "debug"
 # HTTP监听地址(格式：0.0.0.0:8086)
 http_addr = ":8086"
 
-# 系统编号
-system_code = "admin"
+# 系统路径
+system_path = "/admin"
 
 # 日志配置
 [log]
