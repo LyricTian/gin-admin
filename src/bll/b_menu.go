@@ -40,11 +40,11 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 
 // Create 创建数据
 func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
-	exists, err := a.MenuModel.CheckPath(ctx, item.Path, item.ParentID)
+	exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
 	if err != nil {
 		return err
 	} else if exists {
-		return errors.New("链接路径已经存在")
+		return errors.New("编号已经存在")
 	}
 
 	a.lock.Lock()
@@ -76,11 +76,11 @@ func (a *Menu) Update(ctx context.Context, recordID string, item *schema.Menu) e
 	} else if oldItem == nil {
 		return errors.New("无效的参数")
 	} else if item.Path != oldItem.Path {
-		exists, err := a.MenuModel.CheckPath(ctx, item.Path, item.ParentID)
+		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
 		if err != nil {
 			return err
 		} else if exists {
-			return errors.New("链接路径已经存在")
+			return errors.New("编号已经存在")
 		}
 	}
 

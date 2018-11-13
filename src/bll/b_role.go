@@ -5,6 +5,7 @@ import (
 	"gin-admin/src/model"
 	"gin-admin/src/schema"
 	"gin-admin/src/util"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,6 +14,7 @@ import (
 // Role 角色管理
 type Role struct {
 	RoleModel model.IRole `inject:"IRole"`
+	MenuModel model.IMenu `inject:"IMenu"`
 }
 
 // QueryPage 查询分页数据
@@ -27,7 +29,40 @@ func (a *Role) QuerySelect(ctx context.Context, params schema.RoleSelectQueryPar
 
 // Get 查询指定数据
 func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
-	return a.RoleModel.Get(ctx, recordID, true)
+	item, err := a.RoleModel.Get(ctx, recordID, true)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(item.MenuIDs) == 0 {
+		return item, nil
+	}
+
+	// 筛选叶子节点
+	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
+		RecordIDs: item.MenuIDs,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var menuIDs []string
+	for _, m := range menus {
+		var exists bool
+		for _, m2 := range menus {
+			if strings.HasPrefix(m2.LevelCode, m.LevelCode) &&
+				m2.LevelCode != m.LevelCode {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			menuIDs = append(menuIDs, m.RecordID)
+		}
+	}
+	item.MenuIDs = menuIDs
+
+	return item, nil
 }
 
 // Create 创建数据

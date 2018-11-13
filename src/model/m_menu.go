@@ -11,10 +11,10 @@ type IMenu interface {
 	QueryPage(ctx context.Context, params schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error)
 	// 查询选择数据
 	QuerySelect(ctx context.Context, params schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error)
-	// 查询指定数据
+	// Get 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Menu, error)
-	// 检查链接路径是否存在
-	CheckPath(ctx context.Context, path string, parentID string) (bool, error)
+	// 检查编号是否存在
+	CheckCode(ctx context.Context, code string, parentID string) (bool, error)
 	// 根据父级查询分级码
 	QueryLevelCodesByParentID(parentID string) ([]string, error)
 	// 检查子级是否存在

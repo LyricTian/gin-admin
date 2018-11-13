@@ -5,7 +5,7 @@ run_mode = "debug"
 http_addr = ":8086"
 
 # 系统路径
-system_path = "/admin"
+system_code = "admin"
 
 # 日志配置
 [log]
