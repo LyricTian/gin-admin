@@ -16,7 +16,7 @@ import (
 )
 
 // SessionMiddleware session中间件
-func SessionMiddleware(db *mysql.DB, prefixes ...string) gin.HandlerFunc {
+func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 	sessionConfig := viper.GetStringMap("session")
 
 	var opts []session.Option
@@ -35,7 +35,7 @@ func SessionMiddleware(db *mysql.DB, prefixes ...string) gin.HandlerFunc {
 
 	ginConfig := ginsession.DefaultConfig
 	ginConfig.Skipper = func(c *gin.Context) bool {
-		return sessionSkipper(c, prefixes...)
+		return sessionSkipper(c, allowPrefixes...)
 	}
 
 	return ginsession.NewWithConfig(ginConfig, opts...)
