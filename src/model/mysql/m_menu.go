@@ -27,7 +27,9 @@ func (a *Menu) Init(g *inject.Graph, db *mysql.DB, c *Common) *Menu {
 
 	db.CreateTableIfNotExists(schema.Menu{}, a.TableName())
 	db.CreateTableIndex(a.TableName(), "idx_record_id", true, "record_id")
+	db.CreateTableIndex(a.TableName(), "idx_code", false, "code")
 	db.CreateTableIndex(a.TableName(), "idx_name", false, "name")
+	db.CreateTableIndex(a.TableName(), "idx_type", false, "type")
 	db.CreateTableIndex(a.TableName(), "idx_parent_id", false, "parent_id")
 	db.CreateTableIndex(a.TableName(), "idx_status", false, "status")
 	db.CreateTableIndex(a.TableName(), "idx_deleted", false, "deleted")
@@ -59,6 +61,10 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, page
 		where = fmt.Sprintf("%s AND status=?", where)
 		args = append(args, v)
 	}
+	if v := params.Type; v > 0 {
+		where = fmt.Sprintf("%s AND type=?", where)
+		args = append(args, v)
+	}
 
 	count, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s %s", a.TableName(), where), args...)
 	if err != nil {
@@ -68,7 +74,7 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, page
 	}
 
 	var items []*schema.MenuQueryResult
-	fields := "id,record_id,code,name,icon,uri,type,sequence,status"
+	fields := "id,record_id,code,name,icon,path,type,sequence,status"
 	_, err = a.DB.Select(&items, fmt.Sprintf("SELECT %s FROM %s %s ORDER BY type,sequence,id LIMIT %d,%d", fields, a.TableName(), where, (pageIndex-1)*pageSize, pageSize), args...)
 	if err != nil {
 		return 0, nil, errors.Wrap(err, "查询分页数据发生错误")
@@ -92,8 +98,8 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 		where = fmt.Sprintf("%s AND status=?", where)
 		args = append(args, v)
 	}
-	if v := params.RootPath; v != "" {
-		menu, err := a.GetByRootPath(ctx, v)
+	if v := params.SystemCode; v != "" {
+		menu, err := a.GetByCodeAndType(ctx, v, 10)
 		if err != nil {
 			return nil, err
 		} else if menu != nil {
@@ -111,9 +117,20 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 		args = append(args, v)
 	}
 
+	if v := params.RecordIDs; len(v) > 0 {
+		where = fmt.Sprintf("%s AND record_id IN(?)", where)
+		args = append(args, v)
+	}
+
 	var items []*schema.MenuSelectQueryResult
-	fields := "record_id,code,name,level_code,parent_id,type,icon,uri"
-	_, err := a.DB.Select(&items, fmt.Sprintf("SELECT %s FROM %s %s ORDER BY sequence,id", fields, a.TableName(), where), args...)
+
+	fields := "record_id,code,name,level_code,parent_id,type,icon,path"
+	query, args, err := a.DB.In(fmt.Sprintf("SELECT %s FROM %s %s ORDER BY sequence,id", fields, a.TableName(), where), args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "查询选择数据发生错误")
+	}
+
+	_, err = a.DB.Select(&items, query, args...)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询选择数据发生错误")
 	}
@@ -122,18 +139,18 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 }
 
 func (a *Menu) getAllFields() string {
-	fields := "id,record_id,name,sequence,icon,path,level_code,parent_id,status,creator,created,deleted"
+	fields := "id,record_id,code,name,sequence,icon,path,level_code,parent_id,status,creator,created,deleted"
 	return fields
 }
 
-// GetByRootPath 根据根路径查询指定数据
-func (a *Menu) GetByRootPath(ctx context.Context, rootPath string) (*schema.Menu, error) {
+// GetByCodeAndType 根据编号和类型查询指定数据
+func (a *Menu) GetByCodeAndType(ctx context.Context, code string, typ int) (*schema.Menu, error) {
 	var item schema.Menu
-	fields := a.getAllFields()
 
-	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND parent_id='' AND path=?", fields, a.TableName()), rootPath)
+	fields := a.getAllFields()
+	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND code=? AND type=?", fields, a.TableName()), code, typ)
 	if err != nil {
-		return nil, errors.Wrap(err, "根据根路径查询指定数据发生错误")
+		return nil, errors.Wrap(err, "根据编号和类型查询指定数据发生错误")
 	}
 	return &item, nil
 }
@@ -141,8 +158,8 @@ func (a *Menu) GetByRootPath(ctx context.Context, rootPath string) (*schema.Menu
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	var item schema.Menu
-	fields := a.getAllFields()
 
+	fields := a.getAllFields()
 	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND record_id=?", fields, a.TableName()), recordID)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询指定数据发生错误")
@@ -150,13 +167,13 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	return &item, nil
 }
 
-// CheckPath 检查链接路径是否存在
-func (a *Menu) CheckPath(ctx context.Context, path string, parentID string) (bool, error) {
-	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND path=? AND parent_id=?", a.TableName())
+// CheckCode 检查编号是否存在
+func (a *Menu) CheckCode(ctx context.Context, code string, parentID string) (bool, error) {
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND code=? AND parent_id=?", a.TableName())
 
-	n, err := a.DB.SelectInt(query, path, parentID)
+	n, err := a.DB.SelectInt(query, code, parentID)
 	if err != nil {
-		return false, errors.Wrap(err, "检查链接路径是否存在发生错误")
+		return false, errors.Wrap(err, "检查编号是否存在发生错误")
 	}
 	return n > 0, nil
 }
