@@ -162,10 +162,10 @@ func (a *Logger) Login(traceID string, userID string) *logrus.Entry {
 }
 
 // Middleware GIN的日志中间件
-func Middleware(prefixes ...string) gin.HandlerFunc {
+func Middleware(allowPrefixes ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		allow := false
-		for _, p := range prefixes {
+		for _, p := range allowPrefixes {
 			if strings.HasPrefix(c.Request.URL.Path, p) {
 				allow = true
 				break

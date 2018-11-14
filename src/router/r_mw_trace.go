@@ -8,10 +8,10 @@ import (
 )
 
 // TraceMiddleware 跟踪ID中间件
-func TraceMiddleware(prefixes ...string) gin.HandlerFunc {
+func TraceMiddleware(allowPrefixes ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		allow := false
-		for _, p := range prefixes {
+		for _, p := range allowPrefixes {
 			if strings.HasPrefix(c.Request.URL.Path, p) {
 				allow = true
 				break
