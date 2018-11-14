@@ -10,6 +10,7 @@ import (
 	"gin-admin/src/router"
 	"gin-admin/src/service/mysql"
 	"gin-admin/src/util"
+	"os"
 	"time"
 
 	"github.com/LyricTian/logrus-mysql-hook"
@@ -17,6 +18,35 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
+
+// CloseHandle 关闭服务
+type CloseHandle func()
+
+// Init 初始化所有服务
+func Init(version, traceID string) (*gin.Engine, CloseHandle) {
+	db := InitMySQL()
+
+	loggerHook := InitLogger(db.Db)
+
+	logger.System(traceID).Infof("服务已运行在[%s]模式下，版本号:%s，进程号：%d",
+		viper.GetString("run_mode"), version, os.Getpid())
+
+	apiCommon := InitInject(db)
+	httpHandler := InitHTTPHandler(apiCommon, db)
+
+	return httpHandler, func() {
+		// 等待日志钩子写入完成
+		if loggerHook != nil {
+			loggerHook.Flush()
+		}
+
+		// 关闭数据库
+		err := db.Close()
+		if err != nil {
+			logger.System(traceID).Errorf("关闭数据库发生错误: %s", err.Error())
+		}
+	}
+}
 
 // InitInject 初始化依赖注入
 func InitInject(db *mysql.DB) *api.Common {
