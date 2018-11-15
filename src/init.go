@@ -27,7 +27,6 @@ func Init(version, traceID string) (*gin.Engine, CloseHandle) {
 	db := InitMySQL()
 
 	loggerHook := InitLogger(db.Db)
-
 	logger.System(traceID).Infof("服务已运行在[%s]模式下，版本号:%s，进程号：%d",
 		viper.GetString("run_mode"), version, os.Getpid())
 

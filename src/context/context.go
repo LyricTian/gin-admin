@@ -89,7 +89,14 @@ func (a *Context) ResBadRequest(err error, code ...int) {
 
 // ResInternalServerError 响应服务器错误
 func (a *Context) ResInternalServerError(err error, code ...int) {
-	a.ResError(err, http.StatusInternalServerError, code...)
+	status := http.StatusInternalServerError
+
+	switch err {
+	case util.ErrNotFound:
+		status = http.StatusNotFound
+	}
+
+	a.ResError(err, status, code...)
 }
 
 // ResError 响应错误
