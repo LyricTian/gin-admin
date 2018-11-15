@@ -64,7 +64,14 @@ func (a *Demo) Create(ctx *context.Context) {
 		ctx.ResInternalServerError(err)
 		return
 	}
-	ctx.ResOK()
+
+	newItem, err := a.DemoBll.Get(ctx.NewContext(), item.RecordID)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+
+	ctx.ResSuccess(newItem)
 }
 
 // Update 更新数据
@@ -80,6 +87,7 @@ func (a *Demo) Update(ctx *context.Context) {
 		ctx.ResInternalServerError(err)
 		return
 	}
+
 	ctx.ResOK()
 }
 

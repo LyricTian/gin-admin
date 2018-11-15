@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"gin-admin/src/model"
 	"gin-admin/src/schema"
@@ -81,9 +82,22 @@ func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 
 	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND record_id=?", fields, a.TableName()), recordID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "查询指定数据发生错误")
 	}
 	return &item, nil
+}
+
+// Check 检查数据是否存在
+func (a *Demo) Check(ctx context.Context, recordID string) (bool, error) {
+	n, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND record_id=?", a.TableName()), recordID)
+	if err != nil {
+		return false, errors.Wrap(err, "检查数据是否存在发生错误")
+	}
+
+	return n > 0, nil
 }
 
 // Create 创建数据

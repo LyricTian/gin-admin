@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"gin-admin/src/model"
 	"gin-admin/src/schema"
@@ -162,6 +163,9 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	fields := a.getAllFields()
 	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND record_id=?", fields, a.TableName()), recordID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "查询指定数据发生错误")
 	}
 	return &item, nil

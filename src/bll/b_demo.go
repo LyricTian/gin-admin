@@ -20,7 +20,14 @@ func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, page
 
 // Get 查询指定数据
 func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
-	return a.DemoModel.Get(ctx, recordID)
+	item, err := a.DemoModel.Get(ctx, recordID)
+	if err != nil {
+		return nil, err
+	} else if item == nil {
+		return nil, util.ErrNotFound
+	}
+
+	return item, nil
 }
 
 // Create 创建数据
@@ -34,6 +41,13 @@ func (a *Demo) Create(ctx context.Context, item *schema.Demo) error {
 
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, recordID string, item *schema.Demo) error {
+	exists, err := a.DemoModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
 	info := util.StructToMap(item)
 	delete(info, "id")
 	delete(info, "record_id")
@@ -46,5 +60,12 @@ func (a *Demo) Update(ctx context.Context, recordID string, item *schema.Demo) e
 
 // Delete 删除数据
 func (a *Demo) Delete(ctx context.Context, recordID string) error {
+	exists, err := a.DemoModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
 	return a.DemoModel.Delete(ctx, recordID)
 }
