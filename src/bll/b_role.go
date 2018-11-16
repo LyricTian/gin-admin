@@ -43,6 +43,7 @@ func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
 func (a *Role) filterLeafMenuIDs(ctx context.Context, menuIDs []string) ([]string, error) {
 	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
 		RecordIDs: menuIDs,
+		Status:    1,
 	})
 	if err != nil {
 		return nil, err

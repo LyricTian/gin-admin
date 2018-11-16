@@ -68,7 +68,14 @@ func (a *User) Create(ctx *context.Context) {
 		ctx.ResInternalServerError(err)
 		return
 	}
-	ctx.ResOK()
+
+	newItem, err := a.UserBll.Get(ctx.NewContext(), item.RecordID)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+
+	ctx.ResSuccess(newItem)
 }
 
 // Update 更新数据

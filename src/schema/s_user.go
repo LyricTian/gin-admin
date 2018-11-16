@@ -12,7 +12,7 @@ type User struct {
 	Created  int64    `json:"created" db:"created" structs:"created"`                                  // 创建时间戳
 	Updated  int64    `json:"updated" db:"updated" structs:"updated"`                                  // 更新时间戳
 	Deleted  int64    `json:"deleted" db:"deleted" structs:"deleted"`                                  // 删除时间戳
-	RoleIDs  []string `json:"role_ids" db:"-" structs:"-"`                                             // 角色ID
+	RoleIDs  []string `json:"role_ids" db:"-" structs:"-" binding:"required,gt=0"`                     // 角色ID列表
 }
 
 // UserRole 用户角色授权管理
