@@ -35,7 +35,14 @@ func (a *Menu) QueryTree(ctx context.Context, params schema.MenuSelectQueryParam
 
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
-	return a.MenuModel.Get(ctx, recordID)
+	item, err := a.MenuModel.Get(ctx, recordID)
+	if err != nil {
+		return nil, err
+	} else if item == nil {
+		return nil, util.ErrNotFound
+	}
+
+	return item, nil
 }
 
 // Create 创建数据
@@ -74,8 +81,8 @@ func (a *Menu) Update(ctx context.Context, recordID string, item *schema.Menu) e
 	if err != nil {
 		return err
 	} else if oldItem == nil {
-		return errors.New("无效的参数")
-	} else if item.Path != oldItem.Path {
+		return util.ErrNotFound
+	} else if item.Code != oldItem.Code {
 		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
 		if err != nil {
 			return err
@@ -115,7 +122,14 @@ func (a *Menu) Update(ctx context.Context, recordID string, item *schema.Menu) e
 
 // Delete 删除数据
 func (a *Menu) Delete(ctx context.Context, recordID string) error {
-	exists, err := a.MenuModel.CheckChild(ctx, recordID)
+	exists, err := a.MenuModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
+	exists, err = a.MenuModel.CheckChild(ctx, recordID)
 	if err != nil {
 		return err
 	} else if exists {
@@ -127,6 +141,13 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 
 // UpdateStatus 更新状态
 func (a *Menu) UpdateStatus(ctx context.Context, recordID string, status int) error {
+	exists, err := a.MenuModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
 	info := map[string]interface{}{
 		"status": status,
 	}

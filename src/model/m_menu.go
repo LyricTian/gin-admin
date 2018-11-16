@@ -13,6 +13,8 @@ type IMenu interface {
 	QuerySelect(ctx context.Context, params schema.MenuSelectQueryParam) ([]*schema.MenuSelectQueryResult, error)
 	// Get 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Menu, error)
+	// Check 检查数据是否存在
+	Check(ctx context.Context, recordID string) (bool, error)
 	// 检查编号是否存在
 	CheckCode(ctx context.Context, code string, parentID string) (bool, error)
 	// 根据父级查询分级码

@@ -171,6 +171,16 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	return &item, nil
 }
 
+// Check 检查数据是否存在
+func (a *Menu) Check(ctx context.Context, recordID string) (bool, error) {
+	n, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND record_id=?", a.TableName()), recordID)
+	if err != nil {
+		return false, errors.Wrap(err, "检查数据是否存在发生错误")
+	}
+
+	return n > 0, nil
+}
+
 // CheckCode 检查编号是否存在
 func (a *Menu) CheckCode(ctx context.Context, code string, parentID string) (bool, error) {
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND code=? AND parent_id=?", a.TableName())

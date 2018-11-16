@@ -32,21 +32,23 @@ func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
 	item, err := a.RoleModel.Get(ctx, recordID, true)
 	if err != nil {
 		return nil, err
+	} else if item == nil {
+		return nil, util.ErrNotFound
 	}
 
-	if len(item.MenuIDs) == 0 {
-		return item, nil
-	}
+	return item, nil
+}
 
-	// 筛选叶子节点
+// 过滤叶子节点
+func (a *Role) filterLeafMenuIDs(ctx context.Context, menuIDs []string) ([]string, error) {
 	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
-		RecordIDs: item.MenuIDs,
+		RecordIDs: menuIDs,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var menuIDs []string
+	var leafMenuIDs []string
 	for _, m := range menus {
 		var exists bool
 		for _, m2 := range menus {
@@ -57,12 +59,11 @@ func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
 			}
 		}
 		if !exists {
-			menuIDs = append(menuIDs, m.RecordID)
+			leafMenuIDs = append(leafMenuIDs, m.RecordID)
 		}
 	}
-	item.MenuIDs = menuIDs
 
-	return item, nil
+	return leafMenuIDs, nil
 }
 
 // Create 创建数据
@@ -73,6 +74,12 @@ func (a *Role) Create(ctx context.Context, item *schema.Role) error {
 	} else if exists {
 		return errors.New("角色名称已经存在")
 	}
+
+	leafMenuIDs, err := a.filterLeafMenuIDs(ctx, item.MenuIDs)
+	if err != nil {
+		return err
+	}
+	item.MenuIDs = leafMenuIDs
 
 	item.ID = 0
 	item.RecordID = util.MustUUID()
@@ -87,7 +94,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) e
 	if err != nil {
 		return err
 	} else if oldItem == nil {
-		return errors.New("无效的数据")
+		return util.ErrNotFound
 	} else if oldItem.Name != item.Name {
 		exists, err := a.RoleModel.CheckName(ctx, item.Name)
 		if err != nil {
@@ -96,6 +103,12 @@ func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) e
 			return errors.New("角色名称已经存在")
 		}
 	}
+
+	leafMenuIDs, err := a.filterLeafMenuIDs(ctx, item.MenuIDs)
+	if err != nil {
+		return err
+	}
+	item.MenuIDs = leafMenuIDs
 
 	info := util.StructToMap(item)
 	delete(info, "id")
@@ -110,11 +123,25 @@ func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) e
 
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, recordID string) error {
+	exists, err := a.RoleModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
 	return a.RoleModel.Delete(ctx, recordID)
 }
 
 // UpdateStatus 更新状态
 func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
+	exists, err := a.RoleModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
 	info := map[string]interface{}{
 		"status": status,
 	}

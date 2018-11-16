@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"gin-admin/src/bll"
 	"gin-admin/src/context"
 	"gin-admin/src/schema"
@@ -76,9 +75,6 @@ func (a *Role) Create(ctx *context.Context) {
 	if err := ctx.ParseJSON(&item); err != nil {
 		ctx.ResBadRequest(err)
 		return
-	} else if len(item.MenuIDs) == 0 {
-		ctx.ResBadRequest(fmt.Errorf("请选择菜单"))
-		return
 	}
 
 	item.Creator = ctx.GetUserID()
@@ -87,7 +83,14 @@ func (a *Role) Create(ctx *context.Context) {
 		ctx.ResInternalServerError(err)
 		return
 	}
-	ctx.ResOK()
+
+	newItem, err := a.RoleBll.Get(ctx.NewContext(), item.RecordID)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+
+	ctx.ResSuccess(newItem)
 }
 
 // Update 更新数据
@@ -95,9 +98,6 @@ func (a *Role) Update(ctx *context.Context) {
 	var item schema.Role
 	if err := ctx.ParseJSON(&item); err != nil {
 		ctx.ResBadRequest(err)
-		return
-	} else if len(item.MenuIDs) == 0 {
-		ctx.ResBadRequest(fmt.Errorf("请选择菜单"))
 		return
 	}
 
