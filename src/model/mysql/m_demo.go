@@ -111,6 +111,10 @@ func (a *Demo) Create(ctx context.Context, item *schema.Demo) error {
 
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, recordID string, info map[string]interface{}) error {
+	if _, ok := info["updated"]; !ok {
+		info["updated"] = time.Now().Unix()
+	}
+
 	_, err := a.DB.UpdateByPK(a.TableName(),
 		map[string]interface{}{"record_id": recordID},
 		info)

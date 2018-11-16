@@ -89,6 +89,7 @@ func (a *User) Update(ctx context.Context, recordID string, item *schema.User) e
 	delete(info, "record_id")
 	delete(info, "creator")
 	delete(info, "created")
+	delete(info, "updated")
 	delete(info, "deleted")
 	delete(info, "password")
 

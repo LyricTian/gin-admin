@@ -140,7 +140,7 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 }
 
 func (a *Menu) getAllFields() string {
-	fields := "id,record_id,code,name,sequence,icon,path,level_code,parent_id,status,creator,created,deleted"
+	fields := "id,record_id,code,name,sequence,icon,path,level_code,parent_id,status,creator,created,updated,deleted"
 	return fields
 }
 
@@ -222,6 +222,10 @@ func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
 
 // Update 更新数据
 func (a *Menu) Update(ctx context.Context, recordID string, info map[string]interface{}) error {
+	if _, ok := info["updated"]; !ok {
+		info["updated"] = time.Now().Unix()
+	}
+
 	_, err := a.DB.UpdateByPK(a.TableName(),
 		map[string]interface{}{"record_id": recordID},
 		info)

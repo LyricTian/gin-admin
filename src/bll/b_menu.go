@@ -90,6 +90,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item *schema.Menu) e
 	delete(info, "level_code")
 	delete(info, "creator")
 	delete(info, "created")
+	delete(info, "updated")
 	delete(info, "deleted")
 
 	if item.ParentID != oldItem.ParentID {

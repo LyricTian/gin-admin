@@ -102,6 +102,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) e
 	delete(info, "record_id")
 	delete(info, "creator")
 	delete(info, "created")
+	delete(info, "updated")
 	delete(info, "deleted")
 
 	return a.RoleModel.UpdateWithMenuIDs(ctx, recordID, info, item.MenuIDs)
