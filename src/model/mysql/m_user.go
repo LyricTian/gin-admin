@@ -201,6 +201,10 @@ func (a *User) Create(ctx context.Context, item *schema.User) error {
 
 // Update 更新数据
 func (a *User) Update(ctx context.Context, recordID string, info map[string]interface{}) error {
+	if _, ok := info["updated"]; !ok {
+		info["updated"] = time.Now().Unix()
+	}
+
 	_, err := a.DB.UpdateByPK(a.TableName(),
 		map[string]interface{}{"record_id": recordID},
 		info)

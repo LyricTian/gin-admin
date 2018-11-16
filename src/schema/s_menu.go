@@ -15,6 +15,7 @@ type Menu struct {
 	Status    int    `json:"status" db:"status" structs:"status" binding:"required"`   // 状态(1:启用 2:停用)
 	Creator   string `json:"creator" db:"creator,size:36" structs:"creator"`           // 创建人
 	Created   int64  `json:"created" db:"created" structs:"created"`                   // 创建时间戳
+	Updated   int64  `json:"updated" db:"updated" structs:"updated"`                   // 更新时间戳
 	Deleted   int64  `json:"deleted" db:"deleted" structs:"deleted"`                   // 删除时间戳
 }
 

@@ -8,6 +8,7 @@ type Demo struct {
 	Name     string `json:"name" db:"name,size:50" structs:"name" binding:"required"` // 名称
 	Creator  string `json:"creator" db:"creator,size:36" structs:"creator"`           // 创建者
 	Created  int64  `json:"created" db:"created" structs:"created"`                   // 创建时间戳
+	Updated  int64  `json:"updated" db:"updated" structs:"updated"`                   // 更新时间戳
 	Deleted  int64  `json:"deleted" db:"deleted" structs:"deleted"`                   // 删除时间戳
 }
 

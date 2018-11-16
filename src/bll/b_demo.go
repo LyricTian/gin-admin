@@ -53,6 +53,7 @@ func (a *Demo) Update(ctx context.Context, recordID string, item *schema.Demo) e
 	delete(info, "record_id")
 	delete(info, "creator")
 	delete(info, "created")
+	delete(info, "updated")
 	delete(info, "deleted")
 
 	return a.DemoModel.Update(ctx, recordID, info)

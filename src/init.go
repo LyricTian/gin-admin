@@ -104,7 +104,10 @@ func InitMySQL() *mysql.DB {
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s",
-		mysqlConfig["username"], mysqlConfig["password"], mysqlConfig["addr"], mysqlConfig["database"],
+		mysqlConfig["username"],
+		mysqlConfig["password"],
+		mysqlConfig["addr"],
+		mysqlConfig["database"],
 	)
 	opts = append(opts, mysql.SetDSN(dsn))
 
@@ -169,7 +172,15 @@ func InitLogger(mysqlDB *sql.DB) logger.HookFlusher {
 				hookOpts = append(hookOpts, mysqlhook.SetMaxWorkers(v))
 			}
 
-			hook := mysqlhook.DefaultWithExtra(mysqlDB, fmt.Sprintf("%s_%s", viper.GetString("mysql_table_prefix"), util.T(hookConfig["table"]).String()), extraItems, hookOpts...)
+			hook := mysqlhook.DefaultWithExtra(
+				mysqlDB,
+				fmt.Sprintf("%s_%s",
+					viper.GetStringMap("mysql")["table_prefix"],
+					util.T(hookConfig["table"]).String()),
+				extraItems,
+				hookOpts...,
+			)
+
 			l.AddHook(hook)
 			return hook
 		default:
