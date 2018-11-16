@@ -11,7 +11,7 @@ type Role struct {
 	Created  int64    `json:"created" db:"created" structs:"created"`                   // 创建时间戳
 	Updated  int64    `json:"updated" db:"updated" structs:"updated"`                   // 更新时间戳
 	Deleted  int64    `json:"deleted" db:"deleted" structs:"deleted"`                   // 删除时间戳
-	MenuIDs  []string `json:"menu_ids" db:"-" structs:"-"`                              // 菜单ID
+	MenuIDs  []string `json:"menu_ids" db:"-" structs:"-" binding:"required,gt=0"`      // 菜单ID列表
 }
 
 // RoleMenu 角色菜单管理

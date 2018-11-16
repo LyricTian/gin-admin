@@ -161,6 +161,16 @@ func (a *Role) QueryMenuIDs(ctx context.Context, roleID string) ([]string, error
 	return menuIDs, nil
 }
 
+// Check 检查数据是否存在
+func (a *Role) Check(ctx context.Context, recordID string) (bool, error) {
+	n, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND record_id=?", a.TableName()), recordID)
+	if err != nil {
+		return false, errors.Wrap(err, "检查数据是否存在发生错误")
+	}
+
+	return n > 0, nil
+}
+
 // CheckName 检查名称
 func (a *Role) CheckName(ctx context.Context, name string) (bool, error) {
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND name=?", a.TableName())

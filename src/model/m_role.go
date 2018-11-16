@@ -13,6 +13,8 @@ type IRole interface {
 	QuerySelect(ctx context.Context, params schema.RoleSelectQueryParam) ([]*schema.RoleSelectQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, includeMenuIDs bool) (*schema.Role, error)
+	// Check 检查数据是否存在
+	Check(ctx context.Context, recordID string) (bool, error)
 	// 检查名称
 	CheckName(ctx context.Context, name string) (bool, error)
 	// 创建数据
