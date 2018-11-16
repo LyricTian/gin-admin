@@ -140,7 +140,7 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 }
 
 func (a *Menu) getAllFields() string {
-	fields := "id,record_id,code,name,sequence,icon,path,level_code,parent_id,status,creator,created,updated,deleted"
+	fields := "id,record_id,code,name,type,sequence,icon,path,level_code,parent_id,status,creator,created,updated,deleted"
 	return fields
 }
 
