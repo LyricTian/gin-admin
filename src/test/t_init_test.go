@@ -84,6 +84,11 @@ func newPutRequest(formatRouter string, v interface{}, args ...interface{}) *htt
 	return req
 }
 
+func newPatchRequest(formatRouter string, args ...interface{}) *http.Request {
+	req, _ := http.NewRequest("PATCH", apiPrefix+fmt.Sprintf(formatRouter, args...), nil)
+	return req
+}
+
 func newDeleteRequest(formatRouter string, args ...interface{}) *http.Request {
 	req, _ := http.NewRequest("DELETE", apiPrefix+fmt.Sprintf(formatRouter, args...), nil)
 	return req
