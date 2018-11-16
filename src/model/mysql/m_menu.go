@@ -103,19 +103,24 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 		menu, err := a.GetByCodeAndType(ctx, v, 10)
 		if err != nil {
 			return nil, err
-		} else if menu != nil {
-			where = fmt.Sprintf("%s AND level_code!=? AND level_code LIKE ?", where)
-			args = append(args, menu.LevelCode, menu.LevelCode+"%")
+		} else if menu == nil {
+			return nil, nil
 		}
+
+		where = fmt.Sprintf("%s AND level_code!=? AND level_code LIKE ?", where)
+		args = append(args, menu.LevelCode, menu.LevelCode+"%")
 	}
 
 	if v := params.UserID; v != "" {
-		where = fmt.Sprintf("%s AND record_id IN(SELECT menu_id FROM %s WHERE deleted=0 AND role_id IN(SELECT role_id FROM %s WHERE deleted=0 AND user_id=?))",
-			where,
-			a.Common.Role.RoleMenuTableName(),
-			a.Common.User.UserRoleTableName(),
-		)
-		args = append(args, v)
+		levelCodes, err := a.QueryLevelCodesByUserID(v)
+		if err != nil {
+			return nil, err
+		} else if len(levelCodes) == 0 {
+			return nil, nil
+		}
+
+		where = fmt.Sprintf("%s AND level_code IN(?)", where)
+		args = append(args, levelCodes)
 	}
 
 	if v := params.RecordIDs; len(v) > 0 {
@@ -137,6 +142,29 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 	}
 
 	return items, nil
+}
+
+// QueryLevelCodesByUserID 查询用户所拥有的菜单权限
+func (a *Menu) QueryLevelCodesByUserID(userID string) ([]string, error) {
+	query := fmt.Sprintf("SELECT level_code FROM %s WHERE deleted=0 AND status=1", a.TableName())
+	query = fmt.Sprintf("%s AND record_id IN(SELECT menu_id FROM %s WHERE deleted=0 AND role_id IN(SELECT role_id FROM %s WHERE deleted=0 AND user_id=?))",
+		query,
+		a.Common.Role.RoleMenuTableName(),
+		a.Common.User.UserRoleTableName(),
+	)
+
+	var items []*schema.MenuSelectQueryResult
+	_, err := a.DB.Select(&items, query, userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "查询用户所拥有的菜单权限发生错误")
+	}
+
+	levelCodes := make([]string, len(items))
+	for i, item := range items {
+		levelCodes[i] = item.LevelCode
+	}
+
+	return levelCodes, nil
 }
 
 func (a *Menu) getAllFields() string {

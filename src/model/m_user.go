@@ -11,6 +11,8 @@ type IUser interface {
 	QueryPage(ctx context.Context, params schema.UserQueryParam, pageIndex, pageSize uint) (int64, []*schema.UserQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, includeRoleIDs bool) (*schema.User, error)
+	// Check 检查数据是否存在
+	Check(ctx context.Context, recordID string) (bool, error)
 	// 检查用户名
 	CheckUserName(ctx context.Context, userName string) (bool, error)
 	// 根据用户名查询指定数据

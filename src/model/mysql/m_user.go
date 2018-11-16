@@ -118,6 +118,16 @@ func (a *User) Get(ctx context.Context, recordID string, includeRoleIDs bool) (*
 	return &item, nil
 }
 
+// Check 检查数据是否存在
+func (a *User) Check(ctx context.Context, recordID string) (bool, error) {
+	n, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND record_id=?", a.TableName()), recordID)
+	if err != nil {
+		return false, errors.Wrap(err, "检查数据是否存在发生错误")
+	}
+
+	return n > 0, nil
+}
+
 // QueryRoleIDs 查询用户角色
 func (a *User) QueryRoleIDs(ctx context.Context, userID string) ([]string, error) {
 	query := fmt.Sprintf("SELECT role_id FROM %s WHERE deleted=0 AND user_id=?", a.UserRoleTableName())

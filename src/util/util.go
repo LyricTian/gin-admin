@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -98,4 +99,50 @@ func GetLevelCode(orderLevelCodes []string) string {
 	}
 
 	return ""
+}
+
+// ParseLevelCodes 解析分级码（去重）
+func ParseLevelCodes(levelCodes ...string) []string {
+	var allCodes []string
+
+	for _, levelCode := range levelCodes {
+		codes := parseLevelCode(levelCode)
+
+		for _, code := range codes {
+			var exists bool
+			for _, c := range allCodes {
+				if code == c {
+					exists = true
+					break
+				}
+			}
+
+			if !exists {
+				allCodes = append(allCodes, code)
+			}
+		}
+	}
+
+	return allCodes
+}
+
+func parseLevelCode(levelCode string) []string {
+	if len(levelCode) < 2 {
+		return nil
+	}
+	var (
+		codes []string
+		root  bytes.Buffer
+	)
+
+	for i := range levelCode {
+		idx := i + 1
+		if idx%2 == 0 {
+			root.WriteString(levelCode[idx-2 : idx])
+			codes = append(codes, root.String())
+		}
+	}
+
+	root.Reset()
+	return codes
 }

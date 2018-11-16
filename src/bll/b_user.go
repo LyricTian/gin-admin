@@ -45,9 +45,12 @@ func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
 	item, err := a.UserModel.Get(ctx, recordID, true)
 	if err != nil {
 		return nil, err
-	} else if item != nil && item.Password != "" {
-		item.Password = ""
+	} else if item == nil {
+		return nil, util.ErrNotFound
 	}
+
+	// 查询不返回密码
+	item.Password = ""
 	return item, nil
 }
 
@@ -74,7 +77,7 @@ func (a *User) Update(ctx context.Context, recordID string, item *schema.User) e
 	if err != nil {
 		return err
 	} else if oldItem == nil {
-		return errors.New("无效的数据")
+		return util.ErrNotFound
 	} else if oldItem.UserName != item.UserName {
 		exists, err := a.UserModel.CheckUserName(ctx, item.UserName)
 		if err != nil {
@@ -102,11 +105,25 @@ func (a *User) Update(ctx context.Context, recordID string, item *schema.User) e
 
 // Delete 删除数据
 func (a *User) Delete(ctx context.Context, recordID string) error {
+	exists, err := a.UserModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
 	return a.UserModel.Delete(ctx, recordID)
 }
 
 // UpdateStatus 更新状态
 func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) error {
+	exists, err := a.UserModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
 	info := map[string]interface{}{
 		"status": status,
 	}
