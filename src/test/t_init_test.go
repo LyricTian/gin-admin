@@ -29,6 +29,7 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		panic("加载配置文件发生错误：" + err.Error())
 	}
+	viper.SetDefault("run_mode", "debug")
 
 	engine, _ = src.Init("1.0.0", util.MustUUID())
 }
