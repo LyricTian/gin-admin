@@ -163,6 +163,9 @@ func (a *User) GetByUserName(ctx context.Context, userName string, includeRoleID
 
 	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND user_name=?", fields, a.TableName()), userName)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "根据用户名查询指定数据发生错误")
 	}
 
