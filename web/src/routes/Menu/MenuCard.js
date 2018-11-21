@@ -7,40 +7,15 @@ import { Form, Input, Card, Radio, Modal, TreeSelect, InputNumber, Row, Col } fr
 }))
 @Form.create()
 export default class MenuCard extends PureComponent {
-  componentDidMount() {
-    const { id, type, callback } = this.props;
-    this.dispatch({
-      type: 'menu/loadForm',
-      payload: {
-        id,
-        type,
-        callback,
-      },
-    });
-  }
-
-  onModalCancelClick = () => {
-    this.dispatch({
-      type: 'menu/changeFormVisible',
-      payload: false,
-    });
-
-    const { callback } = this.props;
-    callback();
-  };
-
-  onModalOKClick = () => {
-    const { form } = this.props;
+  onOKClick = () => {
+    const { form, onSubmit } = this.props;
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const formData = { ...values };
         formData.status = parseInt(formData.status, 10);
         formData.type = parseInt(formData.type, 10);
         formData.sequence = parseInt(formData.sequence, 10);
-        this.dispatch({
-          type: 'menu/submit',
-          payload: formData,
-        });
+        onSubmit(formData);
       }
     });
   };
@@ -52,8 +27,9 @@ export default class MenuCard extends PureComponent {
 
   render() {
     const {
-      menu: { formTitle, formVisible, formData, submitting, treeData },
+      menu: { formVisible, formTitle, formData, submitting, treeData },
       form: { getFieldDecorator },
+      onCancel,
     } = this.props;
 
     const formItemLayout = {
@@ -76,8 +52,8 @@ export default class MenuCard extends PureComponent {
         maskClosable={false}
         confirmLoading={submitting}
         destroyOnClose
-        onOk={this.onModalOKClick}
-        onCancel={this.onModalCancelClick}
+        onOk={this.onOKClick}
+        onCancel={onCancel}
       >
         <Card bordered={false}>
           <Form>

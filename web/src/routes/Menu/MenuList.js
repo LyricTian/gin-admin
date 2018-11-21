@@ -30,9 +30,6 @@ import styles from './MenuList.less';
 export default class MenuList extends PureComponent {
   state = {
     selectedRows: [],
-    dataForm: false,
-    dataFormID: '',
-    dataFormType: '',
     treeSelectedKeys: [],
   };
 
@@ -87,11 +84,22 @@ export default class MenuList extends PureComponent {
   };
 
   onItemEditClick = id => {
-    this.setState({ dataForm: true, dataFormID: id, dataFormType: 'E' });
+    this.dispatch({
+      type: 'menu/loadForm',
+      payload: {
+        type: 'E',
+        id,
+      },
+    });
   };
 
   onAddClick = () => {
-    this.setState({ dataForm: true, dataFormID: '', dataFormType: 'A' });
+    this.dispatch({
+      type: 'menu/loadForm',
+      payload: {
+        type: 'A',
+      },
+    });
   };
 
   onDelOKClick(id) {
@@ -159,16 +167,18 @@ export default class MenuList extends PureComponent {
     });
   };
 
-  onDataFormCallback = result => {
-    this.setState({ dataForm: false, dataFormID: '' });
-    if (result && result === 'OK') {
-      this.dispatch({
-        type: 'menu/fetchSearchTree',
-      });
-      this.dispatch({
-        type: 'menu/fetch',
-      });
-    }
+  onDataFormSubmit = data => {
+    this.dispatch({
+      type: 'menu/submit',
+      payload: data,
+    });
+  };
+
+  onDataFormCancel = () => {
+    this.dispatch({
+      type: 'menu/changeFormVisible',
+      payload: false,
+    });
   };
 
   getParentID = () => {
@@ -186,11 +196,7 @@ export default class MenuList extends PureComponent {
   };
 
   renderDataForm() {
-    const { dataForm, dataFormID, dataFormType } = this.state;
-    if (dataForm) {
-      return <MenuCard id={dataFormID} type={dataFormType} callback={this.onDataFormCallback} />;
-    }
-    return null;
+    return <MenuCard onCancel={this.onDataFormCancel} onSubmit={this.onDataFormSubmit} />;
   }
 
   renderTreeNodes = data =>
