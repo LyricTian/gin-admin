@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import Debounce from 'lodash-decorators/debounce';
 import GlobalFooter from '../components/GlobalFooter';
 import CopyRight from '../components/CopyRight';
-import Exception from '../components/Exception';
+import NotFound from '../routes/Exception/404';
 import styles from './AdminLayout.less';
 import logo from '../assets/logo.svg';
 
@@ -246,11 +246,13 @@ class AdminLayout extends React.PureComponent {
               onClick={this.onToggleClick}
             />
             <div className={styles.right}>
-              {user.username ? (
+              {user.user_name ? (
                 <Dropdown overlay={menu}>
                   <span className={`${styles.action} ${styles.account}`}>
                     <Avatar size="small" className={styles.avatar} icon="user" />
-                    {user.real_name !== '' ? `${user.username}(${user.real_name})` : user.username}
+                    {user.real_name !== ''
+                      ? `${user.user_name}(${user.real_name})`
+                      : user.user_name}
                   </span>
                 </Dropdown>
               ) : (
@@ -270,15 +272,7 @@ class AdminLayout extends React.PureComponent {
                   />
                 ))}
                 <Redirect exact from="/" to={defaultURL} />
-                <Route
-                  component={
-                    <Exception
-                      type="404"
-                      style={{ minHeight: 500, height: '80%' }}
-                      linkElement={Link}
-                    />
-                  }
-                />
+                <Route component={NotFound} />
               </Switch>
             </div>
             <GlobalFooter copyright={<CopyRight title={copyRight} />} />

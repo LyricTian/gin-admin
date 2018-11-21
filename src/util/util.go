@@ -53,7 +53,7 @@ func StructToMap(s interface{}) map[string]interface{} {
 // StructsToMapSlice 将结构体切片转换为字典切片
 func StructsToMapSlice(v interface{}) []map[string]interface{} {
 	iVal := reflect.Indirect(reflect.ValueOf(v))
-	if iVal.IsNil() || iVal.IsValid() || iVal.Type().Kind() != reflect.Slice {
+	if iVal.IsNil() || !iVal.IsValid() || iVal.Type().Kind() != reflect.Slice {
 		return make([]map[string]interface{}, 0)
 	}
 
@@ -92,7 +92,7 @@ func GetLevelCode(orderLevelCodes []string) string {
 	for i := 1; i < 100; i++ {
 		code := toValue(i)
 		if i <= l &&
-			orderLevelCodes[i] == code {
+			orderLevelCodes[i-1] == code {
 			continue
 		}
 		return code

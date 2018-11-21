@@ -32,3 +32,17 @@ func Slice2Tree(sliceDatas []map[string]interface{}, idField, pidField string) [
 	}
 	return r
 }
+
+// ConvertToViewTree 转换树形数据为视图树数据
+func ConvertToViewTree(treeDatas []map[string]interface{}, labelField, valueField, keyField string) []map[string]interface{} {
+	for _, node := range treeDatas {
+		node["title"] = node[labelField]
+		node["value"] = node[valueField]
+		node["key"] = node[keyField]
+		child, ok := node["children"]
+		if ok {
+			node["children"] = ConvertToViewTree(*child.(*[]map[string]interface{}), labelField, valueField, keyField)
+		}
+	}
+	return treeDatas
+}

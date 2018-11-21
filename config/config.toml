@@ -30,7 +30,7 @@ table = "logger"
 # 存储会话的cookie标识
 cookie_name = "gin_admin_session"
 # 会话签名
-sign = "GAS00000"
+sign = "GINADMIN"
 # 会话存储方式（支持memory/mysql）
 store = "mysql"
 # 存储会话的mysql表名

@@ -33,6 +33,7 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 		Name:     ctx.Query("name"),
 		ParentID: ctx.Query("parent_id"),
 		Status:   util.S(ctx.Query("status")).Int(),
+		Type:     util.S(ctx.Query("mtype")).Int(),
 	}
 
 	total, items, err := a.MenuBll.QueryPage(ctx.NewContext(), params, pageIndex, pageSize)

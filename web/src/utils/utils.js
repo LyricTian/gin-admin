@@ -34,6 +34,18 @@ export function getLevelCode(pathname, menuPaths) {
   if (node) {
     return node.level_code;
   }
+
+  // 如果匹配不到全部路径，则优先匹配前缀
+  const pp = pathname.split('/');
+  if (pp.length > 2) {
+    for (let i = pp.length - 1; i > 1; i -= 1) {
+      const n = menuPaths[pp.slice(0, i).join('/')];
+      if (n) {
+        return n.level_code;
+      }
+    }
+  }
+
   return '';
 }
 

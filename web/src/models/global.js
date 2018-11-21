@@ -1,20 +1,22 @@
 import { getLevelCode, getMenuKeys } from '../utils/utils';
-import p from '../../package.json';
+import config from '../config';
 import * as loginService from '../services/login';
 
 export default {
   namespace: 'global',
 
   state: {
-    title: p.title,
-    copyRight: p.copyRight,
-    defaultURL: '/user/login',
+    title: config.title || '',
+    copyRight: config.copyRight,
+    defaultURL: config.defaultURL,
     collapsed: false,
     openKeys: [],
     selectedKeys: [],
     user: { user_name: 'admin', real_name: '管理员' },
     menuPaths: {
       '/menu': { level_code: '01' },
+      '/role': { level_code: '02' },
+      '/user': { level_code: '03' },
     },
     menus: [
       {
@@ -22,6 +24,18 @@ export default {
         level_code: '01',
         name: '菜单管理',
         router: '/menu',
+      },
+      {
+        icon: 'audit',
+        level_code: '02',
+        name: '角色管理',
+        router: '/role',
+      },
+      {
+        icon: 'user',
+        level_code: '03',
+        name: '用户管理',
+        router: '/user',
       },
     ],
   },

@@ -30,7 +30,7 @@ func (a *Menu) QueryTree(ctx context.Context, params schema.MenuSelectQueryParam
 	}
 
 	treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
-	return treeData, nil
+	return util.ConvertToViewTree(treeData, "name", "record_id", "record_id"), nil
 }
 
 // Get 查询指定数据
@@ -47,11 +47,13 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 
 // Create 创建数据
 func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
-	exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
-	if err != nil {
-		return err
-	} else if exists {
-		return errors.New("编号已经存在")
+	if item.Code != "" {
+		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
+		if err != nil {
+			return err
+		} else if exists {
+			return errors.New("编号已经存在")
+		}
 	}
 
 	a.lock.Lock()

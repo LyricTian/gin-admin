@@ -3,6 +3,7 @@ import './index.less';
 import dva from 'dva';
 import 'moment/locale/zh-cn';
 import browserHistory from 'history/createBrowserHistory';
+import createLoading from 'dva-loading';
 import router from './router';
 import { storeLogoutKey } from './utils/utils';
 
@@ -12,7 +13,7 @@ const app = dva({
 });
 
 // 2. Plugins
-// app.use({});
+app.use(createLoading());
 
 // 3. Register global model
 app.model(require('./models/global').default);
