@@ -211,7 +211,7 @@ export default class MenuList extends PureComponent {
     } = this.props;
     return (
       <Form onSubmit={this.onSearchFormSubmit} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+        <Row>
           <Col md={8} sm={24}>
             <Form.Item label="菜单名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
@@ -269,7 +269,8 @@ export default class MenuList extends PureComponent {
     const columns = [
       {
         dataIndex: 'record_id',
-        width: 100,
+        width: 80,
+        fixed: 'left',
         render: (val, record) => (
           <div>
             <Dropdown
@@ -372,7 +373,7 @@ export default class MenuList extends PureComponent {
       {
         title: '排序值',
         dataIndex: 'sequence',
-        width: 100,
+        width: 80,
       },
       {
         title: '菜单图标',
@@ -397,7 +398,7 @@ export default class MenuList extends PureComponent {
       <PageHeaderLayout title="菜单管理">
         <Layout>
           <Layout.Sider
-            width={240}
+            width={200}
             style={{ background: '#fff', borderRight: '1px solid lightGray' }}
           >
             <div>
@@ -474,7 +475,8 @@ export default class MenuList extends PureComponent {
                   columns={columns}
                   pagination={paginationProps}
                   onChange={this.onTableChange}
-                  scroll={{ x: 1000 }}
+                  scroll={{ x: 910 }}
+                  size="small"
                 />
               </div>
             </Card>

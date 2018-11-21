@@ -91,8 +91,8 @@ func GetLevelCode(orderLevelCodes []string) string {
 
 	for i := 1; i < 100; i++ {
 		code := toValue(i)
-		if i <= l &&
-			orderLevelCodes[i-1] == code {
+		if i < l &&
+			orderLevelCodes[i] == code {
 			continue
 		}
 		return code

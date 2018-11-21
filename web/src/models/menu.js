@@ -66,10 +66,18 @@ export default {
         params = { ...params, ...payload };
       }
       const response = yield call(menuService.query, params);
+      const list = response.list || [];
       yield put({
         type: 'saveSearchTreeData',
-        payload: response.list || [],
+        payload: list,
       });
+
+      if (list.length > 0) {
+        yield put({
+          type: 'saveExpandedKeys',
+          payload: [list[0].record_id],
+        });
+      }
     },
     *loadForm({ payload }, { put, select }) {
       yield put({

@@ -33,9 +33,14 @@ export default app => [
     layout: 'AdminLayout',
     children: [
       {
-        name: '菜单管理',
-        path: 'menu',
-        component: dynamicWrapper(app, ['menu'], () => import('./routes/Menu/MenuList')),
+        path: 'system',
+        children: [
+          {
+            name: '菜单管理',
+            path: 'menu',
+            component: dynamicWrapper(app, ['menu'], () => import('./routes/Menu/MenuList')),
+          },
+        ],
       },
     ],
   },
