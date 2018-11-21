@@ -11,6 +11,7 @@ export default {
       pagination: {},
     },
     submitting: false,
+    formType: '',
     formTitle: '新建菜单',
     formID: '',
     formVisible: false,
@@ -84,7 +85,12 @@ export default {
         type: 'changeFormVisible',
         payload: true,
       });
+
       yield [
+        put({
+          type: 'saveFormType',
+          payload: payload.type,
+        }),
         put({
           type: 'saveFormTitle',
           payload: '新建菜单',
@@ -97,11 +103,10 @@ export default {
           type: 'saveFormData',
           payload: {},
         }),
+        put({
+          type: 'fetchTree',
+        }),
       ];
-
-      yield yield put({
-        type: 'fetchTree',
-      });
 
       if (payload.type === 'A') {
         const search = yield select(state => state.menu.search);
@@ -114,7 +119,7 @@ export default {
         });
       }
 
-      if (payload && payload.id) {
+      if (payload.type === 'E') {
         yield [
           put({
             type: 'saveFormTitle',
@@ -129,13 +134,6 @@ export default {
             payload: { record_id: payload.id },
           }),
         ];
-      }
-
-      if (payload && payload.callback) {
-        yield put({
-          type: 'saveFormCallback',
-          payload: payload.callback,
-        });
       }
     },
     *fetchForm({ payload }, { call, put }) {
@@ -180,9 +178,10 @@ export default {
         }
       }
 
+      const formType = yield select(state => state.menu.formType);
       const formID = yield select(state => state.menu.formID);
       let success = false;
-      if (formID && formID !== '') {
+      if (formType === 'E') {
         params.record_id = formID;
         const response = yield call(menuService.update, params);
         if (response.status === 'OK') {
@@ -206,8 +205,9 @@ export default {
           type: 'changeFormVisible',
           payload: false,
         });
-        const formCallback = yield select(state => state.menu.formCallback);
-        formCallback('OK');
+
+        yield put({ type: 'fetchSearchTree' });
+        yield put({ type: 'fetch' });
       }
     },
     *del({ payload }, { call, put }) {
@@ -285,6 +285,9 @@ export default {
     changeFormVisible(state, { payload }) {
       return { ...state, formVisible: payload };
     },
+    saveFormType(state, { payload }) {
+      return { ...state, formType: payload };
+    },
     saveFormTitle(state, { payload }) {
       return { ...state, formTitle: payload };
     },
@@ -293,9 +296,6 @@ export default {
     },
     saveFormData(state, { payload }) {
       return { ...state, formData: payload };
-    },
-    saveFormCallback(state, { payload }) {
-      return { ...state, formCallback: payload };
     },
     changeSubmitting(state, { payload }) {
       return { ...state, submitting: payload };
