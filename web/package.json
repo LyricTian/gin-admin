@@ -1,8 +1,6 @@
 {
   "name": "web",
   "version": "1.0.0",
-  "title": "GIN+AntD权限管理",
-  "copyRight": "2018 LyricTian",
   "description": "基于GIN + Ant Design的权限管理",
   "private": true,
   "scripts": {
@@ -21,11 +19,13 @@
     "brace": "^0.11.1",
     "classnames": "^2.2.5",
     "dva": "^2.2.3",
+    "dva-loading": "^2.0.6",
     "history": "^4.7.2",
     "lodash": "^4.17.10",
     "lodash-decorators": "^6.0.0",
     "md5": "^2.2.1",
     "moment": "^2.19.3",
+    "path-to-regexp": "^2.4.0",
     "prop-types": "^15.5.10",
     "qs": "^6.5.0",
     "react": "^16.4.1",

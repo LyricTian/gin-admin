@@ -1,5 +1,5 @@
 const path = require('path');
-const p = require('./package.json');
+const config = require('./src/config');
 
 export default {
   entry: 'src/index.js',
@@ -15,7 +15,7 @@ export default {
   ignoreMomentLocale: true,
   theme: './src/theme.js',
   html: {
-    title: p.title,
+    title: config.title,
     template: './src/index.ejs',
   },
   lessLoaderOptions: {

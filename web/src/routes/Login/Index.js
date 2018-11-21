@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Button, Icon, Alert } from 'antd';
 import { md5Hash } from '../../utils/utils';
@@ -9,7 +9,7 @@ import styles from './Index.less';
   login: state.login,
 }))
 @Form.create()
-export default class Login extends Component {
+export default class Login extends PureComponent {
   handleSubmit = e => {
     e.preventDefault();
 
