@@ -17,6 +17,8 @@ type IUser interface {
 	CheckUserName(ctx context.Context, userName string) (bool, error)
 	// 根据用户名查询指定数据
 	GetByUserName(ctx context.Context, userName string, includeRoleIDs bool) (*schema.User, error)
+	// 检查角色下是否存在用户
+	CheckByRoleID(ctx context.Context, roleID string) (bool, error)
 	// 创建数据
 	Create(ctx context.Context, item *schema.User) error
 	// 更新数据

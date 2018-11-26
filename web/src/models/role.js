@@ -1,8 +1,8 @@
 import { message } from 'antd';
-import * as menuService from '../services/menu';
+import * as roleService from '../services/role';
 
 export default {
-  namespace: 'menu',
+  namespace: 'role',
   state: {
     search: {},
     pagination: {},
@@ -11,14 +11,12 @@ export default {
       pagination: {},
     },
     submitting: false,
-    formType: '',
     formTitle: '',
     formID: '',
     formVisible: false,
     formData: {},
-    searchTreeData: [],
-    treeData: [],
-    expandedKeys: [],
+    selectData: [],
+    menuKeys: [],
   },
   effects: {
     *fetch({ search, pagination }, { call, put, select }) {
@@ -33,7 +31,7 @@ export default {
           payload: search,
         });
       } else {
-        const s = yield select(state => state.menu.search);
+        const s = yield select(state => state.role.search);
         if (s) {
           params = { ...params, ...s };
         }
@@ -46,40 +44,19 @@ export default {
           payload: pagination,
         });
       } else {
-        const p = yield select(state => state.menu.pagination);
+        const p = yield select(state => state.role.pagination);
         if (p) {
           params = { ...params, ...p };
         }
       }
 
-      const response = yield call(menuService.query, params);
+      const response = yield call(roleService.query, params);
       yield put({
         type: 'saveData',
         payload: response,
       });
     },
-    *fetchSearchTree({ payload }, { call, put }) {
-      let params = {
-        type: 'tree',
-      };
-      if (payload) {
-        params = { ...params, ...payload };
-      }
-      const response = yield call(menuService.query, params);
-      const list = response.list || [];
-      yield put({
-        type: 'saveSearchTreeData',
-        payload: list,
-      });
-
-      if (list.length > 0) {
-        yield put({
-          type: 'saveExpandedKeys',
-          payload: [list[0].record_id],
-        });
-      }
-    },
-    *loadForm({ payload }, { put, select }) {
+    *loadForm({ payload }, { put }) {
       yield put({
         type: 'changeFormVisible',
         payload: true,
@@ -92,7 +69,7 @@ export default {
         }),
         put({
           type: 'saveFormTitle',
-          payload: '新建菜单',
+          payload: '新建角色',
         }),
         put({
           type: 'saveFormID',
@@ -103,26 +80,16 @@ export default {
           payload: {},
         }),
         put({
-          type: 'fetchTree',
+          type: 'saveMenuKeys',
+          payload: [],
         }),
       ];
-
-      if (payload.type === 'A') {
-        const search = yield select(state => state.menu.search);
-        yield put({
-          type: 'saveFormData',
-          payload: {
-            parent_id: search.parent_id,
-            type: (parseInt(search.parent_type || '0', 10) + 10).toString(),
-          },
-        });
-      }
 
       if (payload.type === 'E') {
         yield [
           put({
             type: 'saveFormTitle',
-            payload: '编辑菜单',
+            payload: '编辑角色',
           }),
           put({
             type: 'saveFormID',
@@ -136,11 +103,17 @@ export default {
       }
     },
     *fetchForm({ payload }, { call, put }) {
-      const response = yield call(menuService.get, payload);
-      yield put({
-        type: 'saveFormData',
-        payload: response,
-      });
+      const response = yield call(roleService.get, payload);
+      yield [
+        put({
+          type: 'saveFormData',
+          payload: response,
+        }),
+        put({
+          type: 'saveMenuKeys',
+          payload: response.menu_ids || [],
+        }),
+      ];
     },
     *submit({ payload }, { call, put, select }) {
       yield put({
@@ -149,45 +122,17 @@ export default {
       });
 
       const params = { ...payload };
-      const { type } = params;
-      if (
-        (type === 20 || type === 30 || type === 40) &&
-        params.parent_id &&
-        params.parent_id !== ''
-      ) {
-        let result = true;
-        const parent = yield call(menuService.get, { record_id: params.parent_id });
-        const ptype = parent.type;
-        if (type === 20 && !(ptype === 10 || ptype === 20)) {
-          message.error('模块依赖于系统或模块');
-          result = false;
-        } else if (type === 30 && !(ptype === 20 || ptype === 10)) {
-          message.error('功能依赖于系统或模块');
-          result = false;
-        } else if (type === 40 && !(ptype === 30)) {
-          message.error('动作依赖于功能');
-          result = false;
-        }
-        if (!result) {
-          yield put({
-            type: 'changeSubmitting',
-            payload: false,
-          });
-          return;
-        }
-      }
-
-      const formType = yield select(state => state.menu.formType);
-      const formID = yield select(state => state.menu.formID);
+      const formType = yield select(state => state.role.formType);
+      const formID = yield select(state => state.role.formID);
       let success = false;
       if (formType === 'E') {
         params.record_id = formID;
-        const response = yield call(menuService.update, params);
+        const response = yield call(roleService.update, params);
         if (response.status === 'OK') {
           success = true;
         }
       } else {
-        const response = yield call(menuService.create, params);
+        const response = yield call(roleService.create, params);
         if (response.record_id && response.record_id !== '') {
           success = true;
         }
@@ -204,33 +149,31 @@ export default {
           type: 'changeFormVisible',
           payload: false,
         });
-
-        yield put({ type: 'fetchSearchTree' });
-        yield put({ type: 'fetch' });
+        yield put({
+          type: 'fetch',
+        });
       }
     },
     *del({ payload }, { call, put }) {
-      const response = yield call(menuService.del, payload);
+      const response = yield call(roleService.del, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
-        yield put({ type: 'fetchSearchTree' });
         yield put({ type: 'fetch' });
       }
     },
     *delMany({ payload }, { call, put }) {
-      const response = yield call(menuService.delMany, payload);
+      const response = yield call(roleService.delMany, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
-        yield put({ type: 'fetchSearchTree' });
         yield put({ type: 'fetch' });
       }
     },
     *changeStatus({ payload }, { call, put, select }) {
       let response;
       if (payload.status === 1) {
-        response = yield call(menuService.enable, payload);
+        response = yield call(roleService.enable, payload);
       } else {
-        response = yield call(menuService.disable, payload);
+        response = yield call(roleService.disable, payload);
       }
 
       if (response.status === 'OK') {
@@ -239,7 +182,7 @@ export default {
           msg = '停用成功';
         }
         message.success(msg);
-        const data = yield select(state => state.menu.data);
+        const data = yield select(state => state.role.data);
         const newData = { list: [], pagination: data.pagination };
 
         for (let i = 0; i < data.list.length; i += 1) {
@@ -256,14 +199,14 @@ export default {
         });
       }
     },
-    *fetchTree(_, { call, put }) {
+    *fetchSelect(_, { call, put }) {
       const params = {
-        type: 'tree',
+        type: 'select',
         status: 1,
       };
-      const response = yield call(menuService.query, params);
+      const response = yield call(roleService.query, params);
       yield put({
-        type: 'saveTreeData',
+        type: 'saveSelectData',
         payload: response.list || [],
       });
     },
@@ -281,11 +224,11 @@ export default {
     changeFormVisible(state, { payload }) {
       return { ...state, formVisible: payload };
     },
-    saveFormType(state, { payload }) {
-      return { ...state, formType: payload };
-    },
     saveFormTitle(state, { payload }) {
       return { ...state, formTitle: payload };
+    },
+    saveFormType(state, { payload }) {
+      return { ...state, formType: payload };
     },
     saveFormID(state, { payload }) {
       return { ...state, formID: payload };
@@ -296,14 +239,11 @@ export default {
     changeSubmitting(state, { payload }) {
       return { ...state, submitting: payload };
     },
-    saveSearchTreeData(state, { payload }) {
-      return { ...state, searchTreeData: payload };
+    saveSelectData(state, { payload }) {
+      return { ...state, selectData: payload };
     },
-    saveTreeData(state, { payload }) {
-      return { ...state, treeData: payload };
-    },
-    saveExpandedKeys(state, { payload }) {
-      return { ...state, expandedKeys: payload };
+    saveMenuKeys(state, { payload }) {
+      return { ...state, menuKeys: payload };
     },
   },
 };

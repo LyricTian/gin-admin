@@ -15,6 +15,7 @@ import (
 type Role struct {
 	RoleModel model.IRole `inject:"IRole"`
 	MenuModel model.IMenu `inject:"IMenu"`
+	UserModel model.IUser `inject:"IUser"`
 }
 
 // QueryPage 查询分页数据
@@ -129,6 +130,13 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 		return err
 	} else if !exists {
 		return util.ErrNotFound
+	}
+
+	exists, err = a.UserModel.CheckByRoleID(ctx, recordID)
+	if err != nil {
+		return err
+	} else if exists {
+		return errors.New("该角色已被赋予用户，不能删除！")
 	}
 
 	return a.RoleModel.Delete(ctx, recordID)
