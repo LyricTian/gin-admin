@@ -371,7 +371,7 @@ export default class MenuList extends PureComponent {
         width: 100,
         render: val => {
           if (val === 1) {
-            return <Badge status="success" text="启用" />;
+            return <Badge status="success" text="正常" />;
           }
           return <Badge status="error" text="停用" />;
         },

@@ -180,6 +180,15 @@ func (a *User) GetByUserName(ctx context.Context, userName string, includeRoleID
 	return &item, nil
 }
 
+// CheckByRoleID 检查角色下是否存在用户
+func (a *User) CheckByRoleID(ctx context.Context, roleID string) (bool, error) {
+	n, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND role_id=?", a.UserRoleTableName()), roleID)
+	if err != nil {
+		return false, errors.Wrap(err, "检查角色下是否存在用户发生错误")
+	}
+	return n > 0, nil
+}
+
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item *schema.User) error {
 	tran, err := a.DB.Begin()

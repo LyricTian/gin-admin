@@ -40,6 +40,13 @@ export default app => [
             path: 'menu',
             component: dynamicWrapper(app, ['menu'], () => import('./routes/Menu/MenuList')),
           },
+          {
+            name: '角色管理',
+            path: 'role',
+            component: dynamicWrapper(app, ['menu', 'role'], () =>
+              import('./routes/Role/RoleList')
+            ),
+          },
         ],
       },
     ],
