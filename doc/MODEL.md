@@ -17,6 +17,7 @@
 | status     | 状态       | 数值     | 1:启用<br/> 2:停用                                 |
 | created    | 创建时间戳 | 数值     |                                                    |
 | creator    | 创建人     | 字符串   |                                                    |
+| updated    | 更新时间戳 | 数值     |                                                    |
 | deleted    | 删除时间戳 | 数值     |                                                    |
 
 ## 角色管理(`role`)
@@ -30,6 +31,7 @@
 | status    | 状态       | 数值     | 1:启用<br/> 2:停用 |
 | created   | 创建时间戳 | 数值     |                    |
 | creator   | 创建人     | 字符串   |                    |
+| updated    | 更新时间戳 | 数值     |                                                    |
 | deleted   | 删除时间戳 | 数值     |                    |
 
 ## 角色菜单授权管理(`role_menu`)
@@ -47,12 +49,13 @@
 | --------- | ---------- | -------- | ------------------ |
 | id        | 自增 ID    | 数值     | 主键               |
 | record_id | 记录 ID    | 字符串   | uuid               |
-| user_name  | 用户名     | 字符串   |                    |
+| user_name | 用户名     | 字符串   |                    |
 | password  | 登录密码   | 字符串   |                    |
-| real_name  | 真实姓名   | 字符串   |                    |
+| real_name | 真实姓名   | 字符串   |                    |
 | status    | 状态       | 数值     | 1:启用<br/> 2:停用 |
 | created   | 创建时间戳 | 数值     |                    |
 | creator   | 创建人     | 字符串   |                    |
+| updated   | 更新时间戳 | 数值     |                    |
 | deleted   | 删除时间戳 | 数值     |                    |
 
 ## 用户角色授权管理(`user_role`)
