@@ -2,9 +2,9 @@ package mysql
 
 import (
 	"fmt"
-	"gin-admin/src/service/mysql"
-	"gin-admin/src/util"
 
+	"github.com/LyricTian/gin-admin/src/service/mysql"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/facebookgo/inject"
 	"github.com/spf13/viper"
 )

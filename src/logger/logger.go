@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"gin-admin/src/util"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )

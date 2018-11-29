@@ -1,8 +1,7 @@
 package router
 
 import (
-	"gin-admin/src/api"
-
+	"github.com/LyricTian/gin-admin/src/api"
 	"github.com/gin-gonic/gin"
 )
 

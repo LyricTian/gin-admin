@@ -3,12 +3,12 @@ package router
 import (
 	"bytes"
 	"fmt"
-	"gin-admin/src/context"
-	"gin-admin/src/logger"
 	"io/ioutil"
 	"net/http"
 	"runtime"
 
+	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/gin-gonic/gin"
 )
 

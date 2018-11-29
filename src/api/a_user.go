@@ -1,11 +1,12 @@
 package api
 
 import (
-	"gin-admin/src/bll"
-	"gin-admin/src/context"
-	"gin-admin/src/schema"
-	"gin-admin/src/util"
 	"strings"
+
+	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // User 用户管理

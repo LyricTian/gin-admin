@@ -12,7 +12,7 @@ $ git clone https://github.com/LyricTian/gin-admin.git
 ## 运行服务
 
 ```
-$ cd gin-admin/cmd/server
+$ cd github.com/LyricTian/gin-admin/cmd/server
 $ go build -o server
 $ ./server -c ../../config/config.toml
 ```

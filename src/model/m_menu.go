@@ -2,7 +2,8 @@ package model
 
 import (
 	"context"
-	"gin-admin/src/schema"
+
+	"github.com/LyricTian/gin-admin/src/schema"
 )
 
 // IMenu 菜单管理
