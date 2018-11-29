@@ -1,10 +1,10 @@
 package test
 
 import (
-	"github.com/LyricTian/gin-admin/src/schema"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/stretchr/testify/assert"
 )
 

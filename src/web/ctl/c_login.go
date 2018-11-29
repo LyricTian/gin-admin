@@ -1,11 +1,11 @@
-package api
+package ctl
 
 import (
 	"github.com/LyricTian/gin-admin/src/bll"
-	"github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/gin-session"
 )

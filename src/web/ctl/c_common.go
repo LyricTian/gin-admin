@@ -1,4 +1,4 @@
-package api
+package ctl
 
 // Common API模块
 type Common struct {

@@ -1,13 +1,13 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/src/api"
-	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/web/context"
+	"github.com/LyricTian/gin-admin/src/web/ctl"
 	"github.com/gin-gonic/gin"
 )
 
 // APIDemoRouter 注册/demos路由
-func APIDemoRouter(g *gin.RouterGroup, demo *api.Demo) {
+func APIDemoRouter(g *gin.RouterGroup, demo *ctl.Demo) {
 	g.GET("/demos", context.WrapContext(demo.Query, "查询示例数据"))
 	g.GET("/demos/:id", context.WrapContext(demo.Get, "查询指定示例数据"))
 	g.POST("/demos", context.WrapContext(demo.Create, "创建示例数据"))
