@@ -7,6 +7,8 @@ import (
 	"gin-admin/src/util"
 	"time"
 
+	"github.com/spf13/viper"
+
 	"github.com/pkg/errors"
 )
 
@@ -128,4 +130,23 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 		"status": status,
 	}
 	return a.UserModel.Update(ctx, recordID, info)
+}
+
+// CheckIsAdmin 检查是否是管理员
+func (a *User) CheckIsAdmin(ctx context.Context, recordID string) (bool, error) {
+	user, err := a.UserModel.Get(ctx, recordID, false)
+	if err != nil {
+		return false, err
+	} else if user == nil {
+		return false, nil
+	}
+
+	adminUsers := viper.GetStringSlice("system_admin_users")
+	for _, v := range adminUsers {
+		if v == user.UserName {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
