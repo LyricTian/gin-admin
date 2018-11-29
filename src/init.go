@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/LyricTian/gin-admin/src/api"
-	"github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/logger"
 	model "github.com/LyricTian/gin-admin/src/model/mysql"
-	"github.com/LyricTian/gin-admin/src/router"
 	"github.com/LyricTian/gin-admin/src/service/mysql"
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/web/context"
+	"github.com/LyricTian/gin-admin/src/web/ctl"
+	"github.com/LyricTian/gin-admin/src/web/router"
 	"github.com/LyricTian/logrus-mysql-hook"
 	"github.com/facebookgo/inject"
 	"github.com/gin-gonic/gin"
@@ -48,14 +48,14 @@ func Init(version, traceID string) (*gin.Engine, CloseHandle) {
 }
 
 // InitInject 初始化依赖注入
-func InitInject(db *mysql.DB) *api.Common {
+func InitInject(db *mysql.DB) *ctl.Common {
 	g := new(inject.Graph)
 
 	// 注入mysql存储
 	new(model.Common).Init(g, db)
 
 	// 注入API
-	apiCommon := new(api.Common)
+	apiCommon := new(ctl.Common)
 	g.Provide(&inject.Object{Value: apiCommon})
 
 	if err := g.Populate(); err != nil {
@@ -66,7 +66,7 @@ func InitInject(db *mysql.DB) *api.Common {
 }
 
 // InitHTTPHandler 初始化GIN服务
-func InitHTTPHandler(apiCommon *api.Common, db *mysql.DB) *gin.Engine {
+func InitHTTPHandler(apiCommon *ctl.Common, db *mysql.DB) *gin.Engine {
 	gin.SetMode(viper.GetString("run_mode"))
 
 	app := gin.New()

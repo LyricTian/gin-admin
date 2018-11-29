@@ -1,12 +1,12 @@
-package api
+package ctl
 
 import (
 	"strings"
 
 	"github.com/LyricTian/gin-admin/src/bll"
-	"github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
 // User 用户管理

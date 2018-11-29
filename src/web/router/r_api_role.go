@@ -1,13 +1,13 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/src/api"
-	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/web/context"
+	"github.com/LyricTian/gin-admin/src/web/ctl"
 	"github.com/gin-gonic/gin"
 )
 
 // APIRoleRouter 注册/roles路由
-func APIRoleRouter(g *gin.RouterGroup, role *api.Role) {
+func APIRoleRouter(g *gin.RouterGroup, role *ctl.Role) {
 	g.GET("/roles", context.WrapContext(role.Query, "查询角色数据"))
 	g.GET("/roles/:id", context.WrapContext(role.Get, "查询指定角色数据"))
 	g.POST("/roles", context.WrapContext(role.Create, "创建角色数据"))

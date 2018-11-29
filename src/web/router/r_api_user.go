@@ -1,13 +1,13 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/src/api"
-	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/web/context"
+	"github.com/LyricTian/gin-admin/src/web/ctl"
 	"github.com/gin-gonic/gin"
 )
 
 // APIUserRouter 注册/users路由
-func APIUserRouter(g *gin.RouterGroup, user *api.User) {
+func APIUserRouter(g *gin.RouterGroup, user *ctl.User) {
 	g.GET("/users", context.WrapContext(user.Query, "查询用户数据"))
 	g.GET("/users/:id", context.WrapContext(user.Get, "查询指定用户数据"))
 	g.POST("/users", context.WrapContext(user.Create, "创建用户数据"))

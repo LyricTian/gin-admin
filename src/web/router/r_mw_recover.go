@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/logger"
+	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
 )
 

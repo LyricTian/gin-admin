@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/LyricTian/gin-admin/src"
-	"github.com/LyricTian/gin-admin/src/util"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
+	"github.com/LyricTian/gin-admin/src"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 

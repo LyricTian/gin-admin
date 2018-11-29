@@ -1,12 +1,12 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/src/api"
+	"github.com/LyricTian/gin-admin/src/web/ctl"
 	"github.com/gin-gonic/gin"
 )
 
 // APIV1Handler /api/v1路由
-func APIV1Handler(r *gin.Engine, c *api.Common) {
+func APIV1Handler(r *gin.Engine, c *ctl.Common) {
 	relativePath := "/api/v1"
 	v1 := r.Group(relativePath,
 		VerifySessionMiddleware(
