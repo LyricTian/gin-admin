@@ -45,11 +45,11 @@ export default class RoleCard extends PureComponent {
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 4 },
+        sm: { span: 6 },
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 20 },
+        sm: { span: 18 },
       },
     };
 
@@ -66,7 +66,7 @@ export default class RoleCard extends PureComponent {
     return (
       <Modal
         title={formTitle}
-        width={600}
+        width={450}
         visible={formVisible}
         maskClosable={false}
         confirmLoading={submitting}
@@ -103,7 +103,7 @@ export default class RoleCard extends PureComponent {
           </Row>
           <Row>
             <Col md={24} sm={24}>
-              <Form.Item {...formItemLayout} label="状态">
+              <Form.Item {...formItemLayout} label="角色状态">
                 {getFieldDecorator('status', {
                   initialValue: formData.status ? formData.status.toString() : '1',
                 })(
@@ -117,7 +117,7 @@ export default class RoleCard extends PureComponent {
           </Row>
         </Form>
         <Card title="选择菜单权限">
-          <div style={{ paddingLeft: 50 }}>
+          <div style={{ paddingLeft: 20 }}>
             <MenuTree treeProps={menuTreeProps} />
           </div>
         </Card>
