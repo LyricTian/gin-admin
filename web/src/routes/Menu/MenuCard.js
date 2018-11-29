@@ -137,7 +137,7 @@ export default class MenuCard extends PureComponent {
                 </Form.Item>
               </Col>
               <Col md={12} sm={24}>
-                <Form.Item {...formItemLayout} label="状态">
+                <Form.Item {...formItemLayout} label="菜单状态">
                   {getFieldDecorator('status', {
                     initialValue: formData.status ? formData.status.toString() : '1',
                   })(

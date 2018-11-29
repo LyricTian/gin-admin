@@ -217,7 +217,7 @@ export default class MenuList extends PureComponent {
     } = this.props;
     return (
       <Form onSubmit={this.onSearchFormSubmit} layout="inline">
-        <Row>
+        <Row gutter={16}>
           <Col md={8} sm={24}>
             <Form.Item label="菜单名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
@@ -236,7 +236,7 @@ export default class MenuList extends PureComponent {
             </Form.Item>
           </Col>
           <Col md={8} sm={24}>
-            <Form.Item label="状态">
+            <Form.Item label="菜单状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Select.Option value="1">正常</Select.Option>
@@ -366,7 +366,7 @@ export default class MenuList extends PureComponent {
         },
       },
       {
-        title: '状态',
+        title: '菜单状态',
         dataIndex: 'status',
         width: 100,
         render: val => {
@@ -465,7 +465,7 @@ export default class MenuList extends PureComponent {
                   {selectedRows.length > 0 && (
                     <span>
                       <Button icon="delete" type="danger" onClick={() => this.onBatchDelClick()}>
-                        批量删除
+                        删除
                       </Button>
                     </span>
                   )}

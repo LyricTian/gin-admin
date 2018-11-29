@@ -47,6 +47,13 @@ export default app => [
               import('./routes/Role/RoleList')
             ),
           },
+          {
+            name: '用户管理',
+            path: 'user',
+            component: dynamicWrapper(app, ['role', 'user'], () =>
+              import('./routes/User/UserList')
+            ),
+          },
         ],
       },
     ],
