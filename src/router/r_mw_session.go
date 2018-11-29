@@ -2,12 +2,12 @@ package router
 
 import (
 	"fmt"
-	"gin-admin/src/context"
-	"gin-admin/src/service/mysql"
-	"gin-admin/src/util"
 	"net/http"
 	"strings"
 
+	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/service/mysql"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/gin-session"
 	mysession "github.com/go-session/mysql"

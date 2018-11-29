@@ -1,10 +1,11 @@
 package api
 
 import (
-	"gin-admin/src/bll"
-	"gin-admin/src/context"
-	"gin-admin/src/schema"
 	"strings"
+
+	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/schema"
 )
 
 // Demo 示例程序

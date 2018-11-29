@@ -1,6 +1,8 @@
 package util
 
-import "github.com/json-iterator/go"
+import (
+	"github.com/json-iterator/go"
+)
 
 // 定义JSON操作
 var (

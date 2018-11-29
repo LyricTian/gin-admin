@@ -2,10 +2,11 @@ package bll
 
 import (
 	"context"
-	"gin-admin/src/model"
-	"gin-admin/src/schema"
-	"gin-admin/src/util"
 	"time"
+
+	"github.com/LyricTian/gin-admin/src/model"
+	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // Demo 示例程序

@@ -2,7 +2,8 @@ package model
 
 import (
 	"context"
-	"gin-admin/src/schema"
+
+	"github.com/LyricTian/gin-admin/src/schema"
 )
 
 // IDemo 示例程序

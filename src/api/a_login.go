@@ -1,12 +1,11 @@
 package api
 
 import (
-	"gin-admin/src/bll"
-	"gin-admin/src/context"
-	"gin-admin/src/logger"
-	"gin-admin/src/schema"
-	"gin-admin/src/util"
-
+	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/logger"
+	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/gin-session"
 )

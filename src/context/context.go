@@ -3,11 +3,11 @@ package context
 import (
 	"context"
 	"fmt"
-	"gin-admin/src/logger"
-	"gin-admin/src/util"
 	"net/http"
 	"strings"
 
+	"github.com/LyricTian/gin-admin/src/logger"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )

@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"gin-admin/src/model"
-	"gin-admin/src/schema"
-	"gin-admin/src/service/mysql"
 	"time"
 
+	"github.com/LyricTian/gin-admin/src/model"
+	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/service/mysql"
 	"github.com/facebookgo/inject"
 	"github.com/pkg/errors"
 )

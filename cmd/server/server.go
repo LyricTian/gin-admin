@@ -2,9 +2,6 @@ package main
 
 import (
 	"flag"
-	"gin-admin/src"
-	"gin-admin/src/logger"
-	"gin-admin/src/util"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/LyricTian/gin-admin/src"
+	"github.com/LyricTian/gin-admin/src/logger"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/spf13/viper"
 
 	_ "github.com/go-sql-driver/mysql"

@@ -2,14 +2,13 @@ package bll
 
 import (
 	"context"
-	"gin-admin/src/model"
-	"gin-admin/src/schema"
-	"gin-admin/src/util"
 	"time"
 
-	"github.com/spf13/viper"
-
+	"github.com/LyricTian/gin-admin/src/model"
+	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 // User 用户管理

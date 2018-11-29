@@ -1,6 +1,8 @@
 package util
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // S 字符串类型转换
 type S string

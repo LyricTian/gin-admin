@@ -1,7 +1,7 @@
 package test
 
 import (
-	"gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/schema"
 	"net/http/httptest"
 	"testing"
 
