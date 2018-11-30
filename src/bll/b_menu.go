@@ -79,6 +79,10 @@ func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
 
 // Update 更新数据
 func (a *Menu) Update(ctx context.Context, recordID string, item *schema.Menu) error {
+	if recordID == item.ParentID {
+		return errors.New("不能使用自己作为菜单上级")
+	}
+
 	oldItem, err := a.MenuModel.Get(ctx, recordID)
 	if err != nil {
 		return err

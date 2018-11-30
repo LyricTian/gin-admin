@@ -322,7 +322,7 @@ export default class UserList extends PureComponent {
       {
         title: '角色名称',
         dataIndex: 'role_names',
-        render: val => <span>{val.join(';')}</span>,
+        render: val => <span>{val ? val.join(';') : ''}</span>,
       },
       {
         title: '用户状态',

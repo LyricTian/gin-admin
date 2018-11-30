@@ -5,11 +5,11 @@ import "testing"
 func TestGetLevelCode(t *testing.T) {
 	levelCodes := []string{
 		"01",
-		"0101",
 		"0102",
+		"0103",
 	}
 	levelCode := GetLevelCode(levelCodes)
-	if levelCode != "0103" {
+	if levelCode != "0101" {
 		t.Error("无效的分级码：", levelCode)
 		return
 	}
