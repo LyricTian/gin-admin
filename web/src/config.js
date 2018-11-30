@@ -1,5 +1,5 @@
 export default {
-  title: '推送服务管理平台',
+  title: '权限管理平台',
   copyRight: '2018 LyricTian',
   defaultURL: '/system/menu',
 };
