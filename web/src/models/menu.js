@@ -58,7 +58,7 @@ export default {
         payload: response,
       });
     },
-    *fetchSearchTree({ payload }, { call, put }) {
+    *fetchSearchTree({ payload }, { call, put, select }) {
       let params = {
         type: 'tree',
       };
@@ -72,7 +72,8 @@ export default {
         payload: list,
       });
 
-      if (list.length > 0) {
+      const expandedKeys = yield select(state => state.menu.expandedKeys);
+      if (expandedKeys.length === 0 && list.length > 0) {
         yield put({
           type: 'saveExpandedKeys',
           payload: [list[0].record_id],
@@ -150,31 +151,37 @@ export default {
 
       const params = { ...payload };
       const { type } = params;
-      if (
-        (type === 20 || type === 30 || type === 40) &&
-        params.parent_id &&
-        params.parent_id !== ''
-      ) {
-        let result = true;
+
+      let valid = true;
+      if (type === 10) {
+        if (params.parent_id !== '') {
+          message.error('系统不能包含上级菜单');
+          valid = false;
+        }
+      } else if (params.parent_id === '') {
+        message.error('请选择上级菜单');
+        valid = false;
+      } else {
         const parent = yield call(menuService.get, { record_id: params.parent_id });
-        const ptype = parent.type;
+        const { type: ptype } = parent;
         if (type === 20 && !(ptype === 10 || ptype === 20)) {
           message.error('模块依赖于系统或模块');
-          result = false;
-        } else if (type === 30 && !(ptype === 20 || ptype === 10)) {
+          valid = false;
+        } else if (type === 30 && !(ptype === 10 || ptype === 20)) {
           message.error('功能依赖于系统或模块');
-          result = false;
-        } else if (type === 40 && !(ptype === 30)) {
+          valid = false;
+        } else if (type === 40 && ptype !== 30) {
           message.error('动作依赖于功能');
-          result = false;
+          valid = false;
         }
-        if (!result) {
-          yield put({
-            type: 'changeSubmitting',
-            payload: false,
-          });
-          return;
-        }
+      }
+
+      if (!valid) {
+        yield put({
+          type: 'changeSubmitting',
+          payload: false,
+        });
+        return;
       }
 
       const formType = yield select(state => state.menu.formType);
