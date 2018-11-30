@@ -28,7 +28,7 @@ export default app => [
     ],
   },
   {
-    component: dynamicWrapper(app, [], () => import('./layouts/AdminLayout')),
+    component: dynamicWrapper(app, ['login'], () => import('./layouts/AdminLayout')),
     path: '',
     layout: 'AdminLayout',
     children: [

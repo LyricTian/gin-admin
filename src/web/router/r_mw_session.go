@@ -20,7 +20,10 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 	sessionConfig := viper.GetStringMap("session")
 
 	var opts []session.Option
-	opts = append(opts, session.SetCookieName(util.T(sessionConfig["cookie_name"]).String()))
+	opts = append(opts, session.SetEnableSetCookie(false))
+	opts = append(opts, session.SetEnableSIDInURLQuery(false))
+	opts = append(opts, session.SetEnableSIDInHTTPHeader(true))
+	opts = append(opts, session.SetSessionNameInHTTPHeader(util.T(sessionConfig["header_name"]).String()))
 	opts = append(opts, session.SetSign(util.T(sessionConfig["sign"]).Bytes()))
 	opts = append(opts, session.SetDomain(util.T(sessionConfig["domain"]).String()))
 	opts = append(opts, session.SetCookieLifeTime(util.T(sessionConfig["cookie_life_time"]).Int()))
@@ -36,6 +39,10 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 	ginConfig := ginsession.DefaultConfig
 	ginConfig.Skipper = func(c *gin.Context) bool {
 		return sessionSkipper(c, allowPrefixes...)
+	}
+	ginConfig.ErrorHandleFunc = func(c *gin.Context, err error) {
+		ctx := context.NewContext(c)
+		ctx.ResError(err, http.StatusInternalServerError)
 	}
 
 	return ginsession.NewWithConfig(ginConfig, opts...)

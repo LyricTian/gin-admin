@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router';
 import { stringify, parse } from 'qs';
-import { storeLogoutKey } from '../utils/utils';
+import { storeLogoutKey, storeAccessTokenKey } from '../utils/utils';
 import * as loginService from '../services/login';
 
 export default {
@@ -27,7 +27,7 @@ export default {
         payload: false,
       });
 
-      if (response.status === 'ok') {
+      if (response.status === 'OK') {
         sessionStorage.removeItem(storeLogoutKey);
         const params = parse(window.location.href.split('?')[1]);
         const { redirect } = params;
@@ -44,11 +44,12 @@ export default {
         payload: false,
       });
       const response = yield call(loginService.logout);
-      if (response === 'ok') {
+      if (response.status === 'OK') {
         if (sessionStorage.getItem(storeLogoutKey) === '1') {
           return;
         }
         sessionStorage.setItem(storeLogoutKey, '1');
+        localStorage.removeItem(storeAccessTokenKey);
 
         yield put(
           routerRedux.push({

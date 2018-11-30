@@ -49,13 +49,18 @@ const query = {
 }))
 class AdminLayout extends React.PureComponent {
   componentDidMount() {
-    // this.dispatch({
-    //   type: 'global/fetchUser',
-    // });
-    // this.dispatch({
-    //   type: 'global/fetchMenus',
-    //   payload: this.props.location.pathname,
-    // });
+    const {
+      location: { pathname },
+    } = this.props;
+
+    this.dispatch({
+      type: 'global/fetchUser',
+    });
+
+    this.dispatch({
+      type: 'global/fetchMenus',
+      pathname,
+    });
   }
 
   dispatch = action => {
@@ -140,7 +145,7 @@ class AdminLayout extends React.PureComponent {
         );
       }
 
-      const itemPath = item.router;
+      const itemPath = item.path;
       const icon = item.icon && <Icon type={item.icon} />;
       const {
         location: { pathname },
