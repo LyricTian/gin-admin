@@ -3,6 +3,8 @@ import md5 from 'md5';
 
 // 登出key
 export const storeLogoutKey = 'is_logout';
+// 访问令牌key
+export const storeAccessTokenKey = 'access_token';
 
 // 扩展节点
 export function getPlainNode(nodeList, parentPath = '') {

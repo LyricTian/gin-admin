@@ -1,6 +1,9 @@
 package ctl
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/schema"
@@ -56,7 +59,7 @@ func (a *Login) Login(ctx *context.Context) {
 	}
 	logger.LoginWithContext(nctx).Infof("登入系统")
 
-	ctx.ResSuccess(gin.H{"status": "success"})
+	ctx.ResOK()
 }
 
 // Logout 用户登出
@@ -97,6 +100,9 @@ func (a *Login) QueryCurrentUserMenus(ctx *context.Context) {
 	menus, err := a.LoginBll.QueryCurrentUserMenus(ctx.NewContext(), userID)
 	if err != nil {
 		ctx.ResInternalServerError(err)
+		return
+	} else if len(menus) == 0 {
+		ctx.ResError(fmt.Errorf("用户未授权"), http.StatusUnauthorized, 9998)
 		return
 	}
 	ctx.ResList(menus)

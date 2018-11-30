@@ -12,44 +12,25 @@ export default {
     collapsed: false,
     openKeys: [],
     selectedKeys: [],
-    user: { user_name: 'admin', real_name: '管理员' },
-    menuPaths: {
-      '/system/menu': { level_code: '01' },
-      '/system/role': { level_code: '02' },
-      '/system/user': { level_code: '03' },
+    user: {
+      user_name: 'admin',
+      real_name: '管理员',
+      role_names: [],
     },
-    menus: [
-      {
-        icon: 'solution',
-        level_code: '01',
-        name: '菜单管理',
-        router: '/system/menu',
-      },
-      {
-        icon: 'audit',
-        level_code: '02',
-        name: '角色管理',
-        router: '/system/role',
-      },
-      {
-        icon: 'user',
-        level_code: '03',
-        name: '用户管理',
-        router: '/system/user',
-      },
-    ],
+    menuPaths: {},
+    menus: [],
   },
 
   effects: {
-    *menuEvent({ payload }, { put, select }) {
-      let pathname = payload;
-      if (pathname === '/') {
-        pathname = yield select(state => state.global.defaultURL);
+    *menuEvent({ pathname }, { put, select }) {
+      let p = pathname;
+      if (p === '/') {
+        p = yield select(state => state.global.defaultURL);
       }
 
       const menuPaths = yield select(state => state.global.menuPaths);
       const menus = yield select(state => state.global.menus);
-      const keys = getMenuKeys(pathname, menuPaths, menus);
+      const keys = getMenuKeys(p, menuPaths, menus);
 
       if (keys.length > 0) {
         yield put({
@@ -58,7 +39,7 @@ export default {
         });
       }
 
-      const levelCode = getLevelCode(pathname, menuPaths);
+      const levelCode = getLevelCode(p, menuPaths);
       yield put({
         type: 'changeSelectedKeys',
         payload: [levelCode],
@@ -71,25 +52,27 @@ export default {
         payload: response,
       });
     },
-    *fetchMenus({ payload }, { call, put }) {
+    *fetchMenus({ pathname }, { call, put }) {
       const response = yield call(loginService.queryCurrentMenus);
+
+      const menuData = response.list || [];
       yield put({
         type: 'saveMenus',
-        payload: response,
+        payload: menuData,
       });
 
       const menuPaths = {};
       function findPath(data) {
         for (let i = 0; i < data.length; i += 1) {
-          if (data[i].router !== '') {
-            menuPaths[data[i].router] = data[i];
+          if (data[i].path !== '') {
+            menuPaths[data[i].path] = data[i];
           }
           if (data[i].children && data[i].children.length > 0) {
             findPath(data[i].children);
           }
         }
       }
-      findPath(response);
+      findPath(menuData);
 
       yield put({
         type: 'saveMenuPaths',
@@ -98,7 +81,7 @@ export default {
 
       yield put({
         type: 'menuEvent',
-        payload,
+        pathname,
       });
     },
   },
@@ -122,13 +105,22 @@ export default {
         selectedKeys: payload,
       };
     },
+    saveUser(state, { payload }) {
+      return { ...state, user: payload };
+    },
+    saveMenuPaths(state, { payload }) {
+      return { ...state, menuPaths: payload };
+    },
+    saveMenus(state, { payload }) {
+      return { ...state, menus: payload };
+    },
   },
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(({ pathname }) => {
         dispatch({
           type: 'menuEvent',
-          payload: pathname,
+          pathname,
         });
       });
     },

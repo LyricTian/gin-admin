@@ -23,6 +23,7 @@ type Login struct {
 	UserModel model.IUser `inject:"IUser"`
 	RoleModel model.IRole `inject:"IRole"`
 	MenuModel model.IMenu `inject:"IMenu"`
+	UserBll   *User       `inject:""`
 }
 
 // Verify 登录验证
@@ -42,7 +43,7 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 }
 
 // GetCurrentUserInfo 获取当前用户信息
-func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (map[string]interface{}, error) {
+func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (*schema.LoginInfo, error) {
 	user, err := a.UserModel.Get(ctx, userID, true)
 	if err != nil {
 		return nil, err
@@ -52,9 +53,9 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (map[stri
 		return nil, ErrUserDisable
 	}
 
-	info := map[string]interface{}{
-		"user_name": user.UserName,
-		"real_name": user.RealName,
+	info := &schema.LoginInfo{
+		UserName: user.UserName,
+		RealName: user.RealName,
 	}
 
 	// 查询用户角色
@@ -65,7 +66,7 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (map[stri
 			for i, item := range roleItems {
 				roleNames[i] = item.Name
 			}
-			info["role_names"] = roleNames
+			info.RoleNames = roleNames
 		}
 	}
 
@@ -74,11 +75,19 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (map[stri
 
 // QueryCurrentUserMenus 查询当前用户菜单
 func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map[string]interface{}, error) {
-	items, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
-		UserID:     userID,
+	params := schema.MenuSelectQueryParam{
 		Status:     1,
 		SystemCode: viper.GetString("system_code"),
-	})
+	}
+
+	isAdmin, err := a.UserBll.CheckIsAdmin(ctx, userID)
+	if err != nil {
+		return nil, err
+	} else if !isAdmin {
+		params.UserID = userID
+	}
+
+	items, err := a.MenuModel.QuerySelect(ctx, params)
 	if err != nil {
 		return nil, err
 	}
