@@ -1,22 +1,16 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/src/service/mysql"
 	"github.com/LyricTian/gin-admin/src/web/ctl"
 	"github.com/gin-gonic/gin"
 )
 
 // APIV1Handler /api/v1路由
-func APIV1Handler(r *gin.Engine, db *mysql.DB, c *ctl.Common) {
-	relativePath := "/api/v1/"
-	v1 := r.Group(relativePath,
-		SessionMiddleware(db, relativePath),
+func APIV1Handler(r *gin.Engine, c *ctl.Common) {
+	v1 := r.Group("/api/v1/",
 		VerifySessionMiddleware(
-			[]string{relativePath},
-			[]string{
-				relativePath + "login",
-				relativePath + "logout",
-			},
+			"/api/v1/login",
+			"/api/v1/logout",
 		))
 
 	// 注册路由

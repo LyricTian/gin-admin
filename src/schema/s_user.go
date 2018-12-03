@@ -41,3 +41,8 @@ type UserQueryResult struct {
 	Created   int64    `json:"created" db:"created"`     // 创建时间戳
 	RoleNames []string `json:"role_names" db:"-"`        // 角色名称
 }
+
+// UserRoleQueryParam 用户角色查询参数
+type UserRoleQueryParam struct {
+	UserID string
+}

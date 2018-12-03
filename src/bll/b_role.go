@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/casbin/casbin"
+
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
@@ -13,9 +15,10 @@ import (
 
 // Role 角色管理
 type Role struct {
-	RoleModel model.IRole `inject:"IRole"`
-	MenuModel model.IMenu `inject:"IMenu"`
-	UserModel model.IUser `inject:"IUser"`
+	RoleModel model.IRole      `inject:"IRole"`
+	MenuModel model.IMenu      `inject:"IMenu"`
+	UserModel model.IUser      `inject:"IUser"`
+	Enforcer  *casbin.Enforcer `inject:""`
 }
 
 // QueryPage 查询分页数据
@@ -87,7 +90,12 @@ func (a *Role) Create(ctx context.Context, item *schema.Role) error {
 	item.RecordID = util.MustUUID()
 	item.Created = time.Now().Unix()
 	item.Deleted = 0
-	return a.RoleModel.Create(ctx, item)
+	err = a.RoleModel.Create(ctx, item)
+	if err != nil {
+		return err
+	}
+
+	return a.LoadPolicy(ctx, item.RecordID)
 }
 
 // Update 更新数据
@@ -120,7 +128,12 @@ func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) e
 	delete(info, "updated")
 	delete(info, "deleted")
 
-	return a.RoleModel.UpdateWithMenuIDs(ctx, recordID, info, item.MenuIDs)
+	err = a.RoleModel.UpdateWithMenuIDs(ctx, recordID, info, item.MenuIDs)
+	if err != nil {
+		return err
+	}
+
+	return a.LoadPolicy(ctx, item.RecordID)
 }
 
 // Delete 删除数据
@@ -139,7 +152,13 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 		return errors.New("该角色已被赋予用户，不能删除！")
 	}
 
-	return a.RoleModel.Delete(ctx, recordID)
+	err = a.RoleModel.Delete(ctx, recordID)
+	if err != nil {
+		return err
+	}
+
+	a.Enforcer.DeletePermissionsForUser(recordID)
+	return nil
 }
 
 // UpdateStatus 更新状态
@@ -154,5 +173,63 @@ func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) er
 	info := map[string]interface{}{
 		"status": status,
 	}
-	return a.RoleModel.Update(ctx, recordID, info)
+
+	err = a.RoleModel.Update(ctx, recordID, info)
+	if err != nil {
+		return err
+	}
+
+	if status == 2 {
+		a.Enforcer.DeletePermissionsForUser(recordID)
+	} else {
+		err = a.LoadPolicy(ctx, recordID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// LoadAllPolicy 加载所有的角色策略
+func (a *Role) LoadAllPolicy() error {
+	ctx := context.Background()
+
+	roles, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{
+		Status: 1,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, role := range roles {
+		err = a.LoadPolicy(ctx, role.RecordID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// LoadPolicy 加载角色权限策略
+func (a *Role) LoadPolicy(ctx context.Context, roleID string) error {
+	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
+		Status: 1,
+		Types:  []int{40},
+		RoleID: roleID,
+	})
+	if err != nil {
+		return err
+	}
+
+	a.Enforcer.DeletePermissionsForUser(roleID)
+	for _, menu := range menus {
+		if menu.Path == "" || menu.Method == "" {
+			continue
+		}
+		a.Enforcer.AddPermissionForUser(roleID, menu.Path, menu.Method)
+	}
+
+	return nil
 }

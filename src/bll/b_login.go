@@ -23,11 +23,38 @@ type Login struct {
 	UserModel model.IUser `inject:"IUser"`
 	RoleModel model.IRole `inject:"IRole"`
 	MenuModel model.IMenu `inject:"IMenu"`
-	UserBll   *User       `inject:""`
+}
+
+func (a *Login) getRootUser() schema.User {
+	rootUser := viper.GetStringSlice("system_root_user")
+	if len(rootUser) == 2 {
+		return schema.User{
+			RecordID: rootUser[0],
+			UserName: rootUser[0],
+			RealName: "超级用户",
+			Password: rootUser[1],
+		}
+	}
+	return schema.User{}
+}
+
+// CheckIsRoot 检查是否是超级用户
+func (a *Login) CheckIsRoot(ctx context.Context, recordID string) bool {
+	rootUser := a.getRootUser()
+	if rootUser.RecordID == recordID {
+		return true
+	}
+	return false
 }
 
 // Verify 登录验证
 func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
+	rootUser := a.getRootUser()
+	if userName == rootUser.UserName &&
+		util.MD5HashString(rootUser.Password) == password {
+		return &rootUser, nil
+	}
+
 	user, err := a.UserModel.GetByUserName(ctx, userName, false)
 	if err != nil {
 		return nil, err
@@ -44,6 +71,14 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 
 // GetCurrentUserInfo 获取当前用户信息
 func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (*schema.LoginInfo, error) {
+	if isRoot := a.CheckIsRoot(ctx, userID); isRoot {
+		rootUser := a.getRootUser()
+		return &schema.LoginInfo{
+			UserName: rootUser.UserName,
+			RealName: rootUser.RealName,
+		}, nil
+	}
+
 	user, err := a.UserModel.Get(ctx, userID, true)
 	if err != nil {
 		return nil, err
@@ -78,12 +113,11 @@ func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map
 	params := schema.MenuSelectQueryParam{
 		Status:     1,
 		SystemCode: viper.GetString("system_code"),
+		IsHide:     2,
+		Types:      []int{20, 30},
 	}
 
-	isAdmin, err := a.UserBll.CheckIsAdmin(ctx, userID)
-	if err != nil {
-		return nil, err
-	} else if !isAdmin {
+	if isRoot := a.CheckIsRoot(ctx, userID); !isRoot {
 		params.UserID = userID
 	}
 
@@ -93,40 +127,5 @@ func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map
 	}
 
 	treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
-	if treeData != nil {
-		a.convertMenuActionTree(&treeData)
-	}
-
 	return treeData, nil
-}
-
-// 遍历菜单树，将功能的下级菜单转换为动作数组
-func (a *Login) convertMenuActionTree(child *[]map[string]interface{}) {
-	for _, c := range *child {
-		if util.T(c["type"]).Int() == 30 {
-			children, ok := c["children"]
-			if ok {
-				delete(c, "children")
-				childActions := *children.(*[]map[string]interface{})
-				actions := make([]map[string]interface{}, len(childActions))
-
-				for i, c := range childActions {
-					actions[i] = map[string]interface{}{
-						"record_id": c["record_id"],
-						"code":      c["code"],
-						"name":      c["name"],
-						"icon":      c["icon"],
-						"path":      c["path"],
-					}
-				}
-
-				c["actions"] = actions
-			}
-			continue
-		}
-
-		if children, ok := c["children"]; ok {
-			a.convertMenuActionTree(children.(*[]map[string]interface{}))
-		}
-	}
 }

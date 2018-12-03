@@ -38,7 +38,12 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 
 	ginConfig := ginsession.DefaultConfig
 	ginConfig.Skipper = func(c *gin.Context) bool {
-		return sessionSkipper(c, allowPrefixes...)
+		for _, prefix := range allowPrefixes {
+			if strings.HasPrefix(c.Request.URL.Path, prefix) {
+				return false
+			}
+		}
+		return true
 	}
 	ginConfig.ErrorHandleFunc = func(c *gin.Context, err error) {
 		ctx := context.NewContext(c)
@@ -48,24 +53,10 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 	return ginsession.NewWithConfig(ginConfig, opts...)
 }
 
-func sessionSkipper(c *gin.Context, prefixes ...string) bool {
-	if viper.GetString("run_mode") == util.DebugMode {
-		return true
-	}
-
-	for _, prefix := range prefixes {
-		if strings.HasPrefix(c.Request.URL.Path, prefix) {
-			return false
-		}
-	}
-
-	return true
-}
-
 // VerifySessionMiddleware 验证session中间件
-func VerifySessionMiddleware(allowPrefixes, skipPrefixes []string) gin.HandlerFunc {
+func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if sessionSkipper(c, allowPrefixes...) {
+		if viper.GetString("run_mode") == util.DebugMode {
 			c.Next()
 			return
 		}

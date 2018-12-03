@@ -7,8 +7,11 @@ http_addr = ":8086"
 # 系统编号
 system_code = "admin"
 
-# 系统管理员用户名(不允许删除和修改用户信息)
-system_admin_users = ["admin"]
+# 超级用户名(用户名、密码)
+system_root_user = ["root","123"]
+
+# casbin的model配置文件
+casbin_model_conf = "../../config/model.conf"
 
 # 日志配置
 [log]

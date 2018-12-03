@@ -7,14 +7,15 @@ import (
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/casbin/casbin"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 // User 用户管理
 type User struct {
-	UserModel model.IUser `inject:"IUser"`
-	RoleModel model.IRole `inject:"IRole"`
+	UserModel model.IUser      `inject:"IUser"`
+	RoleModel model.IRole      `inject:"IRole"`
+	Enforcer  *casbin.Enforcer `inject:""`
 }
 
 // QueryPage 查询分页数据
@@ -69,7 +70,12 @@ func (a *User) Create(ctx context.Context, item *schema.User) error {
 	item.RecordID = util.MustUUID()
 	item.Created = time.Now().Unix()
 	item.Deleted = 0
-	return a.UserModel.Create(ctx, item)
+	err = a.UserModel.Create(ctx, item)
+	if err != nil {
+		return err
+	}
+
+	return a.LoadPolicy(ctx, item.RecordID)
 }
 
 // Update 更新数据
@@ -101,7 +107,12 @@ func (a *User) Update(ctx context.Context, recordID string, item *schema.User) e
 		info["password"] = util.SHA1HashString(item.Password)
 	}
 
-	return a.UserModel.UpdateWithRoleIDs(ctx, recordID, info, item.RoleIDs)
+	err = a.UserModel.UpdateWithRoleIDs(ctx, recordID, info, item.RoleIDs)
+	if err != nil {
+		return err
+	}
+
+	return a.LoadPolicy(ctx, recordID)
 }
 
 // Delete 删除数据
@@ -113,7 +124,13 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 		return util.ErrNotFound
 	}
 
-	return a.UserModel.Delete(ctx, recordID)
+	err = a.UserModel.Delete(ctx, recordID)
+	if err != nil {
+		return err
+	}
+
+	a.Enforcer.DeleteRolesForUser(recordID)
+	return nil
 }
 
 // UpdateStatus 更新状态
@@ -128,24 +145,51 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	info := map[string]interface{}{
 		"status": status,
 	}
-	return a.UserModel.Update(ctx, recordID, info)
-}
-
-// CheckIsAdmin 检查是否是管理员
-func (a *User) CheckIsAdmin(ctx context.Context, recordID string) (bool, error) {
-	user, err := a.UserModel.Get(ctx, recordID, false)
+	err = a.UserModel.Update(ctx, recordID, info)
 	if err != nil {
-		return false, err
-	} else if user == nil {
-		return false, nil
+		return err
 	}
 
-	adminUsers := viper.GetStringSlice("system_admin_users")
-	for _, v := range adminUsers {
-		if v == user.UserName {
-			return true, nil
+	if status == 2 {
+		a.Enforcer.DeleteRolesForUser(recordID)
+	} else {
+		err = a.LoadPolicy(ctx, recordID)
+		if err != nil {
+			return err
 		}
 	}
 
-	return false, nil
+	return nil
+}
+
+// LoadAllPolicy 加载所有的用户策略
+func (a *User) LoadAllPolicy() error {
+	ctx := context.Background()
+
+	userRoles, err := a.UserModel.QueryUserRoles(ctx, schema.UserRoleQueryParam{})
+	if err != nil {
+		return err
+	}
+
+	for _, ur := range userRoles {
+		a.Enforcer.AddRoleForUser(ur.UserID, ur.RoleID)
+	}
+
+	return nil
+}
+
+// LoadPolicy 加载用户权限策略
+func (a *User) LoadPolicy(ctx context.Context, userID string) error {
+	userRoles, err := a.UserModel.QueryUserRoles(ctx, schema.UserRoleQueryParam{
+		UserID: userID,
+	})
+	if err != nil {
+		return err
+	}
+
+	a.Enforcer.DeleteRolesForUser(userID)
+	for _, ur := range userRoles {
+		a.Enforcer.AddRoleForUser(ur.UserID, ur.RoleID)
+	}
+	return nil
 }

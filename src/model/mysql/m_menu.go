@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/LyricTian/gin-admin/src/util"
+
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/mysql"
@@ -31,6 +33,7 @@ func (a *Menu) Init(g *inject.Graph, db *mysql.DB, c *Common) *Menu {
 	db.CreateTableIndex(a.TableName(), "idx_code", false, "code")
 	db.CreateTableIndex(a.TableName(), "idx_name", false, "name")
 	db.CreateTableIndex(a.TableName(), "idx_type", false, "type")
+	db.CreateTableIndex(a.TableName(), "idx_is_hide", false, "is_hide")
 	db.CreateTableIndex(a.TableName(), "idx_parent_id", false, "parent_id")
 	db.CreateTableIndex(a.TableName(), "idx_status", false, "status")
 	db.CreateTableIndex(a.TableName(), "idx_deleted", false, "deleted")
@@ -75,7 +78,7 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, page
 	}
 
 	var items []*schema.MenuQueryResult
-	fields := "id,record_id,code,name,icon,path,type,sequence,status"
+	fields := "id,record_id,code,name,icon,path,type,sequence,is_hide,status"
 	_, err = a.DB.Select(&items, fmt.Sprintf("SELECT %s FROM %s %s ORDER BY type,sequence,id LIMIT %d,%d", fields, a.TableName(), where, (pageIndex-1)*pageSize, pageSize), args...)
 	if err != nil {
 		return 0, nil, errors.Wrap(err, "查询分页数据发生错误")
@@ -123,14 +126,29 @@ func (a *Menu) QuerySelect(ctx context.Context, params schema.MenuSelectQueryPar
 		args = append(args, levelCodes)
 	}
 
+	if v := params.RoleID; v != "" {
+		where = fmt.Sprintf("%s AND record_id IN(SELECT menu_id FROM %s WHERE deleted=0 AND role_id=?)", where, a.Common.Role.RoleMenuTableName())
+		args = append(args, v)
+	}
+
 	if v := params.RecordIDs; len(v) > 0 {
 		where = fmt.Sprintf("%s AND record_id IN(?)", where)
 		args = append(args, v)
 	}
 
+	if v := params.Types; len(v) > 0 {
+		where = fmt.Sprintf("%s AND type IN(?)", where)
+		args = append(args, v)
+	}
+
+	if v := params.IsHide; v > 0 {
+		where = fmt.Sprintf("%s AND is_hide=?", where)
+		args = append(args, v)
+	}
+
 	var items []*schema.MenuSelectQueryResult
 
-	fields := "record_id,code,name,level_code,parent_id,type,icon,path"
+	fields := "record_id,code,name,level_code,parent_id,type,icon,path,method"
 	query, args, err := a.DB.In(fmt.Sprintf("SELECT %s FROM %s %s ORDER BY sequence,id", fields, a.TableName(), where), args...)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询选择数据发生错误")
@@ -164,11 +182,11 @@ func (a *Menu) QueryLevelCodesByUserID(userID string) ([]string, error) {
 		levelCodes[i] = item.LevelCode
 	}
 
-	return levelCodes, nil
+	return util.ParseLevelCodes(levelCodes...), nil
 }
 
 func (a *Menu) getAllFields() string {
-	fields := "id,record_id,code,name,type,sequence,icon,path,level_code,parent_id,status,creator,created,updated,deleted"
+	fields := "id,record_id,code,name,type,sequence,icon,path,method,level_code,parent_id,is_hide,status,creator,created,updated,deleted"
 	return fields
 }
 
