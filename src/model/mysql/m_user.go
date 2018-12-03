@@ -189,6 +189,27 @@ func (a *User) CheckByRoleID(ctx context.Context, roleID string) (bool, error) {
 	return n > 0, nil
 }
 
+// QueryUserRoles 查询用户角色
+func (a *User) QueryUserRoles(ctx context.Context, params schema.UserRoleQueryParam) ([]*schema.UserRole, error) {
+	var (
+		where = "WHERE deleted=0"
+		args  []interface{}
+	)
+
+	if params.UserID != "" {
+		where = fmt.Sprintf("%s AND user_id=?", where)
+		args = append(args, params.UserID)
+	}
+
+	var items []*schema.UserRole
+	query := fmt.Sprintf("SELECT user_id,role_id FROM %s %s", a.UserRoleTableName(), where)
+	_, err := a.DB.Select(&items, query, args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "查询用户角色发生错误")
+	}
+	return items, nil
+}
+
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item *schema.User) error {
 	tran, err := a.DB.Begin()

@@ -10,10 +10,10 @@ import (
 	model "github.com/LyricTian/gin-admin/src/model/mysql"
 	"github.com/LyricTian/gin-admin/src/service/mysql"
 	"github.com/LyricTian/gin-admin/src/util"
-	"github.com/LyricTian/gin-admin/src/web/context"
+	"github.com/LyricTian/gin-admin/src/web"
 	"github.com/LyricTian/gin-admin/src/web/ctl"
-	"github.com/LyricTian/gin-admin/src/web/router"
 	"github.com/LyricTian/logrus-mysql-hook"
+	"github.com/casbin/casbin"
 	"github.com/facebookgo/inject"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -24,14 +24,20 @@ type CloseHandle func()
 
 // Init 初始化所有服务
 func Init(version, traceID string) (*gin.Engine, CloseHandle) {
+	// 初始化MySQL
 	db := InitMySQL()
 
+	// 初始化日志
 	loggerHook := InitLogger(db.Db)
+
 	logger.System(traceID).Infof("服务已运行在[%s]模式下，版本号:%s，进程号：%d",
 		viper.GetString("run_mode"), version, os.Getpid())
 
-	apiCommon := InitInject(db)
-	httpHandler := InitHTTPHandler(apiCommon, db)
+	// 初始化依赖注入
+	enforcer, _, ctlCommon := InitInject(db)
+
+	// 初始化HTTP服务
+	httpHandler := web.Init(db, enforcer, ctlCommon)
 
 	return httpHandler, func() {
 		// 等待日志钩子写入完成
@@ -48,50 +54,25 @@ func Init(version, traceID string) (*gin.Engine, CloseHandle) {
 }
 
 // InitInject 初始化依赖注入
-func InitInject(db *mysql.DB) *ctl.Common {
+func InitInject(db *mysql.DB) (*casbin.Enforcer, *model.Common, *ctl.Common) {
 	g := new(inject.Graph)
 
-	// 注入mysql存储
-	new(model.Common).Init(g, db)
+	// 注入casbin
+	enforcer := casbin.NewEnforcer(viper.GetString("casbin_model_conf"), false)
+	g.Provide(&inject.Object{Value: enforcer})
 
-	// 注入API
-	apiCommon := new(ctl.Common)
-	g.Provide(&inject.Object{Value: apiCommon})
+	// 注入mysql存储
+	modelCommom := new(model.Common).Init(g, db)
+
+	// 注入控制器
+	ctlCommon := new(ctl.Common)
+	g.Provide(&inject.Object{Value: ctlCommon})
 
 	if err := g.Populate(); err != nil {
 		panic("注入模块发生错误:" + err.Error())
 	}
 
-	return apiCommon
-}
-
-// InitHTTPHandler 初始化GIN服务
-func InitHTTPHandler(apiCommon *ctl.Common, db *mysql.DB) *gin.Engine {
-	gin.SetMode(viper.GetString("run_mode"))
-
-	app := gin.New()
-
-	// 注册中间件
-	apiPrefixes := []string{
-		"/api/",
-	}
-
-	app.Use(router.TraceMiddleware(apiPrefixes...))
-	app.Use(logger.Middleware(apiPrefixes...))
-	app.Use(router.RecoveryMiddleware)
-
-	app.NoMethod(context.WrapContext(func(ctx *context.Context) {
-		ctx.ResError(fmt.Errorf("方法不允许"), 405)
-	}))
-
-	app.NoRoute(context.WrapContext(func(ctx *context.Context) {
-		ctx.ResError(fmt.Errorf("资源不存在"), 404)
-	}))
-
-	// 注册/api/v1路由
-	router.APIV1Handler(app, db, apiCommon)
-
-	return app
+	return enforcer, modelCommom, ctlCommon
 }
 
 // InitMySQL 初始化mysql数据库
