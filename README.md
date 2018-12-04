@@ -1,11 +1,12 @@
 # gin-admin
 
-> 基于 GIN + Ant Design 的RBAC管理系统
+> 基于GIN + Casbin + Ant Design的RBAC权限管理脚手架
 
 ## 获取
 
 ```
 $ cd $GOPATH/src
+$ mkdir -p github.com/LyricTian && cd github.com/LyricTian
 $ git clone https://github.com/LyricTian/gin-admin.git
 ```
 
