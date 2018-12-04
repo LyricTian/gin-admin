@@ -332,12 +332,12 @@ export default class MenuList extends PureComponent {
       {
         title: '菜单名称',
         dataIndex: 'name',
-        width: 150,
+        width: 180,
       },
       {
         title: '菜单编号',
         dataIndex: 'code',
-        width: 100,
+        width: 150,
       },
       {
         title: '菜单类型',
@@ -387,7 +387,7 @@ export default class MenuList extends PureComponent {
         width: 100,
       },
       {
-        title: '跳转链接',
+        title: '访问路径',
         dataIndex: 'path',
         width: 200,
       },
@@ -421,7 +421,7 @@ export default class MenuList extends PureComponent {
             </div>
             <Tree
               expandedKeys={expandedKeys}
-              onSelect={(keys, { selectedNodes }) => {
+              onSelect={keys => {
                 this.setState({ treeSelectedKeys: keys });
 
                 const {
@@ -435,7 +435,6 @@ export default class MenuList extends PureComponent {
 
                 if (keys.length > 0) {
                   [item.parent_id] = keys;
-                  item.parent_type = selectedNodes[0].props.dataRef.type;
                 }
 
                 this.dispatch({
@@ -481,7 +480,7 @@ export default class MenuList extends PureComponent {
                   columns={columns}
                   pagination={paginationProps}
                   onChange={this.onTableChange}
-                  scroll={{ x: 910 }}
+                  scroll={{ x: 990 }}
                   size="small"
                 />
               </div>

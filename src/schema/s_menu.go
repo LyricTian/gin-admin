@@ -4,7 +4,7 @@ package schema
 type Menu struct {
 	ID        int64  `json:"id" db:"id,primarykey,autoincrement" structs:"id"`          // 唯一标识(自增ID)
 	RecordID  string `json:"record_id" db:"record_id,size:36" structs:"record_id"`      // 记录内码(uuid)
-	Code      string `json:"code" db:"code,size:50" structs:"code"`                     // 菜单编号
+	Code      string `json:"code" db:"code,size:50" structs:"code" binding:"required"`  // 菜单编号
 	Name      string `json:"name" db:"name,size:50" structs:"name" binding:"required"`  // 菜单名称
 	Type      int    `json:"type" db:"type" structs:"type" binding:"required"`          // 菜单类型(10：系统 20：模块 30：功能 40：资源)
 	Sequence  int    `json:"sequence" db:"sequence" structs:"sequence"`                 // 排序值

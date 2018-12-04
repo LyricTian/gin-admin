@@ -80,7 +80,7 @@ export default {
         });
       }
     },
-    *loadForm({ payload }, { put, select }) {
+    *loadForm({ payload }, { call, put, select }) {
       yield put({
         type: 'changeFormVisible',
         payload: true,
@@ -110,13 +110,17 @@ export default {
 
       if (payload.type === 'A') {
         const search = yield select(state => state.menu.search);
-        yield put({
-          type: 'saveFormData',
-          payload: {
-            parent_id: search.parent_id,
-            type: (parseInt(search.parent_type || '0', 10) + 10).toString(),
-          },
-        });
+        if (search.parent_id) {
+          const { parent_id: parentID } = search;
+          const response = yield call(menuService.get, { record_id: parentID });
+          yield put({
+            type: 'saveFormData',
+            payload: {
+              parent_id: parentID,
+              type: response.type + 10,
+            },
+          });
+        }
       }
 
       if (payload.type === 'E') {
@@ -171,7 +175,7 @@ export default {
           message.error('功能依赖于系统或模块');
           valid = false;
         } else if (type === 40 && ptype !== 30) {
-          message.error('动作依赖于功能');
+          message.error('资源依赖于功能');
           valid = false;
         }
       }
