@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "oyXJxS8qqy5TCkqvndCD1c7Lkg4=",
+			"path": "github.com/Knetic/govaluate",
+			"revision": "9aa49832a739dcd78a5542ff189fb82c3e423116",
+			"revisionTime": "2017-10-22T00:36:10Z"
+		},
+		{
 			"checksumSHA1": "IvS0jG7I/Mk1EXAA/KNb1JSbmCc=",
 			"path": "github.com/LyricTian/logrus-mysql-hook",
 			"revision": "c7a7b3c0046aa7450da608eee22fa9433f2d7d6b",
@@ -19,6 +25,66 @@
 			"path": "github.com/LyricTian/retry",
 			"revision": "b6d48b303d897e03f71fffacbfb5c7d0d4db1268",
 			"revisionTime": "2017-10-17T08:29:30Z"
+		},
+		{
+			"checksumSHA1": "mVLNoe8B5ns+Haj9gNOL61Ab2h0=",
+			"path": "github.com/casbin/casbin",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "HXFHFC5laWQLV7ukDJMOu+fnV98=",
+			"path": "github.com/casbin/casbin/config",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "Lplb5OORSoHiAhyRlaX7feoCRqI=",
+			"path": "github.com/casbin/casbin/effect",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "5IZ0pDKgAJ4fmgI4pP8H6AEYHvs=",
+			"path": "github.com/casbin/casbin/log",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "HlI7cjIFxeL/cwyHCKgdeS3ShBc=",
+			"path": "github.com/casbin/casbin/model",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "Vh0QOexgwx/ecGQUB6TzHEaaZDM=",
+			"path": "github.com/casbin/casbin/persist",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "aLtUb035hzaQYgYXJjJce5o8ePE=",
+			"path": "github.com/casbin/casbin/persist/file-adapter",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "ZruzUDr8GdmwPfkP9s9UNdr4Jrw=",
+			"path": "github.com/casbin/casbin/rbac",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "Wnxdhc2mGdCnhaaITx0yzUsZNWA=",
+			"path": "github.com/casbin/casbin/rbac/default-role-manager",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
+		},
+		{
+			"checksumSHA1": "odG/LhWhDK1q6W2o2OjmO1Bxn3A=",
+			"path": "github.com/casbin/casbin/util",
+			"revision": "86f79503effe8bcee9fbfd545a24334ce50a84da",
+			"revisionTime": "2018-12-04T11:42:30Z"
 		},
 		{
 			"checksumSHA1": "dvabztWVQX8f6oMLRyv4dLH+TGY=",

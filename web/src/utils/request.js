@@ -25,8 +25,8 @@ function handle() {
       } = data;
       if (code === 9999) {
         store.dispatch({ type: 'login/logout' });
+        return {};
       }
-      return {};
     }
 
     let message = '服务器发生错误';
