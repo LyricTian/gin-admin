@@ -27,7 +27,6 @@ func Init(db *mysql.DB, enforcer *casbin.Enforcer, ctlCommon *ctl.Common) *gin.E
 	app.Use(logger.Middleware(apiPrefixes...))
 	app.Use(router.RecoveryMiddleware)
 	app.Use(router.SessionMiddleware(db, apiPrefixes...))
-	app.Use(router.CasbinMiddleware(enforcer, apiPrefixes...))
 
 	app.NoMethod(context.WrapContext(func(ctx *context.Context) {
 		ctx.ResError(fmt.Errorf("方法不允许"), 405)
@@ -38,7 +37,7 @@ func Init(db *mysql.DB, enforcer *casbin.Enforcer, ctlCommon *ctl.Common) *gin.E
 	}))
 
 	// 注册/api/v1路由
-	router.APIV1Handler(app, ctlCommon)
+	router.APIV1Handler(app, enforcer, ctlCommon)
 
 	// 加载casbin策略数据
 	err := loadCasbinPolicyData(ctlCommon)

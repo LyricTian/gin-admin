@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	configFile = "../../config/config.toml"
+	configFile = "../../../config/config.toml"
 	apiPrefix  = "/api/v1/"
 )
 
@@ -29,7 +29,8 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		panic("加载配置文件发生错误：" + err.Error())
 	}
-	viper.SetDefault("run_mode", "debug")
+	viper.Set("run_mode", "debug")
+	viper.Set("casbin_model_conf", "../../../config/model.conf")
 
 	engine, _ = src.Init("1.0.0", util.MustUUID())
 }

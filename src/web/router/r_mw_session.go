@@ -56,16 +56,22 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 // VerifySessionMiddleware 验证session中间件
 func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctx := context.NewContext(c)
+		store := ginsession.FromContext(c)
+		userID, ok := store.Get(util.SessionKeyUserID)
+
 		if viper.GetString("run_mode") == util.DebugMode {
+			if !ok || userID == nil {
+				if rootUser := viper.GetStringSlice("system_root_user"); len(rootUser) > 0 {
+					userID = rootUser[0]
+				}
+			}
+			c.Set(util.SessionKeyUserID, userID)
 			c.Next()
 			return
 		}
 
-		ctx := context.NewContext(c)
-		store := ginsession.FromContext(c)
-		userID, ok := store.Get(util.SessionKeyUserID)
 		if !ok || userID == nil {
-
 			for _, prefix := range skipPrefixes {
 				if strings.HasPrefix(c.Request.URL.Path, prefix) {
 					c.Next()
