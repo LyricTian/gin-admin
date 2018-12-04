@@ -23,6 +23,7 @@ func TestMenu(t *testing.T) {
 		Icon:     "test",
 		Path:     "/test",
 		Status:   1,
+		IsHide:   2,
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
