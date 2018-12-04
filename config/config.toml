@@ -41,12 +41,8 @@ sign = "GINADMIN"
 store = "mysql"
 # 存储会话的mysql表名
 table = "session"
-# 域名（不指定使用默认）
-domain = ""
-# cookie存储时长(单位小时)
-cookie_life_time = 72
-# 会话过期时长(单位分钟)
-expired = 120
+# 会话过期时长(单位秒)
+expired = 7200
 
 # mysql数据库配置
 [mysql]

@@ -25,8 +25,6 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 	opts = append(opts, session.SetEnableSIDInHTTPHeader(true))
 	opts = append(opts, session.SetSessionNameInHTTPHeader(util.T(sessionConfig["header_name"]).String()))
 	opts = append(opts, session.SetSign(util.T(sessionConfig["sign"]).Bytes()))
-	opts = append(opts, session.SetDomain(util.T(sessionConfig["domain"]).String()))
-	opts = append(opts, session.SetCookieLifeTime(util.T(sessionConfig["cookie_life_time"]).Int()))
 	opts = append(opts, session.SetExpired(util.T(sessionConfig["expired"]).Int64()))
 
 	if util.T(sessionConfig["store"]).String() == "mysql" {

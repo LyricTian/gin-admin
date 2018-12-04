@@ -6,15 +6,13 @@ import { storeAccessTokenKey } from './utils';
 // 默认前缀
 export const baseURLV1 = '/api/v1';
 
-function handle(url) {
+function handle() {
   return response => {
     const { status, data, headers } = response;
 
-    if (url === '/api/v1/login') {
-      const { 'access-token': accessToken } = headers;
-      if (accessToken) {
-        localStorage.setItem(storeAccessTokenKey, accessToken);
-      }
+    const { 'access-token': accessToken } = headers;
+    if (accessToken) {
+      sessionStorage.setItem(storeAccessTokenKey, accessToken);
     }
 
     if (status >= 200 && status < 300) {
@@ -22,7 +20,12 @@ function handle(url) {
     }
 
     if (status === 401) {
-      store.dispatch({ type: 'login/logout' });
+      const {
+        error: { code },
+      } = data;
+      if (code === 9999) {
+        store.dispatch({ type: 'login/logout' });
+      }
       return {};
     }
 
@@ -48,7 +51,7 @@ function handle(url) {
 
 export default async function request(url, options) {
   const defaultHeader = {
-    'access-token': localStorage.getItem(storeAccessTokenKey) || '',
+    'access-token': sessionStorage.getItem(storeAccessTokenKey) || '',
   };
 
   const newOptions = {
@@ -64,5 +67,5 @@ export default async function request(url, options) {
   }
   newOptions.headers = { ...defaultHeader, ...newOptions.headers };
 
-  return axios.request(newOptions).then(handle(url));
+  return axios.request(newOptions).then(handle());
 }
