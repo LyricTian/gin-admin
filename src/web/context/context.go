@@ -44,7 +44,7 @@ func (a *Context) NewContext() context.Context {
 // GetPageIndex 获取分页的页索引
 func (a *Context) GetPageIndex() uint {
 	if v := a.Query("current"); v != "" {
-		if iv := util.T(v).Uint(); iv > 0 {
+		if iv := util.S(v).Uint(); iv > 0 {
 			return iv
 		}
 	}
@@ -54,7 +54,7 @@ func (a *Context) GetPageIndex() uint {
 // GetPageSize 获取分页的页大小
 func (a *Context) GetPageSize() uint {
 	if v := a.Query("pageSize"); v != "" {
-		if iv := util.T(v).Uint(); iv > 0 {
+		if iv := util.S(v).Uint(); iv > 0 {
 			if iv > 50 {
 				iv = 50
 			}
