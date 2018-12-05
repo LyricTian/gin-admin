@@ -199,21 +199,23 @@ func (m *Manager) decodeSessionID(value string) (string, error) {
 func (m *Manager) sessionID(r *http.Request) (string, error) {
 	var cookieValue string
 
-	cookie, err := r.Cookie(m.opts.cookieName)
-	if err == nil && cookie.Value != "" {
-		cookieValue = cookie.Value
-	} else {
-		if m.opts.enableSIDInURLQuery {
-			err := r.ParseForm()
-			if err != nil {
-				return "", err
-			}
-			cookieValue = r.FormValue(m.opts.cookieName)
+	if m.opts.enableSetCookie {
+		cookie, err := r.Cookie(m.opts.cookieName)
+		if err == nil && cookie.Value != "" {
+			cookieValue = cookie.Value
 		}
+	}
 
-		if m.opts.enableSIDInHTTPHeader && cookieValue == "" {
-			cookieValue = r.Header.Get(m.opts.sessionNameInHTTPHeader)
+	if m.opts.enableSIDInURLQuery && cookieValue == "" {
+		err := r.ParseForm()
+		if err != nil {
+			return "", err
 		}
+		cookieValue = r.FormValue(m.opts.cookieName)
+	}
+
+	if m.opts.enableSIDInHTTPHeader && cookieValue == "" {
+		cookieValue = r.Header.Get(m.opts.sessionNameInHTTPHeader)
 	}
 
 	if cookieValue != "" {
@@ -244,25 +246,25 @@ func (m *Manager) isSecure(r *http.Request) bool {
 
 func (m *Manager) setCookie(sessionID string, w http.ResponseWriter, r *http.Request) {
 	cookieValue := m.encodeSessionID(sessionID)
-	cookie := &http.Cookie{
-		Name:     m.opts.cookieName,
-		Value:    cookieValue,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   m.isSecure(r),
-		Domain:   m.opts.domain,
-	}
-
-	if v := m.opts.cookieLifeTime; v > 0 {
-		cookie.MaxAge = v
-		cookie.Expires = time.Now().Add(time.Duration(v) * time.Second)
-	}
 
 	if m.opts.enableSetCookie {
-		http.SetCookie(w, cookie)
-	}
+		cookie := &http.Cookie{
+			Name:     m.opts.cookieName,
+			Value:    cookieValue,
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   m.isSecure(r),
+			Domain:   m.opts.domain,
+		}
 
-	r.AddCookie(cookie)
+		if v := m.opts.cookieLifeTime; v > 0 {
+			cookie.MaxAge = v
+			cookie.Expires = time.Now().Add(time.Duration(v) * time.Second)
+		}
+
+		http.SetCookie(w, cookie)
+		r.AddCookie(cookie)
+	}
 
 	if m.opts.enableSIDInHTTPHeader {
 		key := m.opts.sessionNameInHTTPHeader
@@ -340,12 +342,6 @@ func (m *Manager) Destroy(ctx context.Context, w http.ResponseWriter, r *http.Re
 		return err
 	}
 
-	if m.opts.enableSIDInHTTPHeader {
-		key := m.opts.sessionNameInHTTPHeader
-		r.Header.Del(key)
-		w.Header().Del(key)
-	}
-
 	if m.opts.enableSetCookie {
 		cookie := &http.Cookie{
 			Name:     m.opts.cookieName,
@@ -356,6 +352,12 @@ func (m *Manager) Destroy(ctx context.Context, w http.ResponseWriter, r *http.Re
 		}
 
 		http.SetCookie(w, cookie)
+	}
+
+	if m.opts.enableSIDInHTTPHeader {
+		key := m.opts.sessionNameInHTTPHeader
+		r.Header.Del(key)
+		w.Header().Del(key)
 	}
 
 	return nil
