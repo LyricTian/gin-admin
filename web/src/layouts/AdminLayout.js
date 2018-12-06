@@ -2,13 +2,12 @@ import React from 'react';
 import { Layout, Menu, Icon, Avatar, Dropdown, Spin } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { connect } from 'dva';
-import { Link, Route, Redirect, Switch } from 'dva/router';
+import Link from 'umi/link';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import Debounce from 'lodash-decorators/debounce';
-import GlobalFooter from '../components/GlobalFooter';
-import CopyRight from '../components/CopyRight';
-import NotFound from '../routes/Exception/404';
+import GlobalFooter from '@/components/GlobalFooter';
+import CopyRight from '@/components/CopyRight';
 import styles from './AdminLayout.less';
 import logo from '../assets/logo.svg';
 
@@ -39,7 +38,6 @@ const query = {
 @connect(state => ({
   title: state.global.title,
   copyRight: state.global.copyRight,
-  defaultURL: state.global.defaultURL,
   collapsed: state.global.collapsed,
   openKeys: state.global.openKeys,
   selectedKeys: state.global.selectedKeys,
@@ -172,27 +170,25 @@ class AdminLayout extends React.PureComponent {
   renderPageTitle() {
     const {
       location: { pathname },
-      getRouteData,
+      menuPaths,
       title,
     } = this.props;
-    let ptitle = title;
 
-    getRouteData('AdminLayout').forEach(item => {
-      if (item.path === pathname) {
-        ptitle = `${item.name} - ${title}`;
-      }
-    });
+    let ptitle = title;
+    const item = menuPaths[pathname];
+    if (item) {
+      ptitle = `${item.name} - ${title}`;
+    }
     return ptitle;
   }
 
   render() {
     const {
+      children,
       user,
       collapsed,
-      getRouteData,
       menus,
       copyRight,
-      defaultURL,
       openKeys,
       title,
       selectedKeys,
@@ -266,20 +262,7 @@ class AdminLayout extends React.PureComponent {
             </div>
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
-            <div style={{ minHeight: 'calc(100vh - 260px)' }}>
-              <Switch>
-                {getRouteData('AdminLayout').map(item => (
-                  <Route
-                    exact={item.exact}
-                    key={item.path}
-                    path={item.path}
-                    component={item.component}
-                  />
-                ))}
-                <Redirect exact from="/" to={defaultURL} />
-                <Route component={NotFound} />
-              </Switch>
-            </div>
+            <div style={{ minHeight: 'calc(100vh - 260px)' }}>{children}</div>
             <GlobalFooter copyright={<CopyRight title={copyRight} />} />
           </Content>
         </Layout>

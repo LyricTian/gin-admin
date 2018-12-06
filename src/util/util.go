@@ -146,3 +146,13 @@ func parseLevelCode(levelCode string) []string {
 	root.Reset()
 	return codes
 }
+
+// CheckPrefix 检查是否存在前缀
+func CheckPrefix(s string, prefixes ...string) bool {
+	for _, p := range prefixes {
+		if strings.HasPrefix(s, p) {
+			return true
+		}
+	}
+	return false
+}

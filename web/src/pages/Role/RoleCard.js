@@ -8,7 +8,7 @@ import MenuTree from '../Menu/MenuTree';
   role: state.role,
 }))
 @Form.create()
-export default class RoleCard extends PureComponent {
+class RoleCard extends PureComponent {
   onOKClick = () => {
     const {
       form,
@@ -125,3 +125,5 @@ export default class RoleCard extends PureComponent {
     );
   }
 }
+
+export default RoleCard;

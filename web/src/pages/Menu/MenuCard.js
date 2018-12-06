@@ -2,11 +2,11 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Card, Radio, Modal, TreeSelect, Select, InputNumber, Row, Col } from 'antd';
 
-@connect(state => ({
-  menu: state.menu,
+@connect(({ menu }) => ({
+  menu,
 }))
 @Form.create()
-export default class MenuCard extends PureComponent {
+class MenuCard extends PureComponent {
   state = {
     methodData: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   };
@@ -237,3 +237,5 @@ export default class MenuCard extends PureComponent {
     );
   }
 }
+
+export default MenuCard;

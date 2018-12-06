@@ -5,11 +5,11 @@ import { md5Hash } from '../../utils/utils';
 
 import styles from './Index.less';
 
-@connect(state => ({
-  login: state.login,
+@connect(({ login }) => ({
+  login,
 }))
 @Form.create()
-export default class Login extends PureComponent {
+class Login extends PureComponent {
   handleSubmit = e => {
     e.preventDefault();
 
@@ -97,3 +97,5 @@ export default class Login extends PureComponent {
     );
   }
 }
+
+export default Login;

@@ -6,30 +6,6 @@ export const storeLogoutKey = 'is_logout';
 // 访问令牌key
 export const storeAccessTokenKey = 'access_token';
 
-// 扩展节点
-export function getPlainNode(nodeList, parentPath = '') {
-  const arr = [];
-  nodeList.forEach(node => {
-    const item = node;
-    let itemPath = item.path;
-    if (itemPath !== '') {
-      itemPath = `/${itemPath}`;
-    }
-    item.path = `${parentPath}${itemPath}`;
-
-    item.exact = true;
-    if (item.children && !item.component) {
-      arr.push(...getPlainNode(item.children, item.path));
-    } else {
-      if (item.children && item.component) {
-        item.exact = false;
-      }
-      arr.push(item);
-    }
-  });
-  return arr;
-}
-
 // 获取分级码
 export function getLevelCode(pathname, menuPaths) {
   const node = menuPaths[pathname];

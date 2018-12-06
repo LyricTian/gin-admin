@@ -1,18 +1,10 @@
 package logger
 
 import (
-	"bytes"
 	"context"
-	"fmt"
-	"io/ioutil"
-	"mime"
-	"net/http"
-	"strings"
 	"sync"
-	"time"
 
 	"github.com/LyricTian/gin-admin/src/util"
-	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
@@ -159,64 +151,4 @@ func (a *Logger) Operate(traceID string, userID ...string) *logrus.Entry {
 // Login 登录(登出)日志
 func (a *Logger) Login(traceID string, userID string) *logrus.Entry {
 	return a.typeEntry(traceID, "login", userID)
-}
-
-// Middleware GIN的日志中间件
-func Middleware(allowPrefixes ...string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		allow := false
-		for _, p := range allowPrefixes {
-			if strings.HasPrefix(c.Request.URL.Path, p) {
-				allow = true
-				break
-			}
-		}
-
-		if !allow {
-			c.Next()
-			return
-		}
-
-		start := time.Now()
-		fields := logrus.Fields{}
-		fields["ip"] = c.ClientIP()
-		fields["method"] = c.Request.Method
-		fields["url"] = c.Request.URL.String()
-		fields["proto"] = c.Request.Proto
-		fields["user_agent"] = c.GetHeader("User-Agent")
-
-		if method := c.Request.Method; method == http.MethodPost || method == http.MethodPut {
-			mediaType, _, _ := mime.ParseMediaType(c.GetHeader("Content-Type"))
-			if mediaType == "application/json" {
-				body, err := ioutil.ReadAll(c.Request.Body)
-				if err == nil {
-					c.Request.Body.Close()
-					buf := bytes.NewBuffer(body)
-					c.Request.Body = ioutil.NopCloser(buf)
-					fields["content_length"] = c.Request.ContentLength
-					fields["body"] = string(body)
-				}
-			}
-		}
-		c.Next()
-
-		fields["time"] = fmt.Sprintf("%dms", time.Since(start).Nanoseconds()/1e6)
-		fields["status"] = c.Writer.Status()
-		fields["length"] = c.Writer.Size()
-
-		memo := c.Request.URL.Path
-		if v := c.GetString(util.ContextKeyURLMemo); v != "" {
-			memo = fmt.Sprintf("%s(%s)", memo, v)
-		}
-
-		logger().Access(
-			c.GetString(util.ContextKeyTraceID),
-			c.GetString(util.ContextKeyUserID),
-		).WithFields(fields).Infof(
-			"[http] %s - %s - %s",
-			memo,
-			c.Request.Method,
-			c.ClientIP(),
-		)
-	}
 }

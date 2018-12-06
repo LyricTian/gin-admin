@@ -3,7 +3,6 @@ package router
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/LyricTian/gin-admin/src/service/mysql"
 	"github.com/LyricTian/gin-admin/src/util"
@@ -36,12 +35,7 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 
 	ginConfig := ginsession.DefaultConfig
 	ginConfig.Skipper = func(c *gin.Context) bool {
-		for _, prefix := range allowPrefixes {
-			if strings.HasPrefix(c.Request.URL.Path, prefix) {
-				return false
-			}
-		}
-		return true
+		return !util.CheckPrefix(c.Request.URL.Path, allowPrefixes...)
 	}
 	ginConfig.ErrorHandleFunc = func(c *gin.Context, err error) {
 		ctx := context.NewContext(c)
@@ -70,13 +64,10 @@ func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 		}
 
 		if !ok || userID == nil {
-			for _, prefix := range skipPrefixes {
-				if strings.HasPrefix(c.Request.URL.Path, prefix) {
-					c.Next()
-					return
-				}
+			if util.CheckPrefix(c.Request.URL.Path, skipPrefixes...) {
+				c.Next()
+				return
 			}
-
 			ctx.ResError(fmt.Errorf("用户未登录"), http.StatusUnauthorized, 9999)
 			return
 		}

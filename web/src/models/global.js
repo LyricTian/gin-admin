@@ -1,14 +1,12 @@
 import { getLevelCode, getMenuKeys } from '../utils/utils';
-import config from '../config';
 import * as loginService from '../services/login';
 
 export default {
   namespace: 'global',
 
   state: {
-    title: config.title || '',
-    copyRight: config.copyRight,
-    defaultURL: config.defaultURL,
+    title: '推送服务管理平台',
+    copyRight: '2018 LyricTian',
     collapsed: false,
     openKeys: [],
     selectedKeys: [],
@@ -23,9 +21,9 @@ export default {
 
   effects: {
     *menuEvent({ pathname }, { put, select }) {
-      let p = pathname;
+      const p = pathname;
       if (p === '/') {
-        p = yield select(state => state.global.defaultURL);
+        return;
       }
 
       const menuPaths = yield select(state => state.global.menuPaths);
