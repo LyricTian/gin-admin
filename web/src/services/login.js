@@ -1,8 +1,8 @@
-import request, { baseURLV1 } from '../utils/request';
+import request, { v1API } from '../utils/request';
 
 // 登录
 export async function login(params) {
-  return request(`${baseURLV1}/login`, {
+  return request(`${v1API}/login`, {
     method: 'POST',
     body: params,
   });
@@ -10,17 +10,17 @@ export async function login(params) {
 
 // 登出
 export async function logout() {
-  return request(`${baseURLV1}/logout`, {
+  return request(`${v1API}/logout`, {
     method: 'POST',
   });
 }
 
 // 查询当前用户信息
 export async function getCurrentUser() {
-  return request(`${baseURLV1}/current/user`);
+  return request(`${v1API}/current/user`);
 }
 
 // 查询当前用户菜单
 export async function queryCurrentMenus() {
-  return request(`${baseURLV1}/current/menus`);
+  return request(`${v1API}/current/menus`);
 }

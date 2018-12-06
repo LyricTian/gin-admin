@@ -2,8 +2,8 @@ import axios from 'axios';
 import { notification } from 'antd';
 import { storeAccessTokenKey } from './utils';
 
-// 默认前缀
-export const baseURLV1 = '/api/v1';
+// 提供API前缀
+export const v1API = '/api/v1';
 
 function handle() {
   return response => {
