@@ -24,6 +24,7 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, page
 
 // QueryTree 查询菜单树
 func (a *Menu) QueryTree(ctx context.Context, params schema.MenuSelectQueryParam) ([]map[string]interface{}, error) {
+	params.Types = []int{10, 20, 30}
 	items, err := a.MenuModel.QuerySelect(ctx, params)
 	if err != nil {
 		return nil, err
