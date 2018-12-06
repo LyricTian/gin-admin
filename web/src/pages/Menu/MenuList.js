@@ -230,7 +230,7 @@ class MenuList extends PureComponent {
                   <Select.Option value="10">系统</Select.Option>
                   <Select.Option value="20">模块</Select.Option>
                   <Select.Option value="30">功能</Select.Option>
-                  <Select.Option value="40">动作</Select.Option>
+                  <Select.Option value="40">资源</Select.Option>
                 </Select>
               )}
             </Form.Item>
@@ -356,7 +356,7 @@ class MenuList extends PureComponent {
               v = '功能';
               break;
             case 40:
-              v = '动作';
+              v = '资源';
               break;
             default:
               v = '-';

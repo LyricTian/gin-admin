@@ -61,6 +61,7 @@ export default {
     *fetchSearchTree({ payload }, { call, put, select }) {
       let params = {
         type: 'tree',
+        is_menu: 1,
       };
       if (payload) {
         params = { ...params, ...payload };
@@ -105,6 +106,7 @@ export default {
         }),
         put({
           type: 'fetchTree',
+          payload: { is_menu: 1 },
         }),
       ];
 
@@ -267,11 +269,14 @@ export default {
         });
       }
     },
-    *fetchTree(_, { call, put }) {
-      const params = {
+    *fetchTree({ payload }, { call, put }) {
+      let params = {
         type: 'tree',
         status: 1,
       };
+      if (payload) {
+        params = { ...params, ...payload };
+      }
       const response = yield call(menuService.query, params);
       yield put({
         type: 'saveTreeData',

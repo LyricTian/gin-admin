@@ -53,6 +53,10 @@ func (a *Menu) QueryTree(ctx *context.Context) {
 		Status: util.S(ctx.Query("status")).Int(),
 	}
 
+	if util.S(ctx.Query("is_menu")).Int() == 1 {
+		params.Types = []int{10, 20, 30}
+	}
+
 	treeData, err := a.MenuBll.QueryTree(ctx.NewContext(), params)
 	if err != nil {
 		ctx.ResInternalServerError(err)
