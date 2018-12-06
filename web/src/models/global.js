@@ -5,7 +5,7 @@ export default {
   namespace: 'global',
 
   state: {
-    title: '推送服务管理平台',
+    title: 'RBAC权限管理平台',
     copyRight: '2018 LyricTian',
     collapsed: false,
     openKeys: [],

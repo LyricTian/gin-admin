@@ -60,7 +60,7 @@ class Login extends PureComponent {
               <Input
                 size="large"
                 prefix={<Icon type="user" className={styles.prefixIcon} />}
-                placeholder="请输入用户名"
+                placeholder="用户名：demo"
               />
             )}
           </Form.Item>
@@ -77,10 +77,11 @@ class Login extends PureComponent {
                 size="large"
                 prefix={<Icon type="lock" className={styles.prefixIcon} />}
                 type="password"
-                placeholder="请输入密码"
+                placeholder="密码：888888"
               />
             )}
           </Form.Item>
+
           <Form.Item className={styles.additional}>
             <Button
               size="large"

@@ -110,7 +110,7 @@ class UserList extends PureComponent {
 
   onItemDelClick = item => {
     Modal.confirm({
-      title: `确定删除【用户数据：${item.name}】？`,
+      title: `确定删除【用户数据：${item.user_name}】？`,
       okText: '确认',
       okType: 'danger',
       cancelText: '取消',
