@@ -5,7 +5,7 @@ import { Tree } from 'antd';
 @connect(state => ({
   menu: state.menu,
 }))
-export default class MenuTree extends PureComponent {
+class MenuTree extends PureComponent {
   componentDidMount() {
     this.dispatch({
       type: 'menu/fetchTree',
@@ -48,3 +48,5 @@ export default class MenuTree extends PureComponent {
     );
   }
 }
+
+export default MenuTree;

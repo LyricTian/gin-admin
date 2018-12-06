@@ -19,21 +19,23 @@ var (
 	slash     = []byte("/")
 )
 
-// RecoveryMiddleware 崩溃恢复
-func RecoveryMiddleware(c *gin.Context) {
-	ctx := context.NewContext(c)
-	defer func() {
-		if err := recover(); err != nil {
-			stack := stack(3)
+// RecoveryMiddleware 崩溃恢复中间件
+func RecoveryMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := context.NewContext(c)
+		defer func() {
+			if err := recover(); err != nil {
+				stack := stack(3)
 
-			logger.System(ctx.GetTraceID(), ctx.GetUserID()).
-				WithField("stack", string(stack)).
-				Errorf("[Recover]: %s", err)
+				logger.System(ctx.GetTraceID(), ctx.GetUserID()).
+					WithField("stack", string(stack)).
+					Errorf("[Recover]: %s", err)
 
-			ctx.ResError(nil, http.StatusInternalServerError)
-		}
-	}()
-	ctx.Next()
+				ctx.ResError(nil, http.StatusInternalServerError)
+			}
+		}()
+		ctx.Next()
+	}
 }
 
 // stack returns a nicely formatted stack frame, skipping skip frames.

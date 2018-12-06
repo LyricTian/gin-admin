@@ -22,3 +22,5 @@ package-lock.json
 *bak
 # visual studio code 
 .history
+.umi
+.umi-production

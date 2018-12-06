@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { notification } from 'antd';
-import store from '../index';
 import { storeAccessTokenKey } from './utils';
 
 // 默认前缀
@@ -24,7 +23,8 @@ function handle() {
         error: { code },
       } = data;
       if (code === 9999) {
-        store.dispatch({ type: 'login/logout' });
+        /* eslint-disable no-underscore-dangle */
+        window.g_app._store.dispatch({ type: 'login/logout' });
         return {};
       }
     }

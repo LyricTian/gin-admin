@@ -1,12 +1,14 @@
 # gin-admin
 
-> 基于 GIN + Ant Design 的RBAC管理系统
+> 基于GIN + Casbin + Ant Design的RBAC权限管理脚手架
 
 ## 安装依赖包
 
 ```
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+
 cd web
-npm install
+cnpm install
 ```
 
 ## 本地运行

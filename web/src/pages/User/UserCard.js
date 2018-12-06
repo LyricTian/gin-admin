@@ -8,7 +8,7 @@ import { md5Hash } from '../../utils/utils';
   role: state.role,
 }))
 @Form.create()
-export default class UserCard extends PureComponent {
+class UserCard extends PureComponent {
   onOKClick = () => {
     const { form, onSubmit } = this.props;
 
@@ -133,3 +133,5 @@ export default class UserCard extends PureComponent {
     );
   }
 }
+
+export default UserCard;

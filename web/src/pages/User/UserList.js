@@ -16,23 +16,29 @@ import {
   Select,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import RoleCard from './RoleCard';
+import UserCard from './UserCard';
+import { formatTimestamp } from '../../utils/utils';
 
-import styles from './RoleList.less';
+import styles from './UserList.less';
 
 @connect(state => ({
+  loading: state.loading.models.user,
+  user: state.user,
   role: state.role,
-  loading: state.loading.models.role,
 }))
 @Form.create()
-export default class RoleList extends PureComponent {
+class UserList extends PureComponent {
   state = {
     selectedRows: [],
   };
 
   componentDidMount() {
     this.dispatch({
-      type: 'role/fetch',
+      type: 'role/fetchSelect',
+    });
+
+    this.dispatch({
+      type: 'user/fetch',
       search: {},
       pagination: {},
     });
@@ -47,7 +53,7 @@ export default class RoleList extends PureComponent {
       selectedRows: [],
     });
     this.dispatch({
-      type: 'role/delMany',
+      type: 'user/delMany',
       payload: { batch: selectedRows.join(',') },
     });
   };
@@ -64,21 +70,21 @@ export default class RoleList extends PureComponent {
 
   onItemDisableClick = id => {
     this.dispatch({
-      type: 'role/changeStatus',
+      type: 'user/changeStatus',
       payload: { record_id: id, status: 2 },
     });
   };
 
   onItemEnableClick = id => {
     this.dispatch({
-      type: 'role/changeStatus',
+      type: 'user/changeStatus',
       payload: { record_id: id, status: 1 },
     });
   };
 
   onItemEditClick = id => {
     this.dispatch({
-      type: 'role/loadForm',
+      type: 'user/loadForm',
       payload: {
         type: 'E',
         id,
@@ -88,7 +94,7 @@ export default class RoleList extends PureComponent {
 
   onAddClick = () => {
     this.dispatch({
-      type: 'role/loadForm',
+      type: 'user/loadForm',
       payload: {
         type: 'A',
       },
@@ -97,14 +103,14 @@ export default class RoleList extends PureComponent {
 
   onDelOKClick(id) {
     this.dispatch({
-      type: 'role/del',
+      type: 'user/del',
       payload: { record_id: id },
     });
   }
 
   onItemDelClick = item => {
     Modal.confirm({
-      title: `确定删除【角色数据：${item.name}】？`,
+      title: `确定删除【用户数据：${item.name}】？`,
       okText: '确认',
       okType: 'danger',
       cancelText: '取消',
@@ -120,7 +126,7 @@ export default class RoleList extends PureComponent {
 
   onTableChange = pagination => {
     this.dispatch({
-      type: 'role/fetch',
+      type: 'user/fetch',
       pagination: {
         current: pagination.current,
         pageSize: pagination.pageSize,
@@ -131,9 +137,8 @@ export default class RoleList extends PureComponent {
   onResetFormClick = () => {
     const { form } = this.props;
     form.resetFields();
-
     this.dispatch({
-      type: 'role/fetch',
+      type: 'user/fetch',
       search: {},
       pagination: {},
     });
@@ -143,12 +148,11 @@ export default class RoleList extends PureComponent {
     if (e) {
       e.preventDefault();
     }
-
     const { form } = this.props;
     form.validateFields({ force: true }, (err, values) => {
       if (!err) {
         this.dispatch({
-          type: 'role/fetch',
+          type: 'user/fetch',
           search: values,
           pagination: {},
         });
@@ -158,14 +162,14 @@ export default class RoleList extends PureComponent {
 
   onDataFormSubmit = data => {
     this.dispatch({
-      type: 'role/submit',
+      type: 'user/submit',
       payload: data,
     });
   };
 
   onDataFormCancel = () => {
     this.dispatch({
-      type: 'role/changeFormVisible',
+      type: 'user/changeFormVisible',
       payload: false,
     });
   };
@@ -176,24 +180,44 @@ export default class RoleList extends PureComponent {
   };
 
   renderDataForm() {
-    return <RoleCard onCancel={this.onDataFormCancel} onSubmit={this.onDataFormSubmit} />;
+    return <UserCard onCancel={this.onDataFormCancel} onSubmit={this.onDataFormSubmit} />;
   }
 
   renderSearchForm() {
     const {
       form: { getFieldDecorator },
+      role: { selectData: roleData },
     } = this.props;
-
     return (
       <Form onSubmit={this.onSearchFormSubmit} layout="inline">
         <Row gutter={16}>
           <Col md={8} sm={24}>
-            <Form.Item label="角色名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            <Form.Item label="用户名">
+              {getFieldDecorator('user_name')(<Input placeholder="请输入" />)}
             </Form.Item>
           </Col>
           <Col md={8} sm={24}>
-            <Form.Item label="角色状态">
+            <Form.Item label="真实姓名">
+              {getFieldDecorator('real_name')(<Input placeholder="请输入" />)}
+            </Form.Item>
+          </Col>
+          <Col md={8} sm={24}>
+            <Form.Item label="所属角色">
+              {getFieldDecorator('role_id')(
+                <Select style={{ width: '100%' }} placeholder="请选择">
+                  {roleData.map(item => (
+                    <Select.Option key={item.record_id} value={item.record_id}>
+                      {item.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col md={8} sm={24}>
+            <Form.Item label="用户状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Select.Option value="1">正常</Select.Option>
@@ -222,7 +246,7 @@ export default class RoleList extends PureComponent {
   render() {
     const {
       loading,
-      role: {
+      user: {
         data: { list, pagination },
       },
     } = this.props;
@@ -288,22 +312,32 @@ export default class RoleList extends PureComponent {
         ),
       },
       {
+        title: '用户名',
+        dataIndex: 'user_name',
+      },
+      {
+        title: '真实姓名',
+        dataIndex: 'real_name',
+      },
+      {
         title: '角色名称',
-        dataIndex: 'name',
+        dataIndex: 'role_names',
+        render: val => <span>{val ? val.join(';') : ''}</span>,
       },
       {
-        title: '角色备注',
-        dataIndex: 'memo',
-      },
-      {
-        title: '角色状态',
+        title: '用户状态',
         dataIndex: 'status',
         render: val => {
           if (val === 1) {
-            return <Badge status="success" text="正常" />;
+            return <Badge status="success" text="启用" />;
           }
           return <Badge status="error" text="停用" />;
         },
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'created',
+        render: val => <span>{formatTimestamp(val)}</span>,
       },
     ];
 
@@ -315,7 +349,7 @@ export default class RoleList extends PureComponent {
     };
 
     return (
-      <PageHeaderLayout title="角色管理">
+      <PageHeaderLayout title="用户管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
@@ -353,3 +387,5 @@ export default class RoleList extends PureComponent {
     );
   }
 }
+
+export default UserList;

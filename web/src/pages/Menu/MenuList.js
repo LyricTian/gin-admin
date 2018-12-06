@@ -22,12 +22,12 @@ import MenuCard from './MenuCard';
 
 import styles from './MenuList.less';
 
-@connect(state => ({
-  menu: state.menu,
-  loading: state.loading.models.menu,
+@connect(({ menu, loading }) => ({
+  menu,
+  loading: loading.models.menu,
 }))
 @Form.create()
-export default class MenuList extends PureComponent {
+class MenuList extends PureComponent {
   state = {
     selectedRows: [],
     treeSelectedKeys: [],
@@ -492,3 +492,4 @@ export default class MenuList extends PureComponent {
     );
   }
 }
+export default MenuList;
