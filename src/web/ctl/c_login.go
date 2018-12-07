@@ -42,6 +42,8 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
+	nctx = util.NewUserIDContext(nctx, userInfo.RecordID)
+
 	// 更新会话
 	store, err := ginsession.Refresh(ctx.Context)
 	if err != nil {
