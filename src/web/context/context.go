@@ -115,7 +115,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 		}
 
 		if err != nil {
-			logger.System(a.GetTraceID(), a.GetUserID()).
+			logger.SystemWithContext(a.NewContext()).
 				WithField("error", err.Error()).
 				Warnf("[请求错误] %s", message)
 		}
@@ -129,7 +129,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 				StackTrace() errors.StackTrace
 			}
 
-			entry := logger.System(a.GetTraceID(), a.GetUserID())
+			entry := logger.SystemWithContext(a.NewContext())
 			if stack, ok := err.(stackTracer); ok {
 				entry = entry.WithField("error", fmt.Sprintf("%+v", stack.StackTrace()[:2]))
 			}
