@@ -6,12 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-session/gin-session"
-	"github.com/go-session/session"
-
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
+	"github.com/go-session/gin-session"
+	"github.com/go-session/session"
 	"github.com/pkg/errors"
 )
 
