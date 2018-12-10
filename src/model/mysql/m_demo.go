@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -31,6 +30,7 @@ func (a *Demo) Init(g *inject.Graph, db *mysql.DB, c *Common) *Demo {
 	db.CreateTableIndex(a.TableName(), "idx_record_id", true, "record_id")
 	db.CreateTableIndex(a.TableName(), "idx_code", false, "code")
 	db.CreateTableIndex(a.TableName(), "idx_name", false, "name")
+	db.CreateTableIndex(a.TableName(), "idx_status", false, "status")
 	db.CreateTableIndex(a.TableName(), "idx_deleted", false, "deleted")
 
 	return a
@@ -58,6 +58,11 @@ func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, page
 		args = append(args, "%"+params.Name+"%")
 	}
 
+	if params.Status != 0 {
+		where = fmt.Sprintf("%s AND status = ?", where)
+		args = append(args, params.Status)
+	}
+
 	count, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s %s", a.TableName(), where), args...)
 	if err != nil {
 		return 0, nil, errors.Wrap(err, "查询分页数据发生错误")
@@ -66,7 +71,7 @@ func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, page
 	}
 
 	var items []*schema.DemoQueryResult
-	fields := "id,record_id,code,name"
+	fields := "id,record_id,code,name,memo,status"
 	_, err = a.DB.Select(&items, fmt.Sprintf("SELECT %s FROM %s %s ORDER BY id DESC LIMIT %d,%d", fields, a.TableName(), where, (pageIndex-1)*pageSize, pageSize), args...)
 	if err != nil {
 		return 0, nil, errors.Wrap(err, "查询分页数据发生错误")
@@ -78,13 +83,10 @@ func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, page
 // Get 查询指定数据
 func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 	var item schema.Demo
-	fields := "id,record_id,code,name,creator,created,deleted"
+	fields := "id,record_id,code,name,memo,status,creator,created,updated,deleted"
 
 	err := a.DB.SelectOne(&item, fmt.Sprintf("SELECT %s FROM %s WHERE deleted=0 AND record_id=?", fields, a.TableName()), recordID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
 		return nil, errors.Wrap(err, "查询指定数据发生错误")
 	}
 	return &item, nil

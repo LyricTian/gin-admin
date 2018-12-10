@@ -71,3 +71,19 @@ func (a *Demo) Delete(ctx context.Context, recordID string) error {
 
 	return a.DemoModel.Delete(ctx, recordID)
 }
+
+// UpdateStatus 更新状态
+func (a *Demo) UpdateStatus(ctx context.Context, recordID string, status int) error {
+	exists, err := a.DemoModel.Check(ctx, recordID)
+	if err != nil {
+		return err
+	} else if !exists {
+		return util.ErrNotFound
+	}
+
+	info := map[string]interface{}{
+		"status": status,
+	}
+
+	return a.DemoModel.Update(ctx, recordID, info)
+}
