@@ -5,6 +5,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
@@ -31,6 +32,7 @@ func (a *Demo) QueryPage(ctx *context.Context) {
 
 	params.Code = ctx.Query("code")
 	params.Name = ctx.Query("name")
+	params.Status = util.S(ctx.Query("status")).Int()
 
 	total, items, err := a.DemoBll.QueryPage(ctx.NewContext(), params, pageIndex, pageSize)
 	if err != nil {
@@ -88,7 +90,6 @@ func (a *Demo) Update(ctx *context.Context) {
 		ctx.ResInternalServerError(err)
 		return
 	}
-
 	ctx.ResOK()
 }
 
@@ -114,5 +115,25 @@ func (a *Demo) DeleteMany(ctx *context.Context) {
 		}
 	}
 
+	ctx.ResOK()
+}
+
+// Enable 启用数据
+func (a *Demo) Enable(ctx *context.Context) {
+	err := a.DemoBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 1)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
+	ctx.ResOK()
+}
+
+// Disable 禁用数据
+func (a *Demo) Disable(ctx *context.Context) {
+	err := a.DemoBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 2)
+	if err != nil {
+		ctx.ResInternalServerError(err)
+		return
+	}
 	ctx.ResOK()
 }

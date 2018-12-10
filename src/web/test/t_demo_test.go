@@ -16,8 +16,9 @@ func TestDemo(t *testing.T) {
 
 	// post /demos
 	addItem := &schema.Demo{
-		Code: "test_foo_1",
-		Name: "测试用例",
+		Code:   "test_foo_1",
+		Name:   "测试用例",
+		Status: 1,
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
@@ -27,6 +28,7 @@ func TestDemo(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, addItem.Code, addNewItem.Code)
 	assert.Equal(t, addItem.Name, addNewItem.Name)
+	assert.Equal(t, addItem.Status, addNewItem.Status)
 	assert.NotEqual(t, addNewItem.ID, 0)
 	assert.NotEmpty(t, addNewItem.RecordID)
 

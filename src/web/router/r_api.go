@@ -17,9 +17,9 @@ func APIV1Handler(r *gin.Engine, enforcer *casbin.Enforcer, c *ctl.Common) {
 	)
 
 	// 注册路由
+	APIDemoRouter(v1, c.DemoAPI)
 	APILoginRouter(v1, c.LoginAPI)
 	APIRoleRouter(v1, c.RoleAPI)
-	APIDemoRouter(v1, c.DemoAPI)
 	APIMenuRouter(v1, c.MenuAPI)
 	APIUserRouter(v1, c.UserAPI)
 }
