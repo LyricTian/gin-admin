@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LyricTian/gin-admin/src/util"
-
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/mysql"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/facebookgo/inject"
 	"github.com/pkg/errors"
 )

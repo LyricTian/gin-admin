@@ -5,11 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/casbin/casbin"
-
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/casbin/casbin"
 	"github.com/pkg/errors"
 )
 
