@@ -34,7 +34,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 				ctx.ResError(nil, http.StatusInternalServerError)
 			}
 		}()
-		ctx.Next()
+		c.Next()
 	}
 }
 
