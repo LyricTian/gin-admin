@@ -9,8 +9,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
-	"github.com/gin-gonic/gin"
-	"github.com/go-session/gin-session"
 )
 
 // Login 登录管理
@@ -26,37 +24,43 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
+	var result struct {
+		Status string `json:"status"`
+	}
+
 	nctx := ctx.NewContext()
 	userInfo, err := a.LoginBll.Verify(nctx, item.UserName, item.Password)
 	if err != nil {
 		logger.LoginWithContext(nctx).Errorf("登录发生错误：%s", err.Error())
 
-		status := "error"
+		result.Status = "error"
 		if err == bll.ErrInvalidPassword ||
 			err == bll.ErrInvalidUserName ||
 			err == bll.ErrUserDisable {
-			status = "fail"
+			result.Status = "fail"
 		}
 
-		ctx.ResSuccess(gin.H{"status": status})
+		ctx.ResSuccess(result)
 		return
 	}
 
 	nctx = util.NewUserIDContext(nctx, userInfo.RecordID)
 
 	// 更新会话
-	store, err := ginsession.Refresh(ctx.Context)
+	store, err := ctx.RefreshSession()
 	if err != nil {
-		logger.LoginWithContext(nctx).Errorf("登录发生错误：%s", err.Error())
-		ctx.ResSuccess(gin.H{"status": "error"})
+		result.Status = "error"
+		logger.LoginWithContext(nctx).Errorf("更新会话发生错误：%s", err.Error())
+		ctx.ResSuccess(result)
 		return
 	}
 
 	store.Set(util.SessionKeyUserID, userInfo.RecordID)
 	err = store.Save()
 	if err != nil {
-		logger.LoginWithContext(nctx).Errorf("登录发生错误：%s", err.Error())
-		ctx.ResSuccess(gin.H{"status": "error"})
+		result.Status = "error"
+		logger.LoginWithContext(nctx).Errorf("存储会话发生错误：%s", err.Error())
+		ctx.ResSuccess(result)
 		return
 	}
 	logger.LoginWithContext(nctx).Infof("登入系统")
@@ -66,14 +70,12 @@ func (a *Login) Login(ctx *context.Context) {
 
 // Logout 用户登出
 func (a *Login) Logout(ctx *context.Context) {
-	nctx := ctx.NewContext()
-
 	userID := ctx.GetUserID()
 	if userID != "" {
-		store := ginsession.FromContext(ctx.Context)
-		err := store.Flush()
-		if err != nil {
-			logger.LoginWithContext(nctx).Errorf("登出发生错误：%s", err.Error())
+		nctx := ctx.NewContext()
+
+		if err := ctx.DestroySession(); err != nil {
+			logger.LoginWithContext(nctx).Errorf("登出系统发生错误：%s", err.Error())
 			ctx.ResInternalServerError(err)
 			return
 		}

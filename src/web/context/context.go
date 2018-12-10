@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-session/gin-session"
+	"github.com/go-session/session"
+
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
@@ -29,16 +32,52 @@ func NewContext(c *gin.Context) *Context {
 
 // Context 定义上下文
 type Context struct {
-	*gin.Context
+	gctx *gin.Context
+}
+
+// GinContext 获取Gin上下文
+func (a *Context) GinContext() *gin.Context {
+	return a.gctx
 }
 
 // NewContext 创建上下文实例
 func (a *Context) NewContext() context.Context {
 	parent := context.Background()
-	parent = util.NewTraceIDContext(parent, a.GetTraceID())
-	parent = util.NewUserIDContext(parent, a.GetUserID())
+
+	if v := a.GetTraceID(); v != "" {
+		parent = util.NewTraceIDContext(parent, a.GetTraceID())
+	}
+
+	if v := a.GetUserID(); v != "" {
+		parent = util.NewUserIDContext(parent, a.GetUserID())
+	}
 
 	return parent
+}
+
+// SessionStore 获取会话存储
+func (a *Context) SessionStore() session.Store {
+	return ginsession.FromContext(a.gctx)
+}
+
+// RefreshSession 更新会话
+func (a *Context) RefreshSession() (session.Store, error) {
+	return ginsession.Refresh(a.gctx)
+}
+
+// DestroySession 销毁会话
+func (a *Context) DestroySession() error {
+	return ginsession.Destroy(a.gctx)
+}
+
+// Param 获取路径参数(/foo/:id)
+func (a *Context) Param(key string) string {
+	return a.gctx.Param(key)
+}
+
+// Query 获取查询参数(/foo?id=)
+func (a *Context) Query(key string) string {
+	return a.gctx.Query(key)
 }
 
 // GetPageIndex 获取分页的页索引
@@ -66,17 +105,17 @@ func (a *Context) GetPageSize() uint {
 
 // GetTraceID 获取追踪ID
 func (a *Context) GetTraceID() string {
-	return a.GetString(util.ContextKeyTraceID)
+	return a.gctx.GetString(util.ContextKeyTraceID)
 }
 
 // GetUserID 获取当前用户ID
 func (a *Context) GetUserID() string {
-	return a.GetString(util.ContextKeyUserID)
+	return a.gctx.GetString(util.ContextKeyUserID)
 }
 
 // ParseJSON 解析请求JSON
 func (a *Context) ParseJSON(obj interface{}) error {
-	if err := a.ShouldBindJSON(obj); err != nil {
+	if err := a.gctx.ShouldBindJSON(obj); err != nil {
 		return errors.Wrap(err, "解析请求参数发生错误")
 	}
 	return nil
@@ -144,8 +183,8 @@ func (a *Context) ResError(err error, status int, code ...int) {
 	if len(code) > 0 {
 		obj["code"] = code[0]
 	}
-	a.JSON(status, gin.H{"error": obj})
-	a.Abort()
+	a.gctx.JSON(status, gin.H{"error": obj})
+	a.gctx.Abort()
 }
 
 // ResSuccess 响应成功
@@ -153,8 +192,8 @@ func (a *Context) ResSuccess(obj interface{}) {
 	if obj == nil {
 		obj = gin.H{}
 	}
-	a.JSON(http.StatusOK, obj)
-	a.Abort()
+	a.gctx.JSON(http.StatusOK, obj)
+	a.gctx.Abort()
 }
 
 // ResPage 响应分页数据
