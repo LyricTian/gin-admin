@@ -139,7 +139,7 @@ func InitLogger(mysqlDB *sql.DB) logger.HookFlusher {
 			extraItems := []*mysqlhook.ExecExtraItem{
 				mysqlhook.NewExecExtraItem(logger.FieldKeyType, "varchar(20)"),
 				mysqlhook.NewExecExtraItem(logger.FieldKeyUserID, "varchar(36)"),
-				mysqlhook.NewExecExtraItem(logger.FieldKeyTraceID, "varchar(36)"),
+				mysqlhook.NewExecExtraItem(logger.FieldKeyTraceID, "varchar(100)"),
 			}
 
 			var hookOpts []mysqlhook.Option

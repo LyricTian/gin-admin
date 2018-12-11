@@ -33,7 +33,7 @@ func NewExec(db *sql.DB, tableName string, extraItems ...*ExecExtraItem) Execer 
 	var sourceItems []*ExecExtraItem
 	sourceItems = append(sourceItems, NewExecExtraItem("id", "bigint not null primary key auto_increment"))
 	sourceItems = append(sourceItems, NewExecExtraItem("level", "int"))
-	sourceItems = append(sourceItems, NewExecExtraItem("message", "text"))
+	sourceItems = append(sourceItems, NewExecExtraItem("message", "varchar(1024)"))
 	if len(extraItems) > 0 {
 		sourceItems = append(sourceItems, extraItems...)
 	}
