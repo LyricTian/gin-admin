@@ -53,9 +53,9 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 		fields["status"] = c.Writer.Status()
 		fields["length"] = c.Writer.Size()
 
-		memo := c.Request.URL.Path
+		m := p
 		if v := c.GetString(util.ContextKeyURLMemo); v != "" {
-			memo = fmt.Sprintf("%s(%s)", memo, v)
+			m = fmt.Sprintf("%s(%s)", p, v)
 		}
 
 		logger.Access(
@@ -63,7 +63,7 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 			c.GetString(util.ContextKeyUserID),
 		).WithFields(fields).Infof(
 			"[http] %s - %s - %s",
-			memo,
+			m,
 			c.Request.Method,
 			c.ClientIP(),
 		)

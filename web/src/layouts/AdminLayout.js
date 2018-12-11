@@ -229,7 +229,7 @@ class AdminLayout extends React.PureComponent {
             </Link>
           </div>
           <Menu
-            theme="light"
+            theme="dark"
             mode="inline"
             {...menuProps}
             onOpenChange={this.onMenuOpenChange}
