@@ -12,7 +12,7 @@ type IDemo interface {
 	QueryPage(ctx context.Context, params schema.DemoQueryParam, pageIndex, pageSize uint) (int64, []*schema.DemoQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Demo, error)
-	// Check 检查数据是否存在
+	// 检查数据是否存在
 	Check(ctx context.Context, recordID string) (bool, error)
 	// 创建数据
 	Create(ctx context.Context, item *schema.Demo) error

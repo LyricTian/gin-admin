@@ -129,7 +129,7 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 		return err
 	}
 
-	a.Enforcer.DeleteRolesForUser(recordID)
+	a.Enforcer.DeleteUser(recordID)
 	return nil
 }
 
@@ -151,7 +151,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	}
 
 	if status == 2 {
-		a.Enforcer.DeleteRolesForUser(recordID)
+		a.Enforcer.DeleteUser(recordID)
 	} else {
 		err = a.LoadPolicy(ctx, recordID)
 		if err != nil {
