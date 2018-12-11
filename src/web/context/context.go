@@ -107,9 +107,14 @@ func (a *Context) GetTraceID() string {
 	return a.gctx.GetString(util.ContextKeyTraceID)
 }
 
-// GetUserID 获取当前用户ID
+// GetUserID 获取用户ID
 func (a *Context) GetUserID() string {
 	return a.gctx.GetString(util.ContextKeyUserID)
+}
+
+// SetUserID 设定用户ID
+func (a *Context) SetUserID(userID string) {
+	a.gctx.Set(util.ContextKeyUserID, userID)
 }
 
 // ParseJSON 解析请求JSON

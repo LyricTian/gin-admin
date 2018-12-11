@@ -28,24 +28,23 @@ func (a *Login) Login(ctx *context.Context) {
 		Status string `json:"status"`
 	}
 
-	nctx := ctx.NewContext()
-	userInfo, err := a.LoginBll.Verify(nctx, item.UserName, item.Password)
+	userInfo, err := a.LoginBll.Verify(ctx.NewContext(), item.UserName, item.Password)
 	if err != nil {
-		logger.LoginWithContext(nctx).Errorf("登录发生错误：%s", err.Error())
-
 		result.Status = "error"
 		if err == bll.ErrInvalidPassword ||
 			err == bll.ErrInvalidUserName ||
 			err == bll.ErrUserDisable {
 			result.Status = "fail"
+		} else {
+			logger.LoginWithContext(ctx.NewContext()).Errorf("用户登录发生错误：%s", err.Error())
 		}
 
 		ctx.ResSuccess(result)
 		return
 	}
+	ctx.SetUserID(userInfo.RecordID)
 
-	nctx = util.NewUserIDContext(nctx, userInfo.RecordID)
-
+	nctx := ctx.NewContext()
 	// 更新会话
 	store, err := ctx.RefreshSession()
 	if err != nil {
