@@ -1,8 +1,5 @@
--- 创建数据库
-CREATE DATABASE `ginadmin` DEFAULT CHARACTER SET = `utf8mb4`;
-
 -- 创建`g_menu`表
-CREATE TABLE `g_menu` (
+CREATE TABLE `g_menu` IF NOT EXISTS (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `record_id` varchar(36) DEFAULT NULL,
   `code` varchar(50) DEFAULT NULL,
