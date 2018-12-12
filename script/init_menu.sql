@@ -1,5 +1,5 @@
 -- 创建`g_menu`表
-CREATE TABLE `g_menu` IF NOT EXISTS (
+CREATE TABLE `g_menu` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `record_id` varchar(36) DEFAULT NULL,
   `code` varchar(50) DEFAULT NULL,
@@ -32,7 +32,7 @@ LOCK TABLES `g_menu` WRITE;
 
 INSERT INTO `g_menu` (`id`, `record_id`, `code`, `name`, `type`, `sequence`, `icon`, `path`, `method`, `level_code`, `parent_id`, `is_hide`, `status`, `creator`, `created`, `updated`, `deleted`)
 VALUES
-	(15,'047aecdc-76c8-4bfd-8dbc-02a37295d40b','admin','权限管理',10,90,'','','','01','',2,1,'',1543546798,0,0),
+	(15,'047aecdc-76c8-4bfd-8dbc-02a37295d40b','admin','RBAC权限管理平台',10,90,'','','','01','',2,1,'',1543546798,1544539200,0),
 	(16,'d1ef3f75-ebc1-4b0d-be69-25e406b843af','system','系统管理',20,90,'setting','','','0101','047aecdc-76c8-4bfd-8dbc-02a37295d40b',2,1,'',1543546817,1543932539,0),
 	(17,'751ffa55-fcbb-43bc-8b63-c3287f1f42d6','menu','菜单管理',30,10,'solution','/system/menu','','010101','d1ef3f75-ebc1-4b0d-be69-25e406b843af',2,1,'',1543546836,1543932569,0),
 	(18,'7f6c7556-5242-444f-9714-59a1b5d1abcf','role','角色管理',30,20,'audit','/system/role','','010102','d1ef3f75-ebc1-4b0d-be69-25e406b843af',2,1,'',1543546953,1543932702,0),
@@ -60,6 +60,17 @@ VALUES
 	(45,'a7a384a7-13dd-4690-affb-e3bc68934434','delete','删除用户数据',40,5,'','/api/v1/users/:id','DELETE','01010305','4b3448fd-c23f-49df-a51b-94aa2a68aec6',1,1,'root',1543933404,0,0),
 	(46,'13f59032-fb3d-45a4-83a5-ba79ba98904e','deleteMany','删除多条用户数据',40,5,'','/api/v1/users','DELETE','01010306','4b3448fd-c23f-49df-a51b-94aa2a68aec6',1,1,'root',1543933431,0,0),
 	(47,'e54a4e88-1bd7-4186-8fea-892376537925','enable','启用用户数据',40,7,'','/api/v1/users/:id/enable','PATCH','01010307','4b3448fd-c23f-49df-a51b-94aa2a68aec6',1,1,'root',1543933451,0,0),
-	(48,'c8e76678-68bc-45b6-917b-df192220b9ae','disable','禁用用户数据',40,8,'','/api/v1/users/:id/disable','PATCH','01010308','4b3448fd-c23f-49df-a51b-94aa2a68aec6',1,1,'root',1543933470,0,0);
+	(48,'c8e76678-68bc-45b6-917b-df192220b9ae','disable','禁用用户数据',40,8,'','/api/v1/users/:id/disable','PATCH','01010308','4b3448fd-c23f-49df-a51b-94aa2a68aec6',1,1,'root',1543933470,0,0),
+	(49,'782af95c-5756-40d6-8481-a6bf4980a7e8','experiment','DEMO管理',20,10,'experiment','','','0102','047aecdc-76c8-4bfd-8dbc-02a37295d40b',2,1,'root',1544453544,1544453594,0),
+	(50,'f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3','demo','基础示例',30,1,'bulb','/experiment/demo','','010201','782af95c-5756-40d6-8481-a6bf4980a7e8',2,1,'root',1544453744,0,0),
+	(51,'9e253811-4c5f-469b-8243-bcd1db6a8a28','logger','日志管理',30,40,'file-search','/system/logger','','010104','d1ef3f75-ebc1-4b0d-be69-25e406b843af',2,1,'root',1544539145,0,0),
+	(52,'4967e9bf-2e6f-4f98-8987-e2cd6fbe7a9f','query','查询示例数据',40,1,'','/api/v1/demos','GET','01020101','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616440,0,0),
+	(53,'bc0185f2-5ada-4eac-b685-8f1a28d8eee8','one','查询指定示例数据',40,2,'','/api/v1/demos/:id','GET','01020102','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616467,0,0),
+	(54,'8d6faa28-7d7e-4a76-a238-5337d1066bac','create','创建示例数据',40,3,'','/api/v1/demos','POST','01020103','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616493,0,0),
+	(55,'727f1163-bd3e-47da-8dc5-675ef37186f5','update','更新示例数据',40,4,'','/api/v1/demos/:id','PUT','01020104','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616751,0,0),
+	(56,'0a786812-6006-4630-b9ed-ad3008ed4c1f','delete','删除示例数据',40,5,'','/api/v1/demos/:id','DELETE','01020105','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616779,0,0),
+	(57,'bf94fc61-ec1e-4dae-9d64-dc162640d083','deleteMany','删除多条示例数据',40,6,'','/api/v1/demos','DELETE','01020106','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616803,0,0),
+	(58,'95742661-5833-4474-9ce9-1f00f4910f7c','enable','启用示例数据',40,7,'','/api/v1/demos/:id/enable','PATCH','01020107','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616827,0,0),
+	(59,'68ef41b4-3aed-47ef-bc8e-9563395149a9','disable','禁用示例数据',40,8,'','/api/v1/demos/:id/disable','PATCH','01020108','f2a5a525-6b9a-438b-bcec-0db5e8ea6bf3',1,1,'root',1544616852,0,0);
 
 UNLOCK TABLES;

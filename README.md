@@ -8,9 +8,9 @@
 
 ### 1.1 开发环境依赖
 
-- go 1.11及以上版本
-- node 8.12.0及以上版本
-- yarn 1.12.3及以上版本
+- go 1.11+
+- node 8.12.0+
+- yarn 1.12.3+
 
 ### 1.2 获取代码及初始化
 
@@ -74,23 +74,16 @@ yarn start
 
 #### 1.3.3 用户登录
 
-> 在配置文件中可设定`system_root_user`配置项指定用户名及密码，默认用户名为：root，密码为：123
-
-### 1.4 快速打包
-
-#### 1.4.1 编译服务
-
 ```
-go build -ldflags "-w -s" -o server
+在配置文件中可设定`system_root_user`配置项指定用户名及密码，默认用户名为：root，密码为：123
 ```
 
-#### 1.4.2 编译前端
+## 感谢以下框架的开源支持
 
-> 打包之后的目录为：web/dist
+- *Gin* - [https://github.com/gin-gonic/gin](https://github.com/gin-gonic/gin)
+- *Casbin* - [https://github.com/casbin/casbin](https://github.com/casbin/casbin)
+- *Ant Design* - [https://ant.design](https://ant.design)
 
-```
-yarn run build
-```
 
 ## MIT License
 
