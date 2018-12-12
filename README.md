@@ -2,6 +2,8 @@
 
 > 基于Gin + Casbin + Ant Design React 的RBAC权限管理脚手架
 
+![screenshot](http://store.tiannianshou.com/static/github/gin_admin_default.png)
+
 ## 1. 快速开始
 
 ### 1.1 开发环境依赖
@@ -62,7 +64,7 @@ go build -o server
 ./server -c ../../config/config.toml -m ../../config/model.conf
 ```
 
-#### 1.3.2 编译并运营前端
+#### 1.3.2 编译并运行前端
 
 ```
 cd web

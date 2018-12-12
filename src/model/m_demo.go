@@ -14,6 +14,8 @@ type IDemo interface {
 	Get(ctx context.Context, recordID string) (*schema.Demo, error)
 	// 检查数据是否存在
 	Check(ctx context.Context, recordID string) (bool, error)
+	// 检查编号是否存在
+	CheckCode(ctx context.Context, code string) (bool, error)
 	// 创建数据
 	Create(ctx context.Context, item *schema.Demo) error
 	// 更新数据

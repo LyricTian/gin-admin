@@ -1,7 +1,7 @@
 import { routerRedux } from 'dva/router';
 import { stringify, parse } from 'qs';
-import { storeLogoutKey, storeAccessTokenKey } from '../utils/utils';
-import * as loginService from '../services/login';
+import { storeLogoutKey, storeAccessTokenKey } from '@/utils/utils';
+import * as loginService from '@/services/login';
 
 export default {
   namespace: 'login',

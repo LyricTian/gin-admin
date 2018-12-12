@@ -71,7 +71,7 @@ func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, page
 	}
 
 	var items []*schema.DemoQueryResult
-	fields := "id,record_id,code,name,memo,status"
+	fields := "id,record_id,code,name,memo,status,created"
 	_, err = a.DB.Select(&items, fmt.Sprintf("SELECT %s FROM %s %s ORDER BY id DESC LIMIT %d,%d", fields, a.TableName(), where, (pageIndex-1)*pageSize, pageSize), args...)
 	if err != nil {
 		return 0, nil, errors.Wrap(err, "查询分页数据发生错误")
@@ -97,6 +97,16 @@ func (a *Demo) Check(ctx context.Context, recordID string) (bool, error) {
 	n, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND record_id=?", a.TableName()), recordID)
 	if err != nil {
 		return false, errors.Wrap(err, "检查数据是否存在发生错误")
+	}
+
+	return n > 0, nil
+}
+
+// CheckCode 检查编号是否存在
+func (a *Demo) CheckCode(ctx context.Context, code string) (bool, error) {
+	n, err := a.DB.SelectInt(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE deleted=0 AND code=?", a.TableName()), code)
+	if err != nil {
+		return false, errors.Wrap(err, "检查编号是否存在发生错误")
 	}
 
 	return n > 0, nil

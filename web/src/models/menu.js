@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import * as menuService from '../services/menu';
+import * as menuService from '@/services/menu';
 
 export default {
   namespace: 'menu',

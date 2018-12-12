@@ -1,8 +1,8 @@
 import { message } from 'antd';
-import * as roleService from '@/services/role';
+import * as demoService from '@/services/demo';
 
 export default {
-  namespace: 'role',
+  namespace: 'demo',
   state: {
     search: {},
     pagination: {},
@@ -16,7 +16,6 @@ export default {
     formVisible: false,
     formData: {},
     selectData: [],
-    menuKeys: [],
   },
   effects: {
     *fetch({ search, pagination }, { call, put, select }) {
@@ -31,7 +30,7 @@ export default {
           payload: search,
         });
       } else {
-        const s = yield select(state => state.role.search);
+        const s = yield select(state => state.demo.search);
         if (s) {
           params = { ...params, ...s };
         }
@@ -44,13 +43,13 @@ export default {
           payload: pagination,
         });
       } else {
-        const p = yield select(state => state.role.pagination);
+        const p = yield select(state => state.demo.pagination);
         if (p) {
           params = { ...params, ...p };
         }
       }
 
-      const response = yield call(roleService.query, params);
+      const response = yield call(demoService.query, params);
       yield put({
         type: 'saveData',
         payload: response,
@@ -69,7 +68,7 @@ export default {
         }),
         put({
           type: 'saveFormTitle',
-          payload: '新建角色',
+          payload: '新建基础示例',
         }),
         put({
           type: 'saveFormID',
@@ -79,17 +78,13 @@ export default {
           type: 'saveFormData',
           payload: {},
         }),
-        put({
-          type: 'saveMenuKeys',
-          payload: [],
-        }),
       ];
 
       if (payload.type === 'E') {
         yield [
           put({
             type: 'saveFormTitle',
-            payload: '编辑角色',
+            payload: '编辑基础示例',
           }),
           put({
             type: 'saveFormID',
@@ -103,15 +98,11 @@ export default {
       }
     },
     *fetchForm({ payload }, { call, put }) {
-      const response = yield call(roleService.get, payload);
+      const response = yield call(demoService.get, payload);
       yield [
         put({
           type: 'saveFormData',
           payload: response,
-        }),
-        put({
-          type: 'saveMenuKeys',
-          payload: response.menu_ids || [],
         }),
       ];
     },
@@ -122,16 +113,16 @@ export default {
       });
 
       const params = { ...payload };
-      const formType = yield select(state => state.role.formType);
+      const formType = yield select(state => state.demo.formType);
       let success = false;
       if (formType === 'E') {
-        params.record_id = yield select(state => state.role.formID);
-        const response = yield call(roleService.update, params);
+        params.record_id = yield select(state => state.demo.formID);
+        const response = yield call(demoService.update, params);
         if (response.status === 'OK') {
           success = true;
         }
       } else {
-        const response = yield call(roleService.create, params);
+        const response = yield call(demoService.create, params);
         if (response.record_id && response.record_id !== '') {
           success = true;
         }
@@ -154,14 +145,14 @@ export default {
       }
     },
     *del({ payload }, { call, put }) {
-      const response = yield call(roleService.del, payload);
+      const response = yield call(demoService.del, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetch' });
       }
     },
     *delMany({ payload }, { call, put }) {
-      const response = yield call(roleService.delMany, payload);
+      const response = yield call(demoService.delMany, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetch' });
@@ -170,9 +161,9 @@ export default {
     *changeStatus({ payload }, { call, put, select }) {
       let response;
       if (payload.status === 1) {
-        response = yield call(roleService.enable, payload);
+        response = yield call(demoService.enable, payload);
       } else {
-        response = yield call(roleService.disable, payload);
+        response = yield call(demoService.disable, payload);
       }
 
       if (response.status === 'OK') {
@@ -181,7 +172,7 @@ export default {
           msg = '停用成功';
         }
         message.success(msg);
-        const data = yield select(state => state.role.data);
+        const data = yield select(state => state.demo.data);
         const newData = { list: [], pagination: data.pagination };
 
         for (let i = 0; i < data.list.length; i += 1) {
@@ -197,17 +188,6 @@ export default {
           payload: newData,
         });
       }
-    },
-    *fetchSelect(_, { call, put }) {
-      const params = {
-        type: 'select',
-        status: 1,
-      };
-      const response = yield call(roleService.query, params);
-      yield put({
-        type: 'saveSelectData',
-        payload: response.list || [],
-      });
     },
   },
   reducers: {
@@ -237,12 +217,6 @@ export default {
     },
     changeSubmitting(state, { payload }) {
       return { ...state, submitting: payload };
-    },
-    saveSelectData(state, { payload }) {
-      return { ...state, selectData: payload };
-    },
-    saveMenuKeys(state, { payload }) {
-      return { ...state, menuKeys: payload };
     },
   },
 };
