@@ -13,6 +13,10 @@ export default [
     routes: [
       { path: '/', redirect: '/system/menu' },
       {
+        path: '/experiment',
+        routes: [{ path: '/experiment/demo', component: './Demo/DemoList' }],
+      },
+      {
         path: '/system',
         routes: [
           { path: '/system/menu', component: './Menu/MenuList' },

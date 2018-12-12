@@ -1,5 +1,5 @@
-import { getLevelCode, getMenuKeys } from '../utils/utils';
-import * as loginService from '../services/login';
+import { getLevelCode, getMenuKeys } from '@/utils/utils';
+import * as loginService from '@/services/login';
 
 export default {
   namespace: 'global',

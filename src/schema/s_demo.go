@@ -29,4 +29,5 @@ type DemoQueryResult struct {
 	Name     string `json:"name" db:"name"`           // 名称
 	Memo     string `json:"memo" db:"memo"`           // 备注
 	Status   int    `json:"status" db:"status"`       // 状态(1:启用 2:停用)
+	Created  int64  `json:"created" db:"created"`     // 创建时间戳
 }

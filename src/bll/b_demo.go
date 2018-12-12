@@ -7,6 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/pkg/errors"
 )
 
 // Demo 示例程序
@@ -33,6 +34,13 @@ func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 
 // Create 创建数据
 func (a *Demo) Create(ctx context.Context, item *schema.Demo) error {
+	exists, err := a.DemoModel.CheckCode(ctx, item.Code)
+	if err != nil {
+		return err
+	} else if exists {
+		return errors.New("编号已经存在")
+	}
+
 	item.ID = 0
 	item.RecordID = util.MustUUID()
 	item.Created = time.Now().Unix()
@@ -42,11 +50,18 @@ func (a *Demo) Create(ctx context.Context, item *schema.Demo) error {
 
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, recordID string, item *schema.Demo) error {
-	exists, err := a.DemoModel.Check(ctx, recordID)
+	oldItem, err := a.DemoModel.Get(ctx, recordID)
 	if err != nil {
 		return err
-	} else if !exists {
+	} else if oldItem == nil {
 		return util.ErrNotFound
+	} else if oldItem.Code != item.Code {
+		exists, err := a.DemoModel.CheckCode(ctx, item.Code)
+		if err != nil {
+			return err
+		} else if exists {
+			return errors.New("编号已经存在")
+		}
 	}
 
 	info := util.StructToMap(item)
