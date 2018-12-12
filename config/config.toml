@@ -10,9 +10,6 @@ system_code = "admin"
 # 超级用户名(用户名、密码)
 system_root_user = ["root","123"]
 
-# casbin的model配置文件
-casbin_model_conf = "../../config/model.conf"
-
 # 日志配置
 [log]
 # 日志级别(0:panic,1:fatal,2:error,3:warn,4:info,5:debug)

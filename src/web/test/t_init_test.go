@@ -30,7 +30,7 @@ func init() {
 		panic("加载配置文件发生错误：" + err.Error())
 	}
 	viper.Set("run_mode", "debug")
-	viper.Set("casbin_model_conf", "../../../config/model.conf")
+	viper.Set("casbin_model", "../../../config/model.conf")
 
 	engine, _ = src.Init("1.0.0", util.MustUUID())
 }

@@ -123,10 +123,9 @@ export default {
 
       const params = { ...payload };
       const formType = yield select(state => state.role.formType);
-      const formID = yield select(state => state.role.formID);
       let success = false;
       if (formType === 'E') {
-        params.record_id = formID;
+        params.record_id = yield select(state => state.role.formID);
         const response = yield call(roleService.update, params);
         if (response.status === 'OK') {
           success = true;

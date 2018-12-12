@@ -58,7 +58,7 @@ func InitInject(db *mysql.DB) (*casbin.Enforcer, *model.Common, *ctl.Common) {
 	g := new(inject.Graph)
 
 	// 注入casbin
-	enforcer := casbin.NewEnforcer(viper.GetString("casbin_model_conf"), false)
+	enforcer := casbin.NewEnforcer(viper.GetString("casbin_model"), false)
 	g.Provide(&inject.Object{Value: enforcer})
 
 	// 注入mysql存储

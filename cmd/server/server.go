@@ -23,12 +23,15 @@ var VERSION = "1.0.0"
 
 var (
 	configFile string
+	modelFile  string
 	traceID    = util.MustUUID()
 )
 
 func init() {
 	flag.StringVar(&configFile, "config", "", "配置文件(.json,.yaml,.toml)")
 	flag.StringVar(&configFile, "c", "", "配置文件(.json,.yaml,.toml)")
+	flag.StringVar(&modelFile, "model", "", "Casbin的访问控制模型(.conf)")
+	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
 }
 
 func main() {
@@ -42,6 +45,14 @@ func main() {
 	viper.SetConfigFile(configFile)
 	if err := viper.ReadInConfig(); err != nil {
 		panic("加载配置文件发生错误：" + err.Error())
+	}
+
+	if v := viper.GetString("casbin_model"); v == "" && modelFile == "" {
+		panic("请使用-m指定Casbin的访问控制模型")
+	}
+
+	if modelFile != "" {
+		viper.Set("casbin_model", modelFile)
 	}
 
 	var state int32 = 1
