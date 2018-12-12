@@ -191,10 +191,9 @@ export default {
       }
 
       const formType = yield select(state => state.menu.formType);
-      const formID = yield select(state => state.menu.formID);
       let success = false;
       if (formType === 'E') {
-        params.record_id = formID;
+        params.record_id = yield select(state => state.menu.formID);
         const response = yield call(menuService.update, params);
         if (response.status === 'OK') {
           success = true;
