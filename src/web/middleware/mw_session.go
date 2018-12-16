@@ -1,10 +1,10 @@
-package router
+package middleware
 
 import (
 	"fmt"
 	"net/http"
 
-	"github.com/LyricTian/gin-admin/src/service/mysql"
+	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
@@ -15,7 +15,7 @@ import (
 )
 
 // SessionMiddleware session中间件
-func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
+func SessionMiddleware(obj *inject.Object, allowPrefixes ...string) gin.HandlerFunc {
 	sessionConfig := viper.GetStringMap("session")
 
 	var opts []session.Option
@@ -30,7 +30,7 @@ func SessionMiddleware(db *mysql.DB, allowPrefixes ...string) gin.HandlerFunc {
 		tableName := fmt.Sprintf("%s_%s",
 			util.T(viper.GetStringMap("mysql")["table_prefix"]).String(),
 			util.T(sessionConfig["table"]).String())
-		opts = append(opts, session.SetStore(mysession.NewStoreWithDB(db.Db, tableName, 0)))
+		opts = append(opts, session.SetStore(mysession.NewStoreWithDB(obj.MySQL.Db, tableName, 0)))
 	}
 
 	ginConfig := ginsession.DefaultConfig
@@ -58,7 +58,7 @@ func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 					userID = rootUser[0]
 				}
 			}
-			c.Set(util.SessionKeyUserID, userID)
+			c.Set(util.ContextKeyUserID, userID)
 			c.Next()
 			return
 		}
@@ -71,7 +71,7 @@ func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 			ctx.ResError(fmt.Errorf("用户未登录"), http.StatusUnauthorized, 9999)
 			return
 		}
-		c.Set(util.SessionKeyUserID, userID)
+		c.Set(util.ContextKeyUserID, userID)
 		c.Next()
 	}
 }

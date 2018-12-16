@@ -1,4 +1,4 @@
-package router
+package middleware
 
 import (
 	"github.com/LyricTian/gin-admin/src/util"
