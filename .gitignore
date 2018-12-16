@@ -13,4 +13,4 @@
 
 *.DS_Store
 /cmd/server/server
-/cmd/server/start.sh
+release
