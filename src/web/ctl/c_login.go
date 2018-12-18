@@ -24,17 +24,14 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
-	var result struct {
-		Status string `json:"status"`
-	}
-
+	var result context.HTTPStatus
 	userInfo, err := a.LoginBll.Verify(ctx.NewContext(), item.UserName, item.Password)
 	if err != nil {
-		result.Status = "error"
+		result.Status = context.StatusError
 		if err == bll.ErrInvalidPassword ||
 			err == bll.ErrInvalidUserName ||
 			err == bll.ErrUserDisable {
-			result.Status = "fail"
+			result.Status = context.StatusFail
 		} else {
 			logger.LoginWithContext(ctx.NewContext()).Errorf("用户登录发生错误：%s", err.Error())
 		}
@@ -48,7 +45,7 @@ func (a *Login) Login(ctx *context.Context) {
 	// 更新会话
 	store, err := ctx.RefreshSession()
 	if err != nil {
-		result.Status = "error"
+		result.Status = context.StatusError
 		logger.LoginWithContext(nctx).Errorf("更新会话发生错误：%s", err.Error())
 		ctx.ResSuccess(result)
 		return
@@ -57,7 +54,7 @@ func (a *Login) Login(ctx *context.Context) {
 	store.Set(util.SessionKeyUserID, userInfo.RecordID)
 	err = store.Save()
 	if err != nil {
-		result.Status = "error"
+		result.Status = context.StatusError
 		logger.LoginWithContext(nctx).Errorf("存储会话发生错误：%s", err.Error())
 		ctx.ResSuccess(result)
 		return
