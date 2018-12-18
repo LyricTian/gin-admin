@@ -89,7 +89,7 @@ func (a *Context) GetPageIndex() uint {
 	return 1
 }
 
-// GetPageSize 获取分页的页大小
+// GetPageSize 获取分页的页大小(最大50)
 func (a *Context) GetPageSize() uint {
 	if v := a.Query("pageSize"); v != "" {
 		if iv := util.S(v).Uint(); iv > 0 {
@@ -144,27 +144,28 @@ func (a *Context) ResInternalServerError(err error, code ...int) {
 
 // ResError 响应错误
 func (a *Context) ResError(err error, status int, code ...int) {
-	var message string
+	var item HTTPErrorItem
+
 	if err != nil {
 		ss := strings.Split(err.Error(), ": ")
 		if len(ss) > 0 {
-			message = ss[0]
+			item.Message = ss[0]
 		}
 	}
 
 	if status >= 400 && status < 500 {
-		if message == "" {
-			message = "请求发生错误"
+		if item.Message == "" {
+			item.Message = "请求发生错误"
 		}
 
 		if err != nil {
 			logger.SystemWithContext(a.NewContext()).
 				WithField("error", err.Error()).
-				Warnf("[请求错误] %s", message)
+				Warnf("[请求错误] %s", item.Message)
 		}
 	} else if status >= 500 && status < 600 {
-		if message == "" {
-			message = "服务器发生错误"
+		if item.Message == "" {
+			item.Message = "服务器发生错误"
 		}
 
 		if err != nil {
@@ -180,45 +181,44 @@ func (a *Context) ResError(err error, status int, code ...int) {
 		}
 	}
 
-	obj := gin.H{
-		"code":    0,
-		"message": message,
-	}
 	if len(code) > 0 {
-		obj["code"] = code[0]
+		item.Code = code[0]
 	}
-	a.gctx.JSON(status, gin.H{"error": obj})
-	a.gctx.Abort()
-}
-
-// ResSuccess 响应成功
-func (a *Context) ResSuccess(obj interface{}) {
-	if obj == nil {
-		obj = gin.H{}
-	}
-	a.gctx.JSON(http.StatusOK, obj)
-	a.gctx.Abort()
+	a.ResJSON(status, HTTPError{Error: item})
 }
 
 // ResPage 响应分页数据
-func (a *Context) ResPage(total int64, list interface{}) {
-	obj := gin.H{
-		"list": list,
-		"pagination": gin.H{
-			"total":    total,
-			"current":  a.GetPageIndex(),
-			"pageSize": a.GetPageSize(),
+func (a *Context) ResPage(total int64, v interface{}) {
+	a.ResSuccess(HTTPList{
+		List: v,
+		Pagination: &HTTPPagination{
+			Total:    total,
+			Current:  a.GetPageIndex(),
+			PageSize: a.GetPageSize(),
 		},
-	}
-	a.ResSuccess(obj)
+	})
 }
 
 // ResList 响应列表数据
-func (a *Context) ResList(list interface{}) {
-	a.ResSuccess(gin.H{"list": list})
+func (a *Context) ResList(v interface{}) {
+	a.ResSuccess(HTTPList{List: v})
 }
 
 // ResOK 响应OK
 func (a *Context) ResOK() {
-	a.ResSuccess(gin.H{"status": "OK"})
+	a.ResSuccess(HTTPStatus{Status: StatusOK})
+}
+
+// ResSuccess 响应成功
+func (a *Context) ResSuccess(v interface{}) {
+	if v == nil {
+		v = gin.H{}
+	}
+	a.ResJSON(http.StatusOK, v)
+}
+
+// ResJSON 响应JSON数据
+func (a *Context) ResJSON(status int, v interface{}) {
+	a.gctx.JSON(status, v)
+	a.gctx.Abort()
 }

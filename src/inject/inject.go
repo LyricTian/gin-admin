@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	model "github.com/LyricTian/gin-admin/src/model/mysql"
+	mysqlModel "github.com/LyricTian/gin-admin/src/model/mysql"
 	"github.com/LyricTian/gin-admin/src/service/mysql"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/ctl"
@@ -15,27 +15,22 @@ import (
 
 // Object 注入对象
 type Object struct {
-	MySQL       *mysql.DB
-	Enforcer    *casbin.Enforcer
-	ModelCommon *model.Common
-	CtlCommon   *ctl.Common
+	MySQL     *mysql.DB
+	Enforcer  *casbin.Enforcer
+	CtlCommon *ctl.Common
 }
 
 // Init 初始化依赖注入
 func Init() *Object {
-	mysqlDB := InitMySQL()
-
 	g := new(inject.Graph)
 
-	// 注入MySQL
-	g.Provide(&inject.Object{Value: mysqlDB})
+	// 注入mysql存储
+	mysqlDB := initMySQL()
+	new(mysqlModel.Common).Init(g, mysqlDB)
 
 	// 注入casbin
 	enforcer := casbin.NewEnforcer(viper.GetString("casbin_model"), false)
 	g.Provide(&inject.Object{Value: enforcer})
-
-	// 注入mysql存储
-	modelCommom := new(model.Common).Init(g, mysqlDB)
 
 	// 注入控制器
 	ctlCommon := new(ctl.Common)
@@ -46,15 +41,14 @@ func Init() *Object {
 	}
 
 	return &Object{
-		MySQL:       mysqlDB,
-		Enforcer:    enforcer,
-		ModelCommon: modelCommom,
-		CtlCommon:   ctlCommon,
+		MySQL:     mysqlDB,
+		Enforcer:  enforcer,
+		CtlCommon: ctlCommon,
 	}
 }
 
-// InitMySQL 初始化mysql数据库
-func InitMySQL() *mysql.DB {
+// 初始化mysql数据库
+func initMySQL() *mysql.DB {
 	mysqlConfig := viper.GetStringMap("mysql")
 	var opts []mysql.Option
 	if v := util.T(mysqlConfig["trace"]).Bool(); v {
