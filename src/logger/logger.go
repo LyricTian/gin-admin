@@ -10,18 +10,19 @@ import (
 
 // 定义日志中使用的键名
 const (
-	FieldKeyTraceID = "trace_id"
 	FieldKeyType    = "type"
+	FieldKeyTraceID = "trace_id"
 	FieldKeyUserID  = "user_id"
 )
 
-var defaultOptions = options{
-	level:  5,
-	format: "text",
-}
-
-var internalLogger *Logger
-var once sync.Once
+var (
+	internalLogger *Logger
+	once           sync.Once
+	defaultOptions = options{
+		level:  5,
+		format: "text",
+	}
+)
 
 type options struct {
 	level  int
@@ -54,44 +55,24 @@ func Default() *Logger {
 	return logger()
 }
 
-// SystemWithContext 系统日志
-func SystemWithContext(ctx context.Context) *logrus.Entry {
-	return System(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
-}
-
 // System 系统日志
-func System(traceID string, userID ...string) *logrus.Entry {
-	return logger().System(traceID, userID...)
-}
-
-// AccessWithContext 访问日志
-func AccessWithContext(ctx context.Context) *logrus.Entry {
-	return Access(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
+func System(ctx context.Context) *logrus.Entry {
+	return logger().System(ctx)
 }
 
 // Access 访问日志
-func Access(traceID string, userID ...string) *logrus.Entry {
-	return logger().Access(traceID, userID...)
-}
-
-// OperateWithContext 操作日志
-func OperateWithContext(ctx context.Context) *logrus.Entry {
-	return Operate(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
+func Access(ctx context.Context) *logrus.Entry {
+	return logger().Access(ctx)
 }
 
 // Operate 操作日志
-func Operate(traceID string, userID ...string) *logrus.Entry {
-	return logger().Operate(traceID, userID...)
-}
-
-// LoginWithContext 登录(登出)日志
-func LoginWithContext(ctx context.Context) *logrus.Entry {
-	return Login(util.FromTraceIDContext(ctx), util.FromUserIDContext(ctx))
+func Operate(ctx context.Context) *logrus.Entry {
+	return logger().Operate(ctx)
 }
 
 // Login 登录(登出)日志
-func Login(traceID string, userID string) *logrus.Entry {
-	return logger().Login(traceID, userID)
+func Login(ctx context.Context) *logrus.Entry {
+	return logger().Login(ctx)
 }
 
 // New 创建日志实例
@@ -122,33 +103,37 @@ type Logger struct {
 	*logrus.Logger
 }
 
-func (a *Logger) typeEntry(traceID, fieldType string, userID ...string) *logrus.Entry {
+func (a *Logger) typeEntry(ctx context.Context, fieldType string) *logrus.Entry {
 	fields := logrus.Fields{
-		FieldKeyTraceID: traceID,
-		FieldKeyType:    fieldType,
+		FieldKeyType: fieldType,
 	}
-	if len(userID) > 0 {
-		fields[FieldKeyUserID] = userID[0]
+
+	if traceID := util.FromTraceIDContext(ctx); traceID != "" {
+		fields[FieldKeyTraceID] = traceID
 	}
+	if userID := util.FromUserIDContext(ctx); userID != "" {
+		fields[FieldKeyUserID] = userID
+	}
+
 	return a.WithFields(fields)
 }
 
 // System 系统日志
-func (a *Logger) System(traceID string, userID ...string) *logrus.Entry {
-	return a.typeEntry(traceID, "system", userID...)
+func (a *Logger) System(ctx context.Context) *logrus.Entry {
+	return a.typeEntry(ctx, "system")
 }
 
 // Access 访问日志
-func (a *Logger) Access(traceID string, userID ...string) *logrus.Entry {
-	return a.typeEntry(traceID, "access", userID...)
+func (a *Logger) Access(ctx context.Context) *logrus.Entry {
+	return a.typeEntry(ctx, "access")
 }
 
 // Operate 操作日志
-func (a *Logger) Operate(traceID string, userID ...string) *logrus.Entry {
-	return a.typeEntry(traceID, "operate", userID...)
+func (a *Logger) Operate(ctx context.Context) *logrus.Entry {
+	return a.typeEntry(ctx, "operate")
 }
 
 // Login 登录(登出)日志
-func (a *Logger) Login(traceID string, userID string) *logrus.Entry {
-	return a.typeEntry(traceID, "login", userID)
+func (a *Logger) Login(ctx context.Context) *logrus.Entry {
+	return a.typeEntry(ctx, "login")
 }
