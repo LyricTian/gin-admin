@@ -27,7 +27,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 			if err := recover(); err != nil {
 				stack := stack(3)
 
-				logger.System(ctx.GetTraceID(), ctx.GetUserID()).
+				logger.System(context.NewContext(c).NewContext()).
 					WithField("stack", string(stack)).
 					Errorf("[Recover]: %s", err)
 

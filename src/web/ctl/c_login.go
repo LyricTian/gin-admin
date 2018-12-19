@@ -33,7 +33,7 @@ func (a *Login) Login(ctx *context.Context) {
 			err == bll.ErrUserDisable {
 			result.Status = context.StatusFail
 		} else {
-			logger.LoginWithContext(ctx.NewContext()).Errorf("用户登录发生错误：%s", err.Error())
+			logger.Login(ctx.NewContext()).Errorf("用户登录发生错误：%s", err.Error())
 		}
 
 		ctx.ResSuccess(result)
@@ -46,7 +46,7 @@ func (a *Login) Login(ctx *context.Context) {
 	store, err := ctx.RefreshSession()
 	if err != nil {
 		result.Status = context.StatusError
-		logger.LoginWithContext(nctx).Errorf("更新会话发生错误：%s", err.Error())
+		logger.Login(nctx).Errorf("更新会话发生错误：%s", err.Error())
 		ctx.ResSuccess(result)
 		return
 	}
@@ -55,11 +55,11 @@ func (a *Login) Login(ctx *context.Context) {
 	err = store.Save()
 	if err != nil {
 		result.Status = context.StatusError
-		logger.LoginWithContext(nctx).Errorf("存储会话发生错误：%s", err.Error())
+		logger.Login(nctx).Errorf("存储会话发生错误：%s", err.Error())
 		ctx.ResSuccess(result)
 		return
 	}
-	logger.LoginWithContext(nctx).Infof("登入系统")
+	logger.Login(nctx).Infof("登入系统")
 
 	ctx.ResOK()
 }
@@ -71,11 +71,11 @@ func (a *Login) Logout(ctx *context.Context) {
 		nctx := ctx.NewContext()
 
 		if err := ctx.DestroySession(); err != nil {
-			logger.LoginWithContext(nctx).Errorf("登出系统发生错误：%s", err.Error())
+			logger.Login(nctx).Errorf("登出系统发生错误：%s", err.Error())
 			ctx.ResInternalServerError(err)
 			return
 		}
-		logger.LoginWithContext(nctx).Infof("登出系统")
+		logger.Login(nctx).Infof("登出系统")
 	}
 
 	ctx.ResOK()

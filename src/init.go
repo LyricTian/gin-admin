@@ -1,6 +1,7 @@
 package src
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -17,14 +18,14 @@ import (
 type CloseHandle func()
 
 // Init 初始化所有服务
-func Init(version, traceID string) (*gin.Engine, CloseHandle) {
+func Init(ctx context.Context, version string) (*gin.Engine, CloseHandle) {
 	// 初始化依赖注入
 	obj := inject.Init()
 
 	// 初始化日志
 	loggerHook := InitLogger(obj)
 
-	logger.System(traceID).Infof("服务已运行在[%s]模式下，版本号:%s，进程号：%d",
+	logger.System(ctx).Infof("服务已运行在[%s]模式下，运行版本:%s，进程号：%d",
 		viper.GetString("run_mode"), version, os.Getpid())
 
 	// 初始化HTTP服务
@@ -39,7 +40,7 @@ func Init(version, traceID string) (*gin.Engine, CloseHandle) {
 		// 关闭数据库
 		if db := obj.MySQL; db != nil {
 			if err := db.Close(); err != nil {
-				logger.System(traceID).Errorf("关闭数据库发生错误: %s", err.Error())
+				logger.System(ctx).Errorf("关闭数据库发生错误: %s", err.Error())
 			}
 		}
 

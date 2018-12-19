@@ -9,7 +9,6 @@ RELEASE_GINADMIN = "release/ginadmin"
 all: start
 
 start: 
-	rm $(SERVER_BIN)
 	@go build -o $(SERVER_BIN) ./cmd/server
 	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf
 
@@ -17,14 +16,12 @@ web:
 	cd web && yarn && yarn start
 
 test:
-	go test -cover -race ./...
+	@go test -cover -race ./...
 
 build:
-	rm $(SERVER_BIN)
 	@go build -ldflags "-w -s" -o $(SERVER_BIN) ./cmd/server
 
 build-web:
-	rm -rf ./web/dist
 	cd web && yarn && yarn run build
 
 pack: build build-web
