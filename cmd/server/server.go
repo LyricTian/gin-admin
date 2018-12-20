@@ -7,25 +7,24 @@ import (
 	"os"
 	"os/signal"
 	"sync/atomic"
-	"syscall"
 	"time"
-
-	"github.com/LyricTian/gin-admin/src/util"
 
 	"github.com/LyricTian/gin-admin/src"
 	"github.com/LyricTian/gin-admin/src/logger"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/spf13/viper"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// VERSION 服务版本号，
-// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=1.0.1"
-var VERSION = "1.0.0"
+// VERSION 版本号，
+// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=1.2.0-beta"
+var VERSION = "1.2.0-beta"
 
 var (
 	configFile string
 	modelFile  string
+	webDir     string
 )
 
 func init() {
@@ -33,6 +32,7 @@ func init() {
 	flag.StringVar(&configFile, "c", "", "配置文件(.json,.yaml,.toml)")
 	flag.StringVar(&modelFile, "model", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
+	flag.StringVar(&webDir, "www", "", "静态站点目录")
 }
 
 func main() {
@@ -56,27 +56,34 @@ func main() {
 		viper.Set("casbin_model", modelFile)
 	}
 
-	var state int32 = 1
-	ac := make(chan error)
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGTERM, syscall.SIGQUIT)
+	if webDir != "" {
+		viper.Set("web_dir", webDir)
+	}
 
 	ctx := util.NewTraceIDContext(context.Background(), util.MustUUID())
-	httpHandler, closeHandle := src.Init(ctx, VERSION)
+	httpHandler, callback := src.Init(ctx, VERSION)
 
+	srv := &http.Server{
+		Addr:           viper.GetString("http_addr"),
+		Handler:        httpHandler,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	ac := make(chan error)
 	// 开启HTTP监听
 	go func() {
 		logger.System(ctx).Infof("HTTP服务开始启动，监听地址为：[%s]", viper.GetString("http_addr"))
-
-		httpServer := &http.Server{
-			Addr:           viper.GetString("http_addr"),
-			Handler:        httpHandler,
-			ReadTimeout:    10 * time.Second,
-			WriteTimeout:   10 * time.Second,
-			MaxHeaderBytes: 1 << 20,
+		err := srv.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			ac <- err
 		}
-		ac <- httpServer.ListenAndServe()
 	}()
+
+	var state int32 = 1
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, os.Interrupt)
 
 	select {
 	case err := <-ac:
@@ -88,8 +95,15 @@ func main() {
 		logger.System(ctx).Infof("获取到退出信号[%s]", sig.String())
 	}
 
-	if closeHandle != nil {
-		closeHandle()
+	if callback != nil {
+		callback()
+	}
+
+	// 优雅关闭服务
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		logger.System(ctx).Errorf("关闭HTTP服务发生错误:%s", err.Error())
 	}
 
 	// 退出应用

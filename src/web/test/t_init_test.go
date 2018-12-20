@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -32,7 +33,8 @@ func init() {
 	viper.Set("run_mode", "debug")
 	viper.Set("casbin_model", "../../../config/model.conf")
 
-	engine, _ = src.Init("1.0.0", util.MustUUID())
+	ctx := util.NewTraceIDContext(context.Background(), util.MustUUID())
+	engine, _ = src.Init(ctx, "1.2.0-test")
 }
 
 func toReader(v interface{}) io.Reader {

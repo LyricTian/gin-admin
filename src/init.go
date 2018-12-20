@@ -14,11 +14,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// CloseHandle 关闭服务
-type CloseHandle func()
-
 // Init 初始化所有服务
-func Init(ctx context.Context, version string) (*gin.Engine, CloseHandle) {
+func Init(ctx context.Context, version string) (*gin.Engine, func()) {
 	// 初始化依赖注入
 	obj := inject.Init()
 
