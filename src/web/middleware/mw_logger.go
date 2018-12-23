@@ -54,6 +54,11 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 		fields["time"] = fmt.Sprintf("%dms", time.Since(start).Nanoseconds()/1e6)
 		fields["status"] = c.Writer.Status()
 		fields["length"] = c.Writer.Size()
+		if v, ok := c.Get(util.ContextKeyResBody); ok {
+			if b, ok := v.([]byte); ok {
+				fields["res_body"] = string(b)
+			}
+		}
 
 		m := p
 		if v := c.GetString(util.ContextKeyURLMemo); v != "" {

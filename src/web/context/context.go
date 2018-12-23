@@ -219,6 +219,12 @@ func (a *Context) ResSuccess(v interface{}) {
 
 // ResJSON 响应JSON数据
 func (a *Context) ResJSON(status int, v interface{}) {
-	a.gctx.JSON(status, v)
+	buf, err := util.JSONMarshal(v)
+	if err != nil {
+		a.ResInternalServerError(errors.Wrap(err, "JSON序列化发生错误"))
+		return
+	}
+	a.gctx.Set(util.ContextKeyResBody, buf)
+	a.gctx.Data(status, "application/json; charset=utf-8", buf)
 	a.gctx.Abort()
 }
