@@ -23,8 +23,6 @@ Casbin is a powerful and efficient open-source access control library for Golang
 [Casbin](https://github.com/casbin/casbin) | [jCasbin](https://github.com/casbin/jcasbin) | [node-Casbin](https://github.com/casbin/node-casbin) | [PHP-Casbin](https://github.com/php-casbin/php-casbin)
 production-ready | production-ready | production-ready | production-ready
 
-Casbin originates from the research project from the [Lab for Big Data Technology of Peking University](http://ibd.pku.edu.cn/).
-
 ## Table of contents
 
 - [Supported models](#supported-models)
@@ -210,10 +208,8 @@ Adapter | Type | Author | Description
 [Beego ORM Adapter](https://github.com/casbin/beego-orm-adapter) | ORM | Casbin | MySQL, PostgreSQL, Sqlite3 are supported by [Beego ORM](https://beego.me/docs/mvc/model/overview.md)
 [MongoDB Adapter](https://github.com/casbin/mongodb-adapter) | NoSQL | Casbin | Persistence for [MongoDB](https://www.mongodb.com)
 [Cassandra Adapter](https://github.com/casbin/cassandra-adapter) | NoSQL | Casbin | Persistence for [Apache Cassandra DB](http://cassandra.apache.org)
-[GCP Datastore Adapter](https://github.com/livingpackets/datastore-adapter) | NoSQL | [LivingPackets](https://github.com/livingpackets) | Persistence for [Google Cloud Platform Datastore](https://cloud.google.com/datastore/)
 [Consul Adapter](https://github.com/ankitm123/consul-adapter) | KV store | [@ankitm123](https://github.com/ankitm123) | Persistence for [HashiCorp Consul](https://www.consul.io/)
 [Redis Adapter](https://github.com/casbin/redis-adapter) | KV store | Casbin | Persistence for [Redis](https://redis.io/)
-[Etcd Adapter](https://github.com/sebastianliu/etcd-adapter) | KV store | Casbin | Persistence for [etcd](https://github.com/coreos/etcd)
 [Protobuf Adapter](https://github.com/casbin/protobuf-adapter) | Stream | Casbin | Persistence for [Google Protocol Buffers](https://developers.google.com/protocol-buffers/)
 [JSON Adapter](https://github.com/casbin/json-adapter) | String | Casbin | Persistence for [JSON](https://www.json.org/)
 [String Adapter](https://github.com/qiangmzsx/string-adapter) | String | [@qiangmzsx](https://github.com/qiangmzsx) | Persistence for String
@@ -372,6 +368,5 @@ This project is licensed under the [Apache 2.0 license](LICENSE).
 
 If you have any issues or feature requests, please contact us. PR is welcomed.
 - https://github.com/casbin/casbin/issues
-- hsluoyz \<at> gmail.com
-- luoyang \<at> pku.edu.cn
+- hsluoyz@gmail.com
 - Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)

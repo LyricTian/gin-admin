@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -52,6 +53,8 @@ func main() {
 		panic("请使用-m指定Casbin的访问控制模型")
 	}
 
+	fmt.Printf("开始运行服务，服务版本号：%s \n", VERSION)
+
 	if modelFile != "" {
 		viper.Set("casbin_model", modelFile)
 	}
@@ -60,9 +63,8 @@ func main() {
 		viper.Set("web_dir", webDir)
 	}
 
-	ctx := util.NewTraceIDContext(context.Background(), util.MustUUID())
+	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
 	httpHandler, callback := src.Init(ctx, VERSION)
-
 	srv := &http.Server{
 		Addr:           viper.GetString("http_addr"),
 		Handler:        httpHandler,
@@ -72,9 +74,11 @@ func main() {
 	}
 
 	ac := make(chan error)
+	span := logger.Start(ctx)
+
 	// 开启HTTP监听
 	go func() {
-		logger.System(ctx).Infof("HTTP服务开始启动，监听地址为：[%s]", viper.GetString("http_addr"))
+		span.Infof("HTTP服务开始启动，监听地址为：[%s]", viper.GetString("http_addr"))
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			ac <- err
@@ -88,22 +92,22 @@ func main() {
 	select {
 	case err := <-ac:
 		if err != nil && atomic.LoadInt32(&state) == 1 {
-			logger.System(ctx).Errorf("监听HTTP服务发生错误:%s", err.Error())
+			span.Errorf("监听HTTP服务发生错误:%s", err.Error())
 		}
 	case sig := <-sc:
 		atomic.StoreInt32(&state, 0)
-		logger.System(ctx).Infof("获取到退出信号[%s]", sig.String())
+		span.Infof("获取到退出信号[%s]", sig.String())
+	}
+
+	// 优雅关闭服务
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		span.Errorf("关闭HTTP服务发生错误:%s", err.Error())
 	}
 
 	if callback != nil {
 		callback()
-	}
-
-	// 优雅关闭服务
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		logger.System(ctx).Errorf("关闭HTTP服务发生错误:%s", err.Error())
 	}
 
 	// 退出应用

@@ -1,0 +1,10 @@
+language: go
+sudo: false
+go_import_path: github.com/LyricTian/retry
+go:
+  - 1.7
+before_install:
+  - go get github.com/mattn/goveralls
+script:
+  - $HOME/gopath/bin/goveralls -service=travis-ci
+  
