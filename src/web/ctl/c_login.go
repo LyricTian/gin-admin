@@ -33,7 +33,7 @@ func (a *Login) Login(ctx *context.Context) {
 			err == bll.ErrUserDisable {
 			result.Status = context.StatusFail
 		} else {
-			logger.Login(ctx.NewContext()).Errorf("用户登录发生错误：%s", err.Error())
+			logger.Start(ctx.NewContext()).Errorf("用户登录发生错误：%s", err.Error())
 		}
 
 		ctx.ResSuccess(result)
@@ -42,11 +42,12 @@ func (a *Login) Login(ctx *context.Context) {
 	ctx.SetUserID(userInfo.RecordID)
 
 	nctx := ctx.NewContext()
+	span := logger.StartSpan(nctx, "用户登录", "Login")
 	// 更新会话
 	store, err := ctx.RefreshSession()
 	if err != nil {
 		result.Status = context.StatusError
-		logger.Login(nctx).Errorf("更新会话发生错误：%s", err.Error())
+		span.Errorf("更新会话发生错误：%s", err.Error())
 		ctx.ResSuccess(result)
 		return
 	}
@@ -55,11 +56,11 @@ func (a *Login) Login(ctx *context.Context) {
 	err = store.Save()
 	if err != nil {
 		result.Status = context.StatusError
-		logger.Login(nctx).Errorf("存储会话发生错误：%s", err.Error())
+		span.Errorf("存储会话发生错误：%s", err.Error())
 		ctx.ResSuccess(result)
 		return
 	}
-	logger.Login(nctx).Infof("登入系统")
+	span.Infof("登入系统")
 
 	ctx.ResOK()
 }
@@ -69,13 +70,13 @@ func (a *Login) Logout(ctx *context.Context) {
 	userID := ctx.GetUserID()
 	if userID != "" {
 		nctx := ctx.NewContext()
-
+		span := logger.StartSpan(nctx, "用户登出", "Logout")
 		if err := ctx.DestroySession(); err != nil {
-			logger.Login(nctx).Errorf("登出系统发生错误：%s", err.Error())
+			span.Errorf("登出系统发生错误：%s", err.Error())
 			ctx.ResInternalServerError(err)
 			return
 		}
-		logger.Login(nctx).Infof("登出系统")
+		span.Infof("登出系统")
 	}
 
 	ctx.ResOK()

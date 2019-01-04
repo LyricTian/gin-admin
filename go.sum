@@ -10,6 +10,7 @@ github.com/LyricTian/retry v0.0.0-20171017082930-b6d48b303d89/go.mod h1:7XonZD4q
 github.com/casbin/casbin v1.7.0 h1:PuzlE8w0JBg/DhIqnkF1Dewf3z+qmUZMVN07PonvVUQ=
 github.com/casbin/casbin v1.7.0/go.mod h1:c67qKN6Oum3UF5Q1+BByfFxkwKvhwW57ITjqwtzR1KE=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+github.com/davecgh/go-spew v0.0.0-20180221232628-8991bc29aa16 h1:HqkufMBR7waVfFFRABWqHa1WgTvjtVDJTLJe3CR576A=
 github.com/davecgh/go-spew v0.0.0-20180221232628-8991bc29aa16/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-broadcast v0.0.0-20171205050544-f664265f5a66/go.mod h1:kTEh6M2J/mh7nsskr28alwLCXm/DSG5OSA/o31yy2XU=
 github.com/facebookgo/inject v0.0.0-20161006174721-cc1aa653e50f h1:jK9r9Ofgc/Yzdlod77G23LfYtwqAmkQCZ9MaP6779OI=
@@ -62,6 +63,7 @@ github.com/pelletier/go-toml v0.0.0-20180323185243-66540cf1fcd2 h1:BR4UJUSGxC9cr
 github.com/pelletier/go-toml v0.0.0-20180323185243-66540cf1fcd2/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pkg/errors v0.0.0-20181023235946-059132a15dd0 h1:R+lX9nKwNd1n7UE5SQAyoorREvRn3aLF6ZndXBoIWqY=
 github.com/pkg/errors v0.0.0-20181023235946-059132a15dd0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v0.0.0-20180427095347-507c822874d4 h1:MSOOCtLcoTfMUM7Qh1RJGMuNivBzF0gxhfKdutQ+oB4=
 github.com/sirupsen/logrus v0.0.0-20180427095347-507c822874d4/go.mod h1:pMByvHTf9Beacp5x1UXfOR9xyW/9antXMhjMPG0dEzc=
@@ -76,6 +78,7 @@ github.com/spf13/pflag v1.0.1/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnIn
 github.com/spf13/viper v0.0.0-20180404183325-8dc2790b029d h1:L8nQzf8HvZkwRTWjJb7O5Fww1fk6WtNaDr07G6tyJ/E=
 github.com/spf13/viper v0.0.0-20180404183325-8dc2790b029d/go.mod h1:A8kyI5cUJhb8N+3pkfONlcEcZbueH6nhAm0Fq7SrnBM=
 github.com/stretchr/testify v0.0.0-20181014000028-04af85275a5c/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/thinkerou/favicon v0.0.0-20170710140520-94a442a49da6/go.mod h1:HL7Pap5kOluZv1ku34pZo/AJ44GaxMEPFZ3pmuexV2s=
 github.com/ugorji/go v0.0.0-20180831062425-e253f1f20942/go.mod h1:hnLbHMwcvSihnDhEfx2/BzKp2xb0Y+ErdfYcrs9tkJQ=

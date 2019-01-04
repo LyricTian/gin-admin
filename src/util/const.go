@@ -12,8 +12,8 @@ const (
 	SessionKeyUserID = "user_id"
 	// ContextKeyUserID 存储上下文中的键(用户ID)
 	ContextKeyUserID = contextKeyPrefix + "/user_id"
-	// ContextKeyURLMemo 存储上下文中的键(请求URL说明)
-	ContextKeyURLMemo = contextKeyPrefix + "/url_memo"
+	// ContextKeyURLTitle 存储上下文中的键(请求URL说明)
+	ContextKeyURLTitle = contextKeyPrefix + "/url_title"
 	// ContextKeyTraceID 存储上下文中的键(跟踪ID)
 	ContextKeyTraceID = contextKeyPrefix + "/trace_id"
 	// ContextKeyResBody 存储上下文中的键(响应Body数据)

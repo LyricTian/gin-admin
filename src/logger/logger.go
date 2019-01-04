@@ -2,138 +2,95 @@ package logger
 
 import (
 	"context"
-	"sync"
+	"time"
 
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/sirupsen/logrus"
 )
 
-// 定义日志中使用的键名
+// 定义键名
 const (
-	FieldKeyType    = "type"
-	FieldKeyTraceID = "trace_id"
-	FieldKeyUserID  = "user_id"
+	StartTimeKey    = "start_time"
+	TraceIDKey      = "trace_id"
+	UserIDKey       = "user_id"
+	SpanIDKey       = "span_id"
+	SpanTitleKey    = "span_title"
+	SpanFunctionKey = "span_function"
+	VersionKey      = "version"
 )
 
-var (
-	internalLogger *Logger
-	once           sync.Once
-	defaultOptions = options{
-		level:  5,
-		format: "text",
-	}
+// Entry 定义别名
+type Entry = logrus.Entry
+
+type (
+	traceIDContextKey struct{}
+	spanIDContextKey  struct{}
+	userIDContextKey  struct{}
 )
 
-type options struct {
-	level  int
-	format string
+// NewTraceIDContext 创建跟踪ID上下文
+func NewTraceIDContext(ctx context.Context, traceID string) context.Context {
+	return context.WithValue(ctx, traceIDContextKey{}, traceID)
 }
 
-// Option 定义配置参数
-type Option func(o *options)
-
-// SetLevel 设定日志级别(0:panic,1:fatal,2:error,3:warn,4:info,5:debug)
-func SetLevel(level int) Option {
-	return func(o *options) {
-		o.level = level
-	}
-}
-
-// SetFormat 设定日志格式(text/json)
-func SetFormat(format string) Option {
-	return func(o *options) {
-		o.format = format
-	}
-}
-
-func logger() *Logger {
-	return New()
-}
-
-// Default 获取默认日志实例
-func Default() *Logger {
-	return logger()
-}
-
-// System 系统日志
-func System(ctx context.Context) *logrus.Entry {
-	return logger().System(ctx)
-}
-
-// Access 访问日志
-func Access(ctx context.Context) *logrus.Entry {
-	return logger().Access(ctx)
-}
-
-// Operate 操作日志
-func Operate(ctx context.Context) *logrus.Entry {
-	return logger().Operate(ctx)
-}
-
-// Login 登录(登出)日志
-func Login(ctx context.Context) *logrus.Entry {
-	return logger().Login(ctx)
-}
-
-// New 创建日志实例
-func New(opts ...Option) *Logger {
-	once.Do(func() {
-		o := defaultOptions
-		for _, opt := range opts {
-			opt(&o)
+// FromTraceIDContext 从上下文中获取跟踪ID
+func FromTraceIDContext(ctx context.Context) string {
+	v := ctx.Value(traceIDContextKey{})
+	if v != nil {
+		if s, ok := v.(string); ok {
+			return s
 		}
+	}
+	return util.MustUUID()
+}
 
-		l := logrus.New()
-		l.SetLevel(logrus.Level(o.level))
-		if o.format == "json" {
-			l.Formatter = new(logrus.JSONFormatter)
+// NewSpanIDContext 创建跟踪单元ID上下文
+func NewSpanIDContext(ctx context.Context, spanID string) context.Context {
+	return context.WithValue(ctx, spanIDContextKey{}, spanID)
+}
+
+// FromSpanIDContext 从上下文中获取跟踪单元ID
+func FromSpanIDContext(ctx context.Context) string {
+	v := ctx.Value(spanIDContextKey{})
+	if v != nil {
+		if s, ok := v.(string); ok {
+			return s
 		}
-		internalLogger = &Logger{l}
-	})
-	return internalLogger
+	}
+	return util.MustUUID()
 }
 
-// HookFlusher 将缓冲区数据写入日志钩子完成接口
-type HookFlusher interface {
-	Flush()
+// NewUserIDContext 创建用户ID上下文
+func NewUserIDContext(ctx context.Context, userID string) context.Context {
+	return context.WithValue(ctx, userIDContextKey{}, userID)
 }
 
-// Logger 日志管理
-type Logger struct {
-	*logrus.Logger
+// FromUserIDContext 从上下文中获取用户ID
+func FromUserIDContext(ctx context.Context) string {
+	v := ctx.Value(userIDContextKey{})
+	if v != nil {
+		if s, ok := v.(string); ok {
+			return s
+		}
+	}
+	return ""
 }
 
-func (a *Logger) typeEntry(ctx context.Context, fieldType string) *logrus.Entry {
-	fields := logrus.Fields{
-		FieldKeyType: fieldType,
+// Start 开始写入日志
+func Start(ctx context.Context) *Entry {
+	return StartSpan(ctx, "", "")
+}
+
+// StartSpan 开始一个追踪单元
+func StartSpan(ctx context.Context, title, function string) *Entry {
+	fields := map[string]interface{}{
+		StartTimeKey:    time.Now(),
+		UserIDKey:       FromUserIDContext(ctx),
+		TraceIDKey:      FromTraceIDContext(ctx),
+		SpanIDKey:       FromSpanIDContext(ctx),
+		SpanTitleKey:    title,
+		SpanFunctionKey: function,
 	}
 
-	if traceID := util.FromTraceIDContext(ctx); traceID != "" {
-		fields[FieldKeyTraceID] = traceID
-	}
-	if userID := util.FromUserIDContext(ctx); userID != "" {
-		fields[FieldKeyUserID] = userID
-	}
-
-	return a.WithFields(fields)
-}
-
-// System 系统日志
-func (a *Logger) System(ctx context.Context) *logrus.Entry {
-	return a.typeEntry(ctx, "system")
-}
-
-// Access 访问日志
-func (a *Logger) Access(ctx context.Context) *logrus.Entry {
-	return a.typeEntry(ctx, "access")
-}
-
-// Operate 操作日志
-func (a *Logger) Operate(ctx context.Context) *logrus.Entry {
-	return a.typeEntry(ctx, "operate")
-}
-
-// Login 登录(登出)日志
-func (a *Logger) Login(ctx context.Context) *logrus.Entry {
-	return a.typeEntry(ctx, "login")
+	return logrus.WithFields(fields)
 }

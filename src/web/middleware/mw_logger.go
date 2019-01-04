@@ -8,10 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LyricTian/gin-admin/src/web/context"
-
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -60,12 +59,9 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 			}
 		}
 
-		m := p
-		if v := c.GetString(util.ContextKeyURLMemo); v != "" {
-			m = fmt.Sprintf("%s(%s)", p, v)
-		}
-
-		logger.Access(context.NewContext(c).NewContext()).WithFields(fields).
-			Infof("[http] %s - %s - %s", m, c.Request.Method, c.ClientIP())
+		title := c.GetString(util.ContextKeyURLTitle)
+		span := logger.StartSpan(context.NewContext(c).NewContext(), title, p)
+		span = span.WithFields(fields)
+		span.Infof("[http] %s - %s - %s", p, c.Request.Method, c.ClientIP())
 	}
 }

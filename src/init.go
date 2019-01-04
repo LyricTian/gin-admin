@@ -11,6 +11,7 @@ import (
 	"github.com/LyricTian/gin-admin/src/web"
 	"github.com/LyricTian/logrus-mysql-hook"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -20,54 +21,60 @@ func Init(ctx context.Context, version string) (*gin.Engine, func()) {
 	obj := inject.Init()
 
 	// 初始化日志
-	loggerHook := InitLogger(obj)
+	loggerCallback := InitLogger(obj, version)
 
-	logger.System(ctx).Infof("服务已运行在[%s]模式下，运行版本:%s，进程号：%d",
+	entry := logger.Start(ctx)
+	entry.Printf("服务已运行在[%s]模式下，运行版本:%s，进程号：%d",
 		viper.GetString("run_mode"), version, os.Getpid())
 
 	// 初始化HTTP服务
 	httpHandler := web.Init(obj)
-
 	return httpHandler, func() {
-		// 等待日志钩子写入完成
-		if loggerHook != nil {
-			loggerHook.Flush()
-		}
-
 		// 关闭数据库
 		if db := obj.MySQL; db != nil {
 			if err := db.Close(); err != nil {
-				logger.System(ctx).Errorf("关闭数据库发生错误: %s", err.Error())
+				entry.Errorf("关闭数据库发生错误: %s", err.Error())
 			}
+		}
+
+		// 等待日志钩子写入完成
+		if loggerCallback != nil {
+			loggerCallback()
 		}
 
 	}
 }
 
 // InitLogger 初始化日志
-func InitLogger(obj *inject.Object) logger.HookFlusher {
+func InitLogger(obj *inject.Object, version string) func() {
 	logConfig := viper.GetStringMap("log")
 
-	var opts []logger.Option
 	if v := util.T(logConfig["level"]).Int(); v > 0 {
-		opts = append(opts, logger.SetLevel(v))
+		logrus.SetLevel(logrus.Level(v))
 	}
 
-	if v := util.T(logConfig["format"]).String(); v != "" {
-		opts = append(opts, logger.SetFormat(v))
+	if v := util.T(logConfig["format"]).String(); v == "json" {
+		logrus.SetFormatter(new(logrus.JSONFormatter))
 	}
 
-	l := logger.New(opts...)
 	if v := util.T(logConfig["hook"]).String(); v != "" {
 		switch v {
 		case "mysql":
 			extraItems := []*mysqlhook.ExecExtraItem{
-				mysqlhook.NewExecExtraItem(logger.FieldKeyType, "varchar(20)"),
-				mysqlhook.NewExecExtraItem(logger.FieldKeyUserID, "varchar(36)"),
-				mysqlhook.NewExecExtraItem(logger.FieldKeyTraceID, "varchar(100)"),
+				mysqlhook.NewExecExtraItem(logger.StartTimeKey, "DATETIME"),
+				mysqlhook.NewExecExtraItem(logger.UserIDKey, "VARCHAR(36)"),
+				mysqlhook.NewExecExtraItem(logger.TraceIDKey, "VARCHAR(100)"),
+				mysqlhook.NewExecExtraItem(logger.SpanIDKey, "VARCHAR(100)"),
+				mysqlhook.NewExecExtraItem(logger.SpanTitleKey, "VARCHAR(50)"),
+				mysqlhook.NewExecExtraItem(logger.SpanFunctionKey, "VARCHAR(200)"),
+				mysqlhook.NewExecExtraItem(logger.VersionKey, "VARCHAR(50)"),
 			}
 
 			var hookOpts []mysqlhook.Option
+			hookOpts = append(hookOpts, mysqlhook.SetExtra(map[string]interface{}{
+				logger.VersionKey: version,
+			}))
+
 			hookConfig := viper.GetStringMap("log-mysql-hook")
 			if v := util.T(hookConfig["max_buffer"]).Int(); v > 0 {
 				hookOpts = append(hookOpts, mysqlhook.SetMaxQueues(v))
@@ -86,8 +93,10 @@ func InitLogger(obj *inject.Object) logger.HookFlusher {
 				hookOpts...,
 			)
 
-			l.AddHook(hook)
-			return hook
+			logrus.AddHook(hook)
+			return func() {
+				hook.Flush()
+			}
 		default:
 		}
 	}

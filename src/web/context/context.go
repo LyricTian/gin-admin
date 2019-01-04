@@ -18,7 +18,7 @@ import (
 func WrapContext(ctx func(*Context), memo ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if len(memo) > 0 {
-			c.Set(util.ContextKeyURLMemo, memo[0])
+			c.Set(util.ContextKeyURLTitle, memo[0])
 		}
 		ctx(&Context{c})
 	}
@@ -44,11 +44,11 @@ func (a *Context) NewContext() context.Context {
 	parent := context.Background()
 
 	if v := a.GetTraceID(); v != "" {
-		parent = util.NewTraceIDContext(parent, a.GetTraceID())
+		parent = logger.NewTraceIDContext(parent, a.GetTraceID())
 	}
 
 	if v := a.GetUserID(); v != "" {
-		parent = util.NewUserIDContext(parent, a.GetUserID())
+		parent = logger.NewUserIDContext(parent, a.GetUserID())
 	}
 
 	return parent
@@ -159,7 +159,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 		}
 
 		if err != nil {
-			logger.System(a.NewContext()).
+			logger.Start(a.NewContext()).
 				WithField("error", err.Error()).
 				Warnf("[请求错误] %s", item.Message)
 		}
@@ -173,7 +173,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 				StackTrace() errors.StackTrace
 			}
 
-			entry := logger.System(a.NewContext())
+			entry := logger.Start(a.NewContext())
 			if stack, ok := err.(stackTracer); ok {
 				entry = entry.WithField("error", fmt.Sprintf("%+v", stack.StackTrace()[:2]))
 			}
