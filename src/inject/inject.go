@@ -55,7 +55,7 @@ func initMySQL() *mysql.DB {
 		opts = append(opts, mysql.SetTrace(v))
 	}
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true",
 		mysqlConfig["username"],
 		mysqlConfig["password"],
 		mysqlConfig["addr"],

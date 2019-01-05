@@ -35,7 +35,7 @@ import (
 	"fmt"
 
 	"github.com/LyricTian/logrus-mysql-hook"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -81,7 +81,7 @@ import (
 	"fmt"
 
 	"github.com/LyricTian/logrus-mysql-hook"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	_ "github.com/go-sql-driver/mysql"
 )

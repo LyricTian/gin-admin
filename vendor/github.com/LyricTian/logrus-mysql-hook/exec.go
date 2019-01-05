@@ -38,7 +38,7 @@ func NewExec(db *sql.DB, tableName string, extraItems ...*ExecExtraItem) Execer 
 		sourceItems = append(sourceItems, extraItems...)
 	}
 	sourceItems = append(sourceItems, NewExecExtraItem("data", "text"))
-	sourceItems = append(sourceItems, NewExecExtraItem("created", "bigint"))
+	sourceItems = append(sourceItems, NewExecExtraItem("time", "DATETIME"))
 
 	var fields []string
 	for _, item := range sourceItems {
@@ -81,17 +81,21 @@ func (e *defaultExec) Exec(entry *logrus.Entry) error {
 		case "message":
 			values = append(values, entry.Message)
 		case "data":
-			jsonData, _ := json.Marshal(entry.Data)
-			values = append(values, string(jsonData))
-		case "created":
-			values = append(values, entry.Time.Unix())
-		default:
-			if v, ok := entry.Data[item.Field]; ok {
-				delete(entry.Data, item.Field)
-				values = append(values, v)
-			} else {
-				values = append(values, "")
+			var data string
+			if len(entry.Data) > 0 {
+				jsonData, _ := json.Marshal(entry.Data)
+				data = string(jsonData)
 			}
+			values = append(values, data)
+		case "time":
+			values = append(values, entry.Time)
+		default:
+			var value interface{}
+			if v, ok := entry.Data[item.Field]; ok {
+				value = v
+				delete(entry.Data, item.Field)
+			}
+			values = append(values, value)
 		}
 	}
 
