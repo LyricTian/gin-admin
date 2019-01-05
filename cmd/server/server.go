@@ -19,8 +19,8 @@ import (
 )
 
 // VERSION 版本号，
-// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=1.2.0-beta"
-var VERSION = "1.2.0-beta"
+// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=1.2.0-dev"
+var VERSION = "1.2.0-dev"
 
 var (
 	configFile string

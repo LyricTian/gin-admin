@@ -2,14 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris
+// +build darwin dragonfly freebsd linux netbsd openbsd solaris
 
 package unix
 
 import (
 	"bytes"
 	"runtime"
-	"sort"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -50,28 +49,6 @@ func errnoErr(e syscall.Errno) error {
 		return errENOENT
 	}
 	return e
-}
-
-// ErrnoName returns the error name for error number e.
-func ErrnoName(e syscall.Errno) string {
-	i := sort.Search(len(errorList), func(i int) bool {
-		return errorList[i].num >= e
-	})
-	if i < len(errorList) && errorList[i].num == e {
-		return errorList[i].name
-	}
-	return ""
-}
-
-// SignalName returns the signal name for signal number s.
-func SignalName(s syscall.Signal) string {
-	i := sort.Search(len(signalList), func(i int) bool {
-		return signalList[i].num >= s
-	})
-	if i < len(signalList) && signalList[i].num == s {
-		return signalList[i].name
-	}
-	return ""
 }
 
 // clen returns the index of the first NULL byte in n or len(n) if n contains no NULL byte.
@@ -219,7 +196,7 @@ func Getpeername(fd int) (sa Sockaddr, err error) {
 	if err = getpeername(fd, &rsa, &len); err != nil {
 		return
 	}
-	return anyToSockaddr(fd, &rsa)
+	return anyToSockaddr(&rsa)
 }
 
 func GetsockoptByte(fd, level, opt int) (value byte, err error) {
@@ -291,7 +268,7 @@ func Recvfrom(fd int, p []byte, flags int) (n int, from Sockaddr, err error) {
 		return
 	}
 	if rsa.Addr.Family != AF_UNSPEC {
-		from, err = anyToSockaddr(fd, &rsa)
+		from, err = anyToSockaddr(&rsa)
 	}
 	return
 }

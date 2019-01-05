@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"fmt"
 	"html/template"
 	"net"
 	"net/http"
@@ -38,9 +39,10 @@ func (c HandlersChain) Last() HandlerFunc {
 
 // RouteInfo represents a request route's specification which contains method and path and its handler.
 type RouteInfo struct {
-	Method  string
-	Path    string
-	Handler string
+	Method      string
+	Path        string
+	Handler     string
+	HandlerFunc HandlerFunc
 }
 
 // RoutesInfo defines a RouteInfo array.
@@ -266,10 +268,12 @@ func (engine *Engine) Routes() (routes RoutesInfo) {
 func iterate(path, method string, routes RoutesInfo, root *node) RoutesInfo {
 	path += root.path
 	if len(root.handlers) > 0 {
+		handlerFunc := root.handlers.Last()
 		routes = append(routes, RouteInfo{
-			Method:  method,
-			Path:    path,
-			Handler: nameOfFunction(root.handlers.Last()),
+			Method:      method,
+			Path:        path,
+			Handler:     nameOfFunction(handlerFunc),
+			HandlerFunc: handlerFunc,
 		})
 	}
 	for _, child := range root.children {
@@ -318,6 +322,23 @@ func (engine *Engine) RunUnix(file string) (err error) {
 	return
 }
 
+// RunFd attaches the router to a http.Server and starts listening and serving HTTP requests
+// through the specified file descriptor.
+// Note: this method will block the calling goroutine indefinitely unless an error happens.
+func (engine *Engine) RunFd(fd int) (err error) {
+	debugPrint("Listening and serving HTTP on fd@%d", fd)
+	defer func() { debugPrintError(err) }()
+
+	f := os.NewFile(uintptr(fd), fmt.Sprintf("fd@%d", fd))
+	listener, err := net.FileListener(f)
+	if err != nil {
+		return
+	}
+	defer listener.Close()
+	err = http.Serve(listener, engine)
+	return
+}
+
 // ServeHTTP conforms to the http.Handler interface.
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c := engine.pool.Get().(*Context)
@@ -336,7 +357,6 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (engine *Engine) HandleContext(c *Context) {
 	c.reset()
 	engine.handleHTTPRequest(c)
-	engine.pool.Put(c)
 }
 
 func (engine *Engine) handleHTTPRequest(c *Context) {
