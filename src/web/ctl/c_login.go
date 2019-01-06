@@ -25,7 +25,7 @@ func (a *Login) Login(ctx *context.Context) {
 	}
 
 	var result context.HTTPStatus
-	userInfo, err := a.LoginBll.Verify(ctx.NewContext(), item.UserName, item.Password)
+	userInfo, err := a.LoginBll.Verify(ctx.CContext(), item.UserName, item.Password)
 	if err != nil {
 		result.Status = context.StatusError
 		if err == bll.ErrInvalidPassword ||
@@ -33,7 +33,7 @@ func (a *Login) Login(ctx *context.Context) {
 			err == bll.ErrUserDisable {
 			result.Status = context.StatusFail
 		} else {
-			logger.Start(ctx.NewContext()).Errorf("用户登录发生错误：%s", err.Error())
+			logger.Start(ctx.CContext()).Errorf("用户登录发生错误：%s", err.Error())
 		}
 
 		ctx.ResSuccess(result)
@@ -41,7 +41,7 @@ func (a *Login) Login(ctx *context.Context) {
 	}
 	ctx.SetUserID(userInfo.RecordID)
 
-	nctx := ctx.NewContext()
+	nctx := ctx.CContext()
 	span := logger.StartSpan(nctx, "用户登录", "Login")
 	// 更新会话
 	store, err := ctx.RefreshSession()
@@ -69,7 +69,7 @@ func (a *Login) Login(ctx *context.Context) {
 func (a *Login) Logout(ctx *context.Context) {
 	userID := ctx.GetUserID()
 	if userID != "" {
-		nctx := ctx.NewContext()
+		nctx := ctx.CContext()
 		span := logger.StartSpan(nctx, "用户登出", "Logout")
 		if err := ctx.DestroySession(); err != nil {
 			span.Errorf("登出系统发生错误：%s", err.Error())
@@ -86,7 +86,7 @@ func (a *Login) Logout(ctx *context.Context) {
 func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
 	userID := ctx.GetUserID()
 
-	info, err := a.LoginBll.GetCurrentUserInfo(ctx.NewContext(), userID)
+	info, err := a.LoginBll.GetCurrentUserInfo(ctx.CContext(), userID)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -98,7 +98,7 @@ func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
 func (a *Login) QueryCurrentUserMenus(ctx *context.Context) {
 	userID := ctx.GetUserID()
 
-	menus, err := a.LoginBll.QueryCurrentUserMenus(ctx.NewContext(), userID)
+	menus, err := a.LoginBll.QueryCurrentUserMenus(ctx.CContext(), userID)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return

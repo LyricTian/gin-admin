@@ -22,16 +22,16 @@ var (
 // RecoveryMiddleware 崩溃恢复中间件
 func RecoveryMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.NewContext(c)
 		defer func() {
+			nctx := context.New(c)
 			if err := recover(); err != nil {
 				stack := stack(3)
 
-				logger.Start(context.NewContext(c).NewContext()).
+				logger.Start(nctx.CContext()).
 					WithField("stack", string(stack)).
 					Errorf("[Recover]: %s", err)
 
-				ctx.ResError(nil, http.StatusInternalServerError)
+				nctx.ResError(nil, http.StatusInternalServerError)
 			}
 		}()
 		c.Next()

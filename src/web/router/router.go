@@ -7,18 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// MRouterTitle 路由关联的标题数据
-var MRouterTitle = make(map[string]string)
-
 // HandlerFunc 处理函数
 type HandlerFunc func(*context.Context)
 
 // Handle registers a new request handle and middleware with the given path and method.
 func Handle(g *gin.RouterGroup, httpMethod string, relativePath string, handler HandlerFunc, title string) {
-	titleKey := path.Join(httpMethod, g.BasePath(), relativePath)
-	MRouterTitle[titleKey] = title
+	titleKey := context.GetRouterTitleKey(httpMethod, path.Join(g.BasePath(), relativePath))
+	context.MRouterTitle[titleKey] = title
 	g.Handle(httpMethod, relativePath, func(c *gin.Context) {
-		handler(context.NewContext(c))
+		handler(context.New(c))
 	})
 }
 

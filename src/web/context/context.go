@@ -14,18 +14,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// WrapContext 包装上下文
-func WrapContext(ctx func(*Context), memo ...string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if len(memo) > 0 {
-			c.Set(util.ContextKeyURLTitle, memo[0])
-		}
-		ctx(&Context{c})
-	}
-}
-
-// NewContext 创建上下文实例
-func NewContext(c *gin.Context) *Context {
+// New 创建上下文实例
+func New(c *gin.Context) *Context {
 	return &Context{c}
 }
 
@@ -34,13 +24,13 @@ type Context struct {
 	gctx *gin.Context
 }
 
-// GinContext 获取Gin上下文
-func (a *Context) GinContext() *gin.Context {
+// GContext 获取gin.Context
+func (a *Context) GContext() *gin.Context {
 	return a.gctx
 }
 
-// NewContext 创建上下文实例
-func (a *Context) NewContext() context.Context {
+// CContext 获取context.Context
+func (a *Context) CContext() context.Context {
 	parent := context.Background()
 
 	if v := a.GetTraceID(); v != "" {
@@ -159,7 +149,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 		}
 
 		if err != nil {
-			logger.Start(a.NewContext()).
+			logger.Start(a.CContext()).
 				WithField("error", err.Error()).
 				Warnf("[请求错误] %s", item.Message)
 		}
@@ -173,7 +163,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 				StackTrace() errors.StackTrace
 			}
 
-			entry := logger.Start(a.NewContext())
+			entry := logger.Start(a.CContext())
 			if stack, ok := err.(stackTracer); ok {
 				entry = entry.WithField("error", fmt.Sprintf("%+v", stack.StackTrace()[:2]))
 			}

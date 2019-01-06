@@ -13,7 +13,7 @@ import (
 // CasbinMiddleware casbin中间件
 func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.NewContext(c)
+		ctx := context.New(c)
 
 		if b, err := enforcer.EnforceSafe(ctx.GetUserID(), c.Request.URL.Path, c.Request.Method); err != nil {
 			ctx.ResError(errors.Wrap(err, "验证权限发生错误"), http.StatusInternalServerError)

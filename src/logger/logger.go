@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"sync/atomic"
 	"time"
 
 	"github.com/LyricTian/gin-admin/src/util"
@@ -10,7 +11,7 @@ import (
 
 // 定义键名
 const (
-	StartTimeKey    = "start_time"
+	StartedAtKey    = "started_at"
 	TraceIDKey      = "trace_id"
 	UserIDKey       = "user_id"
 	SpanIDKey       = "span_id"
@@ -18,9 +19,6 @@ const (
 	SpanFunctionKey = "span_function"
 	VersionKey      = "version"
 )
-
-// Entry 定义别名
-type Entry = logrus.Entry
 
 type (
 	traceIDContextKey struct{}
@@ -84,7 +82,7 @@ func Start(ctx context.Context) *Entry {
 // StartSpan 开始一个追踪单元
 func StartSpan(ctx context.Context, title, function string) *Entry {
 	fields := map[string]interface{}{
-		StartTimeKey:    time.Now(),
+		StartedAtKey:    time.Now(),
 		UserIDKey:       FromUserIDContext(ctx),
 		TraceIDKey:      FromTraceIDContext(ctx),
 		SpanIDKey:       FromSpanIDContext(ctx),
@@ -92,5 +90,66 @@ func StartSpan(ctx context.Context, title, function string) *Entry {
 		SpanFunctionKey: function,
 	}
 
-	return logrus.WithFields(fields)
+	return newEntry(logrus.WithFields(fields))
+}
+
+func newEntry(entry *logrus.Entry) *Entry {
+	return &Entry{entry: entry}
+}
+
+// Entry 定义统一的日志写入方式
+type Entry struct {
+	entry  *logrus.Entry
+	finish int32
+}
+
+// Finish 完成，如果没有触发写入则手动触发Info级别的日志写入
+func (e *Entry) Finish() {
+	if atomic.CompareAndSwapInt32(&e.finish, 0, 1) {
+		e.entry.Info()
+	}
+}
+
+// WithFields 结构化字段写入
+func (e *Entry) WithFields(fields map[string]interface{}) *Entry {
+	return newEntry(e.entry.WithFields(fields))
+}
+
+// WithField 结构化字段写入
+func (e *Entry) WithField(key string, value interface{}) *Entry {
+	return e.WithFields(map[string]interface{}{key: value})
+}
+
+// Errorf 错误日志
+func (e *Entry) Errorf(format string, args ...interface{}) {
+	e.done()
+	e.entry.Errorf(format, args...)
+}
+
+// Warnf 警告日志
+func (e *Entry) Warnf(format string, args ...interface{}) {
+	e.done()
+	e.entry.Warnf(format, args...)
+}
+
+// Infof 消息日志
+func (e *Entry) Infof(format string, args ...interface{}) {
+	e.done()
+	e.entry.Infof(format, args...)
+}
+
+// Printf 消息日志
+func (e *Entry) Printf(format string, args ...interface{}) {
+	e.done()
+	e.entry.Printf(format, args...)
+}
+
+// Debugf 写入调试日志
+func (e *Entry) Debugf(format string, args ...interface{}) {
+	e.done()
+	e.entry.Debugf(format, args...)
+}
+
+func (e *Entry) done() {
+	atomic.StoreInt32(&e.finish, 1)
 }
