@@ -34,7 +34,7 @@ func (a *Demo) QueryPage(ctx *context.Context) {
 	params.Name = ctx.Query("name")
 	params.Status = util.S(ctx.Query("status")).Int()
 
-	total, items, err := a.DemoBll.QueryPage(ctx.NewContext(), params, pageIndex, pageSize)
+	total, items, err := a.DemoBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -45,7 +45,7 @@ func (a *Demo) QueryPage(ctx *context.Context) {
 
 // Get 查询指定数据
 func (a *Demo) Get(ctx *context.Context) {
-	item, err := a.DemoBll.Get(ctx.NewContext(), ctx.Param("id"))
+	item, err := a.DemoBll.Get(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -62,13 +62,13 @@ func (a *Demo) Create(ctx *context.Context) {
 	}
 
 	item.Creator = ctx.GetUserID()
-	err := a.DemoBll.Create(ctx.NewContext(), &item)
+	err := a.DemoBll.Create(ctx.CContext(), &item)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
 	}
 
-	newItem, err := a.DemoBll.Get(ctx.NewContext(), item.RecordID)
+	newItem, err := a.DemoBll.Get(ctx.CContext(), item.RecordID)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -85,7 +85,7 @@ func (a *Demo) Update(ctx *context.Context) {
 		return
 	}
 
-	err := a.DemoBll.Update(ctx.NewContext(), ctx.Param("id"), &item)
+	err := a.DemoBll.Update(ctx.CContext(), ctx.Param("id"), &item)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -95,7 +95,7 @@ func (a *Demo) Update(ctx *context.Context) {
 
 // Delete 删除数据
 func (a *Demo) Delete(ctx *context.Context) {
-	err := a.DemoBll.Delete(ctx.NewContext(), ctx.Param("id"))
+	err := a.DemoBll.Delete(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -108,7 +108,7 @@ func (a *Demo) DeleteMany(ctx *context.Context) {
 	ids := strings.Split(ctx.Query("batch"), ",")
 
 	for _, id := range ids {
-		err := a.DemoBll.Delete(ctx.NewContext(), id)
+		err := a.DemoBll.Delete(ctx.CContext(), id)
 		if err != nil {
 			ctx.ResInternalServerError(err)
 			return
@@ -120,7 +120,7 @@ func (a *Demo) DeleteMany(ctx *context.Context) {
 
 // Enable 启用数据
 func (a *Demo) Enable(ctx *context.Context) {
-	err := a.DemoBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 1)
+	err := a.DemoBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -130,7 +130,7 @@ func (a *Demo) Enable(ctx *context.Context) {
 
 // Disable 禁用数据
 func (a *Demo) Disable(ctx *context.Context) {
-	err := a.DemoBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 2)
+	err := a.DemoBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return

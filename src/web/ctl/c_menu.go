@@ -37,7 +37,7 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 		Type:     util.S(ctx.Query("mtype")).Int(),
 	}
 
-	total, items, err := a.MenuBll.QueryPage(ctx.NewContext(), params, pageIndex, pageSize)
+	total, items, err := a.MenuBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -57,7 +57,7 @@ func (a *Menu) QueryTree(ctx *context.Context) {
 		params.Types = []int{10, 20, 30}
 	}
 
-	treeData, err := a.MenuBll.QueryTree(ctx.NewContext(), params)
+	treeData, err := a.MenuBll.QueryTree(ctx.CContext(), params)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -68,7 +68,7 @@ func (a *Menu) QueryTree(ctx *context.Context) {
 
 // Get 查询指定数据
 func (a *Menu) Get(ctx *context.Context) {
-	item, err := a.MenuBll.Get(ctx.NewContext(), ctx.Param("id"))
+	item, err := a.MenuBll.Get(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -85,13 +85,13 @@ func (a *Menu) Create(ctx *context.Context) {
 	}
 
 	item.Creator = ctx.GetUserID()
-	err := a.MenuBll.Create(ctx.NewContext(), &item)
+	err := a.MenuBll.Create(ctx.CContext(), &item)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
 	}
 
-	newItem, err := a.MenuBll.Get(ctx.NewContext(), item.RecordID)
+	newItem, err := a.MenuBll.Get(ctx.CContext(), item.RecordID)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -108,7 +108,7 @@ func (a *Menu) Update(ctx *context.Context) {
 		return
 	}
 
-	err := a.MenuBll.Update(ctx.NewContext(), ctx.Param("id"), &item)
+	err := a.MenuBll.Update(ctx.CContext(), ctx.Param("id"), &item)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -118,7 +118,7 @@ func (a *Menu) Update(ctx *context.Context) {
 
 // Delete 删除数据
 func (a *Menu) Delete(ctx *context.Context) {
-	err := a.MenuBll.Delete(ctx.NewContext(), ctx.Param("id"))
+	err := a.MenuBll.Delete(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -131,7 +131,7 @@ func (a *Menu) DeleteMany(ctx *context.Context) {
 	ids := strings.Split(ctx.Query("batch"), ",")
 
 	for _, id := range ids {
-		err := a.MenuBll.Delete(ctx.NewContext(), id)
+		err := a.MenuBll.Delete(ctx.CContext(), id)
 		if err != nil {
 			ctx.ResInternalServerError(err)
 			return
@@ -143,7 +143,7 @@ func (a *Menu) DeleteMany(ctx *context.Context) {
 
 // Enable 启用数据
 func (a *Menu) Enable(ctx *context.Context) {
-	err := a.MenuBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 1)
+	err := a.MenuBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -153,7 +153,7 @@ func (a *Menu) Enable(ctx *context.Context) {
 
 // Disable 禁用数据
 func (a *Menu) Disable(ctx *context.Context) {
-	err := a.MenuBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 2)
+	err := a.MenuBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -12,7 +11,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 // LoggerMiddleware GIN的日志中间件
@@ -25,17 +23,21 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 			return
 		}
 
+		nctx := context.New(c)
+		method := c.Request.Method
+		span := logger.StartSpan(nctx.CContext(), context.MRouterTitle[context.GetRouterTitleKey(method, p)], p)
 		start := time.Now()
-		fields := logrus.Fields{}
+
+		fields := make(map[string]interface{})
 		fields["ip"] = c.ClientIP()
-		fields["method"] = c.Request.Method
+		fields["method"] = method
 		fields["url"] = c.Request.URL.String()
 		fields["proto"] = c.Request.Proto
 		fields["header"] = c.Request.Header
 		fields["user_agent"] = c.GetHeader("User-Agent")
 
-		if m := c.Request.Method; m == http.MethodPost ||
-			m == http.MethodPut {
+		// 如果是POST/PUT请求，并且内容类型为JSON，则读取内容体
+		if method == http.MethodPost || method == http.MethodPut {
 			mediaType, _, _ := mime.ParseMediaType(c.GetHeader("Content-Type"))
 			if mediaType == "application/json" {
 				body, err := ioutil.ReadAll(c.Request.Body)
@@ -50,18 +52,17 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 		}
 		c.Next()
 
-		fields["time"] = fmt.Sprintf("%dms", time.Since(start).Nanoseconds()/1e6)
-		fields["status"] = c.Writer.Status()
-		fields["length"] = c.Writer.Size()
+		timeConsuming := time.Since(start).Nanoseconds() / 1e6
+		fields["time_consuming"] = timeConsuming
+		fields["res_status"] = c.Writer.Status()
+		fields["res_length"] = c.Writer.Size()
 		if v, ok := c.Get(util.ContextKeyResBody); ok {
 			if b, ok := v.([]byte); ok {
 				fields["res_body"] = string(b)
 			}
 		}
-
-		title := c.GetString(util.ContextKeyURLTitle)
-		span := logger.StartSpan(context.NewContext(c).NewContext(), title, p)
-		span = span.WithFields(fields)
-		span.Infof("[http] %s - %s - %s", p, c.Request.Method, c.ClientIP())
+		fields[logger.UserIDKey] = nctx.GetUserID()
+		span.WithFields(fields).Infof("[http] %s-%s-%s-%d(%dms)",
+			p, c.Request.Method, c.ClientIP(), c.Writer.Status(), timeConsuming)
 	}
 }

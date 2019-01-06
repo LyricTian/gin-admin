@@ -38,7 +38,7 @@ func SessionMiddleware(obj *inject.Object, allowPrefixes ...string) gin.HandlerF
 		return !util.CheckPrefix(c.Request.URL.Path, allowPrefixes...)
 	}
 	ginConfig.ErrorHandleFunc = func(c *gin.Context, err error) {
-		ctx := context.NewContext(c)
+		ctx := context.New(c)
 		ctx.ResError(err, http.StatusInternalServerError)
 	}
 
@@ -48,7 +48,7 @@ func SessionMiddleware(obj *inject.Object, allowPrefixes ...string) gin.HandlerF
 // VerifySessionMiddleware 验证session中间件
 func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.NewContext(c)
+		ctx := context.New(c)
 		store := ginsession.FromContext(c)
 		userID, ok := store.Get(util.SessionKeyUserID)
 

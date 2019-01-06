@@ -35,7 +35,7 @@ func (a *Role) QueryPage(ctx *context.Context) {
 	params.Name = ctx.Query("name")
 	params.Status = util.S(ctx.Query("status")).Int()
 
-	total, items, err := a.RoleBll.QueryPage(ctx.NewContext(), params, pageIndex, pageSize)
+	total, items, err := a.RoleBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -51,7 +51,7 @@ func (a *Role) QuerySelect(ctx *context.Context) {
 	params.Name = ctx.Query("name")
 	params.Status = util.S(ctx.Query("status")).Int()
 
-	items, err := a.RoleBll.QuerySelect(ctx.NewContext(), params)
+	items, err := a.RoleBll.QuerySelect(ctx.CContext(), params)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -62,7 +62,7 @@ func (a *Role) QuerySelect(ctx *context.Context) {
 
 // Get 查询指定数据
 func (a *Role) Get(ctx *context.Context) {
-	item, err := a.RoleBll.Get(ctx.NewContext(), ctx.Param("id"))
+	item, err := a.RoleBll.Get(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -79,13 +79,13 @@ func (a *Role) Create(ctx *context.Context) {
 	}
 
 	item.Creator = ctx.GetUserID()
-	err := a.RoleBll.Create(ctx.NewContext(), &item)
+	err := a.RoleBll.Create(ctx.CContext(), &item)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
 	}
 
-	newItem, err := a.RoleBll.Get(ctx.NewContext(), item.RecordID)
+	newItem, err := a.RoleBll.Get(ctx.CContext(), item.RecordID)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -102,7 +102,7 @@ func (a *Role) Update(ctx *context.Context) {
 		return
 	}
 
-	err := a.RoleBll.Update(ctx.NewContext(), ctx.Param("id"), &item)
+	err := a.RoleBll.Update(ctx.CContext(), ctx.Param("id"), &item)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -112,7 +112,7 @@ func (a *Role) Update(ctx *context.Context) {
 
 // Delete 删除数据
 func (a *Role) Delete(ctx *context.Context) {
-	err := a.RoleBll.Delete(ctx.NewContext(), ctx.Param("id"))
+	err := a.RoleBll.Delete(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -125,7 +125,7 @@ func (a *Role) DeleteMany(ctx *context.Context) {
 	ids := strings.Split(ctx.Query("batch"), ",")
 
 	for _, id := range ids {
-		err := a.RoleBll.Delete(ctx.NewContext(), id)
+		err := a.RoleBll.Delete(ctx.CContext(), id)
 		if err != nil {
 			ctx.ResInternalServerError(err)
 			return
@@ -137,7 +137,7 @@ func (a *Role) DeleteMany(ctx *context.Context) {
 
 // Enable 启用数据
 func (a *Role) Enable(ctx *context.Context) {
-	err := a.RoleBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 1)
+	err := a.RoleBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return
@@ -147,7 +147,7 @@ func (a *Role) Enable(ctx *context.Context) {
 
 // Disable 禁用数据
 func (a *Role) Disable(ctx *context.Context) {
-	err := a.RoleBll.UpdateStatus(ctx.NewContext(), ctx.Param("id"), 2)
+	err := a.RoleBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
 	if err != nil {
 		ctx.ResInternalServerError(err)
 		return

@@ -61,7 +61,7 @@ func InitLogger(obj *inject.Object, version string) func() {
 		switch v {
 		case "mysql":
 			extraItems := []*mysqlhook.ExecExtraItem{
-				mysqlhook.NewExecExtraItem(logger.StartTimeKey, "DATETIME"),
+				mysqlhook.NewExecExtraItem(logger.StartedAtKey, "DATETIME"),
 				mysqlhook.NewExecExtraItem(logger.UserIDKey, "VARCHAR(36)"),
 				mysqlhook.NewExecExtraItem(logger.TraceIDKey, "VARCHAR(100)"),
 				mysqlhook.NewExecExtraItem(logger.SpanIDKey, "VARCHAR(100)"),

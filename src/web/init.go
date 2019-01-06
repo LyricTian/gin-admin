@@ -28,13 +28,13 @@ func Init(obj *inject.Object) *gin.Engine {
 	app.Use(middleware.RecoveryMiddleware())
 	app.Use(middleware.SessionMiddleware(obj, apiPrefixes...))
 
-	app.NoMethod(context.WrapContext(func(ctx *context.Context) {
-		ctx.ResError(fmt.Errorf("方法不允许"), 405)
-	}))
+	app.NoMethod(func(c *gin.Context) {
+		context.New(c).ResError(fmt.Errorf("方法不允许"), 405)
+	})
 
-	app.NoRoute(context.WrapContext(func(ctx *context.Context) {
-		ctx.ResError(fmt.Errorf("资源不存在"), 404)
-	}))
+	app.NoRoute(func(c *gin.Context) {
+		context.New(c).ResError(fmt.Errorf("资源不存在"), 404)
+	})
 
 	// 注册/api/v1路由
 	router.APIV1Handler(app, obj)
