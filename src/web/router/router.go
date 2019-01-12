@@ -12,8 +12,7 @@ type HandlerFunc func(*context.Context)
 
 // Handle registers a new request handle and middleware with the given path and method.
 func Handle(g *gin.RouterGroup, httpMethod string, relativePath string, handler HandlerFunc, title string) {
-	titleKey := context.GetRouterTitleKey(httpMethod, path.Join(g.BasePath(), relativePath))
-	context.MRouterTitle[titleKey] = title
+	context.SetRouterTitle(httpMethod, path.Join(g.BasePath(), relativePath), title)
 	g.Handle(httpMethod, relativePath, func(c *gin.Context) {
 		handler(context.New(c))
 	})
