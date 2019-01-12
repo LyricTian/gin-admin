@@ -25,7 +25,9 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 
 		nctx := context.New(c)
 		method := c.Request.Method
-		span := logger.StartSpan(nctx.CContext(), context.MRouterTitle[context.GetRouterTitleKey(method, p)], p)
+
+		stitle, skey := context.GetRouterTitleAndKey(method, p)
+		span := logger.StartSpan(nctx.CContext(), stitle, skey)
 		start := time.Now()
 
 		fields := make(map[string]interface{})
