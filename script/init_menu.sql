@@ -32,7 +32,7 @@ LOCK TABLES `g_menu` WRITE;
 
 INSERT INTO `g_menu` (`id`, `record_id`, `code`, `name`, `type`, `sequence`, `icon`, `path`, `method`, `level_code`, `parent_id`, `is_hide`, `status`, `creator`, `created`, `updated`, `deleted`)
 VALUES
-	(15,'047aecdc-76c8-4bfd-8dbc-02a37295d40b','admin','RBAC权限管理平台',10,90,'','','','01','',2,1,'',1543546798,1544539200,0),
+	(15,'047aecdc-76c8-4bfd-8dbc-02a37295d40b','rbac','RBAC权限管理平台',10,90,'','','','01','',2,1,'',1543546798,1544539200,0),
 	(16,'d1ef3f75-ebc1-4b0d-be69-25e406b843af','system','系统管理',20,90,'setting','','','0101','047aecdc-76c8-4bfd-8dbc-02a37295d40b',2,1,'',1543546817,1543932539,0),
 	(17,'751ffa55-fcbb-43bc-8b63-c3287f1f42d6','menu','菜单管理',30,10,'solution','/system/menu','','010101','d1ef3f75-ebc1-4b0d-be69-25e406b843af',2,1,'',1543546836,1543932569,0),
 	(18,'7f6c7556-5242-444f-9714-59a1b5d1abcf','role','角色管理',30,20,'audit','/system/role','','010102','d1ef3f75-ebc1-4b0d-be69-25e406b843af',2,1,'',1543546953,1543932702,0),
