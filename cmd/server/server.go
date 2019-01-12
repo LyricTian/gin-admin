@@ -25,7 +25,7 @@ var VERSION = "1.2.0-dev"
 var (
 	configFile string
 	modelFile  string
-	webDir     string
+	wwwDir     string
 )
 
 func init() {
@@ -33,7 +33,7 @@ func init() {
 	flag.StringVar(&configFile, "c", "", "配置文件(.json,.yaml,.toml)")
 	flag.StringVar(&modelFile, "model", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
-	flag.StringVar(&webDir, "www", "", "静态站点目录")
+	flag.StringVar(&wwwDir, "www", "", "静态站点目录")
 }
 
 func main() {
@@ -59,14 +59,16 @@ func main() {
 		viper.Set("casbin_model", modelFile)
 	}
 
-	if webDir != "" {
-		viper.Set("web_dir", webDir)
+	if wwwDir != "" {
+		viper.Set("www", wwwDir)
 	}
 
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
 	httpHandler, callback := src.Init(ctx, VERSION)
+
+	httpAddr := fmt.Sprintf("%s:%d", viper.GetString("http_host"), viper.GetInt("http_port"))
 	srv := &http.Server{
-		Addr:           viper.GetString("http_addr"),
+		Addr:           httpAddr,
 		Handler:        httpHandler,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
@@ -78,7 +80,7 @@ func main() {
 
 	// 开启HTTP监听
 	go func() {
-		span.Infof("HTTP服务开始启动，监听地址为：[%s]", viper.GetString("http_addr"))
+		span.Infof("HTTP服务开始启动，地址监听在：[%s]", httpAddr)
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			ac <- err

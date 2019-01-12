@@ -26,16 +26,12 @@ type Login struct {
 }
 
 func (a *Login) getRootUser() schema.User {
-	rootUser := viper.GetStringSlice("system_root_user")
-	if len(rootUser) == 2 {
-		return schema.User{
-			RecordID: rootUser[0],
-			UserName: rootUser[0],
-			RealName: "超级用户",
-			Password: rootUser[1],
-		}
+	return schema.User{
+		RecordID: viper.GetString("system_root_user"),
+		UserName: viper.GetString("system_root_user"),
+		RealName: "超级用户",
+		Password: viper.GetString("system_root_password"),
 	}
-	return schema.User{}
 }
 
 // CheckIsRoot 检查是否是超级用户
@@ -112,7 +108,7 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (*schema.
 func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map[string]interface{}, error) {
 	params := schema.MenuSelectQueryParam{
 		Status:     1,
-		SystemCode: viper.GetString("system_code"),
+		SystemCode: viper.GetString("system_identify"),
 		IsHide:     2,
 		Types:      []int{20, 30},
 	}

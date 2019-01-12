@@ -19,7 +19,7 @@ func Init(obj *inject.Object) *gin.Engine {
 	// 注册中间件
 	apiPrefixes := []string{"/api/"}
 
-	if dir := viper.GetString("web_dir"); dir != "" {
+	if dir := viper.GetString("www"); dir != "" {
 		app.Use(middleware.WWWMiddleware(dir, apiPrefixes...))
 	}
 
