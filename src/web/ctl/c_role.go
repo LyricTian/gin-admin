@@ -22,7 +22,7 @@ func (a *Role) Query(ctx *context.Context) {
 	case "select":
 		a.QuerySelect(ctx)
 	default:
-		ctx.ResBadRequest(nil)
+		ctx.ResError(nil)
 	}
 }
 
@@ -37,11 +37,11 @@ func (a *Role) QueryPage(ctx *context.Context) {
 
 	total, items, err := a.RoleBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResPage(total, items)
+	ctx.ResPage(int(total), items)
 }
 
 // QuerySelect 查询分页数据
@@ -53,7 +53,7 @@ func (a *Role) QuerySelect(ctx *context.Context) {
 
 	items, err := a.RoleBll.QuerySelect(ctx.CContext(), params)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (a *Role) QuerySelect(ctx *context.Context) {
 func (a *Role) Get(ctx *context.Context) {
 	item, err := a.RoleBll.Get(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResSuccess(item)
@@ -74,20 +74,20 @@ func (a *Role) Get(ctx *context.Context) {
 func (a *Role) Create(ctx *context.Context) {
 	var item schema.Role
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
 	item.Creator = ctx.GetUserID()
 	err := a.RoleBll.Create(ctx.CContext(), &item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
 	newItem, err := a.RoleBll.Get(ctx.CContext(), item.RecordID)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -98,13 +98,13 @@ func (a *Role) Create(ctx *context.Context) {
 func (a *Role) Update(ctx *context.Context) {
 	var item schema.Role
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
 	err := a.RoleBll.Update(ctx.CContext(), ctx.Param("id"), &item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -114,7 +114,7 @@ func (a *Role) Update(ctx *context.Context) {
 func (a *Role) Delete(ctx *context.Context) {
 	err := a.RoleBll.Delete(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -127,7 +127,7 @@ func (a *Role) DeleteMany(ctx *context.Context) {
 	for _, id := range ids {
 		err := a.RoleBll.Delete(ctx.CContext(), id)
 		if err != nil {
-			ctx.ResInternalServerError(err)
+			ctx.ResError(err)
 			return
 		}
 	}
@@ -139,7 +139,7 @@ func (a *Role) DeleteMany(ctx *context.Context) {
 func (a *Role) Enable(ctx *context.Context) {
 	err := a.RoleBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -149,7 +149,7 @@ func (a *Role) Enable(ctx *context.Context) {
 func (a *Role) Disable(ctx *context.Context) {
 	err := a.RoleBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()

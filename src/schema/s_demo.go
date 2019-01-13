@@ -1,17 +1,15 @@
 package schema
 
+import "time"
+
 // Demo 示例程序
 type Demo struct {
-	ID       int64  `json:"id" db:"id,primarykey,autoincrement" structs:"id"`         // 唯一标识(自增ID)
-	RecordID string `json:"record_id" db:"record_id,size:36" structs:"record_id"`     // 记录内码(uuid)
-	Code     string `json:"code" db:"code,size:50" structs:"code" binding:"required"` // 编号
-	Name     string `json:"name" db:"name,size:50" structs:"name" binding:"required"` // 名称
-	Memo     string `json:"memo" db:"memo,size:200" structs:"memo"`                   // 备注
-	Status   int    `json:"status" db:"status" structs:"status" binding:"required"`   // 状态(1:启用 2:停用)
-	Creator  string `json:"creator" db:"creator,size:36" structs:"creator"`           // 创建者
-	Created  int64  `json:"created" db:"created" structs:"created"`                   // 创建时间戳
-	Updated  int64  `json:"updated" db:"updated" structs:"updated"`                   // 更新时间戳
-	Deleted  int64  `json:"deleted" db:"deleted" structs:"deleted"`                   // 删除时间戳
+	RecordID string `json:"record_id"`                 // 记录内码
+	Code     string `json:"code" binding:"required"`   // 编号
+	Name     string `json:"name" binding:"required"`   // 名称
+	Memo     string `json:"memo"`                      // 备注
+	Status   int    `json:"status" binding:"required"` // 状态(1:启用 2:停用)
+	Creator  string `json:"creator"`                   // 创建者
 }
 
 // DemoQueryParam 示例查询条件
@@ -23,11 +21,10 @@ type DemoQueryParam struct {
 
 // DemoQueryResult 示例查询结果
 type DemoQueryResult struct {
-	ID       int64  `json:"id" db:"id"`               // 唯一标识(自增ID)
-	RecordID string `json:"record_id" db:"record_id"` // 记录内码(uuid)
-	Code     string `json:"code" db:"code"`           // 编号
-	Name     string `json:"name" db:"name"`           // 名称
-	Memo     string `json:"memo" db:"memo"`           // 备注
-	Status   int    `json:"status" db:"status"`       // 状态(1:启用 2:停用)
-	Created  int64  `json:"created" db:"created"`     // 创建时间戳
+	RecordID string    `json:"record_id"`  // 记录内码
+	Code     string    `json:"code"`       // 编号
+	Name     string    `json:"name"`       // 名称
+	Memo     string    `json:"memo"`       // 备注
+	Status   int       `json:"status"`     // 状态(1:启用 2:停用)
+	Created  time.Time `json:"created_at"` // 创建时间
 }

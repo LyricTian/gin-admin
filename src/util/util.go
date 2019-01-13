@@ -8,6 +8,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/fatih/structs"
 )
 
@@ -53,7 +55,9 @@ func StructToMap(s interface{}) map[string]interface{} {
 // StructsToMapSlice 将结构体切片转换为字典切片
 func StructsToMapSlice(v interface{}) []map[string]interface{} {
 	iVal := reflect.Indirect(reflect.ValueOf(v))
-	if iVal.IsNil() || !iVal.IsValid() || iVal.Type().Kind() != reflect.Slice {
+	if iVal.IsNil() ||
+		!iVal.IsValid() ||
+		iVal.Type().Kind() != reflect.Slice {
 		return make([]map[string]interface{}, 0)
 	}
 
@@ -64,6 +68,64 @@ func StructsToMapSlice(v interface{}) []map[string]interface{} {
 	}
 
 	return result
+}
+
+// FillStruct 填充结构体
+func FillStruct(source, target interface{}) error {
+	if !structs.IsStruct(source) ||
+		!structs.IsStruct(target) {
+		return errors.New("invalid struct")
+	} else if tv := reflect.ValueOf(target); tv.Kind() != reflect.Ptr {
+		return errors.New("the target struct must be a pointer type")
+	}
+
+	sFields := structs.Fields(source)
+	tFields := structs.Fields(target)
+
+	for _, tfield := range tFields {
+		for _, sfield := range sFields {
+			if tfield.Name() == sfield.Name() {
+				tfield.Set(sfield.Value())
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// FillStructs 填充结构体的切片
+func FillStructs(source, target interface{}) error {
+	var check = func(v reflect.Value) bool {
+		if v.IsNil() ||
+			!v.IsValid() ||
+			v.Type().Kind() != reflect.Slice {
+			return false
+		}
+		return true
+	}
+
+	sValue := reflect.Indirect(reflect.ValueOf(source))
+	tValue := reflect.Indirect(reflect.ValueOf(target))
+	if !check(sValue) || !check(tValue) ||
+		sValue.Len() != tValue.Len() {
+		return errors.New("invalid struct slice")
+	}
+
+	for i := 0; i < tValue.Len(); i++ {
+		sv := sValue.Index(i).Interface()
+		tv := tValue.Index(i)
+		if tv.Kind() != reflect.Ptr {
+			tv = tv.Addr()
+			FillStruct(sv, tv.Interface())
+		} else if tv.IsNil() {
+			tv = reflect.New(tv.Type().Elem())
+			FillStruct(sv, tv.Interface())
+			tValue.Index(i).Set(tv)
+		}
+	}
+
+	return nil
 }
 
 // Trim 去除空格

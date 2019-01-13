@@ -18,7 +18,10 @@ import (
 // Init 初始化所有服务
 func Init(ctx context.Context, version string) (*gin.Engine, func()) {
 	// 初始化依赖注入
-	obj := inject.Init()
+	obj, err := inject.Init()
+	if err != nil {
+		panic("初始化依赖注入发生错误：" + err.Error())
+	}
 
 	// 初始化日志
 	loggerCallback := InitLogger(obj, version)
@@ -31,7 +34,7 @@ func Init(ctx context.Context, version string) (*gin.Engine, func()) {
 	httpHandler := web.Init(obj)
 	return httpHandler, func() {
 		// 关闭数据库
-		if db := obj.MySQL; db != nil {
+		if db := obj.GormDB; db != nil {
 			if err := db.Close(); err != nil {
 				entry.Errorf("关闭数据库发生错误: %s", err.Error())
 			}

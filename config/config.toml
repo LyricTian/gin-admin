@@ -22,8 +22,8 @@ system_root_user = "root"
 # 系统root密码
 system_root_password = "123"
 
-# 数据库存储(目前支持的存储：gorm)
-db_store = "gorm"
+# 存储模式(目前支持的存储模式：gorm)
+db_mode = "gorm"
 
 # 认证模式(支持的认证模式：session)
 auth_mode = "session"
@@ -55,16 +55,16 @@ hook_max_buffer = 512
 [gorm]
 # 是否开启调试模式
 debug = true
-# 存储类型(目前支持的存储：mysql/sqlite3/postgres)
-store_type = "mysql"
-# 设置连接可以被重新使用的最大时间量(单位：秒)
+# 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
+db_type = "mysql"
+# 设置连接可以重用的最长时间(单位：秒)
 max_lifetime = 7200
-# 设置打开连接到数据库的最大数量
+# 设置数据库的最大打开连接数
 max_open_conns = 150
 # 设置空闲连接池中的最大连接数
 max_idle_conns = 50
 # 表名前缀
-table_prefix = "g"
+table_prefix = "g_"
 
 [mysql]
 # 连接地址
@@ -76,7 +76,7 @@ user = "root"
 # 密码
 password = "123456"
 # 数据库
-dbname = "ginadmin"
+db_name = "ginadmin"
 
 [sqlite3]
 db_path = "data/ginadmin.db"
@@ -91,4 +91,4 @@ user = "root"
 # 密码
 password = "123456"
 # 数据库
-dbname = "ginadmin"
+db_name = "ginadmin"

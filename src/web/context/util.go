@@ -76,7 +76,12 @@ type HTTPList struct {
 
 // HTTPPagination HTTP分页数据
 type HTTPPagination struct {
-	Total    int64 `json:"total,omitempty"`
-	Current  uint  `json:"current,omitempty"`
-	PageSize uint  `json:"pageSize,omitempty"`
+	Total    int  `json:"total,omitempty"`
+	Current  uint `json:"current,omitempty"`
+	PageSize uint `json:"pageSize,omitempty"`
+}
+
+// HTTPNewItem HTTP响应创建成功后的记录ID
+type HTTPNewItem struct {
+	RecordID string `json:"record_id"`
 }

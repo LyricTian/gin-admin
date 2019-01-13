@@ -22,7 +22,7 @@ func (a *Menu) Query(ctx *context.Context) {
 	case "tree":
 		a.QueryTree(ctx)
 	default:
-		ctx.ResBadRequest(nil)
+		ctx.ResError(nil)
 	}
 }
 
@@ -39,11 +39,11 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 
 	total, items, err := a.MenuBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResPage(total, items)
+	ctx.ResPage(int(total), items)
 }
 
 // QueryTree 查询菜单树
@@ -59,7 +59,7 @@ func (a *Menu) QueryTree(ctx *context.Context) {
 
 	treeData, err := a.MenuBll.QueryTree(ctx.CContext(), params)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (a *Menu) QueryTree(ctx *context.Context) {
 func (a *Menu) Get(ctx *context.Context) {
 	item, err := a.MenuBll.Get(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResSuccess(item)
@@ -80,20 +80,20 @@ func (a *Menu) Get(ctx *context.Context) {
 func (a *Menu) Create(ctx *context.Context) {
 	var item schema.Menu
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
 	item.Creator = ctx.GetUserID()
 	err := a.MenuBll.Create(ctx.CContext(), &item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
 	newItem, err := a.MenuBll.Get(ctx.CContext(), item.RecordID)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -104,13 +104,13 @@ func (a *Menu) Create(ctx *context.Context) {
 func (a *Menu) Update(ctx *context.Context) {
 	var item schema.Menu
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
 	err := a.MenuBll.Update(ctx.CContext(), ctx.Param("id"), &item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -120,7 +120,7 @@ func (a *Menu) Update(ctx *context.Context) {
 func (a *Menu) Delete(ctx *context.Context) {
 	err := a.MenuBll.Delete(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -133,7 +133,7 @@ func (a *Menu) DeleteMany(ctx *context.Context) {
 	for _, id := range ids {
 		err := a.MenuBll.Delete(ctx.CContext(), id)
 		if err != nil {
-			ctx.ResInternalServerError(err)
+			ctx.ResError(err)
 			return
 		}
 	}
@@ -145,7 +145,7 @@ func (a *Menu) DeleteMany(ctx *context.Context) {
 func (a *Menu) Enable(ctx *context.Context) {
 	err := a.MenuBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -155,7 +155,7 @@ func (a *Menu) Enable(ctx *context.Context) {
 func (a *Menu) Disable(ctx *context.Context) {
 	err := a.MenuBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()

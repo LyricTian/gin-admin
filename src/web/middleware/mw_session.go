@@ -9,7 +9,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/gin-session"
-	mysession "github.com/go-session/mysql"
 	"github.com/go-session/session"
 	"github.com/spf13/viper"
 )
@@ -26,12 +25,12 @@ func SessionMiddleware(obj *inject.Object, allowPrefixes ...string) gin.HandlerF
 	opts = append(opts, session.SetSign(util.T(sessionConfig["sign"]).Bytes()))
 	opts = append(opts, session.SetExpired(util.T(sessionConfig["expired"]).Int64()))
 
-	if util.T(sessionConfig["store"]).String() == "mysql" {
-		tableName := fmt.Sprintf("%s_%s",
-			util.T(viper.GetStringMap("mysql")["table_prefix"]).String(),
-			util.T(sessionConfig["table"]).String())
-		opts = append(opts, session.SetStore(mysession.NewStoreWithDB(obj.MySQL.Db, tableName, 0)))
-	}
+	// if util.T(sessionConfig["store"]).String() == "mysql" {
+	// 	tableName := fmt.Sprintf("%s_%s",
+	// 		util.T(viper.GetStringMap("mysql")["table_prefix"]).String(),
+	// 		util.T(sessionConfig["table"]).String())
+	// 	opts = append(opts, session.SetStore(mysession.NewStoreWithDB(obj.MySQL.Db, tableName, 0)))
+	// }
 
 	ginConfig := ginsession.DefaultConfig
 	ginConfig.Skipper = func(c *gin.Context) bool {

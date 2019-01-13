@@ -20,7 +20,7 @@ func (a *User) Query(ctx *context.Context) {
 	case "page":
 		a.QueryPage(ctx)
 	default:
-		ctx.ResBadRequest(nil)
+		ctx.ResError(nil)
 	}
 }
 
@@ -37,18 +37,18 @@ func (a *User) QueryPage(ctx *context.Context) {
 
 	total, items, err := a.UserBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResPage(total, items)
+	ctx.ResPage(int(total), items)
 }
 
 // Get 查询指定数据
 func (a *User) Get(ctx *context.Context) {
 	item, err := a.UserBll.Get(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -59,20 +59,20 @@ func (a *User) Get(ctx *context.Context) {
 func (a *User) Create(ctx *context.Context) {
 	var item schema.User
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
 	item.Creator = ctx.GetUserID()
 	err := a.UserBll.Create(ctx.CContext(), &item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
 	newItem, err := a.UserBll.Get(ctx.CContext(), item.RecordID)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -83,13 +83,13 @@ func (a *User) Create(ctx *context.Context) {
 func (a *User) Update(ctx *context.Context) {
 	var item schema.User
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
 	err := a.UserBll.Update(ctx.CContext(), ctx.Param("id"), &item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -99,7 +99,7 @@ func (a *User) Update(ctx *context.Context) {
 func (a *User) Delete(ctx *context.Context) {
 	err := a.UserBll.Delete(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -112,7 +112,7 @@ func (a *User) DeleteMany(ctx *context.Context) {
 	for _, id := range ids {
 		err := a.UserBll.Delete(ctx.CContext(), id)
 		if err != nil {
-			ctx.ResInternalServerError(err)
+			ctx.ResError(err)
 			return
 		}
 	}
@@ -124,7 +124,7 @@ func (a *User) DeleteMany(ctx *context.Context) {
 func (a *User) Enable(ctx *context.Context) {
 	err := a.UserBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -134,7 +134,7 @@ func (a *User) Enable(ctx *context.Context) {
 func (a *User) Disable(ctx *context.Context) {
 	err := a.UserBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
