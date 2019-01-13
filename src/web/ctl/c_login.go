@@ -20,7 +20,7 @@ type Login struct {
 func (a *Login) Login(ctx *context.Context) {
 	var item schema.LoginParam
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (a *Login) Logout(ctx *context.Context) {
 		span := logger.StartSpan(nctx, "用户登出", "Logout")
 		if err := ctx.DestroySession(); err != nil {
 			span.Errorf("登出系统发生错误：%s", err.Error())
-			ctx.ResInternalServerError(err)
+			ctx.ResError(err)
 			return
 		}
 		span.Infof("登出系统")
@@ -88,7 +88,7 @@ func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
 
 	info, err := a.LoginBll.GetCurrentUserInfo(ctx.CContext(), userID)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResSuccess(info)
@@ -100,7 +100,7 @@ func (a *Login) QueryCurrentUserMenus(ctx *context.Context) {
 
 	menus, err := a.LoginBll.QueryCurrentUserMenus(ctx.CContext(), userID)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	} else if len(menus) == 0 {
 		ctx.ResError(fmt.Errorf("用户未授权"), http.StatusUnauthorized, 9998)

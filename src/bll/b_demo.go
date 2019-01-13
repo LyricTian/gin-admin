@@ -2,21 +2,20 @@ package bll
 
 import (
 	"context"
-	"time"
 
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
-	"github.com/pkg/errors"
 )
 
 // Demo 示例程序
 type Demo struct {
-	DemoModel model.IDemo `inject:"IDemo"`
+	DemoModel  model.IDemo  `inject:"IDemo"`
+	TransModel model.ITrans `inject:"ITrans"`
 }
 
 // QueryPage 查询分页数据
-func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, pageIndex, pageSize uint) (int64, []*schema.DemoQueryResult, error) {
+func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, pageIndex, pageSize uint) (int, []schema.DemoQueryResult, error) {
 	return a.DemoModel.QueryPage(ctx, params, pageIndex, pageSize)
 }
 
@@ -33,23 +32,24 @@ func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 }
 
 // Create 创建数据
-func (a *Demo) Create(ctx context.Context, item *schema.Demo) error {
+func (a *Demo) Create(ctx context.Context, item schema.Demo) (string, error) {
 	exists, err := a.DemoModel.CheckCode(ctx, item.Code)
 	if err != nil {
-		return err
+		return "", err
 	} else if exists {
-		return errors.New("编号已经存在")
+		return "", util.NewBadRequestError("编号已经存在")
 	}
 
-	item.ID = 0
 	item.RecordID = util.MustUUID()
-	item.Created = time.Now().Unix()
-	item.Deleted = 0
-	return a.DemoModel.Create(ctx, item)
+	err = a.DemoModel.Create(ctx, item)
+	if err != nil {
+		return "", err
+	}
+	return item.RecordID, nil
 }
 
 // Update 更新数据
-func (a *Demo) Update(ctx context.Context, recordID string, item *schema.Demo) error {
+func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
 	oldItem, err := a.DemoModel.Get(ctx, recordID)
 	if err != nil {
 		return err
@@ -60,31 +60,42 @@ func (a *Demo) Update(ctx context.Context, recordID string, item *schema.Demo) e
 		if err != nil {
 			return err
 		} else if exists {
-			return errors.New("编号已经存在")
+			return util.NewBadRequestError("编号已经存在")
 		}
 	}
 
-	info := util.StructToMap(item)
-	delete(info, "id")
-	delete(info, "record_id")
-	delete(info, "creator")
-	delete(info, "created")
-	delete(info, "updated")
-	delete(info, "deleted")
-
-	return a.DemoModel.Update(ctx, recordID, info)
+	return a.DemoModel.Update(ctx, recordID, item)
 }
 
 // Delete 删除数据
-func (a *Demo) Delete(ctx context.Context, recordID string) error {
-	exists, err := a.DemoModel.Check(ctx, recordID)
+func (a *Demo) Delete(ctx context.Context, recordIDs ...string) error {
+	trans, err := a.TransModel.Begin(ctx)
 	if err != nil {
 		return err
-	} else if !exists {
-		return util.ErrNotFound
 	}
 
-	return a.DemoModel.Delete(ctx, recordID)
+	for _, recordID := range recordIDs {
+		exists, err := a.DemoModel.Check(ctx, recordID)
+		if err != nil {
+			a.TransModel.Rollback(ctx, trans)
+			return err
+		} else if !exists {
+			a.TransModel.Rollback(ctx, trans)
+			return util.ErrNotFound
+		}
+
+		err = a.DemoModel.Delete(ctx, trans, recordID)
+		if err != nil {
+			a.TransModel.Rollback(ctx, trans)
+			return err
+		}
+	}
+
+	err = a.TransModel.Commit(ctx, trans)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateStatus 更新状态
@@ -96,9 +107,5 @@ func (a *Demo) UpdateStatus(ctx context.Context, recordID string, status int) er
 		return util.ErrNotFound
 	}
 
-	info := map[string]interface{}{
-		"status": status,
-	}
-
-	return a.DemoModel.Update(ctx, recordID, info)
+	return a.DemoModel.UpdateStatus(ctx, recordID, status)
 }

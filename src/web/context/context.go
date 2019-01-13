@@ -2,16 +2,13 @@ package context
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/gin-session"
 	"github.com/go-session/session"
-	"github.com/pkg/errors"
 )
 
 // New 创建上下文实例
@@ -110,65 +107,51 @@ func (a *Context) SetUserID(userID string) {
 // ParseJSON 解析请求JSON
 func (a *Context) ParseJSON(obj interface{}) error {
 	if err := a.gctx.ShouldBindJSON(obj); err != nil {
-		return errors.Wrap(err, "解析请求参数发生错误")
+		logger.Start(a.CContext()).Warnf("解析请求参数发生错误: %s", err.Error())
+		return util.NewBadRequestError("解析请求参数发生错误")
 	}
 	return nil
 }
 
-// ResBadRequest 响应客户端请求错误
-func (a *Context) ResBadRequest(err error, code ...int) {
-	a.ResError(err, http.StatusBadRequest, code...)
-}
-
-// ResInternalServerError 响应服务器错误
-func (a *Context) ResInternalServerError(err error, code ...int) {
-	status := http.StatusInternalServerError
-
-	switch err {
-	case util.ErrNotFound:
-		status = http.StatusNotFound
+// 根据错误获取状态码
+func (a *Context) getStatusByError(err error, status int) int {
+	if status > 0 {
+		return status
 	}
 
-	a.ResError(err, status, code...)
+	switch err {
+	case util.ErrBadRequest:
+		status = 400
+	case util.ErrUnauthorized:
+		status = 401
+	case util.ErrNotFound:
+		status = 404
+	case util.ErrInternalServer:
+		status = 500
+	default:
+		status = 500
+	}
+	return status
 }
 
 // ResError 响应错误
-func (a *Context) ResError(err error, status int, code ...int) {
+func (a *Context) ResError(err error, code ...int) {
+	a.ResErrorWithStatus(err, 0, code...)
+}
+
+// ResErrorWithStatus 响应错误和指定状态码(不指定则根据错误自动判断)
+func (a *Context) ResErrorWithStatus(err error, status int, code ...int) {
 	var item HTTPErrorItem
 
-	if err != nil {
-		ss := strings.Split(err.Error(), ": ")
-		if len(ss) > 0 {
-			item.Message = ss[0]
-		}
-	}
-
-	if status >= 400 && status < 500 {
-		if item.Message == "" {
-			item.Message = "请求发生错误"
-		}
-
+	switch e := err.(type) {
+	case *util.MessageError:
+		item.Message = e.Error()
+		status = a.getStatusByError(e.Parent(), status)
+	default:
 		if err != nil {
-			logger.Start(a.CContext()).
-				WithField("error", err.Error()).
-				Warnf("[请求错误] %s", item.Message)
+			item.Message = err.Error()
 		}
-	} else if status >= 500 && status < 600 {
-		if item.Message == "" {
-			item.Message = "服务器发生错误"
-		}
-
-		if err != nil {
-			type stackTracer interface {
-				StackTrace() errors.StackTrace
-			}
-
-			entry := logger.Start(a.CContext())
-			if stack, ok := err.(stackTracer); ok {
-				entry = entry.WithField("error", fmt.Sprintf("%+v", stack.StackTrace()[:2]))
-			}
-			entry.Errorf("[服务器错误] %s", err.Error())
-		}
+		status = a.getStatusByError(err, status)
 	}
 
 	if len(code) > 0 {
@@ -178,7 +161,7 @@ func (a *Context) ResError(err error, status int, code ...int) {
 }
 
 // ResPage 响应分页数据
-func (a *Context) ResPage(total int64, v interface{}) {
+func (a *Context) ResPage(total int, v interface{}) {
 	a.ResSuccess(HTTPList{
 		List: v,
 		Pagination: &HTTPPagination{
@@ -211,7 +194,8 @@ func (a *Context) ResSuccess(v interface{}) {
 func (a *Context) ResJSON(status int, v interface{}) {
 	buf, err := util.JSONMarshal(v)
 	if err != nil {
-		a.ResInternalServerError(errors.Wrap(err, "JSON序列化发生错误"))
+		logger.Start(a.CContext()).WithField("object", v).Errorf("JSON序列化发生错误: %s", err.Error())
+		a.ResError(util.NewInternalServerError())
 		return
 	}
 	a.gctx.Set(util.ContextKeyResBody, buf)

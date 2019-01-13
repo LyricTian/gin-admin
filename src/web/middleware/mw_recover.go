@@ -29,7 +29,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 
 				logger.Start(nctx.CContext()).
 					WithField("stack", string(stack)).
-					Errorf("[Recover]: %s", err)
+					Errorf("[Recover]: %v", err)
 
 				nctx.ResError(nil, http.StatusInternalServerError)
 			}

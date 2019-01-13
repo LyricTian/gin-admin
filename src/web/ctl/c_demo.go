@@ -20,7 +20,7 @@ func (a *Demo) Query(ctx *context.Context) {
 	case "page":
 		a.QueryPage(ctx)
 	default:
-		ctx.ResBadRequest(nil)
+		ctx.ResError(util.NewBadRequestError("未知的查询类型"))
 	}
 }
 
@@ -36,7 +36,7 @@ func (a *Demo) QueryPage(ctx *context.Context) {
 
 	total, items, err := a.DemoBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (a *Demo) QueryPage(ctx *context.Context) {
 func (a *Demo) Get(ctx *context.Context) {
 	item, err := a.DemoBll.Get(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResSuccess(item)
@@ -57,37 +57,31 @@ func (a *Demo) Get(ctx *context.Context) {
 func (a *Demo) Create(ctx *context.Context) {
 	var item schema.Demo
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
 	item.Creator = ctx.GetUserID()
-	err := a.DemoBll.Create(ctx.CContext(), &item)
+	recordID, err := a.DemoBll.Create(ctx.CContext(), item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 
-	newItem, err := a.DemoBll.Get(ctx.CContext(), item.RecordID)
-	if err != nil {
-		ctx.ResInternalServerError(err)
-		return
-	}
-
-	ctx.ResSuccess(newItem)
+	ctx.ResSuccess(context.HTTPNewItem{RecordID: recordID})
 }
 
 // Update 更新数据
 func (a *Demo) Update(ctx *context.Context) {
 	var item schema.Demo
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
-	err := a.DemoBll.Update(ctx.CContext(), ctx.Param("id"), &item)
+	err := a.DemoBll.Update(ctx.CContext(), ctx.Param("id"), item)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -97,7 +91,7 @@ func (a *Demo) Update(ctx *context.Context) {
 func (a *Demo) Delete(ctx *context.Context) {
 	err := a.DemoBll.Delete(ctx.CContext(), ctx.Param("id"))
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -110,7 +104,7 @@ func (a *Demo) DeleteMany(ctx *context.Context) {
 	for _, id := range ids {
 		err := a.DemoBll.Delete(ctx.CContext(), id)
 		if err != nil {
-			ctx.ResInternalServerError(err)
+			ctx.ResError(err)
 			return
 		}
 	}
@@ -122,7 +116,7 @@ func (a *Demo) DeleteMany(ctx *context.Context) {
 func (a *Demo) Enable(ctx *context.Context) {
 	err := a.DemoBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
@@ -132,7 +126,7 @@ func (a *Demo) Enable(ctx *context.Context) {
 func (a *Demo) Disable(ctx *context.Context) {
 	err := a.DemoBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResOK()
