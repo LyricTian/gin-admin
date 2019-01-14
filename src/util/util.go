@@ -8,9 +8,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/fatih/structs"
+	"github.com/pkg/errors"
 )
 
 // MustUUID 创建一个UUID，如果有错误，则抛出panic

@@ -23,15 +23,15 @@ var (
 func RecoveryMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
-			nctx := context.New(c)
+			ctx := context.New(c)
 			if err := recover(); err != nil {
 				stack := stack(3)
 
-				logger.Start(nctx.CContext()).
+				logger.Start(ctx.CContext()).
 					WithField("stack", string(stack)).
-					Errorf("[Recover]: %v", err)
+					Errorf("[recover]: %v", err)
 
-				nctx.ResError(nil, http.StatusInternalServerError)
+				ctx.ResError(nil, http.StatusInternalServerError)
 			}
 		}()
 		c.Next()
