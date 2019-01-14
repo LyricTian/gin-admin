@@ -2,14 +2,12 @@ package src
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/service/logrus-hook"
 	"github.com/LyricTian/gin-admin/src/web"
-	"github.com/LyricTian/logrus-mysql-hook"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -20,14 +18,16 @@ func Init(ctx context.Context, version string) (*gin.Engine, func()) {
 	// 初始化依赖注入
 	obj, err := inject.Init()
 	if err != nil {
-		panic("初始化依赖注入发生错误：" + err.Error())
+		panic(err.Error())
 	}
 
 	// 初始化日志
-	loggerCallback := InitLogger(obj, version)
+	hookFlush, err := initLogger(obj, version)
+	if err != nil {
+		panic(err.Error())
+	}
 
-	entry := logger.Start(ctx)
-	entry.Printf("服务已运行在[%s]模式下，运行版本:%s，进程号：%d",
+	logger.Start(ctx).Printf("服务已运行在[%s]模式下，运行版本:%s，进程号：%d",
 		viper.GetString("run_mode"), version, os.Getpid())
 
 	// 初始化HTTP服务
@@ -36,73 +36,59 @@ func Init(ctx context.Context, version string) (*gin.Engine, func()) {
 		// 关闭数据库
 		if db := obj.GormDB; db != nil {
 			if err := db.Close(); err != nil {
-				entry.Errorf("关闭数据库发生错误: %s", err.Error())
+				logger.Start(ctx).Errorf("关闭数据库发生错误: %s", err.Error())
 			}
 		}
 
 		// 等待日志钩子写入完成
-		if loggerCallback != nil {
-			loggerCallback()
+		if hookFlush != nil {
+			hookFlush()
 		}
 
 	}
 }
 
-// InitLogger 初始化日志
-func InitLogger(obj *inject.Object, version string) func() {
-	logConfig := viper.GetStringMap("log")
+// 初始化日志
+func initLogger(obj *inject.Object, version string) (func(), error) {
+	var config struct {
+		Level         int    `mapstructure:"level"`
+		Format        string `mapstructure:"format"`
+		EnableHook    bool   `mapstructure:"enable_hook"`
+		HookMaxThread int    `mapstructure:"hook_max_thread"`
+		HookMaxBuffer int    `mapstructure:"hook_max_buffer"`
+	}
 
-	if v := util.T(logConfig["level"]).Int(); v > 0 {
+	err := viper.UnmarshalKey("log", &config)
+	if err != nil {
+		return nil, err
+	}
+
+	if v := config.Level; v > -1 {
 		logrus.SetLevel(logrus.Level(v))
 	}
 
-	if v := util.T(logConfig["format"]).String(); v == "json" {
+	if v := config.Format; v == "json" {
 		logrus.SetFormatter(new(logrus.JSONFormatter))
 	}
 
-	if v := util.T(logConfig["hook"]).String(); v != "" {
-		switch v {
-		case "mysql":
-			extraItems := []*mysqlhook.ExecExtraItem{
-				mysqlhook.NewExecExtraItem(logger.StartedAtKey, "DATETIME"),
-				mysqlhook.NewExecExtraItem(logger.UserIDKey, "VARCHAR(36)"),
-				mysqlhook.NewExecExtraItem(logger.TraceIDKey, "VARCHAR(100)"),
-				mysqlhook.NewExecExtraItem(logger.SpanIDKey, "VARCHAR(100)"),
-				mysqlhook.NewExecExtraItem(logger.SpanTitleKey, "VARCHAR(50)"),
-				mysqlhook.NewExecExtraItem(logger.SpanFunctionKey, "VARCHAR(200)"),
-				mysqlhook.NewExecExtraItem(logger.VersionKey, "VARCHAR(50)"),
-			}
+	if config.EnableHook {
+		var opts []logrushook.Option
+		opts = append(opts, logrushook.SetExtra(map[string]interface{}{
+			logger.VersionKey: version,
+		}))
 
-			var hookOpts []mysqlhook.Option
-			hookOpts = append(hookOpts, mysqlhook.SetExtra(map[string]interface{}{
-				logger.VersionKey: version,
-			}))
+		if v := config.HookMaxThread; v > 0 {
+			opts = append(opts, logrushook.SetMaxWorkers(v))
+		}
+		if v := config.HookMaxBuffer; v > 0 {
+			opts = append(opts, logrushook.SetMaxQueues(v))
+		}
 
-			hookConfig := viper.GetStringMap("log-mysql-hook")
-			if v := util.T(hookConfig["max_buffer"]).Int(); v > 0 {
-				hookOpts = append(hookOpts, mysqlhook.SetMaxQueues(v))
-			}
-
-			if v := util.T(hookConfig["max_thread"]).Int(); v > 0 {
-				hookOpts = append(hookOpts, mysqlhook.SetMaxWorkers(v))
-			}
-
-			hook := mysqlhook.DefaultWithExtra(
-				obj.MySQL.Db,
-				fmt.Sprintf("%s_%s",
-					viper.GetStringMap("mysql")["table_prefix"],
-					util.T(hookConfig["table"]).String()),
-				extraItems,
-				hookOpts...,
-			)
-
+		if mode := viper.GetString("db_mode"); mode == "gorm" && obj.GormDB != nil {
+			hook := logrushook.NewGormHook(obj.GormDB)
 			logrus.AddHook(hook)
-			return func() {
-				hook.Flush()
-			}
-		default:
+			return hook.Flush, nil
 		}
 	}
-
-	return nil
+	return nil, nil
 }

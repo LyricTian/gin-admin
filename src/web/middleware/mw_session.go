@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"fmt"
-	"net/http"
+
+	"github.com/LyricTian/gin-admin/src/logger"
+	"github.com/go-session/gorm"
 
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/util"
@@ -14,31 +16,42 @@ import (
 )
 
 // SessionMiddleware session中间件
-func SessionMiddleware(obj *inject.Object, allowPrefixes ...string) gin.HandlerFunc {
-	sessionConfig := viper.GetStringMap("session")
+func SessionMiddleware(obj *inject.Object) gin.HandlerFunc {
+	var config struct {
+		HeaderName  string `toml:"header_name" yaml:"header_name" json:"header_name"`
+		Sign        string `toml:"sign" yaml:"sign" json:"sign"`
+		Expired     int64  `toml:"expired" yaml:"expired" json:"expired"`
+		EnableStore bool   `toml:"enable_store" yaml:"enable_store" json:"enable_store"`
+	}
+
+	err := viper.UnmarshalKey("session", &config)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	var opts []session.Option
 	opts = append(opts, session.SetEnableSetCookie(false))
 	opts = append(opts, session.SetEnableSIDInURLQuery(false))
 	opts = append(opts, session.SetEnableSIDInHTTPHeader(true))
-	opts = append(opts, session.SetSessionNameInHTTPHeader(util.T(sessionConfig["header_name"]).String()))
-	opts = append(opts, session.SetSign(util.T(sessionConfig["sign"]).Bytes()))
-	opts = append(opts, session.SetExpired(util.T(sessionConfig["expired"]).Int64()))
+	opts = append(opts, session.SetSessionNameInHTTPHeader(config.HeaderName))
+	opts = append(opts, session.SetSign([]byte(config.Sign)))
+	opts = append(opts, session.SetExpired(config.Expired))
 
-	// if util.T(sessionConfig["store"]).String() == "mysql" {
-	// 	tableName := fmt.Sprintf("%s_%s",
-	// 		util.T(viper.GetStringMap("mysql")["table_prefix"]).String(),
-	// 		util.T(sessionConfig["table"]).String())
-	// 	opts = append(opts, session.SetStore(mysession.NewStoreWithDB(obj.MySQL.Db, tableName, 0)))
-	// }
+	if config.EnableStore {
+		if mode := viper.GetString("db_mode"); mode == "gorm" && obj.GormDB != nil {
+			opts = append(opts, session.SetStore(gormsession.NewDefaultStore(obj.GormDB)))
+		}
+	}
 
 	ginConfig := ginsession.DefaultConfig
-	ginConfig.Skipper = func(c *gin.Context) bool {
-		return !util.CheckPrefix(c.Request.URL.Path, allowPrefixes...)
-	}
 	ginConfig.ErrorHandleFunc = func(c *gin.Context, err error) {
 		ctx := context.New(c)
-		ctx.ResError(err, http.StatusInternalServerError)
+		if err == session.ErrInvalidSessionID {
+			ctx.ResError(util.NewBadRequestError("无效的会话"))
+			return
+		}
+		logger.Start(ctx.CContext()).Errorf("服务器会话发生错误: %s", err.Error())
+		ctx.ResError(util.NewInternalServerError("服务器会话发生错误"))
 	}
 
 	return ginsession.NewWithConfig(ginConfig, opts...)
@@ -51,11 +64,10 @@ func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 		store := ginsession.FromContext(c)
 		userID, ok := store.Get(util.SessionKeyUserID)
 
+		// 调试模式使用root用户
 		if viper.GetString("run_mode") == util.DebugMode {
 			if !ok || userID == nil {
-				if rootUser := viper.GetStringSlice("system_root_user"); len(rootUser) > 0 {
-					userID = rootUser[0]
-				}
+				userID = viper.GetString("system_root_user")
 			}
 			c.Set(util.ContextKeyUserID, userID)
 			c.Next()
@@ -63,11 +75,12 @@ func VerifySessionMiddleware(skipPrefixes ...string) gin.HandlerFunc {
 		}
 
 		if !ok || userID == nil {
-			if util.CheckPrefix(c.Request.URL.Path, skipPrefixes...) {
+			p := fmt.Sprintf("%s%s", c.Request.Method, c.Request.URL.Path)
+			if util.CheckPrefix(p, skipPrefixes...) {
 				c.Next()
 				return
 			}
-			ctx.ResError(fmt.Errorf("用户未登录"), http.StatusUnauthorized, 9999)
+			ctx.ResError(util.NewUnauthorizedError("用户未登录"), 9999)
 			return
 		}
 		c.Set(util.ContextKeyUserID, userID)

@@ -17,27 +17,25 @@ func Init(obj *inject.Object) *gin.Engine {
 	app := gin.New()
 
 	// 注册中间件
-	apiPrefixes := []string{"/api/"}
-
+	prefixes := []string{"/api/"}
 	if dir := viper.GetString("www"); dir != "" {
-		app.Use(middleware.WWWMiddleware(dir, apiPrefixes...))
+		app.Use(middleware.WWWMiddleware(dir, prefixes...))
 	}
 
-	app.Use(middleware.TraceMiddleware(apiPrefixes...))
-	app.Use(middleware.LoggerMiddleware(apiPrefixes))
+	app.Use(middleware.TraceMiddleware(prefixes...))
+	app.Use(middleware.LoggerMiddleware(prefixes...))
 	app.Use(middleware.RecoveryMiddleware())
-	app.Use(middleware.SessionMiddleware(obj, apiPrefixes...))
 
 	app.NoMethod(func(c *gin.Context) {
-		context.New(c).ResError(fmt.Errorf("方法不允许"), 405)
+		context.New(c).ResErrorWithStatus(fmt.Errorf("请求方法不允许"), 405)
 	})
 
 	app.NoRoute(func(c *gin.Context) {
-		context.New(c).ResError(fmt.Errorf("资源不存在"), 404)
+		context.New(c).ResErrorWithStatus(fmt.Errorf("资源不存在"), 404)
 	})
 
-	// 注册/api/v1路由
-	router.APIV1Handler(app, obj)
+	// 注册/api路由
+	router.APIHandler(app, obj)
 
 	// 加载casbin策略数据
 	err := loadCasbinPolicyData(obj)

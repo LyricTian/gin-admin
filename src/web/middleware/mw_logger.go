@@ -14,11 +14,10 @@ import (
 )
 
 // LoggerMiddleware GIN的日志中间件
-func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.HandlerFunc {
+func LoggerMiddleware(allowPrefixes ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := c.Request.URL.Path
-		if !util.CheckPrefix(p, allowPrefixes...) ||
-			util.CheckPrefix(p, skipPrefixes...) {
+		if !util.CheckPrefix(p, allowPrefixes...) {
 			c.Next()
 			return
 		}
@@ -55,7 +54,6 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 		c.Next()
 
 		timeConsuming := time.Since(start).Nanoseconds() / 1e6
-		fields["time_consuming"] = timeConsuming
 		fields["res_status"] = c.Writer.Status()
 		fields["res_length"] = c.Writer.Size()
 		if v, ok := c.Get(util.ContextKeyResBody); ok {

@@ -63,12 +63,12 @@ func Init() (*Object, error) {
 // 获取gorm存储
 func getGormDB() (*gorm.DB, error) {
 	var config struct {
-		Debug        bool   `toml:"debug" yaml:"debug" json:"debug"`
-		DBType       string `toml:"db_type" yaml:"db_type" json:"db_type"`
-		MaxLifetime  int    `toml:"max_lifetime" yaml:"max_lifetime" json:"max_lifetime"`
-		MaxOpenConns int    `toml:"max_open_conns" yaml:"max_open_conns" json:"max_open_conns"`
-		MaxIdleConns int    `toml:"max_idle_conns" yaml:"max_idle_conns" json:"max_idle_conns"`
-		TablePrefix  string `toml:"table_prefix" yaml:"table_prefix" json:"table_prefix"`
+		Debug        bool   `mapstructure:"debug"`
+		DBType       string `mapstructure:"db_type"`
+		MaxLifetime  int    `mapstructure:"max_lifetime"`
+		MaxOpenConns int    `mapstructure:"max_open_conns"`
+		MaxIdleConns int    `mapstructure:"max_idle_conns"`
+		TablePrefix  string `mapstructure:"table_prefix"`
 	}
 
 	err := viper.UnmarshalKey("gorm", &config)
@@ -114,11 +114,11 @@ func getGormDB() (*gorm.DB, error) {
 
 func getMySQLDSN() (string, error) {
 	var config struct {
-		Host     string `toml:"host" yaml:"host" json:"host"`
-		Port     int    `toml:"port" yaml:"port" json:"port"`
-		User     string `toml:"user" yaml:"user" json:"user"`
-		Password string `toml:"password" yaml:"password" json:"password"`
-		DBName   string `toml:"db_name" yaml:"db_name" json:"db_name"`
+		Host     string `mapstructure:"host"`
+		Port     int    `mapstructure:"port"`
+		User     string `mapstructure:"user"`
+		Password string `mapstructure:"password"`
+		DBName   string `mapstructure:"db_name"`
 	}
 
 	err := viper.UnmarshalKey("mysql", &config)
@@ -133,7 +133,7 @@ func getMySQLDSN() (string, error) {
 
 func getSqlite3DSN() (string, error) {
 	var config struct {
-		DBPath string `toml:"db_path" yaml:"db_path" json:"db_path"`
+		DBPath string `mapstructure:"db_path"`
 	}
 
 	err := viper.UnmarshalKey("sqlite3", &config)
@@ -151,11 +151,11 @@ func getSqlite3DSN() (string, error) {
 
 func getPostgresDSN() (string, error) {
 	var config struct {
-		Host     string `toml:"host" yaml:"host" json:"host"`
-		Port     int    `toml:"port" yaml:"port" json:"port"`
-		User     string `toml:"user" yaml:"user" json:"user"`
-		Password string `toml:"password" yaml:"password" json:"password"`
-		DBName   string `toml:"db_name" yaml:"db_name" json:"db_name"`
+		Host     string `mapstructure:"host"`
+		Port     int    `mapstructure:"port"`
+		User     string `mapstructure:"user"`
+		Password string `mapstructure:"password"`
+		DBName   string `mapstructure:"db_name"`
 	}
 
 	err := viper.UnmarshalKey("postgres", &config)
