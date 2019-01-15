@@ -9,7 +9,7 @@ import (
 )
 
 func TestDemo(t *testing.T) {
-	const router = "demos"
+	const router = "v1/demos"
 	var err error
 
 	w := httptest.NewRecorder()
@@ -26,11 +26,19 @@ func TestDemo(t *testing.T) {
 	var addNewItem schema.Demo
 	err = parseReader(w.Body, &addNewItem)
 	assert.Nil(t, err)
-	assert.Equal(t, addItem.Code, addNewItem.Code)
-	assert.Equal(t, addItem.Name, addNewItem.Name)
-	assert.Equal(t, addItem.Status, addNewItem.Status)
-	assert.NotEqual(t, addNewItem.ID, 0)
 	assert.NotEmpty(t, addNewItem.RecordID)
+
+	// get /demos/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+
+	var addGetItem schema.Demo
+	err = parseReader(w.Body, &addGetItem)
+
+	assert.Nil(t, err)
+	assert.Equal(t, addGetItem.Code, addItem.Code)
+	assert.Equal(t, addGetItem.Name, addItem.Name)
+	assert.Equal(t, addGetItem.Status, addItem.Status)
 
 	// get /demos?type=page
 	engine.ServeHTTP(w, newGetRequest(router,
