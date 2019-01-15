@@ -18,10 +18,10 @@ import (
 // SessionMiddleware session中间件
 func SessionMiddleware(obj *inject.Object) gin.HandlerFunc {
 	var config struct {
-		HeaderName  string `toml:"header_name" yaml:"header_name" json:"header_name"`
-		Sign        string `toml:"sign" yaml:"sign" json:"sign"`
-		Expired     int64  `toml:"expired" yaml:"expired" json:"expired"`
-		EnableStore bool   `toml:"enable_store" yaml:"enable_store" json:"enable_store"`
+		HeaderName  string `mapstructure:"header_name"`
+		Sign        string `mapstructure:"sign"`
+		Expired     int64  `mapstructure:"expired"`
+		EnableStore bool   `mapstructure:"enable_store"`
 	}
 
 	err := viper.UnmarshalKey("session", &config)
@@ -39,7 +39,9 @@ func SessionMiddleware(obj *inject.Object) gin.HandlerFunc {
 
 	if config.EnableStore {
 		if mode := viper.GetString("db_mode"); mode == "gorm" && obj.GormDB != nil {
-			opts = append(opts, session.SetStore(gormsession.NewDefaultStore(obj.GormDB)))
+			tableName := viper.GetString("db_table_prefix") + "session"
+			store := gormsession.NewStoreWithDB(obj.GormDB.DB, tableName, 0)
+			opts = append(opts, session.SetStore(store))
 		}
 	}
 

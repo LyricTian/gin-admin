@@ -6,13 +6,13 @@ import (
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/service/gormplus"
 	"github.com/LyricTian/gin-admin/src/util"
-	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 )
 
 // NewModel 实例化示例存储
-func NewModel(db *gorm.DB) *Model {
+func NewModel(db *gormplus.DB) *Model {
 	db.AutoMigrate(&Demo{})
 
 	return &Model{db}
@@ -20,7 +20,7 @@ func NewModel(db *gorm.DB) *Model {
 
 // Model 示例程序存储
 type Model struct {
-	db *gorm.DB
+	db *gormplus.DB
 }
 
 // QueryPage 查询分页数据
@@ -39,20 +39,11 @@ func (a *Model) QueryPage(ctx context.Context, params schema.DemoQueryParam, pag
 		db = db.Where("status=?", v)
 	}
 
-	var count int
-	result := db.Count(&count)
-	if err := result.Error; err != nil {
+	var items []Demo
+	count, err := a.db.FindPage(db, pageIndex, pageSize, &items)
+	if err != nil {
 		span.Errorf(err.Error())
 		return 0, nil, errors.New("查询分页数据条数发生错误")
-	} else if count == 0 {
-		return 0, nil, nil
-	}
-
-	var items []Demo
-	result = db.Order("id desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&items)
-	if err := result.Error; err != nil {
-		span.Errorf(err.Error())
-		return 0, nil, errors.New("查询分页数据发生错误")
 	}
 
 	dataItems := make([]schema.DemoQueryResult, len(items))
@@ -65,12 +56,10 @@ func (a *Model) Get(ctx context.Context, recordID string) (*schema.Demo, error) 
 	span := logger.StartSpan(ctx, "查询指定数据", "demo.Get")
 	defer span.Finish()
 
+	db := a.db.Where("record_id=?", recordID)
 	var item Demo
-	result := a.db.Where("record_id=?", recordID).First(&item)
-	if err := result.Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
+	err := a.db.FindOne(db, &item)
+	if err != nil {
 		span.Errorf(err.Error())
 		return nil, errors.New("查询指定数据发生错误")
 	}

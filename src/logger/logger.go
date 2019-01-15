@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -11,14 +12,27 @@ import (
 
 // 定义键名
 const (
-	StartedAtKey    = "started_at"
-	TraceIDKey      = "trace_id"
-	UserIDKey       = "user_id"
-	SpanIDKey       = "span_id"
-	SpanTitleKey    = "span_title"
-	SpanFunctionKey = "span_function"
-	VersionKey      = "version"
+	StartedAtKey     = "started_at"
+	TraceIDKey       = "trace_id"
+	UserIDKey        = "user_id"
+	SpanIDKey        = "span_id"
+	SpanTitleKey     = "span_title"
+	SpanFunctionKey  = "span_function"
+	VersionKey       = "version"
+	TimeConsumingKey = "time_consuming"
 )
+
+var (
+	version string
+	once    sync.Once
+)
+
+// SetVersion 设定版本
+func SetVersion(v string) {
+	once.Do(func() {
+		version = v
+	})
+}
 
 type (
 	traceIDContextKey struct{}
@@ -88,6 +102,7 @@ func StartSpan(ctx context.Context, title, function string) *Entry {
 		SpanIDKey:       FromSpanIDContext(ctx),
 		SpanTitleKey:    title,
 		SpanFunctionKey: function,
+		VersionKey:      version,
 	}
 
 	return newEntry(logrus.WithFields(fields))
@@ -150,6 +165,27 @@ func (e *Entry) Debugf(format string, args ...interface{}) {
 	e.entry.Debugf(format, args...)
 }
 
+func (e *Entry) copyEntry(entry *logrus.Entry) *logrus.Entry {
+	newEntry := logrus.NewEntry(entry.Logger)
+	newEntry.Data = make(logrus.Fields)
+	newEntry.Time = entry.Time
+	newEntry.Level = entry.Level
+	newEntry.Message = entry.Message
+	for k, v := range entry.Data {
+		newEntry.Data[k] = v
+	}
+	return newEntry
+}
+
 func (e *Entry) done() {
+	entry := e.copyEntry(e.entry)
+	entry.Time = time.Now()
+	if v, ok := entry.Data[StartedAtKey]; ok {
+		if startedAt, ok := v.(time.Time); ok {
+			entry.Data[TimeConsumingKey] = entry.Time.Sub(startedAt).Nanoseconds() / 1e6
+			delete(entry.Data, StartedAtKey)
+		}
+	}
+	e.entry = entry
 	atomic.StoreInt32(&e.finish, 1)
 }

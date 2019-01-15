@@ -38,10 +38,10 @@ func Init(obj *inject.Object) *gin.Engine {
 	router.APIHandler(app, obj)
 
 	// 加载casbin策略数据
-	err := loadCasbinPolicyData(obj)
-	if err != nil {
-		panic("加载casbin策略数据发生错误：" + err.Error())
-	}
+	// err := loadCasbinPolicyData(obj)
+	// if err != nil {
+	// 	panic("加载casbin策略数据发生错误：" + err.Error())
+	// }
 
 	return app
 }

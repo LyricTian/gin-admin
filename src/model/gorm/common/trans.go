@@ -3,25 +3,24 @@ package common
 import (
 	"context"
 
-	"github.com/pkg/errors"
-
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/jinzhu/gorm"
+	"github.com/LyricTian/gin-admin/src/service/gormplus"
+	"github.com/pkg/errors"
 )
 
 // GetTrans 获取事务
-func GetTrans(trans interface{}) *gorm.DB {
-	return trans.(*gorm.DB)
+func GetTrans(trans interface{}) *gormplus.DB {
+	return trans.(*gormplus.DB)
 }
 
 // NewTrans 事务管理
-func NewTrans(db *gorm.DB) *Trans {
+func NewTrans(db *gormplus.DB) *Trans {
 	return &Trans{db}
 }
 
 // Trans 事务管理
 type Trans struct {
-	db *gorm.DB
+	db *gormplus.DB
 }
 
 // Begin 开启事务
@@ -34,7 +33,7 @@ func (a *Trans) Begin(ctx context.Context) (interface{}, error) {
 		span.Errorf(err.Error())
 		return nil, errors.New("开启事务发生错误")
 	}
-	return result, nil
+	return gormplus.Wrap(result), nil
 }
 
 // Commit 提交事务
@@ -42,7 +41,7 @@ func (a *Trans) Commit(ctx context.Context, trans interface{}) error {
 	span := logger.StartSpan(ctx, "提交事务", "trans.Commit")
 	defer span.Finish()
 
-	db, ok := trans.(*gorm.DB)
+	db, ok := trans.(*gormplus.DB)
 	if !ok {
 		span.Warnf("未知的事务类型")
 		return errors.New("未知的事务类型")
@@ -61,7 +60,7 @@ func (a *Trans) Rollback(ctx context.Context, trans interface{}) error {
 	span := logger.StartSpan(ctx, "回滚事务", "trans.Rollback")
 	defer span.Finish()
 
-	db, ok := trans.(*gorm.DB)
+	db, ok := trans.(*gormplus.DB)
 	if !ok {
 		span.Warnf("未知的事务类型")
 		return errors.New("未知的事务类型")

@@ -2,7 +2,6 @@ package test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,8 +9,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/LyricTian/gin-admin/src"
-	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/inject"
+	"github.com/LyricTian/gin-admin/src/web"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
@@ -20,7 +19,7 @@ import (
 
 const (
 	configFile = "../../../config/config.toml"
-	apiPrefix  = "/api/v1/"
+	apiPrefix  = "/api/"
 )
 
 var engine *gin.Engine
@@ -33,8 +32,12 @@ func init() {
 	viper.Set("run_mode", "debug")
 	viper.Set("casbin_model", "../../../config/model.conf")
 
-	ctx := util.NewTraceIDContext(context.Background(), util.MustUUID())
-	engine, _ = src.Init(ctx, "1.2.0-test")
+	obj, err := inject.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	engine = web.Init(obj)
 }
 
 func toReader(v interface{}) io.Reader {
