@@ -3,8 +3,7 @@ package logrushook
 import (
 	"time"
 
-	"github.com/spf13/viper"
-
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/jinzhu/gorm"
@@ -95,5 +94,5 @@ type GormItem struct {
 
 // TableName 表名
 func (GormItem) TableName() string {
-	return viper.GetString("db_table_prefix") + "logger"
+	return config.GetDBTablePrefix() + "logger"
 }

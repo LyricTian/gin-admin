@@ -5,21 +5,18 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 )
 
 // WWWMiddleware 静态站点中间件
-func WWWMiddleware(root string, excludeRouters ...string) gin.HandlerFunc {
+func WWWMiddleware(root string, skipper SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m := c.Request.Method
-		p := c.Request.URL.Path
-		if util.CheckPrefix(p, excludeRouters...) ||
-			!(m == http.MethodHead || m == http.MethodGet) {
+		if skipper != nil && skipper(c) {
 			c.Next()
 			return
 		}
 
+		p := c.Request.URL.Path
 		fpath := filepath.Join(root, filepath.FromSlash(p))
 		_, verr := os.Stat(fpath)
 		if verr != nil && os.IsNotExist(verr) {

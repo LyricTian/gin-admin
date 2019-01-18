@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/service/logrus-hook"
@@ -19,22 +19,16 @@ import (
 type CallbackFunc func()
 
 // Init 初始化
-func Init(ctx context.Context, version string) CallbackFunc {
-	// 初始化依赖注入
+func Init(ctx context.Context) CallbackFunc {
 	obj, err := inject.Init()
 	if err != nil {
-		panic(err.Error())
+		logger.Start(ctx).Fatalf("初始化依赖注入发生错误：%s", err.Error())
 	}
 
-	// 初始化日志
-	logger.SetVersion(version)
 	loggerFunc, err := InitLogger(ctx, obj)
 	if err != nil {
-		panic(err.Error())
+		logger.Start(ctx).Fatalf("初始化日志模块发生错误：%s", err.Error())
 	}
-
-	logger.Start(ctx).Printf("服务开始运行在[%s]模式下，运行版本:%s，进程号：%d",
-		viper.GetString("run_mode"), version, os.Getpid())
 
 	// 初始化HTTP服务
 	httpFunc := InitHTTPServer(ctx, obj)
@@ -63,9 +57,8 @@ func Init(ctx context.Context, version string) CallbackFunc {
 
 // InitHTTPServer 初始化http服务
 func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
-	host, port := viper.GetString("http_host"), viper.GetInt("http_port")
-	addr := fmt.Sprintf("%s:%d", host, port)
-
+	a := config.GetHTTPAddr()
+	addr := fmt.Sprintf("%s:%d", a.Host, a.Port)
 	srv := &http.Server{
 		Addr:           addr,
 		Handler:        web.Init(obj),
@@ -93,7 +86,7 @@ func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
 
 // InitLogger 初始化日志
 func InitLogger(ctx context.Context, obj *inject.Object) (CallbackFunc, error) {
-	var config struct {
+	var options struct {
 		Level         int    `mapstructure:"level"`
 		Format        string `mapstructure:"format"`
 		EnableHook    bool   `mapstructure:"enable_hook"`
@@ -101,30 +94,30 @@ func InitLogger(ctx context.Context, obj *inject.Object) (CallbackFunc, error) {
 		HookMaxBuffer int    `mapstructure:"hook_max_buffer"`
 	}
 
-	err := viper.UnmarshalKey("log", &config)
+	err := viper.UnmarshalKey("log", &options)
 	if err != nil {
 		return nil, err
 	}
 
-	if v := config.Level; v > -1 {
+	if v := options.Level; v > -1 {
 		logrus.SetLevel(logrus.Level(v))
 	}
 
-	if v := config.Format; v == "json" {
+	if v := options.Format; v == "json" {
 		logrus.SetFormatter(new(logrus.JSONFormatter))
 	}
 
-	if config.EnableHook {
+	if options.EnableHook {
 		var opts []logrushook.Option
 
-		if v := config.HookMaxThread; v > 0 {
+		if v := options.HookMaxThread; v > 0 {
 			opts = append(opts, logrushook.SetMaxWorkers(v))
 		}
-		if v := config.HookMaxBuffer; v > 0 {
+		if v := options.HookMaxBuffer; v > 0 {
 			opts = append(opts, logrushook.SetMaxQueues(v))
 		}
 
-		if mode := viper.GetString("db_mode"); mode == "gorm" && obj.GormDB != nil {
+		if config.IsGormDB() && obj.GormDB != nil {
 			hook := logrushook.NewGormHook(obj.GormDB.DB, opts...)
 			logrus.AddHook(hook)
 			return hook.Flush, nil

@@ -3,14 +3,22 @@ package common
 import (
 	"context"
 
+	gcontext "github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
-	"github.com/pkg/errors"
 )
 
 // GetTrans 获取事务
-func GetTrans(trans interface{}) *gormplus.DB {
-	return trans.(*gormplus.DB)
+func GetTrans(ctx context.Context, defaultDB *gormplus.DB) *gormplus.DB {
+	trans, ok := gcontext.FromTrans(ctx)
+	if ok {
+		db, ok := trans.(*gormplus.DB)
+		if ok {
+			return db
+		}
+	}
+	return defaultDB
 }
 
 // NewTrans 事务管理

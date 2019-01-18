@@ -1,12 +1,12 @@
 package inject
 
 import (
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/model/gorm"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
 	"github.com/LyricTian/gin-admin/src/web/ctl"
 	"github.com/casbin/casbin"
 	"github.com/facebookgo/inject"
-	"github.com/spf13/viper"
 )
 
 // Object 注入对象
@@ -21,10 +21,8 @@ func Init() (*Object, error) {
 	g := new(inject.Graph)
 	obj := new(Object)
 
-	// 指定存储模式
-	dbMode := viper.GetString("db_mode")
-	switch dbMode {
-	case "gorm":
+	switch {
+	case config.IsGormDB():
 		db, err := getGormDB()
 		if err != nil {
 			return nil, err
@@ -34,7 +32,7 @@ func Init() (*Object, error) {
 	}
 
 	// 注入casbin
-	enforcer := casbin.NewEnforcer(viper.GetString("casbin_model"), false)
+	enforcer := casbin.NewEnforcer(config.GetCasbinModelConf(), false)
 	g.Provide(&inject.Object{Value: enforcer})
 	obj.Enforcer = enforcer
 

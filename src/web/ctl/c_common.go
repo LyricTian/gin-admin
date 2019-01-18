@@ -6,5 +6,5 @@ type Common struct {
 	LoginAPI *Login
 	UserAPI  *User
 	RoleAPI  *Role
-	MenuAPI  *Menu
+	MenuAPI  *Menu `inject:""`
 }

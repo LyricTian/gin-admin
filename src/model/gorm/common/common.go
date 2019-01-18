@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/spf13/viper"
+	"github.com/LyricTian/gin-admin/src/config"
 )
 
 // Model 定义基础的模型
@@ -17,5 +17,5 @@ type Model struct {
 
 // TableName 表名
 func (Model) TableName(name string) string {
-	return fmt.Sprintf("%s%s", viper.GetString("db_table_prefix"), name)
+	return fmt.Sprintf("%s%s", config.GetDBTablePrefix(), name)
 }

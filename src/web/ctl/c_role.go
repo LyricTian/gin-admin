@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
@@ -22,7 +23,7 @@ func (a *Role) Query(ctx *context.Context) {
 	case "select":
 		a.QuerySelect(ctx)
 	default:
-		ctx.ResError(nil)
+		ctx.ResError(errors.NewBadRequestError("未知的查询类型"))
 	}
 }
 
@@ -31,7 +32,6 @@ func (a *Role) QueryPage(ctx *context.Context) {
 	pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
 
 	var params schema.RoleQueryParam
-
 	params.Name = ctx.Query("name")
 	params.Status = util.S(ctx.Query("status")).Int()
 

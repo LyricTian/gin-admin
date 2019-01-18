@@ -1,6 +1,8 @@
 package model
 
-import "context"
+import (
+	"context"
+)
 
 // ITrans 事务管理接口
 type ITrans interface {

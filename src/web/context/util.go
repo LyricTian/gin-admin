@@ -7,6 +7,19 @@ import (
 	"sync"
 )
 
+// 定义上下文中的键
+const (
+	contextKeyPrefix = "github.com/LyricTian/gin-admin"
+	// ContextKeyUserID 存储上下文中的键(用户ID)
+	ContextKeyUserID = contextKeyPrefix + "/user_id"
+	// ContextKeyURLTitle 存储上下文中的键(请求URL说明)
+	ContextKeyURLTitle = contextKeyPrefix + "/url_title"
+	// ContextKeyTraceID 存储上下文中的键(跟踪ID)
+	ContextKeyTraceID = contextKeyPrefix + "/trace_id"
+	// ContextKeyResBody 存储上下文中的键(响应Body数据)
+	ContextKeyResBody = contextKeyPrefix + "/res_body"
+)
+
 // 定义响应状态数据
 const (
 	StatusOK    = "OK"
@@ -20,14 +33,22 @@ var (
 	routerRe    = regexp.MustCompile(`(.*):[^/]+(.*)`)
 )
 
+// GetRouter 获取路由
+func GetRouter(method, path string) string {
+	if len(path) > 0 && path[0] != '/' {
+		path = "/" + path
+	}
+	return fmt.Sprintf("%s%s", method, path)
+}
+
 // SetRouterTitle 设定路由标题
-func SetRouterTitle(method, router, title string) {
-	routerTitle.Store(fmt.Sprintf("%s-%s", method, router), title)
+func SetRouterTitle(method, path, title string) {
+	routerTitle.Store(GetRouter(method, path), title)
 }
 
 // GetRouterTitleAndKey 获取路由标题和键
-func GetRouterTitleAndKey(method, router string) (string, string) {
-	key := fmt.Sprintf("%s-%s", method, router)
+func GetRouterTitleAndKey(method, path string) (string, string) {
+	key := GetRouter(method, path)
 	vv, ok := routerTitle.Load(key)
 	if ok {
 		return vv.(string), key

@@ -1,35 +1,30 @@
 package middleware
 
 import (
-	"fmt"
-
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/casbin/casbin"
 	"github.com/gin-gonic/gin"
 )
 
 // CasbinMiddleware casbin中间件
-func CasbinMiddleware(enforcer *casbin.Enforcer, skipPrefixes ...string) gin.HandlerFunc {
+func CasbinMiddleware(enforcer *casbin.Enforcer, skipper SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.New(c)
-
-		p := c.Request.URL.Path
-		m := c.Request.Method
-
-		// 跳过不需要校验权限的路由(规则：GET/api/v1/test)
-		if util.CheckPrefix(fmt.Sprintf("%s%s", p, m), skipPrefixes...) {
+		if skipper != nil && skipper(c) {
 			c.Next()
 			return
 		}
 
+		ctx := context.New(c)
+		p := c.Request.URL.Path
+		m := c.Request.Method
 		if b, err := enforcer.EnforceSafe(ctx.GetUserID(), p, m); err != nil {
-			logger.Start(ctx.CContext()).Errorf("验证权限发生错误: %s", err.Error())
-			ctx.ResError(util.NewInternalServerError("服务器发生权限校验错误"))
+			logger.Start(ctx.CContext()).Errorf("权限校验发生错误: %s", err.Error())
+			ctx.ResError(errors.NewInternalServerError())
 			return
 		} else if !b {
-			ctx.ResError(util.NewUnauthorizedError("无操作权限"), 9998)
+			ctx.ResError(errors.NewUnauthorizedError("无操作权限"), 9998)
 			return
 		}
 		c.Next()

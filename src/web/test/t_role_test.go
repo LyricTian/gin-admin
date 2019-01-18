@@ -22,7 +22,6 @@ func TestRole(t *testing.T) {
 		Sequence: 1,
 		Icon:     "test",
 		Path:     "/test",
-		Status:   1,
 		IsHide:   2,
 	}
 	engine.ServeHTTP(w, newPostRequest("menus", addMenuItem))

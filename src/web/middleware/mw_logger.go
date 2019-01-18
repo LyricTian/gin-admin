@@ -8,25 +8,23 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
 )
 
-// LoggerMiddleware GIN的日志中间件
-func LoggerMiddleware(allowPrefixes ...string) gin.HandlerFunc {
+// LoggerMiddleware 日志中间件
+func LoggerMiddleware(skipper SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		p := c.Request.URL.Path
-		if !util.CheckPrefix(p, allowPrefixes...) {
+		if skipper != nil && skipper(c) {
 			c.Next()
 			return
 		}
 
-		nctx := context.New(c)
+		p := c.Request.URL.Path
+		ctx := context.New(c)
 		method := c.Request.Method
-
 		stitle, skey := context.GetRouterTitleAndKey(method, p)
-		span := logger.StartSpan(nctx.CContext(), stitle, skey)
+		span := logger.StartSpan(ctx.CContext(), stitle, skey)
 		start := time.Now()
 
 		fields := make(map[string]interface{})
@@ -56,12 +54,12 @@ func LoggerMiddleware(allowPrefixes ...string) gin.HandlerFunc {
 		timeConsuming := time.Since(start).Nanoseconds() / 1e6
 		fields["res_status"] = c.Writer.Status()
 		fields["res_length"] = c.Writer.Size()
-		if v, ok := c.Get(util.ContextKeyResBody); ok {
+		if v, ok := c.Get(context.ContextKeyResBody); ok {
 			if b, ok := v.([]byte); ok {
 				fields["res_body"] = string(b)
 			}
 		}
-		fields[logger.UserIDKey] = nctx.GetUserID()
+		fields[logger.UserIDKey] = ctx.GetUserID()
 		span.WithFields(fields).Infof("[http] %s-%s-%s-%d(%dms)",
 			p, c.Request.Method, c.ClientIP(), c.Writer.Status(), timeConsuming)
 	}

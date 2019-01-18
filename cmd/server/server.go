@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"sync/atomic"
 
 	"github.com/LyricTian/gin-admin/src"
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/spf13/viper"
@@ -45,27 +45,29 @@ func main() {
 		panic("加载配置文件发生错误：" + err.Error())
 	}
 
-	if v := viper.GetString("casbin_model"); v == "" && modelFile == "" {
-		panic("请使用-m指定Casbin的访问控制模型")
+	casbinModelConfKey := "casbin_model_conf"
+	if modelFile == "" && viper.GetString(casbinModelConfKey) == "" {
+		panic("请使用-m指定casbin的访问控制模型")
 	}
 
-	fmt.Printf("开始运行服务，服务版本号：%s \n", VERSION)
-
 	if modelFile != "" {
-		viper.Set("casbin_model", modelFile)
+		viper.Set(casbinModelConfKey, modelFile)
 	}
 
 	if wwwDir != "" {
 		viper.Set("www", wwwDir)
 	}
 
+	logger.SetVersion(VERSION)
+	logger.SetTraceIDFunc(util.MustUUID)
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
-	callback := src.Init(ctx, VERSION)
+	logger.Start(ctx).Printf("服务启动，运行模式：%s，版本号：%s，进程号：%s", config.GetRunMode(), VERSION, os.Getpid())
 
 	var state int32 = 1
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 
+	callback := src.Init(ctx)
 	select {
 	case sig := <-sc:
 		atomic.StoreInt32(&state, 0)
