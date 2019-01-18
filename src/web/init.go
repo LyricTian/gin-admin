@@ -21,6 +21,10 @@ func Init(obj *inject.Object) *gin.Engine {
 		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(apiPrefixes...)))
 	}
 
+	if dir := config.GetSwaggerDir(); dir != "" {
+		app.Static("/swagger", dir)
+	}
+
 	app.Use(middleware.TraceMiddleware(middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
 	app.Use(middleware.LoggerMiddleware(middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
 	app.Use(middleware.RecoveryMiddleware())

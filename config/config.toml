@@ -1,5 +1,5 @@
 # 运行模式(debug:调试,release:正式,test:测试)
-run_mode = "test"
+run_mode = "debug"
 
 # http监听地址
 http_host = "0.0.0.0"
@@ -8,10 +8,13 @@ http_host = "0.0.0.0"
 http_port = 8086
 
 # casbin模型配置文件(也可以启动服务时使用-m指定)
-casbin_model_conf = "config/model.conf"
+casbin_model_conf = ""
 
 # 静态站点目录(也可以启动服务时使用-www指定)
 www = ""
+
+# swagger文档目录(也可以启动服务时使用-swagger指定)
+swagger = ""
 
 # 系统root用户名
 system_root_user = "root"

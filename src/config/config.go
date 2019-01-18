@@ -78,6 +78,11 @@ func GetWWWDir() string {
 	return viper.GetString("www")
 }
 
+// GetSwaggerDir 获取swagger文档目录
+func GetSwaggerDir() string {
+	return viper.GetString("swagger")
+}
+
 // HTTPAddr http地址
 type HTTPAddr struct {
 	Host string

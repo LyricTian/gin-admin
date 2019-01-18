@@ -11,11 +11,28 @@ import (
 )
 
 // Demo 示例程序
+// @Name Demo
+// @Description 示例程序
 type Demo struct {
 	DemoBll *bll.Demo `inject:""`
 }
 
 // Query 查询数据
+// @Title 查询数据
+// @Description 查询示例数据(支持分页查询)
+// @Consumes json
+// @Produces json
+// @Param access-token header string false "访问令牌"
+// @Param type query string true "查询类型(分页查询：page)"
+// @Param current query int true "分页索引" 1
+// @Param pageSize query int true "分页大小" 10
+// @Param code query string false "编号"
+// @Param name query string false "名称"
+// @Param status query int false "状态"
+// @Success 200 []schema.Demo "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小}}"
+// @Failure 400 string "{error:{code:0,message:未知的查询类型}}"
+// @Failure 500 string "{error:{code:0,message:服务器错误}}"
+// @Router GET /api/v1/demos
 func (a *Demo) Query(ctx *context.Context) {
 	switch ctx.Query("type") {
 	case "page":
