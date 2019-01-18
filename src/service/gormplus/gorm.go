@@ -72,10 +72,23 @@ func (d *DB) FindPage(db *gorm.DB, pageIndex, pageSize uint, out interface{}) (i
 }
 
 // FindOne 查询单条数据
-func (d *DB) FindOne(db *gorm.DB, out interface{}) error {
+func (d *DB) FindOne(db *gorm.DB, out interface{}) (bool, error) {
 	result := db.First(out)
-	if err := result.Error; err != nil && err != gorm.ErrRecordNotFound {
-		return err
+	if err := result.Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+		return false, err
 	}
-	return nil
+	return true, nil
+}
+
+// Check 检查数据是否存在
+func (d *DB) Check(db *gorm.DB) (bool, error) {
+	var count int
+	result := db.Count(&count)
+	if err := result.Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }

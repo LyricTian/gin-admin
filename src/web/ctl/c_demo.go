@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
@@ -20,7 +21,7 @@ func (a *Demo) Query(ctx *context.Context) {
 	case "page":
 		a.QueryPage(ctx)
 	default:
-		ctx.ResError(util.NewBadRequestError("未知的查询类型"))
+		ctx.ResError(errors.NewBadRequestError("未知的查询类型"))
 	}
 }
 
@@ -28,8 +29,7 @@ func (a *Demo) Query(ctx *context.Context) {
 func (a *Demo) QueryPage(ctx *context.Context) {
 	pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
 
-	var params schema.DemoQueryParam
-
+	var params schema.DemoPageQueryParam
 	params.Code = ctx.Query("code")
 	params.Name = ctx.Query("name")
 	params.Status = util.S(ctx.Query("status")).Int()
@@ -61,7 +61,6 @@ func (a *Demo) Create(ctx *context.Context) {
 		return
 	}
 
-	item.Creator = ctx.GetUserID()
 	recordID, err := a.DemoBll.Create(ctx.CContext(), item)
 	if err != nil {
 		ctx.ResError(err)

@@ -2,22 +2,24 @@ package middleware
 
 import (
 	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
 )
 
 // TraceMiddleware 跟踪ID中间件
-func TraceMiddleware(allowPrefixes ...string) gin.HandlerFunc {
+func TraceMiddleware(skipper SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !util.CheckPrefix(c.Request.URL.Path, allowPrefixes...) {
+		if skipper != nil && skipper(c) {
 			c.Next()
 			return
 		}
 
-		traceID := c.Query("X-Request-Id")
+		// 优先从请求头中获取请求ID，如果没有则使用UUID
+		traceID := c.GetHeader("X-Request-Id")
 		if traceID == "" {
 			traceID = util.MustUUID()
 		}
-		c.Set(util.ContextKeyTraceID, traceID)
+		c.Set(context.ContextKeyTraceID, traceID)
 		c.Next()
 	}
 }

@@ -4,6 +4,11 @@ import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 )
 
+// GetDemoTableName 获取示例表名
+func GetDemoTableName() string {
+	return Demo{}.TableName()
+}
+
 // Demo 示例程序
 type Demo struct {
 	common.Model

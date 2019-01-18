@@ -3,11 +3,11 @@ package bll
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 // 定义错误
@@ -27,10 +27,10 @@ type Login struct {
 
 func (a *Login) getRootUser() schema.User {
 	return schema.User{
-		RecordID: viper.GetString("system_root_user"),
-		UserName: viper.GetString("system_root_user"),
+		RecordID: config.GetRootUser().UserName,
+		UserName: config.GetRootUser().UserName,
 		RealName: "超级用户",
-		Password: viper.GetString("system_root_password"),
+		Password: config.GetRootUser().Password,
 	}
 }
 
@@ -106,22 +106,22 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (*schema.
 
 // QueryCurrentUserMenus 查询当前用户菜单
 func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map[string]interface{}, error) {
-	params := schema.MenuSelectQueryParam{
-		Status:     1,
-		SystemCode: viper.GetString("system_identify"),
-		IsHide:     2,
-		Types:      []int{20, 30},
-	}
+	// params := schema.MenuSelectQueryParam{
+	// 	Status:     1,
+	// 	IsHide:     2,
+	// 	Types:      []int{20, 30},
+	// }
 
-	if isRoot := a.CheckIsRoot(ctx, userID); !isRoot {
-		params.UserID = userID
-	}
+	// if isRoot := a.CheckIsRoot(ctx, userID); !isRoot {
+	// 	params.UserID = userID
+	// }
 
-	items, err := a.MenuModel.QuerySelect(ctx, params)
-	if err != nil {
-		return nil, err
-	}
+	// items, err := a.MenuModel.QuerySelect(ctx, params)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
-	return treeData, nil
+	// treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
+	// return treeData, nil
+	return nil, nil
 }

@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/casbin/casbin"
-	"github.com/pkg/errors"
 )
 
 // User 用户管理
@@ -48,7 +48,7 @@ func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
 	if err != nil {
 		return nil, err
 	} else if item == nil {
-		return nil, util.ErrNotFound
+		return nil, errors.ErrNotFound
 	}
 
 	// 查询不返回密码
@@ -62,7 +62,7 @@ func (a *User) Create(ctx context.Context, item *schema.User) error {
 	if err != nil {
 		return err
 	} else if exists {
-		return errors.New("用户名已经存在")
+		return errors.NewBadRequestError("用户名已经存在")
 	}
 
 	item.Password = util.SHA1HashString(item.Password)
@@ -84,13 +84,13 @@ func (a *User) Update(ctx context.Context, recordID string, item *schema.User) e
 	if err != nil {
 		return err
 	} else if oldItem == nil {
-		return util.ErrNotFound
+		return errors.ErrNotFound
 	} else if oldItem.UserName != item.UserName {
 		exists, err := a.UserModel.CheckUserName(ctx, item.UserName)
 		if err != nil {
 			return err
 		} else if exists {
-			return errors.New("用户名已经存在")
+			return errors.NewBadRequestError("用户名已经存在")
 		}
 	}
 
@@ -121,7 +121,7 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 	if err != nil {
 		return err
 	} else if !exists {
-		return util.ErrNotFound
+		return errors.ErrNotFound
 	}
 
 	err = a.UserModel.Delete(ctx, recordID)
@@ -139,7 +139,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	if err != nil {
 		return err
 	} else if !exists {
-		return util.ErrNotFound
+		return errors.ErrNotFound
 	}
 
 	info := map[string]interface{}{

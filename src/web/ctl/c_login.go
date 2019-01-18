@@ -7,7 +7,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
@@ -52,7 +51,7 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
-	store.Set(util.SessionKeyUserID, userInfo.RecordID)
+	store.Set(context.ContextKeyUserID, userInfo.RecordID)
 	err = store.Save()
 	if err != nil {
 		result.Status = context.StatusError

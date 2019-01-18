@@ -2,14 +2,13 @@ package bll
 
 import (
 	"context"
-	"strings"
 	"time"
 
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/casbin/casbin"
-	"github.com/pkg/errors"
 )
 
 // Role 角色管理
@@ -36,7 +35,7 @@ func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
 	if err != nil {
 		return nil, err
 	} else if item == nil {
-		return nil, util.ErrNotFound
+		return nil, errors.ErrNotFound
 	}
 
 	return item, nil
@@ -44,30 +43,31 @@ func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
 
 // 过滤叶子节点
 func (a *Role) filterLeafMenuIDs(ctx context.Context, menuIDs []string) ([]string, error) {
-	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
-		RecordIDs: menuIDs,
-		Status:    1,
-	})
-	if err != nil {
-		return nil, err
-	}
+	// menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
+	// 	RecordIDs: menuIDs,
+	// 	Status:    1,
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	var leafMenuIDs []string
-	for _, m := range menus {
-		var exists bool
-		for _, m2 := range menus {
-			if strings.HasPrefix(m2.LevelCode, m.LevelCode) &&
-				m2.LevelCode != m.LevelCode {
-				exists = true
-				break
-			}
-		}
-		if !exists {
-			leafMenuIDs = append(leafMenuIDs, m.RecordID)
-		}
-	}
+	// var leafMenuIDs []string
+	// for _, m := range menus {
+	// 	var exists bool
+	// 	for _, m2 := range menus {
+	// 		if strings.HasPrefix(m2.LevelCode, m.LevelCode) &&
+	// 			m2.LevelCode != m.LevelCode {
+	// 			exists = true
+	// 			break
+	// 		}
+	// 	}
+	// 	if !exists {
+	// 		leafMenuIDs = append(leafMenuIDs, m.RecordID)
+	// 	}
+	// }
 
-	return leafMenuIDs, nil
+	// return leafMenuIDs, nil
+	return nil, nil
 }
 
 // Create 创建数据
@@ -76,7 +76,7 @@ func (a *Role) Create(ctx context.Context, item *schema.Role) error {
 	if err != nil {
 		return err
 	} else if exists {
-		return errors.New("角色名称已经存在")
+		return errors.NewBadRequestError("角色名称已经存在")
 	}
 
 	leafMenuIDs, err := a.filterLeafMenuIDs(ctx, item.MenuIDs)
@@ -103,13 +103,13 @@ func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) e
 	if err != nil {
 		return err
 	} else if oldItem == nil {
-		return util.ErrNotFound
+		return errors.ErrNotFound
 	} else if oldItem.Name != item.Name {
 		exists, err := a.RoleModel.CheckName(ctx, item.Name)
 		if err != nil {
 			return err
 		} else if exists {
-			return errors.New("角色名称已经存在")
+			return errors.NewBadRequestError("角色名称已经存在")
 		}
 	}
 
@@ -141,14 +141,14 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	if err != nil {
 		return err
 	} else if !exists {
-		return util.ErrNotFound
+		return errors.ErrNotFound
 	}
 
 	exists, err = a.UserModel.CheckByRoleID(ctx, recordID)
 	if err != nil {
 		return err
 	} else if exists {
-		return errors.New("该角色已被赋予用户，不能删除！")
+		return errors.NewBadRequestError("该角色已被赋予用户，不能删除！")
 	}
 
 	err = a.RoleModel.Delete(ctx, recordID)
@@ -166,7 +166,7 @@ func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) er
 	if err != nil {
 		return err
 	} else if !exists {
-		return util.ErrNotFound
+		return errors.ErrNotFound
 	}
 
 	info := map[string]interface{}{
@@ -213,22 +213,22 @@ func (a *Role) LoadAllPolicy() error {
 
 // LoadPolicy 加载角色权限策略
 func (a *Role) LoadPolicy(ctx context.Context, roleID string) error {
-	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
-		Status: 1,
-		Types:  []int{40},
-		RoleID: roleID,
-	})
-	if err != nil {
-		return err
-	}
+	// menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
+	// 	Status: 1,
+	// 	Types:  []int{40},
+	// 	RoleID: roleID,
+	// })
+	// if err != nil {
+	// 	return err
+	// }
 
-	a.Enforcer.DeletePermissionsForUser(roleID)
-	for _, menu := range menus {
-		if menu.Path == "" || menu.Method == "" {
-			continue
-		}
-		a.Enforcer.AddPermissionForUser(roleID, menu.Path, menu.Method)
-	}
+	// a.Enforcer.DeletePermissionsForUser(roleID)
+	// for _, menu := range menus {
+	// 	if menu.Path == "" || menu.Method == "" {
+	// 		continue
+	// 	}
+	// 	a.Enforcer.AddPermissionForUser(roleID, menu.Path, menu.Method)
+	// }
 
 	return nil
 }

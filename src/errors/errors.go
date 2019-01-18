@@ -1,15 +1,18 @@
-package util
+package errors
 
 import (
 	"github.com/pkg/errors"
 )
 
-// 定义错误
+// 定义通用错误
 var (
-	ErrNotFound       = errors.New("资源不存在")
-	ErrBadRequest     = errors.New("请求无效")
-	ErrUnauthorized   = errors.New("未授权")
-	ErrInternalServer = errors.New("服务器错误")
+	New               = errors.New
+	Wrap              = errors.Wrap
+	Wrapf             = errors.Wrapf
+	ErrNotFound       = New("资源不存在")
+	ErrBadRequest     = New("请求无效")
+	ErrUnauthorized   = New("未授权")
+	ErrInternalServer = New("服务器错误")
 )
 
 // NewBadRequestError 创建请求无效错误

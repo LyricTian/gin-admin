@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
@@ -22,7 +23,7 @@ func (a *Menu) Query(ctx *context.Context) {
 	case "tree":
 		a.QueryTree(ctx)
 	default:
-		ctx.ResError(nil)
+		ctx.ResError(errors.NewBadRequestError("未知的查询类型"))
 	}
 }
 
@@ -30,10 +31,10 @@ func (a *Menu) Query(ctx *context.Context) {
 func (a *Menu) QueryPage(ctx *context.Context) {
 	pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
 
-	params := schema.MenuQueryParam{
+	params := schema.MenuPageQueryParam{
+		Code:     ctx.Query("code"),
 		Name:     ctx.Query("name"),
 		ParentID: ctx.Query("parent_id"),
-		Status:   util.S(ctx.Query("status")).Int(),
 		Type:     util.S(ctx.Query("mtype")).Int(),
 	}
 
@@ -43,21 +44,12 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 		return
 	}
 
-	ctx.ResPage(int(total), items)
+	ctx.ResPage(total, items)
 }
 
 // QueryTree 查询菜单树
 func (a *Menu) QueryTree(ctx *context.Context) {
-	params := schema.MenuSelectQueryParam{
-		Name:   ctx.Query("name"),
-		Status: util.S(ctx.Query("status")).Int(),
-	}
-
-	if util.S(ctx.Query("is_menu")).Int() == 1 {
-		params.Types = []int{10, 20, 30}
-	}
-
-	treeData, err := a.MenuBll.QueryTree(ctx.CContext(), params)
+	treeData, err := a.MenuBll.QueryTree(ctx.CContext())
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -84,20 +76,13 @@ func (a *Menu) Create(ctx *context.Context) {
 		return
 	}
 
-	item.Creator = ctx.GetUserID()
-	err := a.MenuBll.Create(ctx.CContext(), &item)
+	recordID, err := a.MenuBll.Create(ctx.CContext(), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
 
-	newItem, err := a.MenuBll.Get(ctx.CContext(), item.RecordID)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
-
-	ctx.ResSuccess(newItem)
+	ctx.ResSuccess(context.HTTPNewItem{RecordID: recordID})
 }
 
 // Update 更新数据
@@ -108,7 +93,7 @@ func (a *Menu) Update(ctx *context.Context) {
 		return
 	}
 
-	err := a.MenuBll.Update(ctx.CContext(), ctx.Param("id"), &item)
+	err := a.MenuBll.Update(ctx.CContext(), ctx.Param("id"), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -129,34 +114,16 @@ func (a *Menu) Delete(ctx *context.Context) {
 // DeleteMany 删除多条数据
 func (a *Menu) DeleteMany(ctx *context.Context) {
 	ids := strings.Split(ctx.Query("batch"), ",")
-
-	for _, id := range ids {
-		err := a.MenuBll.Delete(ctx.CContext(), id)
-		if err != nil {
-			ctx.ResError(err)
-			return
-		}
+	if len(ids) == 0 {
+		ctx.ResError(errors.NewBadRequestError("无效的请求数据"))
+		return
 	}
 
-	ctx.ResOK()
-}
-
-// Enable 启用数据
-func (a *Menu) Enable(ctx *context.Context) {
-	err := a.MenuBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
+	err := a.MenuBll.Delete(ctx.CContext(), ids...)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
-	ctx.ResOK()
-}
 
-// Disable 禁用数据
-func (a *Menu) Disable(ctx *context.Context) {
-	err := a.MenuBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
 	ctx.ResOK()
 }

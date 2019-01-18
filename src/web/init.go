@@ -1,38 +1,33 @@
 package web
 
 import (
-	"fmt"
-
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
-	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/LyricTian/gin-admin/src/web/middleware"
 	"github.com/LyricTian/gin-admin/src/web/router"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 )
 
 // Init 初始化所有服务
 func Init(obj *inject.Object) *gin.Engine {
-	gin.SetMode(viper.GetString("run_mode"))
+	gin.SetMode(config.GetRunMode())
 	app := gin.New()
+	app.NoMethod(middleware.NoMethodHandler())
+	app.NoRoute(middleware.NoRouteHandler())
 
 	// 注册中间件
-	prefixes := []string{"/api/"}
-	if dir := viper.GetString("www"); dir != "" {
-		app.Use(middleware.WWWMiddleware(dir, prefixes...))
+	apiPrefixes := []string{"/api/"}
+	if dir := config.GetWWWDir(); dir != "" {
+		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(apiPrefixes...)))
 	}
 
-	app.Use(middleware.TraceMiddleware(prefixes...))
-	app.Use(middleware.LoggerMiddleware(prefixes...))
+	app.Use(middleware.TraceMiddleware(middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
+	app.Use(middleware.LoggerMiddleware(middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
 	app.Use(middleware.RecoveryMiddleware())
 
-	app.NoMethod(func(c *gin.Context) {
-		context.New(c).ResErrorWithStatus(fmt.Errorf("请求方法不允许"), 405)
-	})
-
-	app.NoRoute(func(c *gin.Context) {
-		context.New(c).ResErrorWithStatus(fmt.Errorf("资源不存在"), 404)
-	})
+	if config.IsSessionAuth() {
+		app.Use(middleware.SessionMiddleware(obj, middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
+	}
 
 	// 注册/api路由
 	router.APIHandler(app, obj)

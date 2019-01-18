@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
@@ -20,7 +21,7 @@ func (a *User) Query(ctx *context.Context) {
 	case "page":
 		a.QueryPage(ctx)
 	default:
-		ctx.ResError(nil)
+		ctx.ResError(errors.NewBadRequestError("未知的查询类型"))
 	}
 }
 

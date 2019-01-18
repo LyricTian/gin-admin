@@ -1,20 +1,17 @@
 # 运行模式(debug:调试,release:正式,test:测试)
 run_mode = "test"
 
-# casbin模型配置文件(也可以启动服务时使用-m指定)
-casbin_model = "config/model.conf"
-
 # http监听地址
 http_host = "0.0.0.0"
 
 # http监听端口
 http_port = 8086
 
+# casbin模型配置文件(也可以启动服务时使用-m指定)
+casbin_model_conf = "config/model.conf"
+
 # 静态站点目录(也可以启动服务时使用-www指定)
 www = ""
-
-# 系统唯一标识
-system_identify = "rbac"
 
 # 系统root用户名
 system_root_user = "root"

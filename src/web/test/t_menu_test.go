@@ -9,7 +9,7 @@ import (
 )
 
 func TestMenu(t *testing.T) {
-	const router = "menus"
+	const router = "v1/menus"
 	var err error
 
 	w := httptest.NewRecorder()
@@ -19,10 +19,9 @@ func TestMenu(t *testing.T) {
 		Code:     "test_menu_1",
 		Name:     "测试菜单",
 		Type:     10,
-		Sequence: 1,
+		Sequence: 9999,
 		Icon:     "test",
 		Path:     "/test",
-		Status:   1,
 		IsHide:   2,
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
@@ -31,15 +30,20 @@ func TestMenu(t *testing.T) {
 	var addNewItem schema.Menu
 	err = parseReader(w.Body, &addNewItem)
 	assert.Nil(t, err)
-	assert.Equal(t, addItem.Code, addNewItem.Code)
-	assert.Equal(t, addItem.Name, addNewItem.Name)
-	assert.Equal(t, addItem.Type, addNewItem.Type)
-	assert.Equal(t, addItem.Sequence, addNewItem.Sequence)
-	assert.Equal(t, addItem.Icon, addNewItem.Icon)
-	assert.Equal(t, addItem.Path, addNewItem.Path)
-	assert.Equal(t, addItem.Status, addNewItem.Status)
-	assert.NotEqual(t, addNewItem.ID, 0)
-	assert.NotEmpty(t, addNewItem.RecordID)
+
+	// get /menus/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+
+	var addGetItem schema.Menu
+	err = parseReader(w.Body, &addGetItem)
+	assert.Equal(t, addItem.Code, addGetItem.Code)
+	assert.Equal(t, addItem.Name, addGetItem.Name)
+	assert.Equal(t, addItem.Type, addGetItem.Type)
+	assert.Equal(t, addItem.Sequence, addGetItem.Sequence)
+	assert.Equal(t, addItem.Icon, addGetItem.Icon)
+	assert.Equal(t, addItem.Path, addGetItem.Path)
+	assert.NotEmpty(t, addGetItem.RecordID)
 
 	// get /menus?type=page
 	engine.ServeHTTP(w, newGetRequest(router,
@@ -59,11 +63,6 @@ func TestMenu(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	releaseReader(w.Body)
 
-	// patch /menus/:id/disable
-	engine.ServeHTTP(w, newPatchRequest("%s/%s/disable", router, addNewItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-	releaseReader(w.Body)
-
 	// get /menus/:id
 	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
@@ -75,7 +74,9 @@ func TestMenu(t *testing.T) {
 	assert.Equal(t, getItem.RecordID, addNewItem.RecordID)
 	assert.Equal(t, getItem.Code, putItem.Code)
 	assert.Equal(t, getItem.Name, putItem.Name)
-	assert.Equal(t, getItem.Status, 2)
+	assert.Equal(t, getItem.Sequence, addItem.Sequence)
+	assert.Equal(t, getItem.Icon, addItem.Icon)
+	assert.Equal(t, getItem.IsHide, addItem.IsHide)
 
 	// delete /menus/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))

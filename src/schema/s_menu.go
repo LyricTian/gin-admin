@@ -1,69 +1,87 @@
 package schema
 
+import (
+	"sort"
+
+	"github.com/LyricTian/gin-admin/src/util"
+)
+
 // Menu 菜单管理
 type Menu struct {
-	ID        int64  `json:"id" db:"id,primarykey,autoincrement" structs:"id"`          // 唯一标识(自增ID)
-	RecordID  string `json:"record_id" db:"record_id,size:36" structs:"record_id"`      // 记录内码(uuid)
-	Code      string `json:"code" db:"code,size:50" structs:"code" binding:"required"`  // 菜单编号
-	Name      string `json:"name" db:"name,size:50" structs:"name" binding:"required"`  // 菜单名称
-	Type      int    `json:"type" db:"type" structs:"type" binding:"required"`          // 菜单类型(10：系统 20：模块 30：功能 40：资源)
-	Sequence  int    `json:"sequence" db:"sequence" structs:"sequence"`                 // 排序值
-	Icon      string `json:"icon" db:"icon,size:200" structs:"icon"`                    // 菜单图标
-	Path      string `json:"path" db:"path,size:200" structs:"path"`                    // 访问路径
-	Method    string `json:"method" db:"method,size:50" structs:"method"`               // 资源请求方式
-	LevelCode string `json:"level_code" db:"level_code,size:20" structs:"level_code"`   // 分级码
-	ParentID  string `json:"parent_id" db:"parent_id,size:36" structs:"parent_id"`      // 父级内码
-	IsHide    int    `json:"is_hide" db:"is_hide" structs:"is_hide" binding:"required"` // 是否隐藏(1:是 2:否)
-	Status    int    `json:"status" db:"status" structs:"status" binding:"required"`    // 状态(1:启用 2:停用)
-	Creator   string `json:"creator" db:"creator,size:36" structs:"creator"`            // 创建人
-	Created   int64  `json:"created" db:"created" structs:"created"`                    // 创建时间戳
-	Updated   int64  `json:"updated" db:"updated" structs:"updated"`                    // 更新时间戳
-	Deleted   int64  `json:"deleted" db:"deleted" structs:"deleted"`                    // 删除时间戳
+	RecordID  string `json:"record_id"`                  // 记录内码
+	Code      string `json:"code" binding:"required"`    // 菜单编号
+	Name      string `json:"name" binding:"required"`    // 菜单名称
+	Type      int    `json:"type" binding:"required"`    // 菜单类型(10：模块 20：功能 30：资源)
+	Sequence  int    `json:"sequence"`                   // 排序值
+	Icon      string `json:"icon"`                       // 菜单图标
+	Path      string `json:"path"`                       // 访问路径
+	Method    string `json:"method"`                     // 资源请求方式
+	LevelCode string `json:"level_code"`                 // 分级码
+	ParentID  string `json:"parent_id"`                  // 父级内码
+	IsHide    int    `json:"is_hide" binding:"required"` // 是否隐藏(1:是 2:否)
 }
 
-// MenuQueryParam 菜单查询条件
-type MenuQueryParam struct {
-	Name     string // 菜单名称
-	Type     int    // 菜单类型(10：系统 20：模块 30：功能 40：资源)
+// MenuPageQueryParam 分页查询条件
+type MenuPageQueryParam struct {
+	Code     string // 菜单编号(模糊查询)
+	Name     string // 菜单名称(模糊查询)
+	Type     int    // 菜单类型(10：模块 20：功能 30：资源)
 	ParentID string // 父级内码
-	Status   int    // 状态(1:启用 2:停用)
 }
 
-// MenuQueryResult 菜单查询结果
-type MenuQueryResult struct {
-	ID       int64  `json:"id" db:"id"`               // 唯一标识(自增ID)
-	RecordID string `json:"record_id" db:"record_id"` // 记录内码(uuid)
-	Code     string `json:"code" db:"code"`           // 菜单编号
-	Name     string `json:"name" db:"name"`           // 菜单名称
-	Icon     string `json:"icon" db:"icon"`           // 菜单图标
-	Path     string `json:"path" db:"path"`           // 访问路径
-	Type     int    `json:"type" db:"type"`           // 菜单类型(10：系统 20：模块 30：功能 40：资源)
-	Sequence int    `json:"sequence" db:"sequence"`   // 排序值
-	IsHide   int    `json:"is_hide" db:"is_hide"`     // 是否隐藏(1:是 2:否)
-	Status   int    `json:"status" db:"status"`       // 状态(1:启用 2:停用)
-}
-
-// MenuSelectQueryParam 菜单选择查询条件
-type MenuSelectQueryParam struct {
-	RecordIDs  []string // 记录ID列表
-	Name       string   // 菜单名称
-	Status     int      // 状态(1:启用 2:停用)
-	UserID     string   // 用户ID
-	RoleID     string   // 角色ID
-	SystemCode string   // 系统编号
+// MenuListQueryParam 列表查询条件
+type MenuListQueryParam struct {
+	LevelCode  string   // 分级码(模糊查询)
+	LevelCodes []string // 分级码列表
+	Types      []int    // 菜单类型(10：模块 20：功能 30：资源)
 	IsHide     int      // 是否隐藏(1:是 2:否)
-	Types      []int    // 菜单类型(10：系统 20：模块 30：功能 40：资源)
+	ParentID   string   // 父级内码
 }
 
-// MenuSelectQueryResult 菜单选择查询结果
-type MenuSelectQueryResult struct {
-	RecordID  string `json:"record_id" db:"record_id" structs:"record_id"`    // 记录内码(uuid)
-	Code      string `json:"code" db:"code" structs:"code"`                   // 菜单编号
-	Name      string `json:"name" db:"name" structs:"name"`                   // 菜单名称
-	LevelCode string `json:"level_code" db:"level_code" structs:"level_code"` // 分级码
-	ParentID  string `json:"parent_id" db:"parent_id" structs:"parent_id"`    // 父级内码
-	Type      int    `json:"type" db:"type" structs:"type"`                   // 菜单类型(10：系统 20：模块 30：功能 40：资源)
-	Icon      string `json:"icon" db:"icon" structs:"icon"`                   // 菜单图标
-	Path      string `json:"path" db:"path" structs:"path"`                   // 访问路径
-	Method    string `json:"method" db:"method" structs:"method"`             // 资源请求方式
+// MenuTreeResult 菜单树
+type MenuTreeResult struct {
+	RecordID string            `json:"record_id"` // 记录内码
+	Name     string            `json:"name"`      // 菜单名称
+	ParentID string            `json:"parent_id"` // 父级内码
+	Children []*MenuTreeResult `json:"children"`  // 子级树
+}
+
+// MenuList 菜单列表
+type MenuList []*Menu
+
+// ToLevelCodes 获取分级码列表（按照分级码正序排序）
+func (m MenuList) ToLevelCodes() []string {
+	levelCodes := make([]string, len(m))
+	for i, item := range m {
+		levelCodes[i] = item.LevelCode
+	}
+	sort.Strings(levelCodes)
+	return levelCodes
+}
+
+// ToTreeResult 转换为菜单树
+func (m MenuList) ToTreeResult() []*MenuTreeResult {
+	var result []*MenuTreeResult
+	_ = util.FillStructs(m, &result)
+
+	mi := make(map[string]*MenuTreeResult)
+	for _, item := range result {
+		mi[item.RecordID] = item
+	}
+
+	var data []*MenuTreeResult
+	for _, item := range result {
+		if item.ParentID == "" {
+			data = append(data, item)
+			continue
+		}
+
+		if pitem, ok := mi[item.ParentID]; !ok {
+			pitem.Children = append(pitem.Children, item)
+			continue
+		}
+
+	}
+
+	return data
 }

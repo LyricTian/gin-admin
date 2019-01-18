@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	gcontext "github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
@@ -35,7 +37,8 @@ func (a *Context) CContext() context.Context {
 	}
 
 	if v := a.GetUserID(); v != "" {
-		parent = logger.NewUserIDContext(parent, a.GetUserID())
+		parent = gcontext.NewUserID(parent, v)
+		parent = logger.NewUserIDContext(parent, v)
 	}
 
 	return parent
@@ -91,24 +94,24 @@ func (a *Context) GetPageSize() uint {
 
 // GetTraceID 获取追踪ID
 func (a *Context) GetTraceID() string {
-	return a.gctx.GetString(util.ContextKeyTraceID)
+	return a.gctx.GetString(ContextKeyTraceID)
 }
 
 // GetUserID 获取用户ID
 func (a *Context) GetUserID() string {
-	return a.gctx.GetString(util.ContextKeyUserID)
+	return a.gctx.GetString(ContextKeyUserID)
 }
 
 // SetUserID 设定用户ID
 func (a *Context) SetUserID(userID string) {
-	a.gctx.Set(util.ContextKeyUserID, userID)
+	a.gctx.Set(ContextKeyUserID, userID)
 }
 
 // ParseJSON 解析请求JSON
 func (a *Context) ParseJSON(obj interface{}) error {
 	if err := a.gctx.ShouldBindJSON(obj); err != nil {
 		logger.Start(a.CContext()).Warnf("解析请求参数发生错误: %s", err.Error())
-		return util.NewBadRequestError("解析请求参数发生错误")
+		return errors.NewBadRequestError("解析请求参数发生错误")
 	}
 	return nil
 }
@@ -120,13 +123,13 @@ func (a *Context) getStatusByError(err error, status int) int {
 	}
 
 	switch err {
-	case util.ErrBadRequest:
+	case errors.ErrBadRequest:
 		status = 400
-	case util.ErrUnauthorized:
+	case errors.ErrUnauthorized:
 		status = 401
-	case util.ErrNotFound:
+	case errors.ErrNotFound:
 		status = 404
-	case util.ErrInternalServer:
+	case errors.ErrInternalServer:
 		status = 500
 	default:
 		status = 500
@@ -144,7 +147,7 @@ func (a *Context) ResErrorWithStatus(err error, status int, code ...int) {
 	var item HTTPErrorItem
 
 	switch e := err.(type) {
-	case *util.MessageError:
+	case *errors.MessageError:
 		item.Message = e.Error()
 		status = a.getStatusByError(e.Parent(), status)
 	default:
@@ -195,10 +198,10 @@ func (a *Context) ResJSON(status int, v interface{}) {
 	buf, err := util.JSONMarshal(v)
 	if err != nil {
 		logger.Start(a.CContext()).WithField("object", v).Errorf("JSON序列化发生错误: %s", err.Error())
-		a.ResError(util.NewInternalServerError())
+		a.ResError(errors.NewInternalServerError())
 		return
 	}
-	a.gctx.Set(util.ContextKeyResBody, buf)
+	a.gctx.Set(ContextKeyResBody, buf)
 	a.gctx.Data(status, "application/json; charset=utf-8", buf)
 	a.gctx.Abort()
 }
