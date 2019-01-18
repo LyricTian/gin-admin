@@ -22,6 +22,7 @@ var (
 	configFile string
 	modelFile  string
 	wwwDir     string
+	swaggerDir string
 )
 
 func init() {
@@ -30,6 +31,7 @@ func init() {
 	flag.StringVar(&modelFile, "model", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&wwwDir, "www", "", "静态站点目录")
+	flag.StringVar(&swaggerDir, "swagger", "", "swagger目录")
 }
 
 func main() {
@@ -58,10 +60,14 @@ func main() {
 		viper.Set("www", wwwDir)
 	}
 
+	if swaggerDir != "" {
+		viper.Set("swagger", swaggerDir)
+	}
+
 	logger.SetVersion(VERSION)
 	logger.SetTraceIDFunc(util.MustUUID)
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
-	logger.Start(ctx).Printf("服务启动，运行模式：%s，版本号：%s，进程号：%s", config.GetRunMode(), VERSION, os.Getpid())
+	logger.Start(ctx).Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.GetRunMode(), VERSION, os.Getpid())
 
 	var state int32 = 1
 	sc := make(chan os.Signal, 1)
