@@ -114,13 +114,13 @@ func (a *Menu) Create(ctx *context.Context) {
 		return
 	}
 
-	recordID, err := a.MenuBll.Create(ctx.CContext(), item)
+	newItem, err := a.MenuBll.Create(ctx.CContext(), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResSuccess(context.HTTPNewItem{RecordID: recordID})
+	ctx.ResSuccess(context.HTTPNewItem{RecordID: newItem.RecordID})
 }
 
 // Update 更新数据
