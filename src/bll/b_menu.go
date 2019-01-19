@@ -67,24 +67,44 @@ func (a *Menu) getLevelCode(ctx context.Context, parentItem *schema.Menu) (strin
 	return levelCode, nil
 }
 
-// Create 创建数据
-func (a *Menu) Create(ctx context.Context, item schema.Menu) (string, error) {
-	exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
-	if err != nil {
-		return "", err
-	} else if exists {
-		return "", errors.NewBadRequestError("同一父级下编号不允许重复")
+func (a *Menu) checkAndGetParent(ctx context.Context, item schema.Menu, oldItem *schema.Menu) (*schema.Menu, error) {
+	if oldItem == nil || oldItem.Code != item.Code {
+		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
+		if err != nil {
+			return nil, err
+		} else if exists {
+			return nil, errors.NewBadRequestError("同一父级下编号不允许重复")
+		}
 	}
 
 	var parentItem *schema.Menu
 	if item.ParentID != "" {
 		pitem, err := a.MenuModel.Get(ctx, item.ParentID)
 		if err != nil {
-			return "", err
+			return nil, err
 		} else if pitem == nil {
-			return "", errors.NewBadRequestError("无效的父级ID")
+			return nil, errors.NewBadRequestError("无效的父级节点")
 		}
 		parentItem = pitem
+	}
+
+	switch {
+	case item.Type == 3 && (parentItem == nil || parentItem.Type != 2):
+		return nil, errors.NewBadRequestError("资源类型只能依赖于功能")
+	case item.Type == 2 && (parentItem == nil || parentItem.Type != 1):
+		return nil, errors.NewBadRequestError("功能类型只能依赖于模块")
+	case item.Type == 1 && parentItem != nil && parentItem.Type != 1:
+		return nil, errors.NewBadRequestError("模块类型只能依赖于模块")
+	}
+
+	return parentItem, nil
+}
+
+// Create 创建数据
+func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, error) {
+	parentItem, err := a.checkAndGetParent(ctx, item, nil)
+	if err != nil {
+		return nil, err
 	}
 
 	item.RecordID = util.MustUUID()
@@ -100,10 +120,10 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (string, error) {
 		return a.MenuModel.Create(ctx, item)
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return item.RecordID, nil
+	return &item, nil
 }
 
 // Update 更新数据
@@ -117,24 +137,11 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
-	} else if item.Code != oldItem.Code {
-		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
-		if err != nil {
-			return err
-		} else if exists {
-			return errors.NewBadRequestError("同一父级下编号不允许重复")
-		}
 	}
 
-	var parentItem *schema.Menu
-	if oldItem.ParentID != item.ParentID && item.ParentID != "" {
-		pitem, err := a.MenuModel.Get(ctx, item.ParentID)
-		if err != nil {
-			return err
-		} else if pitem == nil {
-			return errors.NewBadRequestError("无效的父级ID")
-		}
-		parentItem = pitem
+	parentItem, err := a.checkAndGetParent(ctx, item, oldItem)
+	if err != nil {
+		return err
 	}
 	item.LevelCode = oldItem.LevelCode
 
@@ -149,7 +156,6 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 				return err
 			}
 			item.LevelCode = levelCode
-
 			oldLevelCode := oldItem.LevelCode
 			menuList, err := a.MenuModel.QueryList(ctx, schema.MenuListQueryParam{
 				LevelCode: oldLevelCode,

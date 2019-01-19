@@ -32,21 +32,31 @@ func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 	return item, nil
 }
 
+func (a *Demo) check(ctx context.Context, item schema.Demo, oldItem *schema.Demo) error {
+	if oldItem == nil || oldItem.Code != item.Code {
+		exists, err := a.DemoModel.CheckCode(ctx, item.Code)
+		if err != nil {
+			return err
+		} else if exists {
+			return errors.NewBadRequestError("编号已经存在")
+		}
+	}
+	return nil
+}
+
 // Create 创建数据
-func (a *Demo) Create(ctx context.Context, item schema.Demo) (string, error) {
-	exists, err := a.DemoModel.CheckCode(ctx, item.Code)
+func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.Demo, error) {
+	err := a.check(ctx, item, nil)
 	if err != nil {
-		return "", err
-	} else if exists {
-		return "", errors.NewBadRequestError("编号已经存在")
+		return nil, err
 	}
 
 	item.RecordID = util.MustUUID()
 	err = a.DemoModel.Create(ctx, item)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return item.RecordID, nil
+	return &item, nil
 }
 
 // Update 更新数据
@@ -56,13 +66,11 @@ func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) er
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
-	} else if oldItem.Code != item.Code {
-		exists, err := a.DemoModel.CheckCode(ctx, item.Code)
-		if err != nil {
-			return err
-		} else if exists {
-			return errors.NewBadRequestError("编号已经存在")
-		}
+	}
+
+	err = a.check(ctx, item, oldItem)
+	if err != nil {
+		return err
 	}
 
 	return a.DemoModel.Update(ctx, recordID, item)
