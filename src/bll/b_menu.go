@@ -25,7 +25,7 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuPageQueryParam, 
 // QueryTree 查询菜单树
 func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTreeResult, error) {
 	items, err := a.MenuModel.QueryList(ctx, schema.MenuListQueryParam{
-		Types: []int{10, 20},
+		Types: []int{1, 2},
 	})
 	if err != nil {
 		return nil, err
@@ -46,10 +46,15 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	return item, nil
 }
 
-func (a *Menu) getLevelCode(ctx context.Context, parentID string) (string, error) {
-	menuList, err := a.MenuModel.QueryList(ctx, schema.MenuListQueryParam{
-		ParentID: parentID,
-	})
+func (a *Menu) getLevelCode(ctx context.Context, parentItem *schema.Menu) (string, error) {
+	params := schema.MenuListQueryParam{}
+	if parentItem == nil {
+		var value string
+		params.ParentID = &value
+	} else {
+		params.LevelCode = parentItem.LevelCode
+	}
+	menuList, err := a.MenuModel.QueryList(ctx, params)
 	if err != nil {
 		return "", err
 	}
@@ -71,12 +76,23 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (string, error) {
 		return "", errors.NewBadRequestError("同一父级下编号不允许重复")
 	}
 
+	var parentItem *schema.Menu
+	if item.ParentID != "" {
+		pitem, err := a.MenuModel.Get(ctx, item.ParentID)
+		if err != nil {
+			return "", err
+		} else if pitem == nil {
+			return "", errors.NewBadRequestError("无效的父级ID")
+		}
+		parentItem = pitem
+	}
+
 	item.RecordID = util.MustUUID()
 	err = a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
 		a.lock.Lock()
 		defer a.lock.Unlock()
 
-		levelCode, err := a.getLevelCode(ctx, item.ParentID)
+		levelCode, err := a.getLevelCode(ctx, parentItem)
 		if err != nil {
 			return err
 		}
@@ -109,6 +125,17 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 			return errors.NewBadRequestError("同一父级下编号不允许重复")
 		}
 	}
+
+	var parentItem *schema.Menu
+	if oldItem.ParentID != item.ParentID && item.ParentID != "" {
+		pitem, err := a.MenuModel.Get(ctx, item.ParentID)
+		if err != nil {
+			return err
+		} else if pitem == nil {
+			return errors.NewBadRequestError("无效的父级ID")
+		}
+		parentItem = pitem
+	}
 	item.LevelCode = oldItem.LevelCode
 
 	return a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
@@ -117,7 +144,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 
 		// 如果父级更新，需要更新当前节点及节点下级的分级码
 		if item.ParentID != oldItem.ParentID {
-			levelCode, err := a.getLevelCode(ctx, item.ParentID)
+			levelCode, err := a.getLevelCode(ctx, parentItem)
 			if err != nil {
 				return err
 			}

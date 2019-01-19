@@ -25,7 +25,7 @@ system_root_user = "root"
 # 系统root密码
 system_root_password = "123"
 
-# 存储模式(目前支持的存储模式：gorm)
+# 存储模式(支持的存储模式：gorm)
 db_mode = "gorm"
 
 # 数据库表名前缀
@@ -37,7 +37,7 @@ auth_mode = "session"
 # 会话配置
 [session]
 # 存储在header中的cookie标识
-header_name = "access-token"
+header_name = "Access-Token"
 # 会话签名
 sign = "GINADMIN"
 # 会话过期时长(单位秒)
@@ -52,9 +52,9 @@ level = 5
 # 日志格式（text/json）
 format = "text"
 # 是否启用日志钩子(如果启用钩子，则使用当前db的存储类型；否则不写入钩子)
-enable_hook = false
+enable_hook = true
 # 写入钩子的最大工作线程数量
-hook_max_thread = 2
+hook_max_thread = 1
 # 写入钩子的最大缓冲区数量
 hook_max_buffer = 512
 
