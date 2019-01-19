@@ -75,31 +75,31 @@ func GetRouterTitleAndKey(method, path string) (string, string) {
 
 // HTTPError HTTP响应错误
 type HTTPError struct {
-	Error HTTPErrorItem `json:"error,omitempty"`
+	Error HTTPErrorItem `json:"error"`
 }
 
 // HTTPErrorItem HTTP响应错误项
 type HTTPErrorItem struct {
-	Code    int    `json:"code,omitempty"`
-	Message string `json:"message,omitempty"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 // HTTPStatus HTTP响应状态
 type HTTPStatus struct {
-	Status string `json:"status,omitempty"`
+	Status string `json:"status"`
 }
 
 // HTTPList HTTP响应列表数据
 type HTTPList struct {
-	List       interface{}     `json:"list,omitempty"`
+	List       interface{}     `json:"list"`
 	Pagination *HTTPPagination `json:"pagination,omitempty"`
 }
 
 // HTTPPagination HTTP分页数据
 type HTTPPagination struct {
-	Total    int  `json:"total,omitempty"`
-	Current  uint `json:"current,omitempty"`
-	PageSize uint `json:"pageSize,omitempty"`
+	Total    int  `json:"total"`
+	Current  uint `json:"current"`
+	PageSize uint `json:"pageSize"`
 }
 
 // HTTPNewItem HTTP响应创建成功后的记录ID

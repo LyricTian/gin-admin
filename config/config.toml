@@ -7,6 +7,9 @@ http_host = "0.0.0.0"
 # http监听端口
 http_port = 8086
 
+# http优雅关闭等待超时时长(单位秒)
+http_shutdown_timeout = 10
+
 # casbin模型配置文件(也可以启动服务时使用-m指定)
 casbin_model_conf = ""
 

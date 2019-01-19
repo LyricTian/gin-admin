@@ -110,8 +110,8 @@ func (a *Context) SetUserID(userID string) {
 // ParseJSON 解析请求JSON
 func (a *Context) ParseJSON(obj interface{}) error {
 	if err := a.gctx.ShouldBindJSON(obj); err != nil {
-		logger.Start(a.CContext()).Warnf("解析请求参数发生错误: %s", err.Error())
-		return errors.NewBadRequestError("解析请求参数发生错误")
+		logger.Start(a.CContext()).Warnf("无效的请求参数: %s", err.Error())
+		return errors.NewBadRequestError("无效的请求参数")
 	}
 	return nil
 }
