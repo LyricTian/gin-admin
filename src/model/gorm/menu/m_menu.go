@@ -82,8 +82,8 @@ func (a *Model) QueryList(ctx context.Context, params schema.MenuListQueryParam)
 	if v := params.IsHide; v > 0 {
 		db = db.Where("is_hide=?", v)
 	}
-	if v := params.ParentID; v != "" {
-		db = db.Where("parent_id=?", v)
+	if v := params.ParentID; v != nil {
+		db = db.Where("parent_id=?", *v)
 	}
 
 	var items []Menu

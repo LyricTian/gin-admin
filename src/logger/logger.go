@@ -2,7 +2,6 @@ package logger
 
 import (
 	"context"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -27,24 +26,20 @@ type TraceIDFunc func() string
 var (
 	version     string
 	traceIDFunc TraceIDFunc
-	once        sync.Once
 )
 
 // SetVersion 设定版本
 func SetVersion(v string) {
-	once.Do(func() {
-		version = v
-	})
+	version = v
 }
 
 // SetTraceIDFunc 设定追踪ID的处理函数
 func SetTraceIDFunc(fn TraceIDFunc) {
-	once.Do(func() {
-		traceIDFunc = fn
-	})
+	traceIDFunc = fn
 }
 
 func getTraceID() string {
+	// fmt.Println("------------------> trace id:", traceIDFunc, traceIDFunc())
 	if traceIDFunc != nil {
 		return traceIDFunc()
 	}
@@ -138,6 +133,7 @@ type Entry struct {
 // Finish 完成，如果没有触发写入则手动触发Info级别的日志写入
 func (e *Entry) Finish() {
 	if atomic.CompareAndSwapInt32(&e.finish, 0, 1) {
+		e.done()
 		e.entry.Info()
 	}
 }
@@ -210,5 +206,5 @@ func (e *Entry) done() {
 		}
 	}
 	e.entry = entry
-	atomic.StoreInt32(&e.finish, 1)
+	atomic.CompareAndSwapInt32(&e.finish, 0, 1)
 }
