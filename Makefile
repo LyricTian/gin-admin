@@ -19,11 +19,11 @@ build: build-server build-web
 start: build-server build-web
 	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf -www ./web/dist
 
-start-server: 
+start-dev-server: 
 	@go build -o $(SERVER_BIN) ./cmd/server
-	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf
+	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf -swagger ./src/web/swagger
 
-start-web:
+start-dev-web:
 	cd web && yarn && yarn start
 
 test:

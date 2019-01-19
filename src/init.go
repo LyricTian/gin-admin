@@ -57,8 +57,8 @@ func Init(ctx context.Context) CallbackFunc {
 
 // InitHTTPServer 初始化http服务
 func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
-	a := config.GetHTTPAddr()
-	addr := fmt.Sprintf("%s:%d", a.Host, a.Port)
+	cfg := config.GetHTTPConfig()
+	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
 		Addr:           addr,
 		Handler:        web.Init(obj),
@@ -76,7 +76,7 @@ func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
 	}()
 
 	return func() {
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(cfg.ShutdownTimeout))
 		defer cancel()
 		if err := srv.Shutdown(ctx); err != nil {
 			logger.Start(ctx).Errorf("关闭HTTP服务发生错误: %s", err.Error())

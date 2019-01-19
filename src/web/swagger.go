@@ -1,13 +1,13 @@
 /*
-Package swagger 生成swagger文档
+Package web 生成swagger文档
 
 使用方式：
 
 	go get -u -v github.com/teambition/swaggo
-	cd src/web/swagger
-	swaggo -d -s ./swagger.go -p ../../ -o ./swagger
+	cd src/web
+	swaggo -s ./swagger.go -p ../ -o ./swagger
 */
-package swagger
+package web
 
 import (
 	// 控制器

@@ -83,16 +83,18 @@ func GetSwaggerDir() string {
 	return viper.GetString("swagger")
 }
 
-// HTTPAddr http地址
-type HTTPAddr struct {
-	Host string
-	Port int
+// HTTPConfig http配置参数
+type HTTPConfig struct {
+	Host            string
+	Port            int
+	ShutdownTimeout int
 }
 
-// GetHTTPAddr 获取HTTP地址
-func GetHTTPAddr() HTTPAddr {
-	return HTTPAddr{
-		Host: viper.GetString("http_host"),
-		Port: viper.GetInt("http_port"),
+// GetHTTPConfig 获取HTTP地址
+func GetHTTPConfig() HTTPConfig {
+	return HTTPConfig{
+		Host:            viper.GetString("http_host"),
+		Port:            viper.GetInt("http_port"),
+		ShutdownTimeout: viper.GetInt("http_shutdown_timeout"),
 	}
 }
