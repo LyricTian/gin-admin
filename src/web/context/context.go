@@ -7,6 +7,7 @@ import (
 	gcontext "github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
+	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/gin-session"
@@ -92,6 +93,14 @@ func (a *Context) GetPageSize() uint {
 	return 10
 }
 
+// GetPaginationParam 获取分页查询参数
+func (a *Context) GetPaginationParam() *schema.PaginationParam {
+	return &schema.PaginationParam{
+		PageIndex: a.GetPageIndex(),
+		PageSize:  a.GetPageSize(),
+	}
+}
+
 // GetTraceID 获取追踪ID
 func (a *Context) GetTraceID() string {
 	return a.gctx.GetString(ContextKeyTraceID)
@@ -160,19 +169,24 @@ func (a *Context) ResErrorWithStatus(err error, status int, code ...int) {
 	if len(code) > 0 {
 		item.Code = code[0]
 	}
+
 	a.ResJSON(status, HTTPError{Error: item})
 }
 
 // ResPage 响应分页数据
-func (a *Context) ResPage(total int, v interface{}) {
-	a.ResSuccess(HTTPList{
+func (a *Context) ResPage(v interface{}, pr *schema.PaginationResult) {
+	list := HTTPList{
 		List: v,
-		Pagination: &HTTPPagination{
-			Total:    total,
+	}
+	if pr != nil {
+		list.Pagination = &HTTPPagination{
 			Current:  a.GetPageIndex(),
 			PageSize: a.GetPageSize(),
-		},
-	})
+			Total:    pr.Total,
+		}
+	}
+
+	a.ResSuccess(list)
 }
 
 // ResList 响应列表数据

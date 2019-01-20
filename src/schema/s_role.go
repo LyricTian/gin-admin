@@ -22,8 +22,8 @@ type RoleMenu struct {
 	Deleted int64  `json:"deleted" db:"deleted"`                // 删除时间戳
 }
 
-// RoleQueryParam 角色查询条件
-type RoleQueryParam struct {
+// RolePageQueryParam 角色查询条件
+type RolePageQueryParam struct {
 	Name   string // 角色名称
 	Status int    // 角色状态(1:启用 2:停用)
 }
@@ -37,8 +37,8 @@ type RoleQueryResult struct {
 	Status   int    `json:"status" db:"status"`       // 角色状态(1:启用 2:停用)
 }
 
-// RoleSelectQueryParam 角色选择查询条件
-type RoleSelectQueryParam struct {
+// RoleListQueryParam 角色选择查询条件
+type RoleListQueryParam struct {
 	RecordIDs []string // 记录ID列表
 	Name      string   // 角色名称
 	Status    int      // 状态(1:启用 2:停用)

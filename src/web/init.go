@@ -1,6 +1,8 @@
 package web
 
 import (
+	"context"
+
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/web/middleware"
@@ -9,7 +11,7 @@ import (
 )
 
 // Init 初始化所有服务
-func Init(obj *inject.Object) *gin.Engine {
+func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 	gin.SetMode(config.GetRunMode())
 	app := gin.New()
 	app.NoMethod(middleware.NoMethodHandler())
@@ -36,27 +38,5 @@ func Init(obj *inject.Object) *gin.Engine {
 	// 注册/api路由
 	router.APIHandler(app, obj)
 
-	// 加载casbin策略数据
-	// err := loadCasbinPolicyData(obj)
-	// if err != nil {
-	// 	panic("加载casbin策略数据发生错误：" + err.Error())
-	// }
-
 	return app
-}
-
-// 加载casbin策略数据，包括角色权限数据、用户角色数据
-func loadCasbinPolicyData(obj *inject.Object) error {
-	c := obj.CtlCommon
-
-	err := c.RoleAPI.RoleBll.LoadAllPolicy()
-	if err != nil {
-		return err
-	}
-
-	err = c.UserAPI.UserBll.LoadAllPolicy()
-	if err != nil {
-		return err
-	}
-	return nil
 }

@@ -19,7 +19,7 @@ type Demo struct {
 
 // Query 查询数据
 func (a *Demo) Query(ctx *context.Context) {
-	switch ctx.Query("type") {
+	switch ctx.Query("q") {
 	case "page":
 		a.QueryPage(ctx)
 	default:
@@ -34,27 +34,25 @@ func (a *Demo) Query(ctx *context.Context) {
 // @Param pageSize query int true "分页大小" 10
 // @Param code query string false "编号"
 // @Param name query string false "名称"
-// @Param status query int false "状态"
-// @Success 200 []schema.Demo "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小}}"
+// @Param status query int false "状态(1:启用 2:停用)"
+// @Success 200 []schema.Demo "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
-// @Router GET /api/v1/demos?type=page
+// @Router GET /api/v1/demos?q=page
 func (a *Demo) QueryPage(ctx *context.Context) {
-	pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
-
-	var params schema.DemoPageQueryParam
+	var params schema.DemoQueryParam
 	params.Code = ctx.Query("code")
 	params.Name = ctx.Query("name")
 	params.Status = util.S(ctx.Query("status")).Int()
 
-	total, items, err := a.DemoBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
+	items, pr, err := a.DemoBll.Query(ctx.CContext(), params, ctx.GetPaginationParam())
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResPage(total, items)
+	ctx.ResPage(items, pr)
 }
 
 // Get 查询指定数据

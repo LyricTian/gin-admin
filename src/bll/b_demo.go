@@ -15,9 +15,9 @@ type Demo struct {
 	CommonBll *Common     `inject:""`
 }
 
-// QueryPage 查询分页数据
-func (a *Demo) QueryPage(ctx context.Context, params schema.DemoPageQueryParam, pageIndex, pageSize uint) (int, []*schema.Demo, error) {
-	return a.DemoModel.QueryPage(ctx, params, pageIndex, pageSize)
+// Query 查询数据
+func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error) {
+	return a.DemoModel.Query(ctx, params, pp)
 }
 
 // Get 查询指定数据

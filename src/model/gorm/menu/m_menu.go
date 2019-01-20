@@ -30,11 +30,11 @@ func (a *Model) getFuncName(name string) string {
 }
 
 func (a *Model) getMenuDB(ctx context.Context) *gorm.DB {
-	return common.GetTrans(ctx, a.db).Model(Menu{})
+	return common.FromTransDB(ctx, a.db).Model(Menu{})
 }
 
-// QueryPage 查询分页数据
-func (a *Model) QueryPage(ctx context.Context, params schema.MenuPageQueryParam, pageIndex, pageSize uint) (int, []*schema.Menu, error) {
+// Query 查询数据
+func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error) {
 	span := logger.StartSpan(ctx, "查询分页数据", a.getFuncName("QueryPage"))
 	defer span.Finish()
 
@@ -45,36 +45,8 @@ func (a *Model) QueryPage(ctx context.Context, params schema.MenuPageQueryParam,
 	if v := params.Name; v != "" {
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
-	if v := params.Type; v > 0 {
-		db = db.Where("type=?", v)
-	}
-	if v := params.ParentID; v != "" {
-		db = db.Where("parent_id=?", v)
-	}
-
-	var items []Menu
-	count, err := a.db.FindPage(db, pageIndex, pageSize, &items)
-	if err != nil {
-		span.Errorf(err.Error())
-		return 0, nil, errors.New("查询分页数据条数发生错误")
-	}
-
-	var dataItems []*schema.Menu
-	_ = util.FillStructs(items, &dataItems)
-	return count, dataItems, nil
-}
-
-// QueryList 查询列表数据
-func (a *Model) QueryList(ctx context.Context, params schema.MenuListQueryParam) ([]*schema.Menu, error) {
-	span := logger.StartSpan(ctx, "查询列表数据", a.getFuncName("QueryList"))
-	defer span.Finish()
-
-	db := a.getMenuDB(ctx)
 	if v := params.LevelCode; v != "" {
 		db = db.Where("level_code LIKE ?", v+"%")
-	}
-	if v := params.LevelCodes; len(v) > 0 {
-		db = db.Where("level_code IN(?)", v)
 	}
 	if v := params.Types; len(v) > 0 {
 		db = db.Where("type IN(?)", v)
@@ -86,16 +58,14 @@ func (a *Model) QueryList(ctx context.Context, params schema.MenuListQueryParam)
 		db = db.Where("parent_id=?", *v)
 	}
 
-	var items []Menu
-	result := db.Order("sequence,id DESC").Find(&items)
-	if err := result.Error; err != nil {
+	var items []*Menu
+	pr, err := common.WrapPageQuery(db, pp, &items)
+	if err != nil {
 		span.Errorf(err.Error())
-		return nil, errors.New("查询列表数据发生错误")
+		return nil, nil, errors.New("查询数据发生错误")
 	}
 
-	var dataItems []*schema.Menu
-	_ = util.FillStructs(items, &dataItems)
-	return dataItems, nil
+	return Menus(items).ToSchemaMenus(), pr, nil
 }
 
 // Get 查询指定数据
@@ -112,9 +82,7 @@ func (a *Model) Get(ctx context.Context, recordID string) (*schema.Menu, error) 
 		return nil, nil
 	}
 
-	dataItem := new(schema.Menu)
-	_ = util.FillStruct(item, dataItem)
-	return dataItem, nil
+	return item.ToSchemaMenu(), nil
 }
 
 // CheckCode 检查编号是否存在

@@ -9,8 +9,8 @@ type Demo struct {
 	Status   int    `json:"status" binding:"required,max=2,min=1" swaggo:"true,状态(1:启用 2:停用)"`
 }
 
-// DemoPageQueryParam 分页查询条件
-type DemoPageQueryParam struct {
+// DemoQueryParam 查询条件
+type DemoQueryParam struct {
 	Code   string // 编号
 	Name   string // 名称
 	Status int    // 状态(1:启用 2:停用)

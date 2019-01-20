@@ -19,7 +19,7 @@ type Menu struct {
 
 // Query 查询数据
 func (a *Menu) Query(ctx *context.Context) {
-	switch ctx.Query("type") {
+	switch ctx.Query("q") {
 	case "page":
 		a.QueryPage(ctx)
 	case "tree":
@@ -37,29 +37,33 @@ func (a *Menu) Query(ctx *context.Context) {
 // @Param code query string false "编号"
 // @Param name query string false "名称"
 // @Param parent_id query string false "父级ID"
-// @Param mtype query int false "菜单类型(10：模块 20：功能 30：资源)"
-// @Success 200 []schema.Menu "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小}}"
+// @Param type query int false "菜单类型(1：模块 2：功能 3：资源)"
+// @Success 200 []schema.Menu "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
-// @Router GET /api/v1/menus?type=page
+// @Router GET /api/v1/menus?q=page
 func (a *Menu) QueryPage(ctx *context.Context) {
-	pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
-
-	params := schema.MenuPageQueryParam{
-		Code:     ctx.Query("code"),
-		Name:     ctx.Query("name"),
-		ParentID: ctx.Query("parent_id"),
-		Type:     util.S(ctx.Query("mtype")).Int(),
+	params := schema.MenuQueryParam{
+		Code: ctx.Query("code"),
+		Name: ctx.Query("name"),
 	}
 
-	total, items, err := a.MenuBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
+	if v := ctx.Query("parent_id"); v != "" {
+		params.ParentID = &v
+	}
+
+	if v := ctx.Query("type"); v != "" {
+		params.Types = []int{util.S(v).Int()}
+	}
+
+	items, pr, err := a.MenuBll.QueryPage(ctx.CContext(), params, ctx.GetPaginationParam())
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResPage(total, items)
+	ctx.ResPage(items, pr)
 }
 
 // QueryTree 查询菜单树
@@ -69,7 +73,7 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
-// @Router GET /api/v1/menus?type=tree
+// @Router GET /api/v1/menus?q=tree
 func (a *Menu) QueryTree(ctx *context.Context) {
 	treeData, err := a.MenuBll.QueryTree(ctx.CContext())
 	if err != nil {

@@ -19,15 +19,15 @@ type Role struct {
 	Enforcer  *casbin.Enforcer `inject:""`
 }
 
-// QueryPage 查询分页数据
-func (a *Role) QueryPage(ctx context.Context, params schema.RoleQueryParam, pageIndex, pageSize uint) (int64, []*schema.RoleQueryResult, error) {
-	return a.RoleModel.QueryPage(ctx, params, pageIndex, pageSize)
-}
+// // QueryPage 查询分页数据
+// func (a *Role) QueryPage(ctx context.Context, params schema.RoleQueryParam, pageIndex, pageSize uint) (int64, []*schema.RoleQueryResult, error) {
+// 	return a.RoleModel.QueryPage(ctx, params, pageIndex, pageSize)
+// }
 
-// QuerySelect 查询选择数据
-func (a *Role) QuerySelect(ctx context.Context, params schema.RoleSelectQueryParam) ([]*schema.RoleSelectQueryResult, error) {
-	return a.RoleModel.QuerySelect(ctx, params)
-}
+// // QuerySelect 查询选择数据
+// func (a *Role) QuerySelect(ctx context.Context, params schema.RoleSelectQueryParam) ([]*schema.RoleSelectQueryResult, error) {
+// 	return a.RoleModel.QuerySelect(ctx, params)
+// }
 
 // Get 查询指定数据
 func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
@@ -89,10 +89,10 @@ func (a *Role) Create(ctx context.Context, item *schema.Role) error {
 	item.RecordID = util.MustUUID()
 	item.Created = time.Now().Unix()
 	item.Deleted = 0
-	err = a.RoleModel.Create(ctx, item)
-	if err != nil {
-		return err
-	}
+	// err = a.RoleModel.Create(ctx, item)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return a.LoadPolicy(ctx, item.RecordID)
 }
@@ -127,34 +127,34 @@ func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) e
 	delete(info, "updated")
 	delete(info, "deleted")
 
-	err = a.RoleModel.UpdateWithMenuIDs(ctx, recordID, info, item.MenuIDs)
-	if err != nil {
-		return err
-	}
+	// err = a.RoleModel.UpdateWithMenuIDs(ctx, recordID, info, item.MenuIDs)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return a.LoadPolicy(ctx, item.RecordID)
 }
 
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, recordID string) error {
-	exists, err := a.RoleModel.Check(ctx, recordID)
-	if err != nil {
-		return err
-	} else if !exists {
-		return errors.ErrNotFound
-	}
+	// exists, err := a.RoleModel.Check(ctx, recordID)
+	// if err != nil {
+	// 	return err
+	// } else if !exists {
+	// 	return errors.ErrNotFound
+	// }
 
-	exists, err = a.UserModel.CheckByRoleID(ctx, recordID)
-	if err != nil {
-		return err
-	} else if exists {
-		return errors.NewBadRequestError("该角色已被赋予用户，不能删除！")
-	}
+	// exists, err = a.UserModel.CheckByRoleID(ctx, recordID)
+	// if err != nil {
+	// 	return err
+	// } else if exists {
+	// 	return errors.NewBadRequestError("该角色已被赋予用户，不能删除！")
+	// }
 
-	err = a.RoleModel.Delete(ctx, recordID)
-	if err != nil {
-		return err
-	}
+	// err = a.RoleModel.Delete(ctx, recordID)
+	// if err != nil {
+	// 	return err
+	// }
 
 	a.Enforcer.DeletePermissionsForUser(recordID)
 	return nil
@@ -162,51 +162,51 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 
 // UpdateStatus 更新状态
 func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	exists, err := a.RoleModel.Check(ctx, recordID)
-	if err != nil {
-		return err
-	} else if !exists {
-		return errors.ErrNotFound
-	}
+	// exists, err := a.RoleModel.Check(ctx, recordID)
+	// if err != nil {
+	// 	return err
+	// } else if !exists {
+	// 	return errors.ErrNotFound
+	// }
 
-	info := map[string]interface{}{
-		"status": status,
-	}
+	// info := map[string]interface{}{
+	// 	"status": status,
+	// }
 
-	err = a.RoleModel.Update(ctx, recordID, info)
-	if err != nil {
-		return err
-	}
+	// err = a.RoleModel.Update(ctx, recordID, info)
+	// if err != nil {
+	// 	return err
+	// }
 
-	if status == 2 {
-		a.Enforcer.DeletePermissionsForUser(recordID)
-	} else {
-		err = a.LoadPolicy(ctx, recordID)
-		if err != nil {
-			return err
-		}
-	}
+	// if status == 2 {
+	// 	a.Enforcer.DeletePermissionsForUser(recordID)
+	// } else {
+	// 	err = a.LoadPolicy(ctx, recordID)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }
 
 // LoadAllPolicy 加载所有的角色策略
-func (a *Role) LoadAllPolicy() error {
-	ctx := context.Background()
+func (a *Role) LoadAllPolicy(ctx context.Context) error {
+	// ctx := context.Background()
 
-	roles, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{
-		Status: 1,
-	})
-	if err != nil {
-		return err
-	}
+	// roles, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{
+	// 	Status: 1,
+	// })
+	// if err != nil {
+	// 	return err
+	// }
 
-	for _, role := range roles {
-		err = a.LoadPolicy(ctx, role.RecordID)
-		if err != nil {
-			return err
-		}
-	}
+	// for _, role := range roles {
+	// 	err = a.LoadPolicy(ctx, role.RecordID)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }

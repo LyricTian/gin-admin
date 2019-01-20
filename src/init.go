@@ -20,7 +20,7 @@ type CallbackFunc func()
 
 // Init 初始化
 func Init(ctx context.Context) CallbackFunc {
-	obj, err := inject.Init()
+	obj, err := inject.Init(ctx)
 	if err != nil {
 		logger.Start(ctx).Fatalf("初始化依赖注入发生错误：%s", err.Error())
 	}
@@ -61,7 +61,7 @@ func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
 		Addr:           addr,
-		Handler:        web.Init(obj),
+		Handler:        web.Init(ctx, obj),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
