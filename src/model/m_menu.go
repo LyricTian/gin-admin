@@ -6,12 +6,10 @@ import (
 	"github.com/LyricTian/gin-admin/src/schema"
 )
 
-// IMenu 菜单存储接口
+// IMenu 菜单管理存储接口
 type IMenu interface {
-	// 查询分页数据
-	QueryPage(ctx context.Context, params schema.MenuPageQueryParam, pageIndex, pageSize uint) (int, []*schema.Menu, error)
-	// 查询列表数据
-	QueryList(ctx context.Context, params schema.MenuListQueryParam) ([]*schema.Menu, error)
+	// 查询数据
+	Query(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Menu, error)
 	// 检查编号是否存在

@@ -6,7 +6,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
@@ -27,22 +26,22 @@ func (a *User) Query(ctx *context.Context) {
 
 // QueryPage 查询分页数据
 func (a *User) QueryPage(ctx *context.Context) {
-	pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
+	// pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
 
-	var params schema.UserQueryParam
+	// var params schema.UserQueryParam
 
-	params.UserName = ctx.Query("user_name")
-	params.RealName = ctx.Query("real_name")
-	params.RoleID = ctx.Query("role_id")
-	params.Status = util.S(ctx.Query("status")).Int()
+	// params.UserName = ctx.Query("user_name")
+	// params.RealName = ctx.Query("real_name")
+	// params.RoleID = ctx.Query("role_id")
+	// params.Status = util.S(ctx.Query("status")).Int()
 
-	total, items, err := a.UserBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
+	// total, items, err := a.UserBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
+	// if err != nil {
+	// 	ctx.ResError(err)
+	// 	return
+	// }
 
-	ctx.ResPage(int(total), items)
+	// ctx.ResPage(int(total), items)
 }
 
 // Get 查询指定数据

@@ -30,12 +30,12 @@ func (a *Model) getFuncName(name string) string {
 }
 
 func (a *Model) getDemoDB(ctx context.Context) *gorm.DB {
-	return common.GetTrans(ctx, a.db).Model(Demo{})
+	return common.FromTransDB(ctx, a.db).Model(Demo{})
 }
 
-// QueryPage 查询分页数据
-func (a *Model) QueryPage(ctx context.Context, params schema.DemoPageQueryParam, pageIndex, pageSize uint) (int, []*schema.Demo, error) {
-	span := logger.StartSpan(ctx, "查询分页数据", a.getFuncName("QueryPage"))
+// Query 查询数据
+func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error) {
+	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
 	db := a.getDemoDB(ctx)
@@ -49,16 +49,14 @@ func (a *Model) QueryPage(ctx context.Context, params schema.DemoPageQueryParam,
 		db = db.Where("status=?", v)
 	}
 
-	var items []Demo
-	count, err := a.db.FindPage(db, pageIndex, pageSize, &items)
+	var items []*Demo
+	pageResult, err := common.WrapPageQuery(db, pp, &items)
 	if err != nil {
 		span.Errorf(err.Error())
-		return 0, nil, errors.New("查询分页数据条数发生错误")
+		return nil, nil, errors.New("查询数据发生错误")
 	}
 
-	var dataItems []*schema.Demo
-	_ = util.FillStructs(items, &dataItems)
-	return count, dataItems, nil
+	return Demos(items).ToSchemaDemos(), pageResult, nil
 }
 
 // Get 查询指定数据
@@ -76,9 +74,7 @@ func (a *Model) Get(ctx context.Context, recordID string) (*schema.Demo, error) 
 		return nil, nil
 	}
 
-	dataItem := new(schema.Demo)
-	_ = util.FillStruct(item, dataItem)
-	return dataItem, nil
+	return item.ToSchemaDemo(), nil
 }
 
 // CheckCode 检查编号是否存在

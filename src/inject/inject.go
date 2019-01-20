@@ -1,6 +1,8 @@
 package inject
 
 import (
+	"context"
+
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/model/gorm"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
@@ -17,7 +19,7 @@ type Object struct {
 }
 
 // Init 初始化依赖注入
-func Init() (*Object, error) {
+func Init(ctx context.Context) (*Object, error) {
 	g := new(inject.Graph)
 	obj := new(Object)
 
@@ -42,6 +44,12 @@ func Init() (*Object, error) {
 	obj.CtlCommon = ctlCommon
 
 	if err := g.Populate(); err != nil {
+		return nil, err
+	}
+
+	// 初始化casbin策略数据
+	err := obj.CtlCommon.LoadCasbinPolicyData(ctx)
+	if err != nil {
 		return nil, err
 	}
 

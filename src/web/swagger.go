@@ -1,6 +1,8 @@
 /*
 Package web 生成swagger文档
 
+文档规则请参考：https://github.com/teambition/swaggo/wiki/Declarative-Comments-Format
+
 使用方式：
 
 	go get -u -v github.com/teambition/swaggo

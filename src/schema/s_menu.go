@@ -21,21 +21,14 @@ type Menu struct {
 	IsHide    int    `json:"is_hide" binding:"required,max=2,min=1" swaggo:"true,是否隐藏(1:是 2:否)"`
 }
 
-// MenuPageQueryParam 分页查询条件
-type MenuPageQueryParam struct {
-	Code     string // 菜单编号(模糊查询)
-	Name     string // 菜单名称(模糊查询)
-	Type     int    // 菜单类型(1：模块 2：功能 3：资源)
-	ParentID string // 父级内码
-}
-
-// MenuListQueryParam 列表查询条件
-type MenuListQueryParam struct {
-	LevelCode  string   // 分级码(模糊查询)
-	LevelCodes []string // 分级码列表
-	Types      []int    // 菜单类型(1：模块 2：功能 3：资源)
-	IsHide     int      // 是否隐藏(1:是 2:否)
-	ParentID   *string  // 父级内码
+// MenuQueryParam 查询条件
+type MenuQueryParam struct {
+	Code      string  // 菜单编号(模糊查询)
+	Name      string  // 菜单名称(模糊查询)
+	LevelCode string  // 分级码(前缀模糊查询)
+	Types     []int   // 菜单类型(1：模块 2：功能 3：资源)
+	IsHide    int     // 是否隐藏(1:是 2:否)
+	ParentID  *string // 父级内码
 }
 
 // MenuTreeResult 菜单树
@@ -46,17 +39,17 @@ type MenuTreeResult struct {
 	Children *[]*MenuTreeResult `json:"children,omitempty"` // 子级树
 }
 
-// MenuList 菜单列表
-type MenuList []*Menu
+// Menus 菜单列表
+type Menus []*Menu
 
-func (m MenuList) String() string {
-	return util.JSONMarshalToString(m)
+func (a Menus) String() string {
+	return util.JSONMarshalToString(a)
 }
 
 // ToLevelCodes 获取分级码列表（按照分级码正序排序）
-func (m MenuList) ToLevelCodes() []string {
-	levelCodes := make([]string, len(m))
-	for i, item := range m {
+func (a Menus) ToLevelCodes() []string {
+	levelCodes := make([]string, len(a))
+	for i, item := range a {
 		levelCodes[i] = item.LevelCode
 	}
 	sort.Strings(levelCodes)
@@ -64,9 +57,9 @@ func (m MenuList) ToLevelCodes() []string {
 }
 
 // ToTreeResult 转换为菜单树
-func (m MenuList) ToTreeResult() []*MenuTreeResult {
+func (a Menus) ToTreeResult() []*MenuTreeResult {
 	var result []*MenuTreeResult
-	_ = util.FillStructs(m, &result)
+	_ = util.FillStructs(a, &result)
 
 	mi := make(map[string]*MenuTreeResult)
 	for _, item := range result {

@@ -91,14 +91,14 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (*schema.
 
 	// 查询用户角色
 	if len(user.RoleIDs) > 0 {
-		roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
-		if err == nil && len(roleItems) > 0 {
-			roleNames := make([]string, len(roleItems))
-			for i, item := range roleItems {
-				roleNames[i] = item.Name
-			}
-			info.RoleNames = roleNames
-		}
+		// roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
+		// if err == nil && len(roleItems) > 0 {
+		// 	roleNames := make([]string, len(roleItems))
+		// 	for i, item := range roleItems {
+		// 		roleNames[i] = item.Name
+		// 	}
+		// 	info.RoleNames = roleNames
+		// }
 	}
 
 	return info, nil

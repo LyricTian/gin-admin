@@ -2,6 +2,8 @@ package demo
 
 import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
+	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // GetDemoTableName 获取示例表名
@@ -23,4 +25,21 @@ type Demo struct {
 // TableName 表名
 func (a Demo) TableName() string {
 	return a.Model.TableName("demo")
+}
+
+// ToSchemaDemo 转换为模型demo
+func (a Demo) ToSchemaDemo() *schema.Demo {
+	item := new(schema.Demo)
+	_ = util.FillStruct(a, item)
+	return item
+}
+
+// Demos demo列表
+type Demos []*Demo
+
+// ToSchemaDemos 转换为模型demo列表
+func (a Demos) ToSchemaDemos() []*schema.Demo {
+	var list []*schema.Demo
+	_ = util.FillStructs(a, &list)
+	return list
 }

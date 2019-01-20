@@ -25,19 +25,19 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, page
 		return 0, nil, err
 	}
 
-	for i, item := range items {
-		user, err := a.UserModel.Get(ctx, item.RecordID, true)
-		if err == nil && user != nil && len(user.RoleIDs) > 0 {
-			roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
-			if err == nil {
-				roleNames := make([]string, len(roleItems))
-				for i, item := range roleItems {
-					roleNames[i] = item.Name
-				}
-				items[i].RoleNames = roleNames
-			}
-		}
-	}
+	// for i, item := range items {
+	// 	user, err := a.UserModel.Get(ctx, item.RecordID, true)
+	// 	if err == nil && user != nil && len(user.RoleIDs) > 0 {
+	// 		roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
+	// 		if err == nil {
+	// 			roleNames := make([]string, len(roleItems))
+	// 			for i, item := range roleItems {
+	// 				roleNames[i] = item.Name
+	// 			}
+	// 			items[i].RoleNames = roleNames
+	// 		}
+	// 	}
+	// }
 
 	return total, items, nil
 }
@@ -163,9 +163,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 }
 
 // LoadAllPolicy 加载所有的用户策略
-func (a *User) LoadAllPolicy() error {
-	ctx := context.Background()
-
+func (a *User) LoadAllPolicy(ctx context.Context) error {
 	userRoles, err := a.UserModel.QueryUserRoles(ctx, schema.UserRoleQueryParam{})
 	if err != nil {
 		return err

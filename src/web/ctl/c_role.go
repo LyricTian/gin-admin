@@ -6,7 +6,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
@@ -29,35 +28,35 @@ func (a *Role) Query(ctx *context.Context) {
 
 // QueryPage 查询分页数据
 func (a *Role) QueryPage(ctx *context.Context) {
-	pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
+	// pageIndex, pageSize := ctx.GetPageIndex(), ctx.GetPageSize()
 
-	var params schema.RoleQueryParam
-	params.Name = ctx.Query("name")
-	params.Status = util.S(ctx.Query("status")).Int()
+	// var params schema.RoleQueryParam
+	// params.Name = ctx.Query("name")
+	// params.Status = util.S(ctx.Query("status")).Int()
 
-	total, items, err := a.RoleBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
+	// total, items, err := a.RoleBll.QueryPage(ctx.CContext(), params, pageIndex, pageSize)
+	// if err != nil {
+	// 	ctx.ResError(err)
+	// 	return
+	// }
 
-	ctx.ResPage(int(total), items)
+	// ctx.ResPage(int(total), items)
 }
 
 // QuerySelect 查询分页数据
 func (a *Role) QuerySelect(ctx *context.Context) {
-	var params schema.RoleSelectQueryParam
+	// var params schema.RoleSelectQueryParam
 
-	params.Name = ctx.Query("name")
-	params.Status = util.S(ctx.Query("status")).Int()
+	// params.Name = ctx.Query("name")
+	// params.Status = util.S(ctx.Query("status")).Int()
 
-	items, err := a.RoleBll.QuerySelect(ctx.CContext(), params)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
+	// items, err := a.RoleBll.QuerySelect(ctx.CContext(), params)
+	// if err != nil {
+	// 	ctx.ResError(err)
+	// 	return
+	// }
 
-	ctx.ResList(items)
+	// ctx.ResList(items)
 }
 
 // Get 查询指定数据

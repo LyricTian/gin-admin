@@ -2,6 +2,8 @@ package menu
 
 import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
+	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // GetMenuTableName 获取菜单表名
@@ -15,7 +17,7 @@ type Menu struct {
 	RecordID  string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
 	Code      string `gorm:"column:code;size:50;"`                   // 菜单编号
 	Name      string `gorm:"column:name;size:50;index;"`             // 菜单名称
-	Type      int    `gorm:"column:type;index;"`                     // 菜单类型(10：模块 20：功能 30：资源)
+	Type      int    `gorm:"column:type;index;"`                     // 菜单类型(1：模块 2：功能 3：资源)
 	Sequence  int    `gorm:"column:sequence;index;"`                 // 排序值
 	Icon      string `gorm:"column:icon;size:255;"`                  // 菜单图标
 	Path      string `gorm:"column:path;size:255;"`                  // 访问路径
@@ -29,4 +31,21 @@ type Menu struct {
 // TableName 表名
 func (a Menu) TableName() string {
 	return a.Model.TableName("menu")
+}
+
+// ToSchemaMenu 转换为模型菜单
+func (a Menu) ToSchemaMenu() *schema.Menu {
+	item := new(schema.Menu)
+	_ = util.FillStruct(a, item)
+	return item
+}
+
+// Menus 菜单列表
+type Menus []*Menu
+
+// ToSchemaMenus 转换为模型菜单列表
+func (a Menus) ToSchemaMenus() []*schema.Menu {
+	var list []*schema.Menu
+	_ = util.FillStructs(a, &list)
+	return list
 }

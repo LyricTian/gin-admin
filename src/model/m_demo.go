@@ -6,10 +6,10 @@ import (
 	"github.com/LyricTian/gin-admin/src/schema"
 )
 
-// IDemo 示例程序
+// IDemo demo存储接口
 type IDemo interface {
-	// 查询分页数据
-	QueryPage(ctx context.Context, params schema.DemoPageQueryParam, pageIndex, pageSize uint) (int, []*schema.Demo, error)
+	// 查询数据
+	Query(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Demo, error)
 	// 检查编号是否存在

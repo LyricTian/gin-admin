@@ -18,20 +18,20 @@ type Menu struct {
 }
 
 // QueryPage 查询分页数据
-func (a *Menu) QueryPage(ctx context.Context, params schema.MenuPageQueryParam, pageIndex, pageSize uint) (int, []*schema.Menu, error) {
-	return a.MenuModel.QueryPage(ctx, params, pageIndex, pageSize)
+func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error) {
+	return a.MenuModel.Query(ctx, params, pp)
 }
 
 // QueryTree 查询菜单树
 func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTreeResult, error) {
-	items, err := a.MenuModel.QueryList(ctx, schema.MenuListQueryParam{
+	items, _, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		Types: []int{1, 2},
-	})
+	}, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return schema.MenuList(items).ToTreeResult(), nil
+	return schema.Menus(items).ToTreeResult(), nil
 }
 
 // Get 查询指定数据
@@ -47,19 +47,19 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 }
 
 func (a *Menu) getLevelCode(ctx context.Context, parentItem *schema.Menu) (string, error) {
-	params := schema.MenuListQueryParam{}
+	params := schema.MenuQueryParam{}
 	if parentItem == nil {
 		var value string
 		params.ParentID = &value
 	} else {
 		params.LevelCode = parentItem.LevelCode
 	}
-	menuList, err := a.MenuModel.QueryList(ctx, params)
+	menuList, _, err := a.MenuModel.Query(ctx, params, nil)
 	if err != nil {
 		return "", err
 	}
 
-	levelCodes := schema.MenuList(menuList).ToLevelCodes()
+	levelCodes := schema.Menus(menuList).ToLevelCodes()
 	levelCode := util.GetLevelCode(levelCodes)
 	if len(levelCode) == 0 {
 		return "", errors.NewInternalServerError("分级码生成失败")
@@ -157,9 +157,9 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 			}
 			item.LevelCode = levelCode
 			oldLevelCode := oldItem.LevelCode
-			menuList, err := a.MenuModel.QueryList(ctx, schema.MenuListQueryParam{
+			menuList, _, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 				LevelCode: oldLevelCode,
-			})
+			}, nil)
 			if err != nil {
 				return err
 			}
