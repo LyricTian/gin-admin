@@ -1,4 +1,4 @@
-package demo
+package gormdemo
 
 import (
 	"context"
@@ -26,11 +26,11 @@ type Model struct {
 }
 
 func (a *Model) getFuncName(name string) string {
-	return fmt.Sprintf("demo.%s", name)
+	return fmt.Sprintf("gorm.demo.%s", name)
 }
 
 func (a *Model) getDemoDB(ctx context.Context) *gorm.DB {
-	return common.FromTransDB(ctx, a.db).Model(Demo{})
+	return gormcommon.FromTransDB(ctx, a.db).Model(Demo{})
 }
 
 // Query 查询数据
@@ -50,7 +50,7 @@ func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, pp *sch
 	}
 
 	var items []*Demo
-	pageResult, err := common.WrapPageQuery(db, pp, &items)
+	pageResult, err := gormcommon.WrapPageQuery(db, pp, &items)
 	if err != nil {
 		span.Errorf(err.Error())
 		return nil, nil, errors.New("查询数据发生错误")
@@ -140,7 +140,7 @@ func (a *Model) UpdateStatus(ctx context.Context, recordID string, status int) e
 	span := logger.StartSpan(ctx, "更新状态", a.getFuncName("UpdateStatus"))
 	defer span.Finish()
 
-	result := a.getDemoDB(ctx).Model(Demo{}).Where("record_id=?", recordID).Update("status", status)
+	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("更新状态发生错误")

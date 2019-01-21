@@ -1,4 +1,4 @@
-package demo
+package gormdemo
 
 import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
@@ -6,14 +6,14 @@ import (
 	"github.com/LyricTian/gin-admin/src/util"
 )
 
-// GetDemoTableName 获取示例表名
+// GetDemoTableName 获取demo表名
 func GetDemoTableName() string {
 	return Demo{}.TableName()
 }
 
-// Demo 示例程序
+// Demo demo实体
 type Demo struct {
-	common.Model
+	gormcommon.Model
 	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
 	Code     string `gorm:"column:code;size:50;index;"`             // 编号
 	Name     string `gorm:"column:name;size:100;index;"`            // 名称
@@ -27,7 +27,7 @@ func (a Demo) TableName() string {
 	return a.Model.TableName("demo")
 }
 
-// ToSchemaDemo 转换为模型demo
+// ToSchemaDemo 转换为demo对象
 func (a Demo) ToSchemaDemo() *schema.Demo {
 	item := new(schema.Demo)
 	_ = util.FillStruct(a, item)
@@ -37,7 +37,7 @@ func (a Demo) ToSchemaDemo() *schema.Demo {
 // Demos demo列表
 type Demos []*Demo
 
-// ToSchemaDemos 转换为模型demo列表
+// ToSchemaDemos 转换为demo对象列表
 func (a Demos) ToSchemaDemos() []*schema.Demo {
 	var list []*schema.Demo
 	_ = util.FillStructs(a, &list)

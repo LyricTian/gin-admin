@@ -1,4 +1,4 @@
-package menu
+package gormmenu
 
 import (
 	"context"
@@ -26,19 +26,22 @@ type Model struct {
 }
 
 func (a *Model) getFuncName(name string) string {
-	return fmt.Sprintf("menu.%s", name)
+	return fmt.Sprintf("gorm.menu.%s", name)
 }
 
 func (a *Model) getMenuDB(ctx context.Context) *gorm.DB {
-	return common.FromTransDB(ctx, a.db).Model(Menu{})
+	return gormcommon.FromTransDB(ctx, a.db).Model(Menu{})
 }
 
 // Query 查询数据
 func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error) {
-	span := logger.StartSpan(ctx, "查询分页数据", a.getFuncName("QueryPage"))
+	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
 	db := a.getMenuDB(ctx)
+	if v := params.RecordIDs; len(v) > 0 {
+		db = db.Where("record_id IN(?)", v)
+	}
 	if v := params.Code; v != "" {
 		db = db.Where("code LIKE ?", "%"+v+"%")
 	}
@@ -59,7 +62,7 @@ func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, pp *sch
 	}
 
 	var items []*Menu
-	pr, err := common.WrapPageQuery(db, pp, &items)
+	pr, err := gormcommon.WrapPageQuery(db, pp, &items)
 	if err != nil {
 		span.Errorf(err.Error())
 		return nil, nil, errors.New("查询数据发生错误")

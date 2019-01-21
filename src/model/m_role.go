@@ -8,13 +8,11 @@ import (
 
 // IRole 角色管理
 type IRole interface {
-	// 查询分页数据
-	QueryPage(ctx context.Context, params schema.RolePageQueryParam, pageIndex, pageSize uint) (int, []*schema.Role, error)
-	// 查询列表数据
-	QueryList(ctx context.Context, params schema.RoleListQueryParam) ([]*schema.Role, error)
+	// 查询数据
+	Query(ctx context.Context, params schema.RoleQueryParam, pp *schema.PaginationParam) ([]*schema.Role, *schema.PaginationResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, includeMenuIDs bool) (*schema.Role, error)
-	// 检查名称
+	// 检查名称是否存在
 	CheckName(ctx context.Context, name string) (bool, error)
 	// 创建数据
 	Create(ctx context.Context, item schema.Role) error

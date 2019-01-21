@@ -1,51 +1,37 @@
 package schema
 
-// Role 角色管理
+import (
+	"github.com/LyricTian/gin-admin/src/util"
+)
+
+// Role 角色对象
 type Role struct {
-	ID       int64    `json:"id" db:"id,primarykey,autoincrement" structs:"id"`         // 唯一标识(自增ID)
-	RecordID string   `json:"record_id" db:"record_id,size:36" structs:"record_id"`     // 记录内码(uuid)
-	Name     string   `json:"name" db:"name,size:50" structs:"name" binding:"required"` // 角色名称
-	Memo     string   `json:"memo" db:"memo,size:1024" structs:"memo"`                  // 角色备注
-	Status   int      `json:"status" db:"status" structs:"status" binding:"required"`   // 角色状态(1:启用 2:停用)
-	Creator  string   `json:"creator" db:"creator,size:36" structs:"creator"`           // 创建者
-	Created  int64    `json:"created" db:"created" structs:"created"`                   // 创建时间戳
-	Updated  int64    `json:"updated" db:"updated" structs:"updated"`                   // 更新时间戳
-	Deleted  int64    `json:"deleted" db:"deleted" structs:"deleted"`                   // 删除时间戳
-	MenuIDs  []string `json:"menu_ids" db:"-" structs:"-" binding:"required,gt=0"`      // 菜单ID列表
+	RecordID string   `json:"record_id" swaggo:"false,记录ID"`
+	Name     string   `json:"name" binding:"required" swaggo:"true,角色名称"`
+	Memo     string   `json:"memo" swaggo:"false,备注"`
+	Status   int      `json:"status" binding:"required,max=2,min=1" swaggo:"true,状态(1:启用 2:停用)"`
+	MenuIDs  []string `json:"menu_ids" binding:"required,gt=0" swaggo:"true,授权的菜单ID列表"`
 }
 
-// RoleMenu 角色菜单管理
-type RoleMenu struct {
-	ID      int64  `json:"id" db:"id,primarykey,autoincrement"` // 唯一标识(自增ID)
-	RoleID  string `json:"role_id" db:"role_id,size:36"`        // 角色内码
-	MenuID  string `json:"menu_id" db:"menu_id,size:36"`        // 菜单内码
-	Deleted int64  `json:"deleted" db:"deleted"`                // 删除时间戳
+// RoleQueryParam 角色查询条件
+type RoleQueryParam struct {
+	Name           string // 角色名称
+	Status         int    // 角色状态(1:启用 2:停用)
+	IncludeMenuIDs bool   // 是否包含菜单ID列表
 }
 
-// RolePageQueryParam 角色查询条件
-type RolePageQueryParam struct {
-	Name   string // 角色名称
-	Status int    // 角色状态(1:启用 2:停用)
+// RoleSelectResult 角色选择结果
+type RoleSelectResult struct {
+	RecordID string `json:"record_id" swaggo:"true,记录ID"`
+	Name     string `json:"name" swaggo:"true,角色名称"`
 }
 
-// RoleQueryResult 角色查询结果
-type RoleQueryResult struct {
-	ID       int64  `json:"id" db:"id"`               // 唯一标识(自增ID)
-	RecordID string `json:"record_id" db:"record_id"` // 记录内码
-	Name     string `json:"name" db:"name"`           // 角色名称
-	Memo     string `json:"memo" db:"memo"`           // 角色备注
-	Status   int    `json:"status" db:"status"`       // 角色状态(1:启用 2:停用)
-}
+// Roles 角色对象列表
+type Roles []*Role
 
-// RoleListQueryParam 角色选择查询条件
-type RoleListQueryParam struct {
-	RecordIDs []string // 记录ID列表
-	Name      string   // 角色名称
-	Status    int      // 状态(1:启用 2:停用)
-}
-
-// RoleSelectQueryResult 角色选择查询结果
-type RoleSelectQueryResult struct {
-	RecordID string `json:"record_id" db:"record_id"` // 记录内码
-	Name     string `json:"name" db:"name"`           // 角色名称
+// ToSelectResult 转换为角色选择结果列表
+func (a Roles) ToSelectResult() []*RoleSelectResult {
+	var items []*RoleSelectResult
+	_ = util.FillStructs(a, &items)
+	return items
 }

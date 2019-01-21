@@ -47,11 +47,5 @@ func Init(ctx context.Context) (*Object, error) {
 		return nil, err
 	}
 
-	// 初始化casbin策略数据
-	err := obj.CtlCommon.LoadCasbinPolicyData(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	return obj, nil
 }
