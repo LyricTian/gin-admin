@@ -40,9 +40,9 @@ func TestDemo(t *testing.T) {
 	assert.Equal(t, addGetItem.Name, addItem.Name)
 	assert.Equal(t, addGetItem.Status, addItem.Status)
 
-	// get /demos?type=page
+	// get /demos?q=page
 	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"type": "page"})))
+		newPageParam(map[string]string{"q": "page"})))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.Demo
 	err = parsePageReader(w.Body, &pageItems)

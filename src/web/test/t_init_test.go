@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -32,12 +33,13 @@ func init() {
 	viper.Set("run_mode", "debug")
 	viper.Set("casbin_model_conf", "../../../config/model.conf")
 
-	obj, err := inject.Init()
+	ctx := context.Background()
+	obj, err := inject.Init(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	engine = web.Init(obj)
+	engine = web.Init(ctx, obj)
 }
 
 func toReader(v interface{}) io.Reader {

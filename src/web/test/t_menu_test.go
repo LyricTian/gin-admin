@@ -18,8 +18,8 @@ func TestMenu(t *testing.T) {
 	addItem := &schema.Menu{
 		Code:     "test_menu_1",
 		Name:     "测试菜单",
-		Type:     10,
-		Sequence: 9999,
+		Type:     1,
+		Sequence: -1,
 		Icon:     "test",
 		Path:     "/test",
 		IsHide:   2,
@@ -45,9 +45,9 @@ func TestMenu(t *testing.T) {
 	assert.Equal(t, addItem.Path, addGetItem.Path)
 	assert.NotEmpty(t, addGetItem.RecordID)
 
-	// get /menus?type=page
+	// get /menus?q=page
 	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"type": "page"})))
+		newPageParam(map[string]string{"q": "page"})))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.Menu
 	err = parsePageReader(w.Body, &pageItems)
