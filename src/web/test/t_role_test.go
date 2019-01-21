@@ -9,7 +9,7 @@ import (
 )
 
 func TestRole(t *testing.T) {
-	const router = "roles"
+	const router = "v1/roles"
 	var err error
 
 	w := httptest.NewRecorder()
@@ -18,13 +18,13 @@ func TestRole(t *testing.T) {
 	addMenuItem := &schema.Menu{
 		Code:     "test_role_menu_1",
 		Name:     "测试角色菜单",
-		Type:     10,
-		Sequence: 1,
+		Type:     1,
+		Sequence: 9999,
 		Icon:     "test",
 		Path:     "/test",
 		IsHide:   2,
 	}
-	engine.ServeHTTP(w, newPostRequest("menus", addMenuItem))
+	engine.ServeHTTP(w, newPostRequest("v1/menus", addMenuItem))
 	assert.Equal(t, 200, w.Code)
 
 	var addMenuNewItem schema.Menu
@@ -43,16 +43,22 @@ func TestRole(t *testing.T) {
 	var addNewItem schema.Role
 	err = parseReader(w.Body, &addNewItem)
 	assert.Nil(t, err)
-	assert.Equal(t, addItem.Name, addNewItem.Name)
-	assert.Equal(t, addItem.Memo, addNewItem.Memo)
-	assert.Equal(t, addItem.Status, addNewItem.Status)
-	assert.Equal(t, addItem.MenuIDs, addNewItem.MenuIDs)
-	assert.NotEqual(t, addNewItem.ID, 0)
-	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// get /roles?type=page
+	// get /roles/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+
+	var addGetItem schema.Role
+	err = parseReader(w.Body, &addGetItem)
+	assert.Equal(t, addItem.Name, addGetItem.Name)
+	assert.Equal(t, addItem.Memo, addGetItem.Memo)
+	assert.Equal(t, addItem.Status, addGetItem.Status)
+	assert.Equal(t, addItem.MenuIDs, addGetItem.MenuIDs)
+	assert.NotEmpty(t, addGetItem.RecordID)
+
+	// get /roles?q=page
 	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"type": "page"})))
+		newPageParam(map[string]string{"q": "page"})))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.Role
 	err = parsePageReader(w.Body, &pageItems)
@@ -93,7 +99,7 @@ func TestRole(t *testing.T) {
 	releaseReader(w.Body)
 
 	// delete /menus/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", "menus", addMenuNewItem.RecordID))
+	engine.ServeHTTP(w, newDeleteRequest("%s/%s", "v1/menus", addMenuNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
 	releaseReader(w.Body)
 }

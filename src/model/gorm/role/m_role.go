@@ -49,6 +49,7 @@ func (a *Model) Query(ctx context.Context, params schema.RoleQueryParam, pp *sch
 	if v := params.Status; v > 0 {
 		db = db.Where("status=?", v)
 	}
+	db = db.Order("id DESC")
 
 	var items []*Role
 	pr, err := gormcommon.WrapPageQuery(db, pp, &items)

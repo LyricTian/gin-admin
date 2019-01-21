@@ -60,6 +60,7 @@ func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, pp *sch
 	if v := params.ParentID; v != nil {
 		db = db.Where("parent_id=?", *v)
 	}
+	db = db.Order("sequence,id DESC")
 
 	var items []*Menu
 	pr, err := gormcommon.WrapPageQuery(db, pp, &items)

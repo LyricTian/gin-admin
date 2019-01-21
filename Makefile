@@ -26,6 +26,9 @@ start-dev-server:
 start-dev-web:
 	cd web && yarn && yarn start
 
+swagger:
+	swaggo -s ./src/web/swagger.go -p ./src -o ./src/web/swagger
+
 test:
 	@go test -cover -race ./...
 
