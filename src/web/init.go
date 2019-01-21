@@ -3,6 +3,8 @@ package web
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/src/logger"
+
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/web/middleware"
@@ -37,6 +39,12 @@ func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 
 	// 注册/api路由
 	router.APIHandler(app, obj)
+
+	// 初始化casbin策略数据
+	err := obj.CtlCommon.LoadCasbinPolicyData(ctx)
+	if err != nil {
+		logger.Start(ctx).Fatalf("初始化casbin策略数据发生错误：%s", err.Error())
+	}
 
 	return app
 }

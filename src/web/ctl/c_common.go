@@ -9,7 +9,7 @@ type Common struct {
 	DemoAPI  *Demo `inject:""`
 	LoginAPI *Login
 	UserAPI  *User
-	RoleAPI  *Role
+	RoleAPI  *Role `inject:""`
 	MenuAPI  *Menu `inject:""`
 }
 

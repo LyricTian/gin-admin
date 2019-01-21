@@ -107,11 +107,11 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, erro
 		return nil, err
 	}
 
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
 	item.RecordID = util.MustUUID()
 	err = a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
-		a.lock.Lock()
-		defer a.lock.Unlock()
-
 		levelCode, err := a.getLevelCode(ctx, parentItem)
 		if err != nil {
 			return err
@@ -145,10 +145,10 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 	}
 	item.LevelCode = oldItem.LevelCode
 
-	return a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
-		a.lock.Lock()
-		defer a.lock.Unlock()
+	a.lock.Lock()
+	defer a.lock.Unlock()
 
+	return a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
 		// 如果父级更新，需要更新当前节点及节点下级的分级码
 		if item.ParentID != oldItem.ParentID {
 			levelCode, err := a.getLevelCode(ctx, parentItem)
@@ -191,7 +191,10 @@ func (a *Menu) Delete(ctx context.Context, recordIDs ...string) error {
 				return errors.NewBadRequestError("含有子级菜单，不能删除")
 			}
 
-			return a.MenuModel.Delete(ctx, recordID)
+			err = a.MenuModel.Delete(ctx, recordID)
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})

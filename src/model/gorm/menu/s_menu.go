@@ -1,4 +1,4 @@
-package menu
+package gormmenu
 
 import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
@@ -11,9 +11,9 @@ func GetMenuTableName() string {
 	return Menu{}.TableName()
 }
 
-// Menu 菜单管理
+// Menu 菜单实体
 type Menu struct {
-	common.Model
+	gormcommon.Model
 	RecordID  string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
 	Code      string `gorm:"column:code;size:50;"`                   // 菜单编号
 	Name      string `gorm:"column:name;size:50;index;"`             // 菜单名称
@@ -33,7 +33,7 @@ func (a Menu) TableName() string {
 	return a.Model.TableName("menu")
 }
 
-// ToSchemaMenu 转换为模型菜单
+// ToSchemaMenu 转换为菜单对象
 func (a Menu) ToSchemaMenu() *schema.Menu {
 	item := new(schema.Menu)
 	_ = util.FillStruct(a, item)
@@ -43,7 +43,7 @@ func (a Menu) ToSchemaMenu() *schema.Menu {
 // Menus 菜单列表
 type Menus []*Menu
 
-// ToSchemaMenus 转换为模型菜单列表
+// ToSchemaMenus 转换为菜单对象列表
 func (a Menus) ToSchemaMenus() []*schema.Menu {
 	var list []*schema.Menu
 	_ = util.FillStructs(a, &list)

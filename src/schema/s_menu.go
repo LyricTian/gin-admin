@@ -2,6 +2,7 @@ package schema
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/LyricTian/gin-admin/src/util"
 )
@@ -23,12 +24,13 @@ type Menu struct {
 
 // MenuQueryParam 查询条件
 type MenuQueryParam struct {
-	Code      string  // 菜单编号(模糊查询)
-	Name      string  // 菜单名称(模糊查询)
-	LevelCode string  // 分级码(前缀模糊查询)
-	Types     []int   // 菜单类型(1：模块 2：功能 3：资源)
-	IsHide    int     // 是否隐藏(1:是 2:否)
-	ParentID  *string // 父级内码
+	RecordIDs []string // 记录ID列表
+	Code      string   // 菜单编号(模糊查询)
+	Name      string   // 菜单名称(模糊查询)
+	LevelCode string   // 分级码(前缀模糊查询)
+	Types     []int    // 菜单类型(1：模块 2：功能 3：资源)
+	IsHide    int      // 是否隐藏(1:是 2:否)
+	ParentID  *string  // 父级内码
 }
 
 // MenuTreeResult 菜单树
@@ -85,4 +87,25 @@ func (a Menus) ToTreeResult() []*MenuTreeResult {
 	}
 
 	return data
+}
+
+// ToLeafRecordIDs 转换为叶子节点记录ID列表
+func (a Menus) ToLeafRecordIDs() []string {
+	var recordIDs []string
+	for _, item := range a {
+		var exists bool
+
+		for _, item2 := range a {
+			if strings.HasPrefix(item2.LevelCode, item.LevelCode) {
+				exists = false
+				break
+			}
+		}
+
+		if !exists {
+			recordIDs = append(recordIDs, item.RecordID)
+		}
+	}
+
+	return recordIDs
 }
