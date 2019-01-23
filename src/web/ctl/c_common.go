@@ -8,7 +8,7 @@ import (
 type Common struct {
 	DemoAPI  *Demo `inject:""`
 	LoginAPI *Login
-	UserAPI  *User
+	UserAPI  *User `inject:""`
 	RoleAPI  *Role `inject:""`
 	MenuAPI  *Menu `inject:""`
 }

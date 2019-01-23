@@ -32,7 +32,7 @@ func (a *Login) Login(ctx *context.Context) {
 			err == bll.ErrUserDisable {
 			result.Status = context.StatusFail
 		} else {
-			logger.Start(ctx.CContext()).Errorf("用户登录发生错误：%s", err.Error())
+			logger.StartSpan(ctx.CContext(), "用户登录", "Login").Errorf(err.Error())
 		}
 
 		ctx.ResSuccess(result)

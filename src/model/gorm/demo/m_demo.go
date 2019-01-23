@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	gcontext "github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
@@ -99,7 +98,7 @@ func (a *Model) Create(ctx context.Context, item schema.Demo) error {
 
 	demo := new(Demo)
 	_ = util.FillStruct(item, demo)
-	demo.Creator, _ = gcontext.FromUserID(ctx)
+	demo.Creator = gormcommon.FromUserID(ctx)
 	result := a.getDemoDB(ctx).Create(demo)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())

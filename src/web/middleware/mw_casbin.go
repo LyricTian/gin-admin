@@ -20,7 +20,8 @@ func CasbinMiddleware(enforcer *casbin.Enforcer, skipper SkipperFunc) gin.Handle
 		p := c.Request.URL.Path
 		m := c.Request.Method
 		if b, err := enforcer.EnforceSafe(ctx.GetUserID(), p, m); err != nil {
-			logger.Start(ctx.CContext()).Errorf("权限校验发生错误: %s", err.Error())
+			logger.StartSpan(ctx.CContext(), "casbin中间件", "CasbinMiddleware").
+				Errorf("权限校验发生错误: %s", err.Error())
 			ctx.ResError(errors.NewInternalServerError())
 			return
 		} else if !b {

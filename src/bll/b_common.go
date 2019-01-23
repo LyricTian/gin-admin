@@ -17,6 +17,9 @@ type Common struct {
 
 // ExecTrans 执行事务
 func (a *Common) ExecTrans(ctx context.Context, fn TransFunc) error {
+	if _, ok := gcontext.FromTrans(ctx); ok {
+		return fn(ctx)
+	}
 	trans, err := a.TransModel.Begin(ctx)
 	if err != nil {
 		return err

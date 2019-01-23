@@ -119,7 +119,8 @@ func (a *Context) SetUserID(userID string) {
 // ParseJSON 解析请求JSON
 func (a *Context) ParseJSON(obj interface{}) error {
 	if err := a.gctx.ShouldBindJSON(obj); err != nil {
-		logger.Start(a.CContext()).Warnf("无效的请求参数: %s", err.Error())
+		logger.StartSpan(a.CContext(), "解析请求JSON", "context.ParseJSON").
+			Warnf("无效的请求参数: %s", err.Error())
 		return errors.NewBadRequestError("无效的请求参数")
 	}
 	return nil
@@ -177,13 +178,13 @@ func (a *Context) ResErrorWithStatus(err error, status int, code ...int) {
 func (a *Context) ResPage(v interface{}, pr *schema.PaginationResult) {
 	list := HTTPList{
 		List: v,
-	}
-	if pr != nil {
-		list.Pagination = &HTTPPagination{
+		Pagination: &HTTPPagination{
 			Current:  a.GetPageIndex(),
 			PageSize: a.GetPageSize(),
-			Total:    pr.Total,
-		}
+		},
+	}
+	if pr != nil {
+		list.Pagination.Total = pr.Total
 	}
 
 	a.ResSuccess(list)
@@ -211,7 +212,8 @@ func (a *Context) ResSuccess(v interface{}) {
 func (a *Context) ResJSON(status int, v interface{}) {
 	buf, err := util.JSONMarshal(v)
 	if err != nil {
-		logger.Start(a.CContext()).WithField("object", v).Errorf("JSON序列化发生错误: %s", err.Error())
+		logger.StartSpan(a.CContext(), "响应JSON数据", "context.ResJSON").
+			WithField("object", v).Errorf("JSON序列化发生错误: %s", err.Error())
 		a.ResError(errors.NewInternalServerError())
 		return
 	}

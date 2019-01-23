@@ -15,9 +15,10 @@ type Role struct {
 
 // RoleQueryParam 角色查询条件
 type RoleQueryParam struct {
-	Name           string // 角色名称
-	Status         int    // 角色状态(1:启用 2:停用)
-	IncludeMenuIDs bool   // 是否包含菜单ID列表
+	RecordIDs      []string // 记录ID列表
+	Name           string   // 角色名称
+	Status         int      // 角色状态(1:启用 2:停用)
+	IncludeMenuIDs bool     // 是否包含菜单ID列表
 }
 
 // RoleSelectResult 角色选择结果

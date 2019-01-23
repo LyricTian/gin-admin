@@ -20,14 +20,16 @@ type CallbackFunc func()
 
 // Init 初始化
 func Init(ctx context.Context) CallbackFunc {
+	span := logger.StartSpanWithCall(ctx, "服务初始化", "main.Init")
+
 	obj, err := inject.Init(ctx)
 	if err != nil {
-		logger.Start(ctx).Fatalf("初始化依赖注入发生错误：%s", err.Error())
+		span().Fatalf("初始化依赖注入发生错误：%s", err.Error())
 	}
 
 	loggerFunc, err := InitLogger(ctx, obj)
 	if err != nil {
-		logger.Start(ctx).Fatalf("初始化日志模块发生错误：%s", err.Error())
+		span().Fatalf("初始化日志模块发生错误：%s", err.Error())
 	}
 
 	// 初始化HTTP服务
@@ -35,21 +37,21 @@ func Init(ctx context.Context) CallbackFunc {
 	return func() {
 		// 等待HTTP服务关闭
 		if httpFunc != nil {
-			logger.Start(ctx).Printf("关闭HTTP服务")
+			span().Printf("关闭HTTP服务")
 			httpFunc()
 		}
 
 		// 等待日志钩子写入完成
 		if loggerFunc != nil {
-			logger.Start(ctx).Printf("关闭日志服务")
+			span().Printf("关闭日志服务")
 			loggerFunc()
 		}
 
 		// 关闭数据库
 		if db := obj.GormDB; db != nil {
-			logger.Start(ctx).Printf("关闭数据库服务")
+			span().Printf("关闭数据库服务")
 			if err := db.Close(); err != nil {
-				logger.Start(ctx).Errorf("关闭数据库发生错误: %s", err.Error())
+				span().Errorf("关闭数据库发生错误: %s", err.Error())
 			}
 		}
 	}
@@ -57,6 +59,8 @@ func Init(ctx context.Context) CallbackFunc {
 
 // InitHTTPServer 初始化http服务
 func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
+	span := logger.StartSpanWithCall(ctx, "HTTP服务初始化", "main.InitHTTPServer")
+
 	cfg := config.GetHTTPConfig()
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
@@ -68,10 +72,10 @@ func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
 	}
 
 	go func() {
-		logger.Start(ctx).Printf("HTTP服务开始启动，地址监听在：[%s]", addr)
+		span().Printf("HTTP服务开始启动，地址监听在：[%s]", addr)
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			logger.Start(ctx).Errorf("监听HTTP服务发生错误: %s", err.Error())
+			span().Errorf("监听HTTP服务发生错误: %s", err.Error())
 		}
 	}()
 
@@ -79,7 +83,7 @@ func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
 		ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(cfg.ShutdownTimeout))
 		defer cancel()
 		if err := srv.Shutdown(ctx); err != nil {
-			logger.Start(ctx).Errorf("关闭HTTP服务发生错误: %s", err.Error())
+			span().Errorf("关闭HTTP服务发生错误: %s", err.Error())
 		}
 	}
 }

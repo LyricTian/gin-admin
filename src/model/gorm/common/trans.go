@@ -24,6 +24,10 @@ func FromTransDB(ctx context.Context, defaultDB *gormplus.DB) *gormplus.DB {
 
 // ExecTrans 执行事务
 func ExecTrans(ctx context.Context, db *gormplus.DB, fn func(context.Context) error) error {
+	if _, ok := gcontext.FromTrans(ctx); ok {
+		return fn(ctx)
+	}
+
 	transModel := NewTrans(db)
 	trans, err := transModel.Begin(ctx)
 	if err != nil {

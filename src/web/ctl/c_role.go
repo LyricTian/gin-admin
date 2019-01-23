@@ -34,7 +34,7 @@ func (a *Role) Query(ctx *context.Context) {
 // @Param Access-Token header string false "访问令牌"
 // @Param current query int true "分页索引" 1
 // @Param pageSize query int true "分页大小" 10
-// @Param name query string false "角色名称"
+// @Param name query string false "角色名称(模糊查询)"
 // @Param status query int false "状态(1:启用 2:停用)"
 // @Success 200 []schema.Menu "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"

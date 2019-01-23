@@ -26,7 +26,8 @@ func RecoveryMiddleware() gin.HandlerFunc {
 			if err := recover(); err != nil {
 				ctx := context.New(c)
 				stack := stack(3)
-				logger.Start(ctx.CContext()).WithField("stack", string(stack)).Errorf("[recover]: %v", err)
+				logger.StartSpan(ctx.CContext(), "崩溃恢复中间件", "RecoveryMiddleware").
+					WithField("stack", string(stack)).Errorf("[recover]: %v", err)
 				ctx.ResError(errors.NewInternalServerError())
 			}
 		}()

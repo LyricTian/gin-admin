@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	gcontext "github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
@@ -48,6 +47,9 @@ func (a *Model) Query(ctx context.Context, params schema.RoleQueryParam, pp *sch
 	}
 	if v := params.Status; v > 0 {
 		db = db.Where("status=?", v)
+	}
+	if v := params.RecordIDs; len(v) > 0 {
+		db = db.Where("record_id IN(?)", v)
 	}
 	db = db.Order("id DESC")
 
@@ -143,7 +145,7 @@ func (a *Model) CreateRole(ctx context.Context, item schema.Role) error {
 
 	role := new(Role)
 	_ = util.FillStruct(item, role)
-	role.Creator, _ = gcontext.FromUserID(ctx)
+	role.Creator = gormcommon.FromUserID(ctx)
 	result := a.getRoleDB(ctx).Create(role)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())

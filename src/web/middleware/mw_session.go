@@ -51,7 +51,7 @@ func SessionMiddleware(obj *inject.Object, skipper SkipperFunc) gin.HandlerFunc 
 			ctx.ResError(errors.NewBadRequestError("无效的会话"))
 			return
 		}
-		logger.Start(ctx.CContext()).Errorf("服务器会话发生错误: %s", err.Error())
+		logger.StartSpan(ctx.CContext(), "session中间件", "SessionMiddleware").Errorf("服务器会话发生错误: %s", err.Error())
 		ctx.ResError(errors.NewInternalServerError())
 	}
 
