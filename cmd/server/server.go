@@ -67,7 +67,8 @@ func main() {
 	logger.SetVersion(VERSION)
 	logger.SetTraceIDFunc(util.MustUUID)
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
-	logger.Start(ctx).Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.GetRunMode(), VERSION, os.Getpid())
+	span := logger.StartSpanWithCall(ctx, "主函数", "main")
+	span().Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.GetRunMode(), VERSION, os.Getpid())
 
 	var state int32 = 1
 	sc := make(chan os.Signal, 1)
@@ -77,7 +78,7 @@ func main() {
 	select {
 	case sig := <-sc:
 		atomic.StoreInt32(&state, 0)
-		logger.Start(ctx).Printf("获取到退出信号[%s]", sig.String())
+		span().Printf("获取到退出信号[%s]", sig.String())
 	}
 
 	// 等待回调函数执行完成
@@ -85,6 +86,6 @@ func main() {
 		callback()
 	}
 
-	logger.Start(ctx).Printf("服务退出")
+	span().Printf("服务退出")
 	os.Exit(int(atomic.LoadInt32(&state)))
 }

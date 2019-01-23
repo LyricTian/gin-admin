@@ -12,8 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Init 初始化所有服务
+// Init 初始化web服务
 func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
+	span := logger.StartSpan(ctx, "初始化web服务", "web.Init")
+
 	gin.SetMode(config.GetRunMode())
 	app := gin.New()
 	app.NoMethod(middleware.NoMethodHandler())
@@ -43,7 +45,7 @@ func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 	// 初始化casbin策略数据
 	err := obj.CtlCommon.LoadCasbinPolicyData(ctx)
 	if err != nil {
-		logger.Start(ctx).Fatalf("初始化casbin策略数据发生错误：%s", err.Error())
+		span.Fatalf("初始化casbin策略数据发生错误：%s", err.Error())
 	}
 
 	return app

@@ -51,18 +51,19 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 		return &rootUser, nil
 	}
 
-	user, err := a.UserModel.GetByUserName(ctx, userName, false)
-	if err != nil {
-		return nil, err
-	} else if user == nil {
-		return nil, ErrInvalidUserName
-	} else if user.Status != 1 {
-		return nil, ErrUserDisable
-	} else if user.Password != util.SHA1HashString(password) {
-		return nil, ErrInvalidPassword
-	}
+	// user, err := a.UserModel.GetByUserName(ctx, userName, false)
+	// if err != nil {
+	// 	return nil, err
+	// } else if user == nil {
+	// 	return nil, ErrInvalidUserName
+	// } else if user.Status != 1 {
+	// 	return nil, ErrUserDisable
+	// } else if user.Password != util.SHA1HashString(password) {
+	// 	return nil, ErrInvalidPassword
+	// }
 
-	return user, nil
+	// return user, nil
+	return nil, nil
 }
 
 // GetCurrentUserInfo 获取当前用户信息
@@ -75,33 +76,33 @@ func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (*schema.
 		}, nil
 	}
 
-	user, err := a.UserModel.Get(ctx, userID, true)
-	if err != nil {
-		return nil, err
-	} else if user == nil {
-		return nil, ErrInvalidUser
-	} else if user.Status != 1 {
-		return nil, ErrUserDisable
-	}
+	// user, err := a.UserModel.Get(ctx, userID, true)
+	// if err != nil {
+	// 	return nil, err
+	// } else if user == nil {
+	// 	return nil, ErrInvalidUser
+	// } else if user.Status != 1 {
+	// 	return nil, ErrUserDisable
+	// }
 
-	info := &schema.LoginInfo{
-		UserName: user.UserName,
-		RealName: user.RealName,
-	}
+	// info := &schema.LoginInfo{
+	// 	UserName: user.UserName,
+	// 	RealName: user.RealName,
+	// }
 
-	// 查询用户角色
-	if len(user.RoleIDs) > 0 {
-		// roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
-		// if err == nil && len(roleItems) > 0 {
-		// 	roleNames := make([]string, len(roleItems))
-		// 	for i, item := range roleItems {
-		// 		roleNames[i] = item.Name
-		// 	}
-		// 	info.RoleNames = roleNames
-		// }
-	}
+	// // 查询用户角色
+	// if len(user.RoleIDs) > 0 {
+	// roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
+	// if err == nil && len(roleItems) > 0 {
+	// 	roleNames := make([]string, len(roleItems))
+	// 	for i, item := range roleItems {
+	// 		roleNames[i] = item.Name
+	// 	}
+	// 	info.RoleNames = roleNames
+	// }
+	// }
 
-	return info, nil
+	return nil, nil
 }
 
 // QueryCurrentUserMenus 查询当前用户菜单

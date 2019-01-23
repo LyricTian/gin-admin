@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	gcontext "github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
@@ -124,7 +123,7 @@ func (a *Model) Create(ctx context.Context, item schema.Menu) error {
 
 	menu := new(Menu)
 	_ = util.FillStruct(item, menu)
-	menu.Creator, _ = gcontext.FromUserID(ctx)
+	menu.Creator = gormcommon.FromUserID(ctx)
 	result := a.getMenuDB(ctx).Create(menu)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())

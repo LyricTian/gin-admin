@@ -1,48 +1,66 @@
 package schema
 
+import (
+	"time"
+)
+
 // User 用户管理
 type User struct {
-	ID       int64    `json:"id" db:"id,primarykey,autoincrement" structs:"id"`                        // 唯一标识(自增ID)
-	RecordID string   `json:"record_id" db:"record_id,size:36" structs:"record_id"`                    // 记录内码(uuid)
-	UserName string   `json:"user_name" db:"user_name,size:50" structs:"user_name" binding:"required"` // 用户名
-	RealName string   `json:"real_name" db:"real_name,size:50" structs:"real_name" binding:"required"` // 真实姓名
-	Password string   `json:"password" db:"password,size:40" structs:"password"`                       // 登录密码(sha1(md5(明文))加密)
-	Status   int      `json:"status" db:"status" structs:"status" binding:"required"`                  // 用户状态(1:启用 2:停用)
-	Creator  string   `json:"creator" db:"creator,size:36" structs:"creator"`                          // 创建者
-	Created  int64    `json:"created" db:"created" structs:"created"`                                  // 创建时间戳
-	Updated  int64    `json:"updated" db:"updated" structs:"updated"`                                  // 更新时间戳
-	Deleted  int64    `json:"deleted" db:"deleted" structs:"deleted"`                                  // 删除时间戳
-	RoleIDs  []string `json:"role_ids" db:"-" structs:"-" binding:"required,gt=0"`                     // 角色ID列表
-}
-
-// UserRole 用户角色授权管理
-type UserRole struct {
-	ID      int64  `json:"id" db:"id,primarykey,autoincrement"` // 唯一标识(自增ID)
-	UserID  string `json:"user_id" db:"user_id,size:36"`        // 用户内码
-	RoleID  string `json:"role_id" db:"role_id,size:36"`        // 角色内码
-	Deleted int64  `json:"deleted" db:"deleted"`                // 删除时间戳
+	RecordID  string    `json:"record_id" swaggo:"false,记录ID"`
+	UserName  string    `json:"user_name" binding:"required" swaggo:"true,用户名"`
+	RealName  string    `json:"real_name" binding:"required" swaggo:"true,真实姓名"`
+	Password  string    `json:"password" swaggo:"false,密码"`
+	Status    int       `json:"status" binding:"required,max=2,min=1" swaggo:"true,用户状态(1:启用 2:停用)"`
+	RoleIDs   []string  `json:"role_ids" binding:"required,gt=0" swaggo:"true,授权角色ID列表"`
+	CreatedAt time.Time `json:"created_at" swaggo:"false,创建时间"`
 }
 
 // UserQueryParam 用户查询条件
 type UserQueryParam struct {
-	UserName string // 用户名
-	RealName string // 真实姓名
-	Status   int    // 用户状态(1:启用 2:停用)
-	RoleID   string // 角色ID
+	UserName        string // 用户名
+	RealName        string // 真实姓名
+	Status          int    // 用户状态(1:启用 2:停用)
+	RoleID          string // 角色ID
+	IncludeRoleIDs  bool   // 是否包含角色ID列表
+	IncludePassword bool   // 是否包含密码
 }
 
 // UserQueryResult 用户查询结果
 type UserQueryResult struct {
-	ID        int64    `json:"id" db:"id"`               // 唯一标识(自增ID)
-	RecordID  string   `json:"record_id" db:"record_id"` // 记录内码(uuid)
-	UserName  string   `json:"user_name" db:"user_name"` // 用户名
-	RealName  string   `json:"real_name" db:"real_name"` // 真实姓名
-	Status    int      `json:"status" db:"status"`       // 用户状态(1:启用 2:停用)
-	Created   int64    `json:"created" db:"created"`     // 创建时间戳
-	RoleNames []string `json:"role_names" db:"-"`        // 角色名称
+	RecordID  string              `json:"record_id" swaggo:"false,记录ID"`
+	UserName  string              `json:"user_name" swaggo:"true,用户名"`
+	RealName  string              `json:"real_name" swaggo:"true,真实姓名"`
+	Status    int                 `json:"status" swaggo:"true,用户状态(1:启用 2:停用)"`
+	CreatedAt time.Time           `json:"created_at" swaggo:"false,创建时间"`
+	Roles     []*RoleSelectResult `json:"roles" swaggo:"true,授权角色列表"`
 }
 
-// UserRoleQueryParam 用户角色查询参数
-type UserRoleQueryParam struct {
-	UserID string
+// Users 用户对象列表
+type Users []*User
+
+// ToQueryResult 转换为查询结果
+func (a Users) ToQueryResult(roles map[string]*Role) []*UserQueryResult {
+	items := make([]*UserQueryResult, len(a))
+
+	for i, user := range a {
+		result := &UserQueryResult{
+			RecordID:  user.RecordID,
+			RealName:  user.RealName,
+			UserName:  user.UserName,
+			Status:    user.Status,
+			CreatedAt: user.CreatedAt,
+		}
+
+		var roleItems []*Role
+		for _, roleID := range user.RoleIDs {
+			if v, ok := roles[roleID]; ok {
+				roleItems = append(roleItems, v)
+			}
+		}
+		result.Roles = Roles(roleItems).ToSelectResult()
+
+		items[i] = result
+	}
+
+	return items
 }

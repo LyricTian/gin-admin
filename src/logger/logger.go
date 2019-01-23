@@ -39,7 +39,6 @@ func SetTraceIDFunc(fn TraceIDFunc) {
 }
 
 func getTraceID() string {
-	// fmt.Println("------------------> trace id:", traceIDFunc, traceIDFunc())
 	if traceIDFunc != nil {
 		return traceIDFunc()
 	}
@@ -100,24 +99,26 @@ func FromUserIDContext(ctx context.Context) string {
 	return ""
 }
 
-// Start 开始写入日志
-func Start(ctx context.Context) *Entry {
-	return StartSpan(ctx, "", "")
-}
-
 // StartSpan 开始一个追踪单元
-func StartSpan(ctx context.Context, title, function string) *Entry {
+func StartSpan(ctx context.Context, title, functionName string) *Entry {
 	fields := map[string]interface{}{
 		StartedAtKey:    time.Now(),
 		UserIDKey:       FromUserIDContext(ctx),
 		TraceIDKey:      FromTraceIDContext(ctx),
 		SpanIDKey:       FromSpanIDContext(ctx),
 		SpanTitleKey:    title,
-		SpanFunctionKey: function,
+		SpanFunctionKey: functionName,
 		VersionKey:      version,
 	}
 
 	return newEntry(logrus.WithFields(fields))
+}
+
+// StartSpanWithCall 开始一个追踪单元（回调执行）
+func StartSpanWithCall(ctx context.Context, title, functionName string) func() *Entry {
+	return func() *Entry {
+		return StartSpan(ctx, title, functionName)
+	}
 }
 
 func newEntry(entry *logrus.Entry) *Entry {
