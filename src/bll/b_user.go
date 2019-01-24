@@ -29,15 +29,15 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *
 		return nil, nil, nil
 	}
 
-	roles, _, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-		RecordIDs: schema.Users(result.Data).ToRoleIDs(),
+	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+		RecordIDs: result.Data.ToRoleIDs(),
 		Status:    1,
-	}, nil)
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	pageResult := result.Data.ToPageQueryResult(schema.Roles(roles).ToMap())
+	pageResult := result.Data.ToPageQueryResult(roleResult.Data.ToMap())
 	return pageResult, result.PageResult, nil
 }
 

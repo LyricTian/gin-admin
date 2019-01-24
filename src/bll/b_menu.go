@@ -13,25 +13,30 @@ import (
 // Menu 菜单管理
 type Menu struct {
 	lock      sync.RWMutex
-	CommonBll *Common     `inject:""`
 	MenuModel model.IMenu `inject:"IMenu"`
+	CommonBll *Common     `inject:""`
 }
 
 // QueryPage 查询分页数据
 func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error) {
-	return a.MenuModel.Query(ctx, params, pp)
+	result, err := a.MenuModel.Query(ctx, params, schema.MenuQueryOptions{
+		PageParam: pp,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return result.Data, result.PageResult, nil
 }
 
 // QueryTree 查询菜单树
-func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTreeResult, error) {
-	items, _, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTreeQueryResult, error) {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		Types: []int{1, 2},
-	}, nil)
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	return schema.Menus(items).ToTreeResult(), nil
+	return result.Data.ToTreeQueryResult().ToTree(), nil
 }
 
 // Get 查询指定数据
@@ -42,7 +47,6 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	} else if item == nil {
 		return nil, errors.ErrNotFound
 	}
-
 	return item, nil
 }
 
@@ -54,12 +58,12 @@ func (a *Menu) getLevelCode(ctx context.Context, parentItem *schema.Menu) (strin
 	} else {
 		params.LevelCode = parentItem.LevelCode
 	}
-	menuList, _, err := a.MenuModel.Query(ctx, params, nil)
+	result, err := a.MenuModel.Query(ctx, params)
 	if err != nil {
 		return "", err
 	}
 
-	levelCodes := schema.Menus(menuList).ToLevelCodes()
+	levelCodes := result.Data.ToLevelCodes()
 	levelCode := util.GetLevelCode(levelCodes)
 	if len(levelCode) == 0 {
 		return "", errors.NewInternalServerError("分级码生成失败")
@@ -157,14 +161,14 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 			}
 			item.LevelCode = levelCode
 			oldLevelCode := oldItem.LevelCode
-			menuList, _, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+			result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 				LevelCode: oldLevelCode,
-			}, nil)
+			})
 			if err != nil {
 				return err
 			}
 
-			for _, menu := range menuList {
+			for _, menu := range result.Data {
 				if menu.RecordID == recordID {
 					continue
 				}

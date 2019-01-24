@@ -15,7 +15,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" swaggo:"false,创建时间"`
 }
 
-// UserQueryParam 用户查询条件
+// UserQueryParam 用户对象查询条件
 type UserQueryParam struct {
 	UserName string // 用户名
 	RealName string // 真实姓名
@@ -30,7 +30,7 @@ type UserQueryOptions struct {
 	IncludeRoleIDs  bool             // 是否包含角色ID列表字段
 }
 
-// UserQueryResult 用户查询结果
+// UserQueryResult 用户对象查询结果
 type UserQueryResult struct {
 	Data       Users
 	PageResult *PaginationResult

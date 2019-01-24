@@ -3,12 +3,32 @@ package gormmenu
 import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // GetMenuTableName 获取菜单表名
 func GetMenuTableName() string {
 	return Menu{}.TableName()
+}
+
+// SchemaMenu 菜单对象
+type SchemaMenu schema.Menu
+
+// ToMenu 转换为菜单实体
+func (a SchemaMenu) ToMenu() *Menu {
+	item := &Menu{
+		RecordID:  a.RecordID,
+		Code:      a.Code,
+		Name:      a.Name,
+		Type:      a.Type,
+		Sequence:  a.Sequence,
+		Icon:      a.Icon,
+		Path:      a.Path,
+		Method:    a.Method,
+		LevelCode: a.LevelCode,
+		ParentID:  a.ParentID,
+		IsHide:    a.IsHide,
+	}
+	return item
 }
 
 // Menu 菜单实体
@@ -35,8 +55,19 @@ func (a Menu) TableName() string {
 
 // ToSchemaMenu 转换为菜单对象
 func (a Menu) ToSchemaMenu() *schema.Menu {
-	item := new(schema.Menu)
-	_ = util.FillStruct(a, item)
+	item := &schema.Menu{
+		RecordID:  a.RecordID,
+		Code:      a.Code,
+		Name:      a.Name,
+		Type:      a.Type,
+		Sequence:  a.Sequence,
+		Icon:      a.Icon,
+		Path:      a.Path,
+		Method:    a.Method,
+		LevelCode: a.LevelCode,
+		ParentID:  a.ParentID,
+		IsHide:    a.IsHide,
+	}
 	return item
 }
 
@@ -45,7 +76,9 @@ type Menus []*Menu
 
 // ToSchemaMenus 转换为菜单对象列表
 func (a Menus) ToSchemaMenus() []*schema.Menu {
-	var list []*schema.Menu
-	_ = util.FillStructs(a, &list)
+	list := make([]*schema.Menu, len(a))
+	for i, item := range a {
+		list[i] = item.ToSchemaMenu()
+	}
 	return list
 }

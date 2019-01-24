@@ -9,7 +9,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/jinzhu/gorm"
 )
 
@@ -37,8 +36,15 @@ func (a *Model) getDemoDB(ctx context.Context) *gorm.DB {
 	return gormcommon.FromTransDB(ctx, a.db).Model(Demo{})
 }
 
+func (a *Model) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryOptions {
+	if len(opts) > 0 {
+		return opts[0]
+	}
+	return schema.DemoQueryOptions{}
+}
+
 // Query 查询数据
-func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error) {
+func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (schema.DemoQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
@@ -54,14 +60,18 @@ func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, pp *sch
 	}
 	db = db.Order("id DESC")
 
-	var items []*Demo
-	pageResult, err := gormcommon.WrapPageQuery(db, pp, &items)
+	var qr schema.DemoQueryResult
+	opt := a.getQueryOption(opts...)
+	var items Demos
+	pr, err := gormcommon.WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
-		return nil, nil, errors.New("查询数据发生错误")
+		return qr, errors.New("查询数据发生错误")
 	}
+	qr.PageResult = pr
+	qr.Data = items.ToSchemaDemos()
 
-	return Demos(items).ToSchemaDemos(), pageResult, nil
+	return qr, nil
 }
 
 // Get 查询指定数据
@@ -101,8 +111,7 @@ func (a *Model) Create(ctx context.Context, item schema.Demo) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
 	defer span.Finish()
 
-	demo := new(Demo)
-	_ = util.FillStruct(item, demo)
+	demo := SchemaDemo(item).ToDemo()
 	demo.Creator = gormcommon.FromUserID(ctx)
 	result := a.getDemoDB(ctx).Create(demo)
 	if err := result.Error; err != nil {
@@ -117,8 +126,7 @@ func (a *Model) Update(ctx context.Context, recordID string, item schema.Demo) e
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
 	defer span.Finish()
 
-	demo := new(Demo)
-	_ = util.FillStruct(item, demo)
+	demo := SchemaDemo(item).ToDemo()
 	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(demo)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())

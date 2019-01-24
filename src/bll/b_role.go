@@ -20,23 +20,29 @@ type Role struct {
 
 // QueryPage 查询分页数据
 func (a *Role) QueryPage(ctx context.Context, params schema.RoleQueryParam, pp *schema.PaginationParam) ([]*schema.Role, *schema.PaginationResult, error) {
-	return a.RoleModel.Query(ctx, params, pp)
+	result, err := a.RoleModel.Query(ctx, params, schema.RoleQueryOptions{
+		PageParam: pp,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return result.Data, result.PageResult, nil
 }
 
 // QuerySelect 查询选择数据
-func (a *Role) QuerySelect(ctx context.Context) ([]*schema.RoleMiniResult, error) {
-	items, _, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+func (a *Role) QuerySelect(ctx context.Context) ([]*schema.RoleMiniQueryResult, error) {
+	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
 		Status: 1,
-	}, nil)
+	})
 	if err != nil {
 		return nil, err
 	}
-	return schema.Roles(items).ToMiniResult(), nil
+	return result.Data.ToMiniQueryResult(), nil
 }
 
 // Get 查询指定数据
 func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
-	item, err := a.RoleModel.Get(ctx, recordID, true)
+	item, err := a.RoleModel.Get(ctx, recordID, schema.RoleQueryOptions{IncludeMenuIDs: true})
 	if err != nil {
 		return nil, err
 	} else if item == nil {
@@ -56,16 +62,16 @@ func (a *Role) checkAndGetLeafMenuIDs(ctx context.Context, item schema.Role, old
 		}
 	}
 
-	menus, _, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		RecordIDs: item.MenuIDs,
-	}, nil)
+	})
 	if err != nil {
 		return nil, err
-	} else if len(menus) == 0 {
+	} else if len(result.Data) == 0 {
 		return nil, errors.NewBadRequestError("请选择授权菜单")
 	}
 
-	return schema.Menus(menus).ToLeafRecordIDs(), nil
+	return result.Data.ToLeafRecordIDs(), nil
 }
 
 // Create 创建数据
@@ -91,7 +97,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.Role, erro
 
 // Update 更新数据
 func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) error {
-	oldItem, err := a.RoleModel.Get(ctx, recordID, false)
+	oldItem, err := a.RoleModel.Get(ctx, recordID)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -154,15 +160,14 @@ func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) er
 
 // LoadAllPolicy 加载所有的角色策略
 func (a *Role) LoadAllPolicy(ctx context.Context) error {
-	roles, _, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-		Status:         1,
-		IncludeMenuIDs: true,
-	}, nil)
+	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+		Status: 1,
+	}, schema.RoleQueryOptions{IncludeMenuIDs: true})
 	if err != nil {
 		return err
 	}
 
-	for _, role := range roles {
+	for _, role := range result.Data {
 		err = a.LoadPolicy(ctx, *role)
 		if err != nil {
 			return err
@@ -174,7 +179,7 @@ func (a *Role) LoadAllPolicy(ctx context.Context) error {
 
 // LoadPolicyWithRecordID 加载角色权限策略
 func (a *Role) LoadPolicyWithRecordID(ctx context.Context, recordID string) error {
-	role, err := a.RoleModel.Get(ctx, recordID, true)
+	role, err := a.RoleModel.Get(ctx, recordID, schema.RoleQueryOptions{IncludeMenuIDs: true})
 	if err != nil {
 		return err
 	} else if role == nil {
@@ -186,17 +191,17 @@ func (a *Role) LoadPolicyWithRecordID(ctx context.Context, recordID string) erro
 
 // LoadPolicy 加载角色权限策略
 func (a *Role) LoadPolicy(ctx context.Context, item schema.Role) error {
-	menus, _, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		RecordIDs: item.MenuIDs,
 		Types:     []int{3},
-	}, nil)
+	})
 	if err != nil {
 		return err
 	}
 
 	roleID := item.RecordID
 	a.Enforcer.DeletePermissionsForUser(roleID)
-	for _, menu := range menus {
+	for _, menu := range result.Data {
 		if menu.Path == "" || menu.Method == "" {
 			continue
 		}
