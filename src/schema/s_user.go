@@ -38,12 +38,12 @@ type UserQueryResult struct {
 
 // UserPageQueryResult 用户分页查询结果
 type UserPageQueryResult struct {
-	RecordID  string            `json:"record_id" swaggo:"false,记录ID"`
-	UserName  string            `json:"user_name" swaggo:"true,用户名"`
-	RealName  string            `json:"real_name" swaggo:"true,真实姓名"`
-	Status    int               `json:"status" swaggo:"true,用户状态(1:启用 2:停用)"`
-	CreatedAt time.Time         `json:"created_at" swaggo:"false,创建时间"`
-	Roles     []*RoleMiniResult `json:"roles" swaggo:"true,授权角色列表"`
+	RecordID  string                 `json:"record_id" swaggo:"false,记录ID"`
+	UserName  string                 `json:"user_name" swaggo:"true,用户名"`
+	RealName  string                 `json:"real_name" swaggo:"true,真实姓名"`
+	Status    int                    `json:"status" swaggo:"true,用户状态(1:启用 2:停用)"`
+	CreatedAt time.Time              `json:"created_at" swaggo:"false,创建时间"`
+	Roles     []*RoleMiniQueryResult `json:"roles" swaggo:"true,授权角色列表"`
 }
 
 // Users 用户对象列表
@@ -77,8 +77,7 @@ func (a Users) ToPageQueryResult(roles map[string]*Role) []*UserPageQueryResult 
 				roleItems = append(roleItems, v)
 			}
 		}
-		result.Roles = Roles(roleItems).ToMiniResult()
-
+		result.Roles = Roles(roleItems).ToMiniQueryResult()
 		items[i] = result
 	}
 

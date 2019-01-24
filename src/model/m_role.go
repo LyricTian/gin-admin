@@ -9,9 +9,9 @@ import (
 // IRole 角色管理
 type IRole interface {
 	// 查询数据
-	Query(ctx context.Context, params schema.RoleQueryParam, pp *schema.PaginationParam) ([]*schema.Role, *schema.PaginationResult, error)
+	Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (schema.RoleQueryResult, error)
 	// 查询指定数据
-	Get(ctx context.Context, recordID string, includeMenuIDs bool) (*schema.Role, error)
+	Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error)
 	// 检查名称是否存在
 	CheckName(ctx context.Context, name string) (bool, error)
 	// 创建数据

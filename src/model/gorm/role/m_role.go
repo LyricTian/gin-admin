@@ -9,7 +9,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/jinzhu/gorm"
 )
 
@@ -41,8 +40,15 @@ func (a *Model) getRoleMenuDB(ctx context.Context) *gorm.DB {
 	return gormcommon.FromTransDB(ctx, a.db).Model(RoleMenu{})
 }
 
+func (a *Model) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
+	if len(opts) > 0 {
+		return opts[0]
+	}
+	return schema.RoleQueryOptions{}
+}
+
 // Query 查询数据
-func (a *Model) Query(ctx context.Context, params schema.RoleQueryParam, pp *schema.PaginationParam) ([]*schema.Role, *schema.PaginationResult, error) {
+func (a *Model) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (schema.RoleQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
@@ -58,29 +64,44 @@ func (a *Model) Query(ctx context.Context, params schema.RoleQueryParam, pp *sch
 	}
 	db = db.Order("id DESC")
 
-	var items []*Role
-	pr, err := gormcommon.WrapPageQuery(db, pp, &items)
+	opt := a.getQueryOption(opts...)
+	var qr schema.RoleQueryResult
+	var items Roles
+	pr, err := gormcommon.WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
-		return nil, nil, errors.New("查询数据发生错误")
+		return qr, errors.New("查询数据发生错误")
 	}
+	qr.PageResult = pr
 
-	sroles := Roles(items).ToSchemaRoles()
-	if params.IncludeMenuIDs {
-		for i, item := range sroles {
-			menuIDs, err := a.QueryMenuIDs(ctx, item.RecordID)
-			if err != nil {
-				return nil, nil, err
-			}
-			sroles[i].MenuIDs = menuIDs
+	sitems := make([]*schema.Role, len(items))
+	for i, item := range items {
+		sitems[i], err = a.toSchemaRole(ctx, *item, opts...)
+		if err != nil {
+			return qr, err
 		}
 	}
+	qr.Data = sitems
 
-	return sroles, pr, nil
+	return qr, nil
+}
+
+func (a *Model) toSchemaRole(ctx context.Context, item Role, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
+	opt := a.getQueryOption(opts...)
+	sitem := item.ToSchemaRole()
+	if opt.IncludeMenuIDs {
+		menuIDs, err := a.QueryMenuIDs(ctx, item.RecordID)
+		if err != nil {
+			return nil, err
+		}
+		sitem.MenuIDs = menuIDs
+	}
+
+	return sitem, nil
 }
 
 // Get 查询指定数据
-func (a *Model) Get(ctx context.Context, recordID string, includeMenuIDs bool) (*schema.Role, error) {
+func (a *Model) Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	span := logger.StartSpan(ctx, "查询指定数据", a.getFuncName("Get"))
 	defer span.Finish()
 
@@ -93,16 +114,7 @@ func (a *Model) Get(ctx context.Context, recordID string, includeMenuIDs bool) (
 		return nil, nil
 	}
 
-	srole := item.ToSchemaRole()
-	if includeMenuIDs {
-		menuIDs, err := a.QueryMenuIDs(ctx, recordID)
-		if err != nil {
-			return nil, err
-		}
-		srole.MenuIDs = menuIDs
-	}
-
-	return srole, nil
+	return a.toSchemaRole(ctx, item, opts...)
 }
 
 // CheckName 检查名称是否存在
@@ -148,8 +160,7 @@ func (a *Model) CreateRole(ctx context.Context, item schema.Role) error {
 	span := logger.StartSpan(ctx, "创建角色数据", a.getFuncName("CreateRole"))
 	defer span.Finish()
 
-	role := new(Role)
-	_ = util.FillStruct(item, role)
+	role := SchemaRole(item).ToRole()
 	role.Creator = gormcommon.FromUserID(ctx)
 	result := a.getRoleDB(ctx).Create(role)
 	if err := result.Error; err != nil {
@@ -193,8 +204,7 @@ func (a *Model) UpdateRole(ctx context.Context, recordID string, item schema.Rol
 	span := logger.StartSpan(ctx, "更新角色数据", a.getFuncName("UpdateRole"))
 	defer span.Finish()
 
-	role := new(Role)
-	_ = util.FillStruct(item, role)
+	role := SchemaRole(item).ToRole()
 	result := a.getRoleDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(role)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
