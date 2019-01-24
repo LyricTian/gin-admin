@@ -3,7 +3,6 @@ package gormrole
 import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // GetRoleTableName 获取角色表名
@@ -14,6 +13,20 @@ func GetRoleTableName() string {
 // GetRoleMenuTableName 获取角色菜单关联表名
 func GetRoleMenuTableName() string {
 	return RoleMenu{}.TableName()
+}
+
+// SchemaRole 角色对象
+type SchemaRole schema.Role
+
+// ToRole 转换为角色实体
+func (a SchemaRole) ToRole() *Role {
+	item := &Role{
+		RecordID: a.RecordID,
+		Name:     a.Name,
+		Memo:     a.Memo,
+		Status:   a.Status,
+	}
+	return item
 }
 
 // Role 角色实体
@@ -33,8 +46,12 @@ func (a Role) TableName() string {
 
 // ToSchemaRole 转换为角色对象
 func (a Role) ToSchemaRole() *schema.Role {
-	item := new(schema.Role)
-	_ = util.FillStruct(a, item)
+	item := &schema.Role{
+		RecordID: a.RecordID,
+		Name:     a.Name,
+		Memo:     a.Memo,
+		Status:   a.Status,
+	}
 	return item
 }
 
@@ -43,8 +60,10 @@ type Roles []*Role
 
 // ToSchemaRoles 转换为角色对象列表
 func (a Roles) ToSchemaRoles() []*schema.Role {
-	var list []*schema.Role
-	_ = util.FillStructs(a, &list)
+	list := make([]*schema.Role, len(a))
+	for i, item := range a {
+		list[i] = item.ToSchemaRole()
+	}
 	return list
 }
 

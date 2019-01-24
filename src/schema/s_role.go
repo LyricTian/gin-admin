@@ -9,16 +9,27 @@ type Role struct {
 	MenuIDs  []string `json:"menu_ids" binding:"required,gt=0" swaggo:"true,授权的菜单ID列表"`
 }
 
-// RoleQueryParam 角色查询条件
+// RoleQueryParam 角色对象查询条件
 type RoleQueryParam struct {
-	RecordIDs      []string // 记录ID列表
-	Name           string   // 角色名称
-	Status         int      // 角色状态(1:启用 2:停用)
-	IncludeMenuIDs bool     // 是否包含菜单ID列表
+	RecordIDs []string // 记录ID列表
+	Name      string   // 角色名称
+	Status    int      // 角色状态(1:启用 2:停用)
 }
 
-// RoleMiniResult 角色对象最小数据结果
-type RoleMiniResult struct {
+// RoleQueryOptions 角色对象查询可选参数项
+type RoleQueryOptions struct {
+	PageParam      *PaginationParam // 分页参数
+	IncludeMenuIDs bool             // 是否包含菜单ID列表字段
+}
+
+// RoleQueryResult 角色对象查询结果
+type RoleQueryResult struct {
+	Data       Roles
+	PageResult *PaginationResult
+}
+
+// RoleMiniQueryResult 角色对象少量数据查询结果
+type RoleMiniQueryResult struct {
 	RecordID string `json:"record_id" swaggo:"true,记录ID"`
 	Name     string `json:"name" swaggo:"true,角色名称"`
 }
@@ -35,11 +46,11 @@ func (a Roles) ToMap() map[string]*Role {
 	return m
 }
 
-// ToMiniResult 转换为角色最小结果
-func (a Roles) ToMiniResult() []*RoleMiniResult {
-	items := make([]*RoleMiniResult, len(a))
+// ToMiniQueryResult 转换为少量数据查询结果
+func (a Roles) ToMiniQueryResult() []*RoleMiniQueryResult {
+	items := make([]*RoleMiniQueryResult, len(a))
 	for i, item := range items {
-		items[i] = &RoleMiniResult{
+		items[i] = &RoleMiniQueryResult{
 			RecordID: item.RecordID,
 			Name:     item.Name,
 		}
