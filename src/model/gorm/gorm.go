@@ -14,8 +14,8 @@ import (
 // Init 初始化gorm存储
 func Init(g *inject.Graph, db *gormplus.DB) {
 	g.Provide(&inject.Object{Value: model.ITrans(gormcommon.NewTrans(db)), Name: "ITrans"})
-	g.Provide(&inject.Object{Value: model.IDemo(gormdemo.NewModel(db)), Name: "IDemo"})
-	g.Provide(&inject.Object{Value: model.IMenu(gormmenu.NewModel(db)), Name: "IMenu"})
-	g.Provide(&inject.Object{Value: model.IRole(gormrole.NewModel(db)), Name: "IRole"})
-	g.Provide(&inject.Object{Value: model.IUser(gormuser.NewModel(db)), Name: "IUser"})
+	g.Provide(&inject.Object{Value: model.IDemo(gormdemo.InitModel(db)), Name: "IDemo"})
+	g.Provide(&inject.Object{Value: model.IMenu(gormmenu.InitModel(db)), Name: "IMenu"})
+	g.Provide(&inject.Object{Value: model.IRole(gormrole.InitModel(db)), Name: "IRole"})
+	g.Provide(&inject.Object{Value: model.IUser(gormuser.InitModel(db)), Name: "IUser"})
 }

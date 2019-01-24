@@ -6,14 +6,14 @@ import (
 	"github.com/LyricTian/gin-admin/src/schema"
 )
 
-// IUser 用户管理
+// IUser 用户对象存储接口
 type IUser interface {
 	// 查询数据
-	Query(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.User, *schema.PaginationResult, error)
+	Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (schema.UserQueryResult, error)
 	// 查询指定数据
-	Get(ctx context.Context, recordID string, includePassword, includeRoleIDs bool) (*schema.User, error)
+	Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error)
 	// 根据用户名查询指定数据
-	GetByUserName(ctx context.Context, userName string, includePassword, includeUserIDs bool) (*schema.User, error)
+	GetByUserName(ctx context.Context, userName string, opts ...schema.UserQueryOptions) (*schema.User, error)
 	// 检查用户名是否存在
 	CheckUserName(ctx context.Context, userName string) (bool, error)
 	// 创建数据

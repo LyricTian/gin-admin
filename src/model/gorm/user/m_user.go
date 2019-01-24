@@ -12,10 +12,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// InitModel 初始化用户存储
+func InitModel(db *gormplus.DB) *Model {
+	db.AutoMigrate(new(User), new(UserRole))
+	return NewModel(db)
+}
+
 // NewModel 实例化用户存储
 func NewModel(db *gormplus.DB) *Model {
-	db.AutoMigrate(new(User), new(UserRole))
-	return &Model{db}
+	return &Model{db: db}
 }
 
 // Model 用户存储
@@ -35,8 +40,15 @@ func (a *Model) getUserRoleDB(ctx context.Context) *gorm.DB {
 	return gormcommon.FromTransDB(ctx, a.db).Model(UserRole{})
 }
 
+func (a *Model) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryOptions {
+	if len(opts) > 0 {
+		return opts[0]
+	}
+	return schema.UserQueryOptions{}
+}
+
 // Query 查询数据
-func (a *Model) Query(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.User, *schema.PaginationResult, error) {
+func (a *Model) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (schema.UserQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
@@ -56,29 +68,44 @@ func (a *Model) Query(ctx context.Context, params schema.UserQueryParam, pp *sch
 	}
 	db = db.Order("id DESC")
 
+	opt := a.getQueryOption(opts...)
+	var qr schema.UserQueryResult
 	var items []*User
-	pr, err := gormcommon.WrapPageQuery(db, pp, &items)
+	pr, err := gormcommon.WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
-		return nil, nil, errors.New("查询数据发生错误")
+		return qr, errors.New("查询数据发生错误")
 	}
+	qr.PageResult = pr
 
-	sitems := Users(items).ToSchemaUsers(params.IncludePassword)
-	if params.IncludeRoleIDs {
-		for i, item := range sitems {
-			roleIDs, err := a.QueryRoleIDs(ctx, item.RecordID)
-			if err != nil {
-				return nil, nil, err
-			}
-			sitems[i].RoleIDs = roleIDs
+	sitems := make([]*schema.User, len(items))
+	for i, item := range items {
+		sitems[i], err = a.toSchemaUser(ctx, *item, opts...)
+		if err != nil {
+			return qr, err
 		}
 	}
+	qr.Data = sitems
 
-	return sitems, pr, nil
+	return qr, nil
+}
+
+func (a *Model) toSchemaUser(ctx context.Context, item User, opts ...schema.UserQueryOptions) (*schema.User, error) {
+	opt := a.getQueryOption(opts...)
+	sitem := item.ToSchemaUser(opt.IncludePassword)
+	if opt.IncludeRoleIDs {
+		roleIDs, err := a.QueryRoleIDs(ctx, item.RecordID)
+		if err != nil {
+			return nil, err
+		}
+		sitem.RoleIDs = roleIDs
+	}
+
+	return sitem, nil
 }
 
 // GetByUserName 根据用户名查询指定数据
-func (a *Model) GetByUserName(ctx context.Context, userName string, includePassword, includeRoleIDs bool) (*schema.User, error) {
+func (a *Model) GetByUserName(ctx context.Context, userName string, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	span := logger.StartSpan(ctx, "根据用户名查询指定数据", a.getFuncName("GetByUserName"))
 	defer span.Finish()
 
@@ -91,20 +118,11 @@ func (a *Model) GetByUserName(ctx context.Context, userName string, includePassw
 		return nil, nil
 	}
 
-	sitem := item.ToSchemaUser(includePassword)
-	if includeRoleIDs {
-		roleIDs, err := a.QueryRoleIDs(ctx, item.RecordID)
-		if err != nil {
-			return nil, err
-		}
-		sitem.RoleIDs = roleIDs
-	}
-
-	return sitem, nil
+	return a.toSchemaUser(ctx, item, opts...)
 }
 
 // Get 查询指定数据
-func (a *Model) Get(ctx context.Context, recordID string, includePassword, includeRoleIDs bool) (*schema.User, error) {
+func (a *Model) Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	span := logger.StartSpan(ctx, "查询指定数据", a.getFuncName("Get"))
 	defer span.Finish()
 
@@ -117,16 +135,7 @@ func (a *Model) Get(ctx context.Context, recordID string, includePassword, inclu
 		return nil, nil
 	}
 
-	sitem := item.ToSchemaUser(includePassword)
-	if includeRoleIDs {
-		roleIDs, err := a.QueryRoleIDs(ctx, recordID)
-		if err != nil {
-			return nil, err
-		}
-		sitem.RoleIDs = roleIDs
-	}
-
-	return sitem, nil
+	return a.toSchemaUser(ctx, item, opts...)
 }
 
 // CheckUserName 检查用户名是否存在

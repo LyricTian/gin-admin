@@ -13,10 +13,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// InitModel 初始化菜单存储
+func InitModel(db *gormplus.DB) *Model {
+	db.AutoMigrate(new(Menu))
+	return NewModel(db)
+}
+
 // NewModel 实例化菜单存储
 func NewModel(db *gormplus.DB) *Model {
-	db.AutoMigrate(new(Menu))
-	return &Model{db}
+	return &Model{db: db}
 }
 
 // Model 菜单存储

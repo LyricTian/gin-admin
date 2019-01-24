@@ -13,10 +13,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// InitModel 初始化角色存储
+func InitModel(db *gormplus.DB) *Model {
+	db.AutoMigrate(new(Role), new(RoleMenu))
+	return NewModel(db)
+}
+
 // NewModel 实例化角色存储
 func NewModel(db *gormplus.DB) *Model {
-	db.AutoMigrate(new(Role), new(RoleMenu))
-	return &Model{db}
+	return &Model{db: db}
 }
 
 // Model 角色存储
