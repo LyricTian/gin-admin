@@ -13,10 +13,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// NewModel 实例化示例存储
-func NewModel(db *gormplus.DB) *Model {
+// InitModel 实例化demo存储
+func InitModel(db *gormplus.DB) *Model {
 	db.AutoMigrate(new(Demo))
-	return &Model{db}
+	return NewModel(db)
+}
+
+// NewModel 实例化demo存储
+func NewModel(db *gormplus.DB) *Model {
+	return &Model{db: db}
 }
 
 // Model 示例程序存储

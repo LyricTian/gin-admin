@@ -19,37 +19,33 @@ type User struct {
 }
 
 // QueryPage 查询分页数据
-func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.UserQueryResult, *schema.PaginationResult, error) {
-	items, pr, err := a.UserModel.Query(ctx, params, pp)
+func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.UserPageQueryResult, *schema.PaginationResult, error) {
+	result, err := a.UserModel.Query(ctx, params, schema.UserQueryOptions{
+		PageParam: pp,
+	})
 	if err != nil {
 		return nil, nil, err
-	} else if len(items) == 0 {
+	} else if len(result.Data) == 0 {
 		return nil, nil, nil
 	}
 
-	var roleIDs []string
-	for _, item := range items {
-		roleIDs = append(roleIDs, item.RoleIDs...)
-	}
 	roles, _, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-		RecordIDs: roleIDs,
+		RecordIDs: schema.Users(result.Data).ToRoleIDs(),
 		Status:    1,
 	}, nil)
 	if err != nil {
 		return nil, nil, err
 	}
-	mrole := make(map[string]*schema.Role)
-	for _, item := range roles {
-		mrole[item.RecordID] = item
-	}
 
-	result := schema.Users(items).ToQueryResult(mrole)
-	return result, pr, nil
+	pageResult := result.Data.ToPageQueryResult(schema.Roles(roles).ToMap())
+	return pageResult, result.PageResult, nil
 }
 
 // Get 查询指定数据
 func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
-	item, err := a.UserModel.Get(ctx, recordID, false, true)
+	item, err := a.UserModel.Get(ctx, recordID, schema.UserQueryOptions{
+		IncludeRoleIDs: true,
+	})
 	if err != nil {
 		return nil, err
 	} else if item == nil {
@@ -91,7 +87,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.User, erro
 
 // Update 更新数据
 func (a *User) Update(ctx context.Context, recordID string, item schema.User) error {
-	oldItem, err := a.UserModel.Get(ctx, recordID, false, false)
+	oldItem, err := a.UserModel.Get(ctx, recordID)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -158,16 +154,14 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 
 // LoadAllPolicy 加载所有的用户策略
 func (a *User) LoadAllPolicy(ctx context.Context) error {
-	// TODO: 优化为分页查询
-	items, _, err := a.UserModel.Query(ctx, schema.UserQueryParam{
-		Status:         1,
-		IncludeRoleIDs: true,
-	}, nil)
+	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+		Status: 1,
+	}, schema.UserQueryOptions{IncludeRoleIDs: true})
 	if err != nil {
 		return err
 	}
 
-	for _, item := range items {
+	for _, item := range result.Data {
 		for _, roleID := range item.RoleIDs {
 			a.Enforcer.AddRoleForUser(item.RecordID, roleID)
 		}
@@ -178,7 +172,9 @@ func (a *User) LoadAllPolicy(ctx context.Context) error {
 
 // LoadPolicy 加载用户权限策略
 func (a *User) LoadPolicy(ctx context.Context, recordID string) error {
-	item, err := a.UserModel.Get(ctx, recordID, false, true)
+	item, err := a.UserModel.Get(ctx, recordID, schema.UserQueryOptions{
+		IncludeRoleIDs: true,
+	})
 	if err != nil {
 		return err
 	}
