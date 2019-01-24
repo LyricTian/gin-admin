@@ -36,7 +36,7 @@ func (a *User) Query(ctx *context.Context) {
 // @Param real_name query string false "真实姓名(模糊查询)"
 // @Param role_id query string false "角色ID"
 // @Param status query int false "状态(1:启用 2:停用)"
-// @Success 200 []schema.UserQueryResult "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
+// @Success 200 []schema.UserPageQueryResult "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"

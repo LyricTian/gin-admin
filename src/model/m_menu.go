@@ -9,7 +9,7 @@ import (
 // IMenu 菜单管理存储接口
 type IMenu interface {
 	// 查询数据
-	Query(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error)
+	Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (schema.MenuQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Menu, error)
 	// 检查编号是否存在

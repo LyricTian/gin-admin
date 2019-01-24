@@ -3,12 +3,26 @@ package gormdemo
 import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // GetDemoTableName 获取demo表名
 func GetDemoTableName() string {
 	return Demo{}.TableName()
+}
+
+// SchemaDemo demo对象
+type SchemaDemo schema.Demo
+
+// ToDemo 转换为demo实体
+func (a SchemaDemo) ToDemo() *Demo {
+	item := &Demo{
+		RecordID: a.RecordID,
+		Code:     a.Code,
+		Name:     a.Name,
+		Memo:     a.Memo,
+		Status:   a.Status,
+	}
+	return item
 }
 
 // Demo demo实体
@@ -29,8 +43,13 @@ func (a Demo) TableName() string {
 
 // ToSchemaDemo 转换为demo对象
 func (a Demo) ToSchemaDemo() *schema.Demo {
-	item := new(schema.Demo)
-	_ = util.FillStruct(a, item)
+	item := &schema.Demo{
+		RecordID: a.RecordID,
+		Code:     a.Code,
+		Name:     a.Name,
+		Memo:     a.Memo,
+		Status:   a.Status,
+	}
 	return item
 }
 
@@ -39,7 +58,9 @@ type Demos []*Demo
 
 // ToSchemaDemos 转换为demo对象列表
 func (a Demos) ToSchemaDemos() []*schema.Demo {
-	var list []*schema.Demo
-	_ = util.FillStructs(a, &list)
+	list := make([]*schema.Demo, len(a))
+	for i, item := range a {
+		list[i] = item.ToSchemaDemo()
+	}
 	return list
 }

@@ -17,7 +17,11 @@ type Demo struct {
 
 // Query 查询数据
 func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error) {
-	return a.DemoModel.Query(ctx, params, pp)
+	result, err := a.DemoModel.Query(ctx, params, schema.DemoQueryOptions{PageParam: pp})
+	if err != nil {
+		return nil, nil, err
+	}
+	return result.Data, result.PageResult, nil
 }
 
 // Get 查询指定数据

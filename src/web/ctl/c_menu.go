@@ -69,7 +69,7 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 // QueryTree 查询菜单树
 // @Summary 查询菜单树
 // @Param Access-Token header string false "访问令牌"
-// @Success 200 option.Interface "查询结果：{list:[{record_id:记录ID,name:名称,parent_id:父级ID,children:子级树}]}"
+// @Success 200 option.Interface "查询结果：{list:菜单树}"
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"

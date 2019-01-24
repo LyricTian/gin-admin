@@ -9,7 +9,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/jinzhu/gorm"
 )
 
@@ -37,8 +36,15 @@ func (a *Model) getMenuDB(ctx context.Context) *gorm.DB {
 	return gormcommon.FromTransDB(ctx, a.db).Model(Menu{})
 }
 
+func (a *Model) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
+	if len(opts) > 0 {
+		return opts[0]
+	}
+	return schema.MenuQueryOptions{}
+}
+
 // Query 查询数据
-func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error) {
+func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (schema.MenuQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
@@ -66,14 +72,18 @@ func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, pp *sch
 	}
 	db = db.Order("sequence,id DESC")
 
-	var items []*Menu
-	pr, err := gormcommon.WrapPageQuery(db, pp, &items)
+	var qr schema.MenuQueryResult
+	opt := a.getQueryOption(opts...)
+	var items Menus
+	pr, err := gormcommon.WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
-		return nil, nil, errors.New("查询数据发生错误")
+		return qr, errors.New("查询数据发生错误")
 	}
+	qr.PageResult = pr
+	qr.Data = items.ToSchemaMenus()
 
-	return Menus(items).ToSchemaMenus(), pr, nil
+	return qr, nil
 }
 
 // Get 查询指定数据
@@ -126,8 +136,7 @@ func (a *Model) Create(ctx context.Context, item schema.Menu) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
 	defer span.Finish()
 
-	menu := new(Menu)
-	_ = util.FillStruct(item, menu)
+	menu := SchemaMenu(item).ToMenu()
 	menu.Creator = gormcommon.FromUserID(ctx)
 	result := a.getMenuDB(ctx).Create(menu)
 	if err := result.Error; err != nil {
@@ -142,8 +151,7 @@ func (a *Model) Update(ctx context.Context, recordID string, item schema.Menu) e
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
 	defer span.Finish()
 
-	menu := new(Menu)
-	_ = util.FillStruct(item, menu)
+	menu := SchemaMenu(item).ToMenu()
 	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(menu)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())

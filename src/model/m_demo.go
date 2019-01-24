@@ -9,7 +9,7 @@ import (
 // IDemo demo存储接口
 type IDemo interface {
 	// 查询数据
-	Query(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error)
+	Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (schema.DemoQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Demo, error)
 	// 检查编号是否存在
