@@ -1,15 +1,6 @@
 # 运行模式(debug:调试,release:正式,test:测试)
 run_mode = "debug"
 
-# http监听地址
-http_host = "0.0.0.0"
-
-# http监听端口
-http_port = 8086
-
-# http优雅关闭等待超时时长(单位秒)
-http_shutdown_timeout = 10
-
 # casbin模型配置文件(也可以启动服务时使用-m指定)
 casbin_model_conf = ""
 
@@ -19,20 +10,34 @@ www = ""
 # swagger文档目录(也可以启动服务时使用-swagger指定)
 swagger = ""
 
-# 系统root用户名
-system_root_user = "root"
-
-# 系统root密码
-system_root_password = "123"
-
 # 存储模式(支持的存储模式：gorm)
 db_mode = "gorm"
 
-# 数据库表名前缀
-db_table_prefix = "g_"
+# http配置
+[http]
+# http监听地址
+host = "0.0.0.0"
+# http监听端口
+port = 8086
+# http优雅关闭等待超时时长(单位秒)
+shutdown_timeout = 10
 
-# 认证模式(支持的认证模式：session)
-auth_mode = "session"
+# root用户
+[root_user]
+user_name = "root"
+password = "123"
+real_name = "超级用户"
+
+# 图形验证码
+[captcha]
+# 存储方式(支持：memory/redis)
+store = "memory"
+# 数字长度
+length = 4
+# 图片宽度
+width = 100
+# 图片高度
+height = 45
 
 # 会话配置
 [session]
@@ -58,6 +63,11 @@ hook_max_thread = 1
 # 写入钩子的最大缓冲区数量
 hook_max_buffer = 512
 
+[redis]
+addr = "192.168.33.90:6379"
+db = "10"
+password = ""
+
 [gorm]
 # 是否开启调试模式
 debug = false
@@ -69,6 +79,8 @@ max_lifetime = 7200
 max_open_conns = 150
 # 设置空闲连接池中的最大连接数
 max_idle_conns = 50
+# 数据库表名前缀
+table_prefix = "ga_"
 
 [mysql]
 # 连接地址
@@ -82,10 +94,6 @@ password = "123456"
 # 数据库
 db_name = "ginadmin"
 
-[sqlite3]
-# 数据库
-db_name = "data/ginadmin.db"
-
 [postgres]
 # 连接地址
 host = "127.0.0.1"
@@ -97,3 +105,7 @@ user = "root"
 password = "123456"
 # 数据库
 db_name = "ginadmin"
+
+[sqlite3]
+# 数据库路径
+path = "data/ginadmin.db"

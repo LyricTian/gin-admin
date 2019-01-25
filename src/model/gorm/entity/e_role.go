@@ -1,7 +1,6 @@
-package gormrole
+package gormentity
 
 import (
-	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
 )
 
@@ -31,7 +30,7 @@ func (a SchemaRole) ToRole() *Role {
 
 // Role 角色实体
 type Role struct {
-	gormcommon.Model
+	Model
 	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
 	Name     string `gorm:"column:name;size:100;index;"`            // 角色名称
 	Memo     string `gorm:"column:memo;size:200;"`                  // 备注
@@ -69,7 +68,7 @@ func (a Roles) ToSchemaRoles() []*schema.Role {
 
 // RoleMenu 角色菜单关联实体
 type RoleMenu struct {
-	gormcommon.Model
+	Model
 	RoleID string `gorm:"column:role_id;size:36;index;"` // 角色内码
 	MenuID string `gorm:"column:menu_id;size:36;index;"` // 菜单内码
 }

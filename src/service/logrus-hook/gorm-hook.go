@@ -94,5 +94,5 @@ type GormItem struct {
 
 // TableName 表名
 func (GormItem) TableName() string {
-	return config.GetDBTablePrefix() + "logger"
+	return config.GetGormTablePrefix() + "logger"
 }

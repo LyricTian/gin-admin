@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +17,7 @@ func TestRole(t *testing.T) {
 
 	// post /menus
 	addMenuItem := &schema.Menu{
-		Code:     "test_role_menu_1",
+		Code:     util.MustUUID(),
 		Name:     "测试角色菜单",
 		Type:     1,
 		Sequence: 9999,
@@ -32,7 +33,7 @@ func TestRole(t *testing.T) {
 
 	// post /roles
 	addItem := &schema.Role{
-		Name:    "测试角色",
+		Name:    util.MustUUID(),
 		Memo:    "角色备注",
 		Status:  1,
 		MenuIDs: []string{addMenuNewItem.RecordID},
@@ -66,9 +67,13 @@ func TestRole(t *testing.T) {
 	assert.Equal(t, len(pageItems), 1)
 	assert.Equal(t, pageItems[0].RecordID, addNewItem.RecordID)
 
+	// get /roles/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+	var putItem schema.Role
+	err = parseReader(w.Body, &putItem)
 	// put /roles/:id
-	putItem := *pageItems[0]
-	putItem.Name = "测试角色2"
+	putItem.Name = util.MustUUID()
 	putItem.Memo = "角色备注2"
 	putItem.MenuIDs = []string{addMenuNewItem.RecordID}
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))

@@ -1,4 +1,4 @@
-package gormmenu
+package gormmodel
 
 import (
 	"context"
@@ -6,37 +6,36 @@ import (
 
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/LyricTian/gin-admin/src/model/gorm/common"
+	"github.com/LyricTian/gin-admin/src/model/gorm/entity"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
-	"github.com/jinzhu/gorm"
 )
 
-// InitModel 初始化菜单存储
-func InitModel(db *gormplus.DB) *Model {
-	db.AutoMigrate(new(Menu))
-	return NewModel(db)
+// InitMenu 初始化菜单存储
+func InitMenu(db *gormplus.DB) *Menu {
+	db.AutoMigrate(new(gormentity.Menu))
+	return NewMenu(db)
 }
 
-// NewModel 实例化菜单存储
-func NewModel(db *gormplus.DB) *Model {
-	return &Model{db: db}
+// NewMenu 实例化菜单存储
+func NewMenu(db *gormplus.DB) *Menu {
+	return &Menu{db: db}
 }
 
-// Model 菜单存储
-type Model struct {
+// Menu 菜单存储
+type Menu struct {
 	db *gormplus.DB
 }
 
-func (a *Model) getFuncName(name string) string {
+func (a *Menu) getFuncName(name string) string {
 	return fmt.Sprintf("gorm.menu.%s", name)
 }
 
-func (a *Model) getMenuDB(ctx context.Context) *gorm.DB {
-	return gormcommon.FromTransDB(ctx, a.db).Model(Menu{})
+func (a *Menu) getMenuDB(ctx context.Context) *gormplus.DB {
+	return FromTransDBWithModel(ctx, a.db, gormentity.Menu{})
 }
 
-func (a *Model) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
+func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
 	if len(opts) > 0 {
 		return opts[0]
 	}
@@ -44,11 +43,11 @@ func (a *Model) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQuery
 }
 
 // Query 查询数据
-func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (schema.MenuQueryResult, error) {
+func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (schema.MenuQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
-	db := a.getMenuDB(ctx)
+	db := a.getMenuDB(ctx).DB
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
 	}
@@ -70,12 +69,19 @@ func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, opts ..
 	if v := params.ParentID; v != nil {
 		db = db.Where("parent_id=?", *v)
 	}
+	if v := params.UserID; v != "" {
+		// expr := a.getMenuDB(ctx).Select("user_id").Where("role_id=?", v).SubQuery()
+		// db=db.Where("record_id IN(?)")
+	}
+	if v := params.LevelCodes; len(v) > 0 {
+		db = db.Where("level_code IN(?)", v)
+	}
 	db = db.Order("sequence,id DESC")
 
 	var qr schema.MenuQueryResult
 	opt := a.getQueryOption(opts...)
-	var items Menus
-	pr, err := gormcommon.WrapPageQuery(db, opt.PageParam, &items)
+	var items gormentity.Menus
+	pr, err := WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
 		return qr, errors.New("查询数据发生错误")
@@ -87,11 +93,11 @@ func (a *Model) Query(ctx context.Context, params schema.MenuQueryParam, opts ..
 }
 
 // Get 查询指定数据
-func (a *Model) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
+func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	span := logger.StartSpan(ctx, "查询指定数据", a.getFuncName("Get"))
 	defer span.Finish()
 
-	var item Menu
+	var item gormentity.Menu
 	ok, err := a.db.FindOne(a.getMenuDB(ctx).Where("record_id=?", recordID), &item)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -104,7 +110,7 @@ func (a *Model) Get(ctx context.Context, recordID string) (*schema.Menu, error) 
 }
 
 // CheckCode 检查编号是否存在
-func (a *Model) CheckCode(ctx context.Context, code string, parentID string) (bool, error) {
+func (a *Menu) CheckCode(ctx context.Context, code string, parentID string) (bool, error) {
 	span := logger.StartSpan(ctx, "检查编号是否存在", a.getFuncName("CheckCode"))
 	defer span.Finish()
 
@@ -118,7 +124,7 @@ func (a *Model) CheckCode(ctx context.Context, code string, parentID string) (bo
 }
 
 // CheckChild 检查子级是否存在
-func (a *Model) CheckChild(ctx context.Context, parentID string) (bool, error) {
+func (a *Menu) CheckChild(ctx context.Context, parentID string) (bool, error) {
 	span := logger.StartSpan(ctx, "检查子级是否存在", a.getFuncName("CheckChild"))
 	defer span.Finish()
 
@@ -132,12 +138,12 @@ func (a *Model) CheckChild(ctx context.Context, parentID string) (bool, error) {
 }
 
 // Create 创建数据
-func (a *Model) Create(ctx context.Context, item schema.Menu) error {
+func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
 	defer span.Finish()
 
-	menu := SchemaMenu(item).ToMenu()
-	menu.Creator = gormcommon.FromUserID(ctx)
+	menu := gormentity.SchemaMenu(item).ToMenu()
+	menu.Creator = FromUserID(ctx)
 	result := a.getMenuDB(ctx).Create(menu)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
@@ -147,11 +153,11 @@ func (a *Model) Create(ctx context.Context, item schema.Menu) error {
 }
 
 // Update 更新数据
-func (a *Model) Update(ctx context.Context, recordID string, item schema.Menu) error {
+func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) error {
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
 	defer span.Finish()
 
-	menu := SchemaMenu(item).ToMenu()
+	menu := gormentity.SchemaMenu(item).ToMenu()
 	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(menu)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
@@ -161,7 +167,7 @@ func (a *Model) Update(ctx context.Context, recordID string, item schema.Menu) e
 }
 
 // UpdateLevelCode 更新分级码
-func (a *Model) UpdateLevelCode(ctx context.Context, recordID, levelCode string) error {
+func (a *Menu) UpdateLevelCode(ctx context.Context, recordID, levelCode string) error {
 	span := logger.StartSpan(ctx, "更新分级码", a.getFuncName("UpdateLevelCode"))
 	defer span.Finish()
 
@@ -174,11 +180,11 @@ func (a *Model) UpdateLevelCode(ctx context.Context, recordID, levelCode string)
 }
 
 // Delete 删除数据
-func (a *Model) Delete(ctx context.Context, recordID string) error {
+func (a *Menu) Delete(ctx context.Context, recordID string) error {
 	span := logger.StartSpan(ctx, "删除数据", a.getFuncName("Delete"))
 	defer span.Finish()
 
-	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Delete(Menu{})
+	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Delete(gormentity.Menu{})
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("删除数据发生错误")

@@ -45,6 +45,16 @@ func (a *Context) CContext() context.Context {
 	return parent
 }
 
+// Request http request
+func (a *Context) Request() *http.Request {
+	return a.gctx.Request
+}
+
+// ResponseWriter http response stream
+func (a *Context) ResponseWriter() http.ResponseWriter {
+	return a.gctx.Writer
+}
+
 // SessionStore 获取会话存储
 func (a *Context) SessionStore() session.Store {
 	return ginsession.FromContext(a.gctx)

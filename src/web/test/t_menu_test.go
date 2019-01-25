@@ -4,6 +4,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/LyricTian/gin-admin/src/util"
+
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +18,7 @@ func TestMenu(t *testing.T) {
 
 	// post /menus
 	addItem := &schema.Menu{
-		Code:     "test_menu_1",
+		Code:     util.MustUUID(),
 		Name:     "测试菜单",
 		Type:     1,
 		Sequence: -1,
@@ -55,9 +57,13 @@ func TestMenu(t *testing.T) {
 	assert.Equal(t, len(pageItems), 1)
 	assert.Equal(t, pageItems[0].RecordID, addNewItem.RecordID)
 
+	// get /menus/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+	var putItem schema.Menu
+	err = parseReader(w.Body, &putItem)
 	// put /menus/:id
-	putItem := *pageItems[0]
-	putItem.Code = "test_menu_2"
+	putItem.Code = util.MustUUID()
 	putItem.Name = "测试菜单2"
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)

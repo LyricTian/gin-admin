@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +17,7 @@ func TestDemo(t *testing.T) {
 
 	// post /demos
 	addItem := &schema.Demo{
-		Code:   "test_foo_1",
+		Code:   util.MustUUID(),
 		Name:   "测试用例",
 		Status: 1,
 	}
@@ -50,9 +51,13 @@ func TestDemo(t *testing.T) {
 	assert.Equal(t, len(pageItems), 1)
 	assert.Equal(t, pageItems[0].RecordID, addNewItem.RecordID)
 
+	// get /demos/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+	var putItem schema.Demo
+	err = parseReader(w.Body, &putItem)
 	// put /demos/:id
-	putItem := *pageItems[0]
-	putItem.Code = "test_foo_2"
+	putItem.Code = util.MustUUID()
 	putItem.Name = "测试用例2"
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)

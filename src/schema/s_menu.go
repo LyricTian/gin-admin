@@ -24,13 +24,15 @@ type Menu struct {
 
 // MenuQueryParam 菜单对象查询条件
 type MenuQueryParam struct {
-	RecordIDs []string // 记录ID列表
-	Code      string   // 菜单编号(模糊查询)
-	Name      string   // 菜单名称(模糊查询)
-	LevelCode string   // 分级码(前缀模糊查询)
-	Types     []int    // 菜单类型(1：模块 2：功能 3：资源)
-	IsHide    int      // 是否隐藏(1:是 2:否)
-	ParentID  *string  // 父级内码
+	RecordIDs  []string // 记录ID列表
+	Code       string   // 菜单编号(模糊查询)
+	Name       string   // 菜单名称(模糊查询)
+	LevelCode  string   // 分级码(前缀模糊查询)
+	Types      []int    // 菜单类型(1：模块 2：功能 3：资源)
+	IsHide     int      // 是否隐藏(1:是 2:否)
+	ParentID   *string  // 父级内码
+	UserID     string   // 用户ID（查询用户所拥有的菜单权限）
+	LevelCodes []string // 分级码列表
 }
 
 // MenuQueryOptions 菜单对象查询可选参数项

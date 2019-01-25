@@ -4,18 +4,19 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/src/config"
+	gcontext "github.com/LyricTian/gin-admin/src/context"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
-	"github.com/pkg/errors"
 )
 
 // 定义错误
 var (
-	ErrInvalidUser     = errors.New("无效的用户")
-	ErrInvalidUserName = errors.New("无效的用户名")
-	ErrInvalidPassword = errors.New("无效的密码")
-	ErrUserDisable     = errors.New("用户被禁用")
+	ErrInvalidUser     = errors.NewBadRequestError("无效的用户")
+	ErrInvalidUserName = errors.NewBadRequestError("无效的用户名")
+	ErrInvalidPassword = errors.NewBadRequestError("无效的密码")
+	ErrUserDisable     = errors.NewBadRequestError("用户被禁用")
 )
 
 // Login 登录管理
@@ -25,18 +26,20 @@ type Login struct {
 	MenuModel model.IMenu `inject:"IMenu"`
 }
 
-func (a *Login) getRootUser() schema.User {
+// GetRootUser 获取root用户数据
+func (a *Login) GetRootUser() schema.User {
+	rootUser := config.GetRootUser()
 	return schema.User{
-		RecordID: config.GetRootUser().UserName,
-		UserName: config.GetRootUser().UserName,
-		RealName: "超级用户",
-		Password: config.GetRootUser().Password,
+		RecordID: rootUser.UserName,
+		UserName: rootUser.UserName,
+		RealName: rootUser.RealName,
+		Password: util.MD5HashString(rootUser.Password),
 	}
 }
 
 // CheckIsRoot 检查是否是超级用户
 func (a *Login) CheckIsRoot(ctx context.Context, recordID string) bool {
-	rootUser := a.getRootUser()
+	rootUser := a.GetRootUser()
 	if rootUser.RecordID == recordID {
 		return true
 	}
@@ -44,69 +47,73 @@ func (a *Login) CheckIsRoot(ctx context.Context, recordID string) bool {
 }
 
 // Verify 登录验证
-func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
-	rootUser := a.getRootUser()
-	if userName == rootUser.UserName &&
-		util.MD5HashString(rootUser.Password) == password {
-		return &rootUser, nil
+func (a *Login) Verify(ctx context.Context, userName, password string) (string, error) {
+	// 检查是否是超级用户
+	rootUser := a.GetRootUser()
+	if userName == rootUser.UserName && rootUser.Password == password {
+		return rootUser.RecordID, nil
 	}
 
-	// user, err := a.UserModel.GetByUserName(ctx, userName, false)
-	// if err != nil {
-	// 	return nil, err
-	// } else if user == nil {
-	// 	return nil, ErrInvalidUserName
-	// } else if user.Status != 1 {
-	// 	return nil, ErrUserDisable
-	// } else if user.Password != util.SHA1HashString(password) {
-	// 	return nil, ErrInvalidPassword
-	// }
+	user, err := a.UserModel.GetByUserName(ctx, userName, schema.UserQueryOptions{IncludePassword: true})
+	if err != nil {
+		return "", err
+	} else if user == nil {
+		return "", ErrInvalidUserName
+	} else if user.Status != 1 {
+		return "", ErrUserDisable
+	} else if user.Password != util.SHA1HashString(password) {
+		return "", ErrInvalidPassword
+	}
 
-	// return user, nil
-	return nil, nil
+	return user.RecordID, nil
 }
 
-// GetCurrentUserInfo 获取当前用户信息
-func (a *Login) GetCurrentUserInfo(ctx context.Context, userID string) (*schema.LoginInfo, error) {
+// GetUserInfo 获取当前用户登录信息
+func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) {
+	userID := gcontext.FromUserID(ctx)
 	if isRoot := a.CheckIsRoot(ctx, userID); isRoot {
-		rootUser := a.getRootUser()
-		return &schema.LoginInfo{
-			UserName: rootUser.UserName,
-			RealName: rootUser.RealName,
-		}, nil
+		user := a.GetRootUser()
+		loginInfo := &schema.UserLoginInfo{
+			UserName: user.UserName,
+			RealName: user.RealName,
+		}
+		return loginInfo, nil
 	}
 
-	// user, err := a.UserModel.Get(ctx, userID, true)
-	// if err != nil {
-	// 	return nil, err
-	// } else if user == nil {
-	// 	return nil, ErrInvalidUser
-	// } else if user.Status != 1 {
-	// 	return nil, ErrUserDisable
-	// }
+	user, err := a.UserModel.Get(ctx, userID, schema.UserQueryOptions{
+		IncludeRoleIDs: true,
+	})
+	if err != nil {
+		return nil, err
+	} else if user == nil {
+		return nil, ErrInvalidUser
+	} else if user.Status != 1 {
+		return nil, ErrUserDisable
+	}
 
-	// info := &schema.LoginInfo{
-	// 	UserName: user.UserName,
-	// 	RealName: user.RealName,
-	// }
+	loginInfo := &schema.UserLoginInfo{
+		UserName: user.UserName,
+		RealName: user.RealName,
+	}
 
-	// // 查询用户角色
-	// if len(user.RoleIDs) > 0 {
-	// roleItems, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{RecordIDs: user.RoleIDs})
-	// if err == nil && len(roleItems) > 0 {
-	// 	roleNames := make([]string, len(roleItems))
-	// 	for i, item := range roleItems {
-	// 		roleNames[i] = item.Name
-	// 	}
-	// 	info.RoleNames = roleNames
-	// }
-	// }
+	if len(user.RoleIDs) > 0 {
+		roles, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+			Status:    1,
+			RecordIDs: user.RoleIDs,
+		})
+		if err != nil {
+			return nil, err
+		}
+		loginInfo.RoleNames = roles.Data.ToNames()
+	}
 
-	return nil, nil
+	return loginInfo, nil
 }
 
-// QueryCurrentUserMenus 查询当前用户菜单
-func (a *Login) QueryCurrentUserMenus(ctx context.Context, userID string) ([]map[string]interface{}, error) {
+// QueryUserMenuTree 查询当前用户的权限菜单树
+func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTreeQueryResult, error) {
+	// userID := gcontext.FromUserID(ctx)
+
 	// params := schema.MenuSelectQueryParam{
 	// 	Status:     1,
 	// 	IsHide:     2,

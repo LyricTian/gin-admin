@@ -1,46 +1,13 @@
-package gormcommon
+package gormmodel
 
 import (
 	"context"
 	"fmt"
 
-	gcontext "github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
 )
-
-// FromTransDB 从上下文中获取事务DB，如果不存在则使用默认DB
-func FromTransDB(ctx context.Context, defaultDB *gormplus.DB) *gormplus.DB {
-	trans, ok := gcontext.FromTrans(ctx)
-	if ok {
-		db, ok := trans.(*gormplus.DB)
-		if ok {
-			return db
-		}
-	}
-	return defaultDB
-}
-
-// ExecTrans 执行事务
-func ExecTrans(ctx context.Context, db *gormplus.DB, fn func(context.Context) error) error {
-	if _, ok := gcontext.FromTrans(ctx); ok {
-		return fn(ctx)
-	}
-
-	transModel := NewTrans(db)
-	trans, err := transModel.Begin(ctx)
-	if err != nil {
-		return err
-	}
-
-	err = fn(gcontext.NewTrans(ctx, trans))
-	if err != nil {
-		_ = transModel.Rollback(ctx, trans)
-		return err
-	}
-	return transModel.Commit(ctx, trans)
-}
 
 // NewTrans 事务管理
 func NewTrans(db *gormplus.DB) *Trans {

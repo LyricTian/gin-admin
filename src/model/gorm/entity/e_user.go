@@ -1,7 +1,6 @@
-package gormuser
+package gormentity
 
 import (
-	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
 )
 
@@ -32,7 +31,7 @@ func (a SchemaUser) ToUser() *User {
 
 // User 用户实体
 type User struct {
-	gormcommon.Model
+	Model
 	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
 	UserName string `gorm:"column:user_name;size:64;index;"`        // 用户名
 	RealName string `gorm:"column:real_name;size:32;index;"`        // 真实姓名
@@ -75,7 +74,7 @@ func (a Users) ToSchemaUsers(includePassword bool) []*schema.User {
 
 // UserRole 用户角色关联实体
 type UserRole struct {
-	gormcommon.Model
+	Model
 	UserID string `gorm:"column:user_id;size:36;index;"` // 用户内码
 	RoleID string `gorm:"column:role_id;size:36;index;"` // 角色内码
 }

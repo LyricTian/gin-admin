@@ -21,7 +21,8 @@ type User struct {
 // QueryPage 查询分页数据
 func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.UserPageQueryResult, *schema.PaginationResult, error) {
 	result, err := a.UserModel.Query(ctx, params, schema.UserQueryOptions{
-		PageParam: pp,
+		PageParam:      pp,
+		IncludeRoleIDs: true,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -60,8 +61,15 @@ func (a *User) check(ctx context.Context, item schema.User, oldItem *schema.User
 		if err != nil {
 			return err
 		} else if exists {
-			return errors.NewBadRequestError("用户名已经存在")
+			return errors.NewBadRequestError("用户名已经存在，请重新填写")
 		}
+	}
+
+	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{RecordIDs: item.RoleIDs})
+	if err != nil {
+		return err
+	} else if len(roleResult.Data) == 0 {
+		return errors.NewBadRequestError("请选择有效的角色")
 	}
 	return nil
 }
@@ -73,6 +81,8 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.User, erro
 		return nil, err
 	}
 
+	item.Password = util.SHA1HashString(item.Password)
+	item.RecordID = util.MustUUID()
 	err = a.UserModel.Create(ctx, item)
 	if err != nil {
 		return nil, err
