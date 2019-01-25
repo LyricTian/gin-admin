@@ -1,4 +1,4 @@
-package gormdemo
+package gormmodel
 
 import (
 	"context"
@@ -6,37 +6,36 @@ import (
 
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/LyricTian/gin-admin/src/model/gorm/common"
+	"github.com/LyricTian/gin-admin/src/model/gorm/entity"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
-	"github.com/jinzhu/gorm"
 )
 
-// InitModel 实例化demo存储
-func InitModel(db *gormplus.DB) *Model {
-	db.AutoMigrate(new(Demo))
-	return NewModel(db)
+// InitDemo 初始化demo存储
+func InitDemo(db *gormplus.DB) *Demo {
+	db.AutoMigrate(new(gormentity.Demo))
+	return NewDemo(db)
 }
 
-// NewModel 实例化demo存储
-func NewModel(db *gormplus.DB) *Model {
-	return &Model{db: db}
+// NewDemo 实例化demo存储
+func NewDemo(db *gormplus.DB) *Demo {
+	return &Demo{db: db}
 }
 
-// Model 示例程序存储
-type Model struct {
+// Demo demo存储
+type Demo struct {
 	db *gormplus.DB
 }
 
-func (a *Model) getFuncName(name string) string {
+func (a *Demo) getFuncName(name string) string {
 	return fmt.Sprintf("gorm.demo.%s", name)
 }
 
-func (a *Model) getDemoDB(ctx context.Context) *gorm.DB {
-	return gormcommon.FromTransDB(ctx, a.db).Model(Demo{})
+func (a *Demo) getDemoDB(ctx context.Context) *gormplus.DB {
+	return FromTransDBWithModel(ctx, a.db, gormentity.Demo{})
 }
 
-func (a *Model) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryOptions {
+func (a *Demo) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryOptions {
 	if len(opts) > 0 {
 		return opts[0]
 	}
@@ -44,11 +43,11 @@ func (a *Model) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQuery
 }
 
 // Query 查询数据
-func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (schema.DemoQueryResult, error) {
+func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (schema.DemoQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
-	db := a.getDemoDB(ctx)
+	db := a.getDemoDB(ctx).DB
 	if v := params.Code; v != "" {
 		db = db.Where("code LIKE ?", "%"+v+"%")
 	}
@@ -62,8 +61,8 @@ func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, opts ..
 
 	var qr schema.DemoQueryResult
 	opt := a.getQueryOption(opts...)
-	var items Demos
-	pr, err := gormcommon.WrapPageQuery(db, opt.PageParam, &items)
+	var items gormentity.Demos
+	pr, err := WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
 		return qr, errors.New("查询数据发生错误")
@@ -75,12 +74,12 @@ func (a *Model) Query(ctx context.Context, params schema.DemoQueryParam, opts ..
 }
 
 // Get 查询指定数据
-func (a *Model) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
+func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 	span := logger.StartSpan(ctx, "查询指定数据", a.getFuncName("Get"))
 	defer span.Finish()
 
 	db := a.getDemoDB(ctx).Where("record_id=?", recordID)
-	var item Demo
+	var item gormentity.Demo
 	ok, err := a.db.FindOne(db, &item)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -93,7 +92,7 @@ func (a *Model) Get(ctx context.Context, recordID string) (*schema.Demo, error) 
 }
 
 // CheckCode 检查编号是否存在
-func (a *Model) CheckCode(ctx context.Context, code string) (bool, error) {
+func (a *Demo) CheckCode(ctx context.Context, code string) (bool, error) {
 	span := logger.StartSpan(ctx, "检查编号是否存在", a.getFuncName("CheckCode"))
 	defer span.Finish()
 
@@ -107,12 +106,12 @@ func (a *Model) CheckCode(ctx context.Context, code string) (bool, error) {
 }
 
 // Create 创建数据
-func (a *Model) Create(ctx context.Context, item schema.Demo) error {
+func (a *Demo) Create(ctx context.Context, item schema.Demo) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
 	defer span.Finish()
 
-	demo := SchemaDemo(item).ToDemo()
-	demo.Creator = gormcommon.FromUserID(ctx)
+	demo := gormentity.SchemaDemo(item).ToDemo()
+	demo.Creator = FromUserID(ctx)
 	result := a.getDemoDB(ctx).Create(demo)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
@@ -122,11 +121,11 @@ func (a *Model) Create(ctx context.Context, item schema.Demo) error {
 }
 
 // Update 更新数据
-func (a *Model) Update(ctx context.Context, recordID string, item schema.Demo) error {
+func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
 	defer span.Finish()
 
-	demo := SchemaDemo(item).ToDemo()
+	demo := gormentity.SchemaDemo(item).ToDemo()
 	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(demo)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
@@ -136,11 +135,11 @@ func (a *Model) Update(ctx context.Context, recordID string, item schema.Demo) e
 }
 
 // Delete 删除数据
-func (a *Model) Delete(ctx context.Context, recordID string) error {
+func (a *Demo) Delete(ctx context.Context, recordID string) error {
 	span := logger.StartSpan(ctx, "删除数据", a.getFuncName("Delete"))
 	defer span.Finish()
 
-	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Delete(Demo{})
+	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Delete(gormentity.Demo{})
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("删除数据发生错误")
@@ -149,7 +148,7 @@ func (a *Model) Delete(ctx context.Context, recordID string) error {
 }
 
 // UpdateStatus 更新状态
-func (a *Model) UpdateStatus(ctx context.Context, recordID string, status int) error {
+func (a *Demo) UpdateStatus(ctx context.Context, recordID string, status int) error {
 	span := logger.StartSpan(ctx, "更新状态", a.getFuncName("UpdateStatus"))
 	defer span.Finish()
 

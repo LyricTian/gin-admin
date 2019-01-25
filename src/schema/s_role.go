@@ -37,6 +37,15 @@ type RoleMiniQueryResult struct {
 // Roles 角色对象列表
 type Roles []*Role
 
+// ToNames 转换为名称列表
+func (a Roles) ToNames() []string {
+	names := make([]string, len(a))
+	for i, item := range a {
+		names[i] = item.Name
+	}
+	return names
+}
+
 // ToMap 转换为键值存储
 func (a Roles) ToMap() map[string]*Role {
 	m := make(map[string]*Role)
@@ -49,7 +58,7 @@ func (a Roles) ToMap() map[string]*Role {
 // ToMiniQueryResult 转换为少量数据查询结果
 func (a Roles) ToMiniQueryResult() []*RoleMiniQueryResult {
 	items := make([]*RoleMiniQueryResult, len(a))
-	for i, item := range items {
+	for i, item := range a {
 		items[i] = &RoleMiniQueryResult{
 			RecordID: item.RecordID,
 			Name:     item.Name,

@@ -3,16 +3,19 @@ package src
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/LyricTian/captcha"
+	"github.com/LyricTian/captcha/store"
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/service/logrus-hook"
 	"github.com/LyricTian/gin-admin/src/web"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // CallbackFunc 回调处理函数
@@ -27,9 +30,17 @@ func Init(ctx context.Context) CallbackFunc {
 		span().Fatalf("初始化依赖注入发生错误：%s", err.Error())
 	}
 
-	loggerFunc, err := InitLogger(ctx, obj)
-	if err != nil {
-		span().Fatalf("初始化日志模块发生错误：%s", err.Error())
+	// 初始化日志
+	loggerFunc := InitLogger(ctx, obj)
+
+	// 初始化图形验证码
+	if config.IsCaptchaRedisStore() {
+		config := config.GetRedisConfig()
+		captcha.SetCustomStore(store.NewRedisStore(&store.RedisOptions{
+			Addr:     config.Password,
+			DB:       config.DB,
+			Password: config.Password,
+		}, captcha.Expiration, log.New(os.Stderr, "[captcha]", log.LstdFlags), "captcha_"))
 	}
 
 	// 初始化HTTP服务
@@ -89,20 +100,8 @@ func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
 }
 
 // InitLogger 初始化日志
-func InitLogger(ctx context.Context, obj *inject.Object) (CallbackFunc, error) {
-	var options struct {
-		Level         int    `mapstructure:"level"`
-		Format        string `mapstructure:"format"`
-		EnableHook    bool   `mapstructure:"enable_hook"`
-		HookMaxThread int    `mapstructure:"hook_max_thread"`
-		HookMaxBuffer int    `mapstructure:"hook_max_buffer"`
-	}
-
-	err := viper.UnmarshalKey("log", &options)
-	if err != nil {
-		return nil, err
-	}
-
+func InitLogger(ctx context.Context, obj *inject.Object) CallbackFunc {
+	options := config.GetLogConfig()
 	if v := options.Level; v > -1 {
 		logrus.SetLevel(logrus.Level(v))
 	}
@@ -124,8 +123,8 @@ func InitLogger(ctx context.Context, obj *inject.Object) (CallbackFunc, error) {
 		if config.IsGormDB() && obj.GormDB != nil {
 			hook := logrushook.NewGormHook(obj.GormDB.DB, opts...)
 			logrus.AddHook(hook)
-			return hook.Flush, nil
+			return hook.Flush
 		}
 	}
-	return nil, nil
+	return nil
 }

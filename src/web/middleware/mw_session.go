@@ -10,22 +10,11 @@ import (
 	"github.com/go-session/gin-session"
 	"github.com/go-session/gorm"
 	"github.com/go-session/session"
-	"github.com/spf13/viper"
 )
 
 // SessionMiddleware session中间件
 func SessionMiddleware(obj *inject.Object, skipper SkipperFunc) gin.HandlerFunc {
-	var options struct {
-		HeaderName  string `mapstructure:"header_name"`
-		Sign        string `mapstructure:"sign"`
-		Expired     int64  `mapstructure:"expired"`
-		EnableStore bool   `mapstructure:"enable_store"`
-	}
-
-	err := viper.UnmarshalKey("session", &options)
-	if err != nil {
-		panic(err.Error())
-	}
+	options := config.GetSessionConfig()
 
 	var opts []session.Option
 	opts = append(opts, session.SetEnableSetCookie(false))
@@ -37,7 +26,7 @@ func SessionMiddleware(obj *inject.Object, skipper SkipperFunc) gin.HandlerFunc 
 
 	if options.EnableStore {
 		if config.IsGormDB() && obj.GormDB != nil {
-			tableName := config.GetDBTablePrefix() + "session"
+			tableName := config.GetGormTablePrefix() + "session"
 			store := gormsession.NewStoreWithDB(obj.GormDB.DB, tableName, 0)
 			opts = append(opts, session.SetStore(store))
 		}

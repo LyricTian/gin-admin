@@ -1,7 +1,6 @@
-package gormdemo
+package gormentity
 
 import (
-	"github.com/LyricTian/gin-admin/src/model/gorm/common"
 	"github.com/LyricTian/gin-admin/src/schema"
 )
 
@@ -27,7 +26,7 @@ func (a SchemaDemo) ToDemo() *Demo {
 
 // Demo demo实体
 type Demo struct {
-	gormcommon.Model
+	Model
 	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
 	Code     string `gorm:"column:code;size:50;index;"`             // 编号
 	Name     string `gorm:"column:name;size:100;index;"`            // 名称

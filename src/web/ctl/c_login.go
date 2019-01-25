@@ -24,7 +24,7 @@ func (a *Login) Login(ctx *context.Context) {
 	}
 
 	var result context.HTTPStatus
-	userInfo, err := a.LoginBll.Verify(ctx.CContext(), item.UserName, item.Password)
+	recordID, err := a.LoginBll.Verify(ctx.CContext(), item.UserName, item.Password)
 	if err != nil {
 		result.Status = context.StatusError
 		if err == bll.ErrInvalidPassword ||
@@ -38,7 +38,7 @@ func (a *Login) Login(ctx *context.Context) {
 		ctx.ResSuccess(result)
 		return
 	}
-	ctx.SetUserID(userInfo.RecordID)
+	ctx.SetUserID(recordID)
 
 	nctx := ctx.CContext()
 	span := logger.StartSpan(nctx, "用户登录", "Login")
@@ -51,7 +51,7 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
-	store.Set(context.ContextKeyUserID, userInfo.RecordID)
+	store.Set(context.ContextKeyUserID, recordID)
 	err = store.Save()
 	if err != nil {
 		result.Status = context.StatusError
@@ -81,11 +81,9 @@ func (a *Login) Logout(ctx *context.Context) {
 	ctx.ResOK()
 }
 
-// GetCurrentUserInfo 获取当前用户信息
-func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
-	userID := ctx.GetUserID()
-
-	info, err := a.LoginBll.GetCurrentUserInfo(ctx.CContext(), userID)
+// GetUserInfo 获取用户登录信息
+func (a *Login) GetUserInfo(ctx *context.Context) {
+	info, err := a.LoginBll.GetUserInfo(ctx.CContext())
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -95,9 +93,7 @@ func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
 
 // QueryCurrentUserMenus 查询当前用户菜单
 func (a *Login) QueryCurrentUserMenus(ctx *context.Context) {
-	userID := ctx.GetUserID()
-
-	menus, err := a.LoginBll.QueryCurrentUserMenus(ctx.CContext(), userID)
+	menus, err := a.LoginBll.QueryUserMenuTree(ctx.CContext())
 	if err != nil {
 		ctx.ResError(err)
 		return

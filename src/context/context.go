@@ -27,12 +27,12 @@ func NewUserID(ctx context.Context, userID string) context.Context {
 }
 
 // FromUserID 从上下文中获取用户ID
-func FromUserID(ctx context.Context) (string, bool) {
+func FromUserID(ctx context.Context) string {
 	v := ctx.Value(userIDCtx{})
 	if v != nil {
 		if s, ok := v.(string); ok {
-			return s, true
+			return s
 		}
 	}
-	return "", false
+	return ""
 }
