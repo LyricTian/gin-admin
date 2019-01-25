@@ -28,15 +28,15 @@ type User struct {
 }
 
 func (a *User) getFuncName(name string) string {
-	return fmt.Sprintf("gorm.user.%s", name)
+	return fmt.Sprintf("gorm.model.User.%s", name)
 }
 
 func (a *User) getUserDB(ctx context.Context) *gormplus.DB {
-	return FromTransDBWithModel(ctx, a.db, gormentity.User{})
+	return FromDBWithModel(ctx, a.db, gormentity.User{})
 }
 
 func (a *User) getUserRoleDB(ctx context.Context) *gormplus.DB {
-	return FromTransDBWithModel(ctx, a.db, gormentity.UserRole{})
+	return FromDBWithModel(ctx, a.db, gormentity.UserRole{})
 }
 
 func (a *User) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryOptions {
@@ -279,6 +279,19 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("更新状态发生错误")
+	}
+	return nil
+}
+
+// UpdatePassword 更新密码
+func (a *User) UpdatePassword(ctx context.Context, recordID, password string) error {
+	span := logger.StartSpan(ctx, "更新密码", a.getFuncName("UpdatePassword"))
+	defer span.Finish()
+
+	result := a.getUserDB(ctx).Where("record_id=?", recordID).Update("password", password)
+	if err := result.Error; err != nil {
+		span.Errorf(err.Error())
+		return errors.New("更新密码发生错误")
 	}
 	return nil
 }

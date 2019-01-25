@@ -28,15 +28,15 @@ type Role struct {
 }
 
 func (a *Role) getFuncName(name string) string {
-	return fmt.Sprintf("gorm.role.%s", name)
+	return fmt.Sprintf("gorm.model.Role.%s", name)
 }
 
 func (a *Role) getRoleDB(ctx context.Context) *gormplus.DB {
-	return FromTransDBWithModel(ctx, a.db, gormentity.Role{})
+	return FromDBWithModel(ctx, a.db, gormentity.Role{})
 }
 
 func (a *Role) getRoleMenuDB(ctx context.Context) *gormplus.DB {
-	return FromTransDBWithModel(ctx, a.db, gormentity.RoleMenu{})
+	return FromDBWithModel(ctx, a.db, gormentity.RoleMenu{})
 }
 
 func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {

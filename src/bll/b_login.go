@@ -13,10 +13,11 @@ import (
 
 // 定义错误
 var (
-	ErrInvalidUser     = errors.NewBadRequestError("无效的用户")
 	ErrInvalidUserName = errors.NewBadRequestError("无效的用户名")
 	ErrInvalidPassword = errors.NewBadRequestError("无效的密码")
-	ErrUserDisable     = errors.NewBadRequestError("用户被禁用")
+	ErrInvalidUser     = errors.NewUnauthorizedError("无效的用户")
+	ErrUserDisable     = errors.NewUnauthorizedError("用户被禁用")
+	ErrNoPerm          = errors.NewUnauthorizedError("没有权限")
 )
 
 // Login 登录管理
@@ -59,10 +60,10 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (string, 
 		return "", err
 	} else if user == nil {
 		return "", ErrInvalidUserName
-	} else if user.Status != 1 {
-		return "", ErrUserDisable
 	} else if user.Password != util.SHA1HashString(password) {
 		return "", ErrInvalidPassword
+	} else if user.Status != 1 {
+		return "", ErrUserDisable
 	}
 
 	return user.RecordID, nil
@@ -112,24 +113,54 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 
 // QueryUserMenuTree 查询当前用户的权限菜单树
 func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTreeQueryResult, error) {
-	// userID := gcontext.FromUserID(ctx)
+	userID := gcontext.FromUserID(ctx)
+	if a.CheckIsRoot(ctx, userID) {
+		userID = ""
+	}
 
-	// params := schema.MenuSelectQueryParam{
-	// 	Status:     1,
-	// 	IsHide:     2,
-	// 	Types:      []int{20, 30},
-	// }
+	// 查询用户的权限
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		IsHide: 2,
+		UserID: userID,
+	})
+	if err != nil {
+		return nil, err
+	} else if len(result.Data) == 0 {
+		return nil, ErrNoPerm
+	}
 
-	// if isRoot := a.CheckIsRoot(ctx, userID); !isRoot {
-	// 	params.UserID = userID
-	// }
+	// 将权限拆分，组装成树
+	result, err = a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		LevelCodes: util.ParseLevelCodes(result.Data.ToLevelCodes()...),
+	})
+	if err != nil {
+		return nil, err
+	} else if len(result.Data) == 0 {
+		return nil, ErrNoPerm
+	}
 
-	// items, err := a.MenuModel.QuerySelect(ctx, params)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	return result.Data.ToTreeQueryResult(), nil
+}
 
-	// treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
-	// return treeData, nil
-	return nil, nil
+// UpdatePassword 更新当前用户登录密码
+func (a *Login) UpdatePassword(ctx context.Context, params schema.UpdatePasswordParam) error {
+	userID := gcontext.FromUserID(ctx)
+	if a.CheckIsRoot(ctx, userID) {
+		return errors.NewBadRequestError("超级用户密码只能通过配置文件修改")
+	}
+
+	user, err := a.UserModel.Get(ctx, userID, schema.UserQueryOptions{
+		IncludePassword: true,
+	})
+	if err != nil {
+		return err
+	} else if user == nil {
+		return ErrInvalidUser
+	} else if user.Status != 1 {
+		return ErrUserDisable
+	} else if util.SHA1HashString(params.OldPassword) != user.Password {
+		return errors.NewBadRequestError("旧密码不正确")
+	}
+
+	return a.UserModel.UpdatePassword(ctx, userID, params.NewPassword)
 }

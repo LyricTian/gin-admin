@@ -14,8 +14,8 @@ func FromUserID(ctx context.Context) string {
 	return gcontext.FromUserID(ctx)
 }
 
-// FromTransDB 从上下文中获取事务DB，如果不存在则使用默认DB
-func FromTransDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+// FromDB 从上下文中获取DB，如果不存在则使用默认DB
+func FromDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
 	trans, ok := gcontext.FromTrans(ctx)
 	if ok {
 		db, ok := trans.(*gormplus.DB)
@@ -26,9 +26,9 @@ func FromTransDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
 	return defDB
 }
 
-// FromTransDBWithModel 获取数据库模型
-func FromTransDBWithModel(ctx context.Context, defDB *gormplus.DB, v interface{}) *gormplus.DB {
-	return gormplus.Wrap(FromTransDB(ctx, defDB).Model(v))
+// FromDBWithModel 从上下文获取DB，并创建模型
+func FromDBWithModel(ctx context.Context, defDB *gormplus.DB, v interface{}) *gormplus.DB {
+	return gormplus.Wrap(FromDB(ctx, defDB).Model(v))
 }
 
 // WrapPageQuery 包装带有分页的查询

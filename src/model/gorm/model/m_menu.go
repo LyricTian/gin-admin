@@ -28,11 +28,11 @@ type Menu struct {
 }
 
 func (a *Menu) getFuncName(name string) string {
-	return fmt.Sprintf("gorm.menu.%s", name)
+	return fmt.Sprintf("gorm.model.Menu.%s", name)
 }
 
 func (a *Menu) getMenuDB(ctx context.Context) *gormplus.DB {
-	return FromTransDBWithModel(ctx, a.db, gormentity.Menu{})
+	return FromDBWithModel(ctx, a.db, gormentity.Menu{})
 }
 
 func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
@@ -70,8 +70,9 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 		db = db.Where("parent_id=?", *v)
 	}
 	if v := params.UserID; v != "" {
-		// expr := a.getMenuDB(ctx).Select("user_id").Where("role_id=?", v).SubQuery()
-		// db=db.Where("record_id IN(?)")
+		userRoleQuery := FromDBWithModel(ctx, a.db, gormentity.UserRole{}).Select("role_id").Where("user_id=?", v).SubQuery()
+		roleMenuQuery := FromDBWithModel(ctx, a.db, gormentity.RoleMenu{}).Select("menu_id").Where("role_id IN(?)", userRoleQuery).SubQuery()
+		db = db.Where("record_id IN(?)", roleMenuQuery)
 	}
 	if v := params.LevelCodes; len(v) > 0 {
 		db = db.Where("level_code IN(?)", v)

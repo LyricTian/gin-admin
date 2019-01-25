@@ -16,8 +16,8 @@ func APIHandler(app *gin.Engine, obj *inject.Object) {
 	case config.IsSessionAuth():
 		api.Use(middleware.VerifySessionMiddleware(
 			middleware.AllowMethodAndPathPrefixSkipper(
+				context.GetRouter("GET", "/api/v1/login"),
 				context.GetRouter("POST", "/api/v1/login"),
-				context.GetRouter("POST", "/api/v1/logout"),
 			),
 		))
 	}
@@ -25,10 +25,11 @@ func APIHandler(app *gin.Engine, obj *inject.Object) {
 	// 权限校验中间件
 	api.Use(middleware.CasbinMiddleware(obj.Enforcer,
 		middleware.AllowMethodAndPathPrefixSkipper(
+			context.GetRouter("GET", "/api/v1/login"),
 			context.GetRouter("POST", "/api/v1/login"),
-			context.GetRouter("POST", "/api/v1/logout"),
-			context.GetRouter("GET", "/api/v1/current/menus"),
+			context.GetRouter("PUT", "/api/v1/current/password"),
 			context.GetRouter("GET", "/api/v1/current/user"),
+			context.GetRouter("GET", "/api/v1/current/menutree"),
 		),
 	))
 

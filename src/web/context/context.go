@@ -2,6 +2,7 @@ package context
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	gcontext "github.com/LyricTian/gin-admin/src/context"
@@ -11,7 +12,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/gin-session"
-	"github.com/go-session/session"
 )
 
 // New 创建上下文实例
@@ -22,6 +22,10 @@ func New(c *gin.Context) *Context {
 // Context 定义上下文
 type Context struct {
 	gctx *gin.Context
+}
+
+func (a *Context) getFunctionName(name string) string {
+	return fmt.Sprintf("web.context.Context.%s", name)
 }
 
 // GContext 获取gin.Context
@@ -55,19 +59,31 @@ func (a *Context) ResponseWriter() http.ResponseWriter {
 	return a.gctx.Writer
 }
 
-// SessionStore 获取会话存储
-func (a *Context) SessionStore() session.Store {
-	return ginsession.FromContext(a.gctx)
-}
+// SaveUserIDToSession 将用户ID存储到当前会话
+func (a *Context) SaveUserIDToSession(userID string) error {
+	store, err := ginsession.Refresh(a.gctx)
+	if err != nil {
+		logger.StartSpan(a.CContext(), "更新会话", a.getFunctionName("SaveUserIDToSession")).Errorf(err.Error())
+		return errors.NewInternalServerError("更新会话发生错误")
+	}
 
-// RefreshSession 更新会话
-func (a *Context) RefreshSession() (session.Store, error) {
-	return ginsession.Refresh(a.gctx)
+	store.Set(ContextKeyUserID, userID)
+	err = store.Save()
+	if err != nil {
+		logger.StartSpan(a.CContext(), "存储会话", a.getFunctionName("SaveUserIDToSession")).Errorf(err.Error())
+		return errors.NewInternalServerError("存储会话发生错误")
+	}
+	return nil
 }
 
 // DestroySession 销毁会话
 func (a *Context) DestroySession() error {
-	return ginsession.Destroy(a.gctx)
+	err := ginsession.Destroy(a.gctx)
+	if err != nil {
+		logger.StartSpan(a.CContext(), "销毁会话", a.getFunctionName("DestroySession")).Errorf(err.Error())
+		return errors.NewInternalServerError("销毁会话发生错误")
+	}
+	return nil
 }
 
 // Param 获取路径参数(/foo/:id)
@@ -129,8 +145,7 @@ func (a *Context) SetUserID(userID string) {
 // ParseJSON 解析请求JSON
 func (a *Context) ParseJSON(obj interface{}) error {
 	if err := a.gctx.ShouldBindJSON(obj); err != nil {
-		logger.StartSpan(a.CContext(), "解析请求JSON", "context.ParseJSON").
-			Warnf("无效的请求参数: %s", err.Error())
+		logger.StartSpan(a.CContext(), "解析请求JSON", a.getFunctionName("ParseJSON")).Warnf(err.Error())
 		return errors.NewBadRequestError("无效的请求参数")
 	}
 	return nil
@@ -222,8 +237,8 @@ func (a *Context) ResSuccess(v interface{}) {
 func (a *Context) ResJSON(status int, v interface{}) {
 	buf, err := util.JSONMarshal(v)
 	if err != nil {
-		logger.StartSpan(a.CContext(), "响应JSON数据", "context.ResJSON").
-			WithField("object", v).Errorf("JSON序列化发生错误: %s", err.Error())
+		logger.StartSpan(a.CContext(), "响应JSON数据", a.getFunctionName("ResJSON")).
+			WithField("object", v).Errorf(err.Error())
 		a.ResError(errors.NewInternalServerError())
 		return
 	}

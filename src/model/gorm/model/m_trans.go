@@ -20,7 +20,7 @@ type Trans struct {
 }
 
 func (a *Trans) getFuncName(name string) string {
-	return fmt.Sprintf("trans.%s", name)
+	return fmt.Sprintf("gorm.model.Trans.%s", name)
 }
 
 // Begin 开启事务
