@@ -24,4 +24,6 @@ type IUser interface {
 	Delete(ctx context.Context, recordID string) error
 	// 更新状态
 	UpdateStatus(ctx context.Context, recordID string, status int) error
+	// 更新密码
+	UpdatePassword(ctx context.Context, recordID, password string) error
 }

@@ -28,11 +28,11 @@ type Demo struct {
 }
 
 func (a *Demo) getFuncName(name string) string {
-	return fmt.Sprintf("gorm.demo.%s", name)
+	return fmt.Sprintf("gorm.model.Demo.%s", name)
 }
 
 func (a *Demo) getDemoDB(ctx context.Context) *gormplus.DB {
-	return FromTransDBWithModel(ctx, a.db, gormentity.Demo{})
+	return FromDBWithModel(ctx, a.db, gormentity.Demo{})
 }
 
 func (a *Demo) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryOptions {
