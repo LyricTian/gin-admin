@@ -1,4 +1,4 @@
-package gormentity
+package entity
 
 import (
 	"github.com/LyricTian/gin-admin/src/schema"

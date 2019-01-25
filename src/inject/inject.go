@@ -2,6 +2,7 @@ package inject
 
 import (
 	"context"
+	"errors"
 
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/model/gorm"
@@ -23,13 +24,14 @@ func Init(ctx context.Context) (*Object, error) {
 	g := new(inject.Graph)
 	obj := new(Object)
 
+	// 注入存储层
 	switch {
 	case config.IsGormDB():
 		db, err := getGormDB()
 		if err != nil {
 			return nil, err
 		}
-		gormmodel.Init(g, db)
+		gorm.Inject(g, db)
 		obj.GormDB = db
 	}
 
@@ -48,4 +50,29 @@ func Init(ctx context.Context) (*Object, error) {
 	}
 
 	return obj, nil
+}
+
+func getGormDB() (*gormplus.DB, error) {
+	cfg := config.GetGormConfig()
+
+	var dsn string
+	switch cfg.DBType {
+	case "mysql":
+		dsn = config.GetMySQLConfig().DSN()
+	case "sqlite3":
+		dsn = config.GetSqlite3Config().DSN()
+	case "postgres":
+		dsn = config.GetPostgresConfig().DSN()
+	default:
+		return nil, errors.New("unknown db")
+	}
+
+	return gormplus.New(gormplus.Config{
+		Debug:        cfg.Debug,
+		DBType:       cfg.DBType,
+		DSN:          dsn,
+		MaxIdleConns: cfg.MaxIdleConns,
+		MaxLifetime:  cfg.MaxLifetime,
+		MaxOpenConns: cfg.MaxOpenConns,
+	})
 }

@@ -1,4 +1,4 @@
-package gormmodel
+package model
 
 import (
 	"context"

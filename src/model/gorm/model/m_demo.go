@@ -1,4 +1,4 @@
-package gormmodel
+package model
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 
 // InitDemo 初始化demo存储
 func InitDemo(db *gormplus.DB) *Demo {
-	db.AutoMigrate(new(gormentity.Demo))
+	db.AutoMigrate(new(entity.Demo))
 	return NewDemo(db)
 }
 
@@ -32,7 +32,7 @@ func (a *Demo) getFuncName(name string) string {
 }
 
 func (a *Demo) getDemoDB(ctx context.Context) *gormplus.DB {
-	return FromDBWithModel(ctx, a.db, gormentity.Demo{})
+	return FromDBWithModel(ctx, a.db, entity.Demo{})
 }
 
 func (a *Demo) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryOptions {
@@ -61,7 +61,7 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 
 	var qr schema.DemoQueryResult
 	opt := a.getQueryOption(opts...)
-	var items gormentity.Demos
+	var items entity.Demos
 	pr, err := WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -79,7 +79,7 @@ func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 	defer span.Finish()
 
 	db := a.getDemoDB(ctx).Where("record_id=?", recordID)
-	var item gormentity.Demo
+	var item entity.Demo
 	ok, err := a.db.FindOne(db, &item)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -110,7 +110,7 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
 	defer span.Finish()
 
-	demo := gormentity.SchemaDemo(item).ToDemo()
+	demo := entity.SchemaDemo(item).ToDemo()
 	demo.Creator = FromUserID(ctx)
 	result := a.getDemoDB(ctx).Create(demo)
 	if err := result.Error; err != nil {
@@ -125,7 +125,7 @@ func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) er
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
 	defer span.Finish()
 
-	demo := gormentity.SchemaDemo(item).ToDemo()
+	demo := entity.SchemaDemo(item).ToDemo()
 	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(demo)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
@@ -139,7 +139,7 @@ func (a *Demo) Delete(ctx context.Context, recordID string) error {
 	span := logger.StartSpan(ctx, "删除数据", a.getFuncName("Delete"))
 	defer span.Finish()
 
-	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Delete(gormentity.Demo{})
+	result := a.getDemoDB(ctx).Where("record_id=?", recordID).Delete(entity.Demo{})
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("删除数据发生错误")

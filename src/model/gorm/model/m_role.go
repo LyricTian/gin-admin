@@ -1,4 +1,4 @@
-package gormmodel
+package model
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 
 // InitRole 初始化角色存储
 func InitRole(db *gormplus.DB) *Role {
-	db.AutoMigrate(new(gormentity.Role), new(gormentity.RoleMenu))
+	db.AutoMigrate(new(entity.Role), new(entity.RoleMenu))
 	return NewRole(db)
 }
 
@@ -32,11 +32,11 @@ func (a *Role) getFuncName(name string) string {
 }
 
 func (a *Role) getRoleDB(ctx context.Context) *gormplus.DB {
-	return FromDBWithModel(ctx, a.db, gormentity.Role{})
+	return FromDBWithModel(ctx, a.db, entity.Role{})
 }
 
 func (a *Role) getRoleMenuDB(ctx context.Context) *gormplus.DB {
-	return FromDBWithModel(ctx, a.db, gormentity.RoleMenu{})
+	return FromDBWithModel(ctx, a.db, entity.RoleMenu{})
 }
 
 func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
@@ -65,7 +65,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 
 	opt := a.getQueryOption(opts...)
 	var qr schema.RoleQueryResult
-	var items gormentity.Roles
+	var items entity.Roles
 	pr, err := WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -85,7 +85,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	return qr, nil
 }
 
-func (a *Role) toSchemaRole(ctx context.Context, item gormentity.Role, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
+func (a *Role) toSchemaRole(ctx context.Context, item entity.Role, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	opt := a.getQueryOption(opts...)
 	sitem := item.ToSchemaRole()
 	if opt.IncludeMenuIDs {
@@ -104,7 +104,7 @@ func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQuer
 	span := logger.StartSpan(ctx, "查询指定数据", a.getFuncName("Get"))
 	defer span.Finish()
 
-	var item gormentity.Role
+	var item entity.Role
 	ok, err := a.db.FindOne(a.getRoleDB(ctx).Where("record_id=?", recordID), &item)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -142,7 +142,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 		}
 
 		for _, menuID := range item.MenuIDs {
-			err = a.CreateMenu(ctx, gormentity.RoleMenu{
+			err = a.CreateMenu(ctx, entity.RoleMenu{
 				RoleID: item.RecordID,
 				MenuID: menuID,
 			})
@@ -159,7 +159,7 @@ func (a *Role) CreateRole(ctx context.Context, item schema.Role) error {
 	span := logger.StartSpan(ctx, "创建角色数据", a.getFuncName("CreateRole"))
 	defer span.Finish()
 
-	role := gormentity.SchemaRole(item).ToRole()
+	role := entity.SchemaRole(item).ToRole()
 	role.Creator = FromUserID(ctx)
 	result := a.getRoleDB(ctx).Create(role)
 	if err := result.Error; err != nil {
@@ -186,7 +186,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 		}
 
 		for _, menuID := range item.MenuIDs {
-			err = a.CreateMenu(ctx, gormentity.RoleMenu{
+			err = a.CreateMenu(ctx, entity.RoleMenu{
 				RoleID: recordID,
 				MenuID: menuID,
 			})
@@ -203,7 +203,7 @@ func (a *Role) UpdateRole(ctx context.Context, recordID string, item schema.Role
 	span := logger.StartSpan(ctx, "更新角色数据", a.getFuncName("UpdateRole"))
 	defer span.Finish()
 
-	role := gormentity.SchemaRole(item).ToRole()
+	role := entity.SchemaRole(item).ToRole()
 	result := a.getRoleDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(role)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
@@ -263,18 +263,18 @@ func (a *Role) QueryMenuIDs(ctx context.Context, recordID string) ([]string, err
 	span := logger.StartSpan(ctx, "查询菜单ID列表", a.getFuncName("QueryMenuIDs"))
 	defer span.Finish()
 
-	var items []*gormentity.RoleMenu
+	var items []*entity.RoleMenu
 	result := a.getRoleMenuDB(ctx).Where("role_id=?", recordID).Find(&items)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return nil, errors.New("查询菜单ID列表发生错误")
 	}
 
-	return gormentity.RoleMenus(items).ToMenuIDs(), nil
+	return entity.RoleMenus(items).ToMenuIDs(), nil
 }
 
 // CreateMenu 创建角色菜单
-func (a *Role) CreateMenu(ctx context.Context, item gormentity.RoleMenu) error {
+func (a *Role) CreateMenu(ctx context.Context, item entity.RoleMenu) error {
 	span := logger.StartSpan(ctx, "创建角色菜单", a.getFuncName("CreateMenu"))
 	defer span.Finish()
 
@@ -291,7 +291,7 @@ func (a *Role) DeleteMenu(ctx context.Context, recordID string) error {
 	span := logger.StartSpan(ctx, "删除角色菜单", a.getFuncName("DeleteMenu"))
 	defer span.Finish()
 
-	result := a.getRoleMenuDB(ctx).Where("role_id=?", recordID).Delete(gormentity.RoleMenu{})
+	result := a.getRoleMenuDB(ctx).Where("role_id=?", recordID).Delete(entity.RoleMenu{})
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("删除角色菜单发生错误")

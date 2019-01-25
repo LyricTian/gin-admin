@@ -1,4 +1,4 @@
-package gormmodel
+package model
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 
 // InitMenu 初始化菜单存储
 func InitMenu(db *gormplus.DB) *Menu {
-	db.AutoMigrate(new(gormentity.Menu))
+	db.AutoMigrate(new(entity.Menu))
 	return NewMenu(db)
 }
 
@@ -32,7 +32,7 @@ func (a *Menu) getFuncName(name string) string {
 }
 
 func (a *Menu) getMenuDB(ctx context.Context) *gormplus.DB {
-	return FromDBWithModel(ctx, a.db, gormentity.Menu{})
+	return FromDBWithModel(ctx, a.db, entity.Menu{})
 }
 
 func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
@@ -70,8 +70,8 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 		db = db.Where("parent_id=?", *v)
 	}
 	if v := params.UserID; v != "" {
-		userRoleQuery := FromDBWithModel(ctx, a.db, gormentity.UserRole{}).Select("role_id").Where("user_id=?", v).SubQuery()
-		roleMenuQuery := FromDBWithModel(ctx, a.db, gormentity.RoleMenu{}).Select("menu_id").Where("role_id IN(?)", userRoleQuery).SubQuery()
+		userRoleQuery := FromDBWithModel(ctx, a.db, entity.UserRole{}).Select("role_id").Where("user_id=?", v).SubQuery()
+		roleMenuQuery := FromDBWithModel(ctx, a.db, entity.RoleMenu{}).Select("menu_id").Where("role_id IN(?)", userRoleQuery).SubQuery()
 		db = db.Where("record_id IN(?)", roleMenuQuery)
 	}
 	if v := params.LevelCodes; len(v) > 0 {
@@ -81,7 +81,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 
 	var qr schema.MenuQueryResult
 	opt := a.getQueryOption(opts...)
-	var items gormentity.Menus
+	var items entity.Menus
 	pr, err := WrapPageQuery(db, opt.PageParam, &items)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -98,7 +98,7 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	span := logger.StartSpan(ctx, "查询指定数据", a.getFuncName("Get"))
 	defer span.Finish()
 
-	var item gormentity.Menu
+	var item entity.Menu
 	ok, err := a.db.FindOne(a.getMenuDB(ctx).Where("record_id=?", recordID), &item)
 	if err != nil {
 		span.Errorf(err.Error())
@@ -143,7 +143,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
 	defer span.Finish()
 
-	menu := gormentity.SchemaMenu(item).ToMenu()
+	menu := entity.SchemaMenu(item).ToMenu()
 	menu.Creator = FromUserID(ctx)
 	result := a.getMenuDB(ctx).Create(menu)
 	if err := result.Error; err != nil {
@@ -158,7 +158,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
 	defer span.Finish()
 
-	menu := gormentity.SchemaMenu(item).ToMenu()
+	menu := entity.SchemaMenu(item).ToMenu()
 	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(menu)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
@@ -185,7 +185,7 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 	span := logger.StartSpan(ctx, "删除数据", a.getFuncName("Delete"))
 	defer span.Finish()
 
-	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Delete(gormentity.Menu{})
+	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Delete(entity.Menu{})
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("删除数据发生错误")
