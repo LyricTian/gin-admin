@@ -58,7 +58,7 @@ func (a *Role) QueryPage(ctx *context.Context) {
 // QuerySelect 查询选择数据
 // @Summary 查询选择数据
 // @Param Access-Token header string false "访问令牌"
-// @Success 200 []schema.RoleMiniQueryResult "{list:角色列表}"
+// @Success 200 []schema.RoleMini "{list:角色列表}"
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"

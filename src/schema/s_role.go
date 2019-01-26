@@ -28,8 +28,8 @@ type RoleQueryResult struct {
 	PageResult *PaginationResult
 }
 
-// RoleMiniQueryResult 角色对象少量数据查询结果
-type RoleMiniQueryResult struct {
+// RoleMini 角色对象
+type RoleMini struct {
 	RecordID string `json:"record_id" swaggo:"true,记录ID"`
 	Name     string `json:"name" swaggo:"true,角色名称"`
 }
@@ -55,11 +55,11 @@ func (a Roles) ToMap() map[string]*Role {
 	return m
 }
 
-// ToMiniQueryResult 转换为少量数据查询结果
-func (a Roles) ToMiniQueryResult() []*RoleMiniQueryResult {
-	items := make([]*RoleMiniQueryResult, len(a))
+// ToMiniList 转换为轻量数据
+func (a Roles) ToMiniList() []*RoleMini {
+	items := make([]*RoleMini, len(a))
 	for i, item := range a {
-		items[i] = &RoleMiniQueryResult{
+		items[i] = &RoleMini{
 			RecordID: item.RecordID,
 			Name:     item.Name,
 		}
