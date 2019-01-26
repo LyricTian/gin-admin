@@ -36,8 +36,8 @@ type UserQueryResult struct {
 	PageResult *PaginationResult
 }
 
-// UserPageQueryResult 用户分页查询结果
-type UserPageQueryResult struct {
+// UserPageShow 用户对象分页显示项
+type UserPageShow struct {
 	RecordID  string      `json:"record_id" swaggo:"false,记录ID"`
 	UserName  string      `json:"user_name" swaggo:"true,用户名"`
 	RealName  string      `json:"real_name" swaggo:"true,真实姓名"`
@@ -58,12 +58,12 @@ func (a Users) ToRoleIDs() []string {
 	return roleIDs
 }
 
-// ToPageQueryResult 转换为分页查询结果
-func (a Users) ToPageQueryResult(roles map[string]*Role) []*UserPageQueryResult {
-	items := make([]*UserPageQueryResult, len(a))
+// ToPageShowList 转换为分页显示列表
+func (a Users) ToPageShowList(roles map[string]*Role) []*UserPageShow {
+	items := make([]*UserPageShow, len(a))
 
 	for i, user := range a {
-		result := &UserPageQueryResult{
+		result := &UserPageShow{
 			RecordID:  user.RecordID,
 			RealName:  user.RealName,
 			UserName:  user.UserName,
