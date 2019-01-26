@@ -19,7 +19,7 @@ type User struct {
 }
 
 // QueryPage 查询分页数据
-func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.UserPageQueryResult, *schema.PaginationResult, error) {
+func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.UserPageShow, *schema.PaginationResult, error) {
 	result, err := a.UserModel.Query(ctx, params, schema.UserQueryOptions{
 		PageParam:      pp,
 		IncludeRoleIDs: true,
@@ -38,7 +38,7 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *
 		return nil, nil, err
 	}
 
-	pageResult := result.Data.ToPageQueryResult(roleResult.Data.ToMap())
+	pageResult := result.Data.ToPageShowList(roleResult.Data.ToMap())
 	return pageResult, result.PageResult, nil
 }
 
