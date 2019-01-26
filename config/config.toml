@@ -80,7 +80,7 @@ max_open_conns = 150
 # 设置空闲连接池中的最大连接数
 max_idle_conns = 50
 # 数据库表名前缀
-table_prefix = "ga_"
+table_prefix = "g_"
 
 [mysql]
 # 连接地址
@@ -92,7 +92,7 @@ user = "root"
 # 密码
 password = "123456"
 # 数据库
-db_name = "ginadmin"
+db_name = "gadmin"
 
 [postgres]
 # 连接地址
@@ -104,8 +104,8 @@ user = "root"
 # 密码
 password = "123456"
 # 数据库
-db_name = "ginadmin"
+db_name = "gadmin"
 
 [sqlite3]
 # 数据库路径
-path = "data/ginadmin.db"
+path = "data/gadmin.db"
