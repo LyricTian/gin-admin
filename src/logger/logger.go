@@ -139,8 +139,18 @@ func (e *Entry) Finish() {
 	}
 }
 
+func (e *Entry) checkAndDelete(fields map[string]interface{}, keys ...string) {
+	for _, key := range keys {
+		if _, ok := fields[key]; ok {
+			delete(fields, key)
+		}
+	}
+}
+
 // WithFields 结构化字段写入
 func (e *Entry) WithFields(fields map[string]interface{}) *Entry {
+	e.checkAndDelete(fields,
+		TraceIDKey, StartedAtKey, TimeConsumingKey, TraceIDKey, SpanIDKey, VersionKey)
 	return newEntry(e.entry.WithFields(fields))
 }
 
