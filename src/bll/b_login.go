@@ -139,7 +139,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 		return nil, ErrNoPerm
 	}
 
-	return result.Data.ToTreeQueryResult(), nil
+	return result.Data.ToTreeList(), nil
 }
 
 // UpdatePassword 更新当前用户登录密码
