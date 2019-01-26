@@ -29,7 +29,7 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pp *
 }
 
 // QueryTree 查询菜单树
-func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTreeQueryResult, error) {
+func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTree, error) {
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		Types: []int{1, 2},
 	})

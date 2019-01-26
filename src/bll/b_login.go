@@ -112,7 +112,7 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 }
 
 // QueryUserMenuTree 查询当前用户的权限菜单树
-func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTreeQueryResult, error) {
+func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, error) {
 	userID := gcontext.FromUserID(ctx)
 	if a.CheckIsRoot(ctx, userID) {
 		userID = ""

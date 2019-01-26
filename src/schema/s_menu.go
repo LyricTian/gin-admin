@@ -46,29 +46,29 @@ type MenuQueryResult struct {
 	PageResult *PaginationResult
 }
 
-// MenuTreeQueryResult 菜单树
-type MenuTreeQueryResult struct {
-	RecordID  string                  `json:"record_id" swaggo:"false,记录ID"`
-	Code      string                  `json:"code" binding:"required" swaggo:"true,菜单编号"`
-	Name      string                  `json:"name" binding:"required" swaggo:"true,菜单名称"`
-	Type      int                     `json:"type" binding:"required,max=3,min=1" swaggo:"true,菜单类型(1：模块 2：功能 3：资源)"`
-	Icon      string                  `json:"icon" swaggo:"false,菜单图标"`
-	Path      string                  `json:"path" swaggo:"false,访问路径"`
-	LevelCode string                  `json:"level_code" swaggo:"false,分级码"`
-	ParentID  string                  `json:"parent_id" swaggo:"false,父级内码"`
-	Children  *[]*MenuTreeQueryResult `json:"children,omitempty" swaggo:"false,子级树"`
+// MenuTree 菜单树
+type MenuTree struct {
+	RecordID  string       `json:"record_id" swaggo:"false,记录ID"`
+	Code      string       `json:"code" binding:"required" swaggo:"true,菜单编号"`
+	Name      string       `json:"name" binding:"required" swaggo:"true,菜单名称"`
+	Type      int          `json:"type" binding:"required,max=3,min=1" swaggo:"true,菜单类型(1：模块 2：功能 3：资源)"`
+	Icon      string       `json:"icon" swaggo:"false,菜单图标"`
+	Path      string       `json:"path" swaggo:"false,访问路径"`
+	LevelCode string       `json:"level_code" swaggo:"false,分级码"`
+	ParentID  string       `json:"parent_id" swaggo:"false,父级内码"`
+	Children  *[]*MenuTree `json:"children,omitempty" swaggo:"false,子级树"`
 }
 
-// MenuTreeQueryResults 菜单树列表
-type MenuTreeQueryResults []*MenuTreeQueryResult
+// MenuTrees 菜单树列表
+type MenuTrees []*MenuTree
 
 // ToTree 转换为树形结构
-func (a MenuTreeQueryResults) ToTree() []*MenuTreeQueryResult {
-	mi := make(map[string]*MenuTreeQueryResult)
+func (a MenuTrees) ToTree() []*MenuTree {
+	mi := make(map[string]*MenuTree)
 	for _, item := range a {
 		mi[item.RecordID] = item
 	}
-	var data []*MenuTreeQueryResult
+	var data []*MenuTree
 	for _, item := range a {
 		if item.ParentID == "" {
 			data = append(data, item)
@@ -76,7 +76,7 @@ func (a MenuTreeQueryResults) ToTree() []*MenuTreeQueryResult {
 		}
 		if pitem, ok := mi[item.ParentID]; ok {
 			if pitem.Children == nil {
-				var children []*MenuTreeQueryResult
+				var children []*MenuTree
 				children = append(children, item)
 				pitem.Children = &children
 				continue
@@ -105,10 +105,10 @@ func (a Menus) ToLevelCodes() []string {
 }
 
 // ToTreeQueryResult 转换为菜单树查询结果
-func (a Menus) ToTreeQueryResult() MenuTreeQueryResults {
-	items := make([]*MenuTreeQueryResult, len(a))
+func (a Menus) ToTreeQueryResult() MenuTrees {
+	items := make([]*MenuTree, len(a))
 	for i, item := range a {
-		items[i] = &MenuTreeQueryResult{
+		items[i] = &MenuTree{
 			RecordID:  item.RecordID,
 			Code:      item.Code,
 			Name:      item.Name,
