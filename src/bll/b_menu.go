@@ -36,7 +36,7 @@ func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTree, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.Data.ToTreeQueryResult().ToTree(), nil
+	return result.Data.ToTreeList().ToTree(), nil
 }
 
 // Get 查询指定数据

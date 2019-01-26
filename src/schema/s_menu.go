@@ -3,8 +3,6 @@ package schema
 import (
 	"sort"
 	"strings"
-
-	"github.com/LyricTian/gin-admin/src/util"
 )
 
 // Menu 菜单对象
@@ -90,10 +88,6 @@ func (a MenuTrees) ToTree() []*MenuTree {
 // Menus 菜单列表
 type Menus []*Menu
 
-func (a Menus) String() string {
-	return util.JSONMarshalToString(a)
-}
-
 // ToLevelCodes 获取分级码列表（按照分级码正序排序）
 func (a Menus) ToLevelCodes() []string {
 	levelCodes := make([]string, len(a))
@@ -104,8 +98,8 @@ func (a Menus) ToLevelCodes() []string {
 	return levelCodes
 }
 
-// ToTreeQueryResult 转换为菜单树查询结果
-func (a Menus) ToTreeQueryResult() MenuTrees {
+// ToTreeList 转换为菜单树列表
+func (a Menus) ToTreeList() MenuTrees {
 	items := make([]*MenuTree, len(a))
 	for i, item := range a {
 		items[i] = &MenuTree{
