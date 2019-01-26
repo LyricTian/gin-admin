@@ -30,14 +30,14 @@ func (a *Role) QueryPage(ctx context.Context, params schema.RoleQueryParam, pp *
 }
 
 // QuerySelect 查询选择数据
-func (a *Role) QuerySelect(ctx context.Context) ([]*schema.RoleMiniQueryResult, error) {
+func (a *Role) QuerySelect(ctx context.Context) ([]*schema.RoleMini, error) {
 	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
 		Status: 1,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.Data.ToMiniQueryResult(), nil
+	return result.Data.ToMiniList(), nil
 }
 
 // Get 查询指定数据
