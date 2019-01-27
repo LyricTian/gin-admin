@@ -23,15 +23,15 @@ type CallbackFunc func()
 
 // Init 初始化
 func Init(ctx context.Context) CallbackFunc {
-	span := logger.StartSpanWithCall(ctx, "服务初始化", "main.Init")
+	span := logger.StartSpanWithCall(ctx, "初始化", "main.src.Init")
 
 	obj, err := inject.Init(ctx)
 	if err != nil {
 		span().Fatalf("初始化依赖注入发生错误：%s", err.Error())
 	}
 
-	// 初始化日志
-	loggerFunc := InitLogger(ctx, obj)
+	// 初始化日志钩子
+	loggerFunc := InitLoggerHook(ctx, obj)
 
 	// 初始化图形验证码
 	if config.IsCaptchaRedisStore() {
@@ -70,7 +70,7 @@ func Init(ctx context.Context) CallbackFunc {
 
 // InitHTTPServer 初始化http服务
 func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
-	span := logger.StartSpanWithCall(ctx, "HTTP服务初始化", "main.InitHTTPServer")
+	span := logger.StartSpanWithCall(ctx, "HTTP服务初始化", "main.src.InitHTTPServer")
 
 	cfg := config.GetHTTPConfig()
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
@@ -99,16 +99,9 @@ func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
 	}
 }
 
-// InitLogger 初始化日志
-func InitLogger(ctx context.Context, obj *inject.Object) CallbackFunc {
+// InitLoggerHook 初始化日志钩子
+func InitLoggerHook(ctx context.Context, obj *inject.Object) CallbackFunc {
 	options := config.GetLogConfig()
-	if v := options.Level; v > -1 {
-		logrus.SetLevel(logrus.Level(v))
-	}
-
-	if v := options.Format; v == "json" {
-		logrus.SetFormatter(new(logrus.JSONFormatter))
-	}
 
 	if options.EnableHook {
 		var opts []logrushook.Option

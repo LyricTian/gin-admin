@@ -28,6 +28,21 @@ var (
 	traceIDFunc TraceIDFunc
 )
 
+// SetLevel 设定日志级别
+func SetLevel(level int) {
+	logrus.SetLevel(logrus.Level(level))
+}
+
+// SetFormatter 设定日志输出格式
+func SetFormatter(format string) {
+	switch format {
+	case "json":
+		logrus.SetFormatter(new(logrus.JSONFormatter))
+	default:
+		logrus.SetFormatter(new(logrus.TextFormatter))
+	}
+}
+
 // SetVersion 设定版本
 func SetVersion(v string) {
 	version = v

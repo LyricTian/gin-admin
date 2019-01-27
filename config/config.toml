@@ -1,4 +1,4 @@
-# 运行模式(debug:调试,release:正式,test:测试)
+# 运行模式(debug:调试,test:测试,release:正式)
 run_mode = "test"
 
 # casbin模型配置文件(也可以启动服务时使用-m指定)
@@ -10,8 +10,11 @@ www = ""
 # swagger文档目录(也可以启动服务时使用-swagger指定)
 swagger = ""
 
-# 存储模式(支持的存储模式：gorm)
+# 存储模式(支持：gorm)
 db_mode = "gorm"
+
+# 认证模式(支持：session)
+auth_mode = "session"
 
 # http配置
 [http]
@@ -24,8 +27,11 @@ shutdown_timeout = 10
 
 # root用户
 [root_user]
+# 登录用户名
 user_name = "root"
+# 登录密码
 password = "123"
+# 显示的真实姓名
 real_name = "超级用户"
 
 # 图形验证码
@@ -52,7 +58,7 @@ enable_store = true
 
 # 日志配置
 [log]
-# 日志级别(2:error,3:warn,4:info,5:debug)
+# 日志级别(1:fatal 2:error,3:warn,4:info,5:debug)
 level = 5
 # 日志格式（text/json）
 format = "text"
@@ -63,11 +69,16 @@ hook_max_thread = 1
 # 写入钩子的最大缓冲区数量
 hook_max_buffer = 512
 
+# redis配置
 [redis]
+# 地址
 addr = "192.168.33.90:6379"
+# 数据库
 db = "10"
+# 密码
 password = ""
 
+# gorm配置
 [gorm]
 # 是否开启调试模式
 debug = false
@@ -82,6 +93,7 @@ max_idle_conns = 50
 # 数据库表名前缀
 table_prefix = "g_"
 
+# mysql数据库配置
 [mysql]
 # 连接地址
 host = "127.0.0.1"
@@ -94,6 +106,7 @@ password = "123456"
 # 数据库
 db_name = "gadmin"
 
+# postgres数据库配置
 [postgres]
 # 连接地址
 host = "127.0.0.1"
@@ -106,6 +119,7 @@ password = "123456"
 # 数据库
 db_name = "gadmin"
 
+# sqlite数据库配置
 [sqlite3]
 # 数据库路径
 path = "data/gadmin.db"
