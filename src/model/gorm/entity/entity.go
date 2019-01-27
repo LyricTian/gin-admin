@@ -3,9 +3,14 @@ package entity
 import (
 	"fmt"
 	"time"
-
-	"github.com/LyricTian/gin-admin/src/config"
 )
+
+var tablePrefix string
+
+// SetTablePrefix 设定表名前缀
+func SetTablePrefix(prefix string) {
+	tablePrefix = prefix
+}
 
 // Model base model
 type Model struct {
@@ -17,5 +22,5 @@ type Model struct {
 
 // TableName table name
 func (Model) TableName(name string) string {
-	return fmt.Sprintf("%s%s", config.GetGormTablePrefix(), name)
+	return fmt.Sprintf("%s%s", tablePrefix, name)
 }
