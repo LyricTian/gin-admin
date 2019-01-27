@@ -9,15 +9,13 @@ import (
 
 // 定义上下文中的键
 const (
-	contextKeyPrefix = "github.com/LyricTian/gin-admin"
-	// ContextKeyUserID 存储上下文中的键(用户ID)
-	ContextKeyUserID = contextKeyPrefix + "/user_id"
-	// ContextKeyURLTitle 存储上下文中的键(请求URL说明)
-	ContextKeyURLTitle = contextKeyPrefix + "/url_title"
-	// ContextKeyTraceID 存储上下文中的键(跟踪ID)
-	ContextKeyTraceID = contextKeyPrefix + "/trace_id"
-	// ContextKeyResBody 存储上下文中的键(响应Body数据)
-	ContextKeyResBody = contextKeyPrefix + "/res_body"
+	prefix = "github.com/LyricTian/gin-admin"
+	// UserIDKey 存储上下文中的键(用户ID)
+	UserIDKey = prefix + "/user_id"
+	// TraceIDKey 存储上下文中的键(跟踪ID)
+	TraceIDKey = prefix + "/trace_id"
+	// ResBodyKey 存储上下文中的键(响应Body数据)
+	ResBodyKey = prefix + "/res_body"
 )
 
 // 定义响应状态数据
@@ -27,35 +25,39 @@ const (
 	StatusFail  = "fail"
 )
 
-// 路由关联的标题数据
 var (
-	routerTitle = &sync.Map{}
-	routerRe    = regexp.MustCompile(`(.*):[^/]+(.*)`)
+	routerData = &sync.Map{}
+	routerRe   = regexp.MustCompile(`(.*):[^/]+(.*)`)
 )
 
-// GetRouter 获取路由
-func GetRouter(method, path string) string {
+// RouterItem 路由项
+type RouterItem struct {
+	Code string // 路由编号
+	Name string // 路由名称
+}
+
+// JoinRouter 拼接路由
+func JoinRouter(method, path string) string {
 	if len(path) > 0 && path[0] != '/' {
 		path = "/" + path
 	}
-	return fmt.Sprintf("%s%s", method, path)
+	return fmt.Sprintf("%s%s", strings.ToUpper(method), path)
 }
 
-// SetRouterTitle 设定路由标题
-func SetRouterTitle(method, path, title string) {
-	routerTitle.Store(GetRouter(method, path), title)
+// SetRouterItem 存储路由项
+func SetRouterItem(key string, item RouterItem) {
+	routerData.Store(key, item)
 }
 
-// GetRouterTitleAndKey 获取路由标题和键
-func GetRouterTitleAndKey(method, path string) (string, string) {
-	key := GetRouter(method, path)
-	vv, ok := routerTitle.Load(key)
+// GetRouterItem 获取路由项
+func GetRouterItem(key string) RouterItem {
+	vv, ok := routerData.Load(key)
 	if ok {
-		return vv.(string), key
+		return vv.(RouterItem)
 	}
 
-	var title string
-	routerTitle.Range(func(vk, vv interface{}) bool {
+	var item RouterItem
+	routerData.Range(func(vk, vv interface{}) bool {
 		vkey := vk.(string)
 		if !strings.Contains(vkey, "/:") {
 			return true
@@ -64,13 +66,11 @@ func GetRouterTitleAndKey(method, path string) (string, string) {
 		rkey := "^" + routerRe.ReplaceAllString(vkey, "$1[^/]+$2") + "$"
 		b, _ := regexp.MatchString(rkey, key)
 		if b {
-			title = vv.(string)
-			key = vkey
+			item = vv.(RouterItem)
 		}
 		return !b
 	})
-
-	return title, key
+	return item
 }
 
 // HTTPError HTTP响应错误

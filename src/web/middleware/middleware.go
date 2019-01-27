@@ -56,7 +56,7 @@ func NoAllowPathPrefixSkipper(prefixes ...string) SkipperFunc {
 // AllowMethodAndPathPrefixSkipper 检查请求方法和路径是否包含指定的前缀，如果不包含则跳过
 func AllowMethodAndPathPrefixSkipper(prefixes ...string) SkipperFunc {
 	return func(c *gin.Context) bool {
-		path := context.GetRouter(c.Request.Method, c.Request.URL.Path)
+		path := context.JoinRouter(c.Request.Method, c.Request.URL.Path)
 		pathLen := len(path)
 
 		for _, p := range prefixes {

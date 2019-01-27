@@ -57,7 +57,7 @@ func VerifySessionMiddleware(skipper SkipperFunc) gin.HandlerFunc {
 
 		ctx := context.New(c)
 		store := ginsession.FromContext(c)
-		userID, ok := store.Get(context.ContextKeyUserID)
+		userID, ok := store.Get(context.UserIDKey)
 		if !ok || userID == nil {
 			if !config.IsDebugMode() {
 				ctx.ResError(errors.NewUnauthorizedError("用户未登录"), 9999)
@@ -67,7 +67,7 @@ func VerifySessionMiddleware(skipper SkipperFunc) gin.HandlerFunc {
 			userID = config.GetRootUser().UserName
 		}
 
-		c.Set(context.ContextKeyUserID, userID)
+		c.Set(context.UserIDKey, userID)
 		c.Next()
 	}
 }

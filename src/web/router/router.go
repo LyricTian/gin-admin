@@ -2,6 +2,10 @@ package router
 
 import (
 	"path"
+	"reflect"
+	"runtime"
+	"strings"
+	"unicode"
 
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
@@ -10,21 +14,31 @@ import (
 var defaultOptions = options{}
 
 type options struct {
-	title string
+	name string
 }
 
 // Option 定义配置项
 type Option func(*options)
 
-// SetTitle 设定路由标题
-func SetTitle(title string) Option {
+// SetName 设定路由名称
+func SetName(name string) Option {
 	return func(o *options) {
-		o.title = title
+		o.name = name
 	}
 }
 
 // HandlerFunc 处理函数
 type HandlerFunc func(*context.Context)
+
+func getRouterCode(handler HandlerFunc) string {
+	fname := runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
+	if v := strings.LastIndex(fname, "."); v > 0 {
+		code := []rune(strings.TrimSuffix(fname[v+1:], "-fm"))
+		code[0] = unicode.ToLower(code[0])
+		return string(code)
+	}
+	return ""
+}
 
 // Handle registers a new request handle and middleware with the given path and method.
 func Handle(g *gin.RouterGroup, httpMethod string, relativePath string, handler HandlerFunc, opts ...Option) {
@@ -33,7 +47,12 @@ func Handle(g *gin.RouterGroup, httpMethod string, relativePath string, handler 
 		opt(&o)
 	}
 
-	context.SetRouterTitle(httpMethod, path.Join(g.BasePath(), relativePath), o.title)
+	key := context.JoinRouter(httpMethod, path.Join(g.BasePath(), relativePath))
+	context.SetRouterItem(key, context.RouterItem{
+		Code: getRouterCode(handler),
+		Name: o.name,
+	})
+
 	g.Handle(httpMethod, relativePath, func(c *gin.Context) {
 		handler(context.New(c))
 	})
