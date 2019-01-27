@@ -31,7 +31,7 @@ func IsTestMode() bool {
 
 // IsReleaseMode 检查正式模式
 func IsReleaseMode() bool {
-	return GetRunMode() == "ReleaseMode"
+	return GetRunMode() == "release"
 }
 
 // GetAuthMode 获取认证模式

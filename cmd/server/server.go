@@ -64,6 +64,9 @@ func main() {
 		viper.Set("swagger", swaggerDir)
 	}
 
+	// 设定日志初始化参数
+	logger.SetLevel(config.GetLogConfig().Level)
+	logger.SetFormatter(config.GetLogConfig().Format)
 	logger.SetVersion(VERSION)
 	logger.SetTraceIDFunc(util.MustUUID)
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
