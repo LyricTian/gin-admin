@@ -19,7 +19,7 @@ func TraceMiddleware(skipper SkipperFunc) gin.HandlerFunc {
 		if traceID == "" {
 			traceID = util.MustUUID()
 		}
-		c.Set(context.ContextKeyTraceID, traceID)
+		c.Set(context.TraceIDKey, traceID)
 		c.Next()
 	}
 }

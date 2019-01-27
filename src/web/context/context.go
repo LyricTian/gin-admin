@@ -67,7 +67,7 @@ func (a *Context) SaveUserIDToSession(userID string) error {
 		return errors.NewInternalServerError("更新会话发生错误")
 	}
 
-	store.Set(ContextKeyUserID, userID)
+	store.Set(UserIDKey, userID)
 	err = store.Save()
 	if err != nil {
 		logger.StartSpan(a.CContext(), "存储会话", a.getFunctionName("SaveUserIDToSession")).Errorf(err.Error())
@@ -129,17 +129,17 @@ func (a *Context) GetPaginationParam() *schema.PaginationParam {
 
 // GetTraceID 获取追踪ID
 func (a *Context) GetTraceID() string {
-	return a.gctx.GetString(ContextKeyTraceID)
+	return a.gctx.GetString(TraceIDKey)
 }
 
 // GetUserID 获取用户ID
 func (a *Context) GetUserID() string {
-	return a.gctx.GetString(ContextKeyUserID)
+	return a.gctx.GetString(UserIDKey)
 }
 
 // SetUserID 设定用户ID
 func (a *Context) SetUserID(userID string) {
-	a.gctx.Set(ContextKeyUserID, userID)
+	a.gctx.Set(UserIDKey, userID)
 }
 
 // ParseJSON 解析请求JSON
@@ -242,7 +242,7 @@ func (a *Context) ResJSON(status int, v interface{}) {
 		a.ResError(errors.NewInternalServerError())
 		return
 	}
-	a.gctx.Set(ContextKeyResBody, buf)
+	a.gctx.Set(ResBodyKey, buf)
 	a.gctx.Data(status, "application/json; charset=utf-8", buf)
 	a.gctx.Abort()
 }
