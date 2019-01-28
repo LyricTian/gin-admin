@@ -1,5 +1,5 @@
 # 运行模式(debug:调试,test:测试,release:正式)
-run_mode = "test"
+run_mode = "debug"
 
 # casbin模型配置文件(也可以启动服务时使用-m指定)
 casbin_model_conf = ""
@@ -105,6 +105,8 @@ user = "root"
 password = "123456"
 # 数据库
 db_name = "gadmin"
+# 连接参数
+parameters = "charset=utf8&parseTime=True&loc=Local&allowNativePasswords=true"
 
 # postgres数据库配置
 [postgres]

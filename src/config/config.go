@@ -191,17 +191,18 @@ func GetSessionConfig() SessionConfig {
 
 // MySQLConfig mysql配置参数
 type MySQLConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
-	DBName   string `mapstructure:"db_name"`
+	Host       string `mapstructure:"host"`
+	Port       int    `mapstructure:"port"`
+	User       string `mapstructure:"user"`
+	Password   string `mapstructure:"password"`
+	DBName     string `mapstructure:"db_name"`
+	Parameters string `mapstructure:"parameters"`
 }
 
 // DSN 数据库连接串
 func (a MySQLConfig) DSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
-		a.User, a.Password, a.Host, a.Port, a.DBName)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
+		a.User, a.Password, a.Host, a.Port, a.DBName, a.Parameters)
 }
 
 // GetMySQLConfig 获取mysql配置参数
