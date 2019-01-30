@@ -55,13 +55,10 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	if v := params.Name; v != "" {
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
-	if v := params.Status; v > 0 {
-		db = db.Where("status=?", v)
-	}
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
 	}
-	db = db.Order("id DESC")
+	db = db.Order("sequence DESC,id DESC")
 
 	opt := a.getQueryOption(opts...)
 	var qr schema.RoleQueryResult
@@ -241,19 +238,6 @@ func (a *Role) DeleteRole(ctx context.Context, recordID string) error {
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("删除角色数据发生错误")
-	}
-	return nil
-}
-
-// UpdateStatus 更新状态
-func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	span := logger.StartSpan(ctx, "更新状态", a.getFuncName("UpdateStatus"))
-	defer span.Finish()
-
-	result := a.getRoleDB(ctx).Where("record_id=?", recordID).Update("status", status)
-	if err := result.Error; err != nil {
-		span.Errorf(err.Error())
-		return errors.New("更新状态发生错误")
 	}
 	return nil
 }

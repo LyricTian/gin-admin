@@ -99,7 +99,6 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 
 	if len(user.RoleIDs) > 0 {
 		roles, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-			Status:    1,
 			RecordIDs: user.RoleIDs,
 		})
 		if err != nil {
@@ -137,9 +136,9 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 	if err != nil {
 		return nil, err
 	}
-	perms = append(perms, result.Data...)
+	perms = append(result.Data, perms...)
 
-	return perms.ToTreeList(), nil
+	return perms.ToTreeList().ToTree(), nil
 }
 
 // UpdatePassword 更新当前用户登录密码

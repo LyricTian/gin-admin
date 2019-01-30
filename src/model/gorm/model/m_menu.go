@@ -77,7 +77,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	if v := params.ParentPaths; len(v) > 0 {
 		db = db.Where("parent_path IN(?)", v)
 	}
-	db = db.Order("sequence,id DESC")
+	db = db.Order("sequence DESC,id DESC")
 
 	var qr schema.MenuQueryResult
 	opt := a.getQueryOption(opts...)

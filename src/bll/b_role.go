@@ -31,9 +31,7 @@ func (a *Role) QueryPage(ctx context.Context, params schema.RoleQueryParam, pp *
 
 // QuerySelect 查询选择数据
 func (a *Role) QuerySelect(ctx context.Context) ([]*schema.RoleMini, error) {
-	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-		Status: 1,
-	})
+	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{})
 	if err != nil {
 		return nil, err
 	}
@@ -139,30 +137,10 @@ func (a *Role) Delete(ctx context.Context, recordIDs ...string) error {
 	return nil
 }
 
-// UpdateStatus 更新状态
-func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	err := a.RoleModel.UpdateStatus(ctx, recordID, status)
-	if err != nil {
-		return err
-	}
-
-	if status == 2 {
-		a.Enforcer.DeletePermissionsForUser(recordID)
-	} else {
-		err = a.LoadPolicyWithRecordID(ctx, recordID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 // LoadAllPolicy 加载所有的角色策略
 func (a *Role) LoadAllPolicy(ctx context.Context) error {
-	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-		Status: 1,
-	}, schema.RoleQueryOptions{IncludeMenuIDs: true})
+	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{},
+		schema.RoleQueryOptions{IncludeMenuIDs: true})
 	if err != nil {
 		return err
 	}
