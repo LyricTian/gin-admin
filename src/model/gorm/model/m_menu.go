@@ -60,9 +60,6 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	if v := params.Types; len(v) > 0 {
 		db = db.Where("type IN(?)", v)
 	}
-	if v := params.IsHide; v > 0 {
-		db = db.Where("is_hide=?", v)
-	}
 	if v := params.ParentID; v != nil {
 		db = db.Where("parent_id=?", *v)
 	}
@@ -108,6 +105,20 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	}
 
 	return item.ToSchemaMenu(), nil
+}
+
+// GetCount 获取数量
+func (a *Menu) GetCount(ctx context.Context) (int, error) {
+	span := logger.StartSpan(ctx, "获取数量", a.getFuncName("GetCount"))
+	defer span.Finish()
+
+	var count int
+	result := a.getMenuDB(ctx).Count(&count)
+	if err := result.Error; err != nil {
+		span.Errorf(err.Error())
+		return 0, errors.New("获取数量发生错误")
+	}
+	return count, nil
 }
 
 // CheckCode 检查编号是否存在

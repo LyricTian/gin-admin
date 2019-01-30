@@ -25,10 +25,17 @@ type CallbackFunc func()
 func Init(ctx context.Context) CallbackFunc {
 	span := logger.StartSpanWithCall(ctx, "初始化", "main.src.Init")
 
+	// 依赖注入
 	obj, err := inject.Init(ctx)
 	if err != nil {
 		span().Fatalf("初始化依赖注入发生错误：%s", err.Error())
 	}
+
+	// 初始化WEB
+	webApp := web.Init(ctx, obj)
+
+	// 初始化数据
+	InitData(ctx, obj)
 
 	// 初始化日志钩子
 	loggerFunc := InitLoggerHook(ctx, obj)
@@ -44,7 +51,7 @@ func Init(ctx context.Context) CallbackFunc {
 	}
 
 	// 初始化HTTP服务
-	httpFunc := InitHTTPServer(ctx, obj)
+	httpFunc := InitHTTPServer(ctx, webApp)
 	return func() {
 		// 等待HTTP服务关闭
 		if httpFunc != nil {
@@ -69,14 +76,14 @@ func Init(ctx context.Context) CallbackFunc {
 }
 
 // InitHTTPServer 初始化http服务
-func InitHTTPServer(ctx context.Context, obj *inject.Object) CallbackFunc {
+func InitHTTPServer(ctx context.Context, handler http.Handler) CallbackFunc {
 	span := logger.StartSpanWithCall(ctx, "HTTP服务初始化", "main.src.InitHTTPServer")
 
 	cfg := config.GetHTTPConfig()
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
 		Addr:           addr,
-		Handler:        web.Init(ctx, obj),
+		Handler:        handler,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -120,4 +127,30 @@ func InitLoggerHook(ctx context.Context, obj *inject.Object) CallbackFunc {
 		}
 	}
 	return nil
+}
+
+// InitData 初始化数据
+func InitData(ctx context.Context, obj *inject.Object) {
+	span := logger.StartSpan(ctx, "初始化数据", "main.src.InitData")
+
+	if config.IsAllowCreateResources() {
+		// 检查并创建资源数据
+		err := obj.CtlCommon.CheckAndCreateResource(ctx)
+		if err != nil {
+			span.Fatalf("检查并创建资源数据发生错误：%s", err.Error())
+		}
+	}
+
+	if config.IsAllowInitializeMenus() {
+		err := obj.CtlCommon.InitMenuData(ctx)
+		if err != nil {
+			span.Fatalf("初始化菜单数据发生错误：%s", err.Error())
+		}
+	}
+
+	// 初始化casbin策略数据
+	err := obj.CtlCommon.LoadCasbinPolicyData(ctx)
+	if err != nil {
+		span.Fatalf("初始化casbin策略数据发生错误：%s", err.Error())
+	}
 }
