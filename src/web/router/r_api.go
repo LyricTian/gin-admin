@@ -41,4 +41,5 @@ func APIHandler(app *gin.Engine, obj *inject.Object) {
 	APIRoleRouter(api, c.RoleAPI)
 	APIMenuRouter(api, c.MenuAPI)
 	APIUserRouter(api, c.UserAPI)
+	APIResourceRouter(api, c.ResourceAPI)
 }
