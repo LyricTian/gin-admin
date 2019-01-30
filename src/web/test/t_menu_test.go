@@ -20,7 +20,7 @@ func TestMenu(t *testing.T) {
 		Code:     util.MustUUID(),
 		Name:     "测试菜单",
 		Type:     1,
-		Sequence: -1,
+		Sequence: 9999,
 		Icon:     "test",
 		Path:     "/test",
 		IsHide:   2,

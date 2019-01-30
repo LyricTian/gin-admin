@@ -33,10 +33,10 @@ func TestRole(t *testing.T) {
 
 	// post /roles
 	addItem := &schema.Role{
-		Name:    util.MustUUID(),
-		Memo:    "角色备注",
-		Status:  1,
-		MenuIDs: []string{addMenuNewItem.RecordID},
+		Name:     util.MustUUID(),
+		Sequence: 9999,
+		Memo:     "角色备注",
+		MenuIDs:  []string{addMenuNewItem.RecordID},
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
@@ -53,7 +53,6 @@ func TestRole(t *testing.T) {
 	err = parseReader(w.Body, &addGetItem)
 	assert.Equal(t, addItem.Name, addGetItem.Name)
 	assert.Equal(t, addItem.Memo, addGetItem.Memo)
-	assert.Equal(t, addItem.Status, addGetItem.Status)
 	assert.Equal(t, addItem.MenuIDs, addGetItem.MenuIDs)
 	assert.NotEmpty(t, addGetItem.RecordID)
 
@@ -96,7 +95,6 @@ func TestRole(t *testing.T) {
 	assert.Equal(t, getItem.RecordID, addNewItem.RecordID)
 	assert.Equal(t, getItem.Name, putItem.Name)
 	assert.Equal(t, getItem.MenuIDs, putItem.MenuIDs)
-	assert.Equal(t, getItem.Status, 2)
 
 	// delete /roles/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))

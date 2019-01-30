@@ -35,7 +35,6 @@ func TestUser(t *testing.T) {
 	addRoleItem := &schema.Role{
 		Name:    util.MustUUID(),
 		Memo:    "角色备注",
-		Status:  1,
 		MenuIDs: []string{addMenuNewItem.RecordID},
 	}
 	engine.ServeHTTP(w, newPostRequest("v1/roles", addRoleItem))

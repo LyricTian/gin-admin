@@ -32,7 +32,6 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *
 
 	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
 		RecordIDs: result.Data.ToRoleIDs(),
-		Status:    1,
 	})
 	if err != nil {
 		return nil, nil, err

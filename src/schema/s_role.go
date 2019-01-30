@@ -4,8 +4,8 @@ package schema
 type Role struct {
 	RecordID string   `json:"record_id" swaggo:"false,记录ID"`
 	Name     string   `json:"name" binding:"required" swaggo:"true,角色名称"`
+	Sequence int      `json:"sequence" swaggo:"false,排序值"`
 	Memo     string   `json:"memo" swaggo:"false,备注"`
-	Status   int      `json:"status" binding:"required,max=2,min=1" swaggo:"true,状态(1:启用 2:停用)"`
 	MenuIDs  []string `json:"menu_ids" binding:"required,gt=0" swaggo:"true,授权的菜单ID列表"`
 }
 
@@ -13,7 +13,6 @@ type Role struct {
 type RoleQueryParam struct {
 	RecordIDs []string // 记录ID列表
 	Name      string   // 角色名称
-	Status    int      // 角色状态(1:启用 2:停用)
 }
 
 // RoleQueryOptions 角色对象查询可选参数项

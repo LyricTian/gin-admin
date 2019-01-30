@@ -13,6 +13,4 @@ func APIRoleRouter(g *gin.RouterGroup, c *ctl.Role) {
 	PUT(g, "/v1/roles/:id", c.Update, SetName("更新角色数据"))
 	DELETE(g, "/v1/roles/:id", c.Delete, SetName("删除角色数据"))
 	DELETE(g, "/v1/roles", c.DeleteMany, SetName("删除多条角色数据"))
-	PATCH(g, "/v1/roles/:id/enable", c.Enable, SetName("启用角色数据"))
-	PATCH(g, "/v1/roles/:id/disable", c.Disable, SetName("禁用角色数据"))
 }

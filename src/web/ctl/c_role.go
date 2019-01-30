@@ -6,7 +6,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
@@ -44,7 +43,6 @@ func (a *Role) Query(ctx *context.Context) {
 func (a *Role) QueryPage(ctx *context.Context) {
 	var params schema.RoleQueryParam
 	params.Name = ctx.Query("name")
-	params.Status = util.S(ctx.Query("status")).Int()
 
 	items, pr, err := a.RoleBll.QueryPage(ctx.CContext(), params, ctx.GetPaginationParam())
 	if err != nil {
@@ -180,39 +178,5 @@ func (a *Role) DeleteMany(ctx *context.Context) {
 		return
 	}
 
-	ctx.ResOK()
-}
-
-// Enable 启用数据
-// @Summary 启用数据
-// @Param Access-Token header string false "访问令牌"
-// @Param id path string true "记录ID"
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
-// @Router PATCH /api/v1/roles/{id}/enable
-func (a *Role) Enable(ctx *context.Context) {
-	err := a.RoleBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
-	ctx.ResOK()
-}
-
-// Disable 禁用数据
-// @Summary 禁用数据
-// @Param Access-Token header string false "访问令牌"
-// @Param id path string true "记录ID"
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
-// @Router PATCH /api/v1/roles/{id}/disable
-func (a *Role) Disable(ctx *context.Context) {
-	err := a.RoleBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
 	ctx.ResOK()
 }

@@ -22,8 +22,8 @@ func (a SchemaRole) ToRole() *Role {
 	item := &Role{
 		RecordID: a.RecordID,
 		Name:     a.Name,
+		Sequence: a.Sequence,
 		Memo:     a.Memo,
-		Status:   a.Status,
 	}
 	return item
 }
@@ -33,8 +33,8 @@ type Role struct {
 	Model
 	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
 	Name     string `gorm:"column:name;size:100;index;"`            // 角色名称
+	Sequence int    `gorm:"column:sequence;index;"`                 // 排序值
 	Memo     string `gorm:"column:memo;size:200;"`                  // 备注
-	Status   int    `gorm:"column:status;index;"`                   // 状态(1:启用 2:停用)
 	Creator  string `gorm:"column:creator;size:36;"`                // 创建者
 }
 
@@ -52,8 +52,8 @@ func (a Role) ToSchemaRole() *schema.Role {
 	item := &schema.Role{
 		RecordID: a.RecordID,
 		Name:     a.Name,
+		Sequence: a.Sequence,
 		Memo:     a.Memo,
-		Status:   a.Status,
 	}
 	return item
 }
