@@ -29,6 +29,7 @@ func Init(ctx context.Context, g *inject.Graph) (*gormplus.DB, error) {
 	g.Provide(&inject.Object{Value: model.IMenu(gormmodel.InitMenu(db)), Name: "IMenu"})
 	g.Provide(&inject.Object{Value: model.IRole(gormmodel.InitRole(db)), Name: "IRole"})
 	g.Provide(&inject.Object{Value: model.IUser(gormmodel.InitUser(db)), Name: "IUser"})
+	g.Provide(&inject.Object{Value: model.IResource(gormmodel.InitResource(db)), Name: "IResource"})
 	return db, nil
 }
 
