@@ -87,7 +87,7 @@ type GormItem struct {
 	SpanTitle     string    `gorm:"column:span_title;size:256;"`           // 跟踪单元标题
 	SpanFunction  string    `gorm:"column:span_function;size:256;"`        // 跟踪单元函数名
 	Data          string    `gorm:"column:data;size:4096;"`                // 日志数据(json)
-	TimeConsuming int64     `gorm:"column:time_consuming;index;"`          // 耗时(单位：毫秒)
+	TimeConsuming int64     `gorm:"column:time_consuming;index;"`          // 耗时(单位：微妙)
 	Version       string    `gorm:"column:version;size:32;"`               // 服务版本号
 	CreatedAt     time.Time `gorm:"column:created_at;index"`               // 创建时间
 }

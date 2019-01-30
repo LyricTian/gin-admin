@@ -57,9 +57,6 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	if v := params.Name; v != "" {
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
-	if v := params.LevelCode; v != "" {
-		db = db.Where("level_code LIKE ?", v+"%")
-	}
 	if v := params.Types; len(v) > 0 {
 		db = db.Where("type IN(?)", v)
 	}
@@ -74,8 +71,11 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 		roleMenuQuery := FromDBWithModel(ctx, a.db, entity.RoleMenu{}).Select("menu_id").Where("role_id IN(?)", userRoleQuery).SubQuery()
 		db = db.Where("record_id IN(?)", roleMenuQuery)
 	}
-	if v := params.LevelCodes; len(v) > 0 {
-		db = db.Where("level_code IN(?)", v)
+	if v := params.ParentPath; v != "" {
+		db = db.Where("parent_path LIKE ?", v+"%")
+	}
+	if v := params.ParentPaths; len(v) > 0 {
+		db = db.Where("parent_path IN(?)", v)
 	}
 	db = db.Order("sequence,id DESC")
 
@@ -167,15 +167,15 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 	return nil
 }
 
-// UpdateLevelCode 更新分级码
-func (a *Menu) UpdateLevelCode(ctx context.Context, recordID, levelCode string) error {
-	span := logger.StartSpan(ctx, "更新分级码", a.getFuncName("UpdateLevelCode"))
+// UpdateParentPath 更新父级路径
+func (a *Menu) UpdateParentPath(ctx context.Context, recordID, parentPath string) error {
+	span := logger.StartSpan(ctx, "更新父级路径", a.getFuncName("UpdateParentPath"))
 	defer span.Finish()
 
-	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Update("level_code", levelCode)
+	result := a.getMenuDB(ctx).Where("record_id=?", recordID).Update("parent_path", parentPath)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
-		return errors.New("更新分级码发生错误")
+		return errors.New("更新父级路径发生错误")
 	}
 	return nil
 }

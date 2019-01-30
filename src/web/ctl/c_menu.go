@@ -69,13 +69,15 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 // QueryTree 查询菜单树
 // @Summary 查询菜单树
 // @Param Access-Token header string false "访问令牌"
+// @Param include_resource query string false "是否包含资源层级"
 // @Success 200 option.Interface "查询结果：{list:菜单树}"
 // @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/menus?q=tree
 func (a *Menu) QueryTree(ctx *context.Context) {
-	treeData, err := a.MenuBll.QueryTree(ctx.CContext())
+	includeResource := ctx.Query("include_resource") == "1"
+	treeData, err := a.MenuBll.QueryTree(ctx.CContext(), includeResource)
 	if err != nil {
 		ctx.ResError(err)
 		return

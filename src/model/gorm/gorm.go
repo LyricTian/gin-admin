@@ -13,6 +13,7 @@ import (
 )
 
 // Init 初始化gorm存储层
+// 参考官方文档：http://gorm.io/zh_CN/docs/
 func Init(ctx context.Context, g *inject.Graph) (*gormplus.DB, error) {
 	// 设定初始值
 	entity.SetTablePrefix(config.GetGormTablePrefix())
@@ -21,6 +22,7 @@ func Init(ctx context.Context, g *inject.Graph) (*gormplus.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	// 依赖注入
 	g.Provide(&inject.Object{Value: model.ITrans(gormmodel.NewTrans(db)), Name: "ITrans"})
 	g.Provide(&inject.Object{Value: model.IDemo(gormmodel.InitDemo(db)), Name: "IDemo"})

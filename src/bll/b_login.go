@@ -129,17 +129,17 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 		return nil, ErrNoPerm
 	}
 
-	// 将权限拆分，组装成树
+	// 组装权限树
+	perms := result.Data
 	result, err = a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		LevelCodes: util.ParseLevelCodes(result.Data.ToLevelCodes()...),
+		RecordIDs: result.Data.SplitParentPathToRecordIDs(),
 	})
 	if err != nil {
 		return nil, err
-	} else if len(result.Data) == 0 {
-		return nil, ErrNoPerm
 	}
+	perms = append(perms, result.Data...)
 
-	return result.Data.ToTreeList(), nil
+	return perms.ToTreeList(), nil
 }
 
 // UpdatePassword 更新当前用户登录密码
