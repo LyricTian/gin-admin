@@ -2,7 +2,6 @@ package bll
 
 import (
 	"context"
-	"sync"
 
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
@@ -12,7 +11,6 @@ import (
 
 // Menu 菜单管理
 type Menu struct {
-	lock      sync.RWMutex
 	MenuModel model.IMenu `inject:"IMenu"`
 	CommonBll *Common     `inject:""`
 }
@@ -29,9 +27,13 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pp *
 }
 
 // QueryTree 查询菜单树
-func (a *Menu) QueryTree(ctx context.Context) ([]*schema.MenuTree, error) {
+func (a *Menu) QueryTree(ctx context.Context, includeResource bool) ([]*schema.MenuTree, error) {
+	types := []int{1, 2}
+	if includeResource {
+		types = append(types, 3)
+	}
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		Types: []int{1, 2},
+		Types: types,
 	})
 	if err != nil {
 		return nil, err
@@ -48,27 +50,6 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 		return nil, errors.ErrNotFound
 	}
 	return item, nil
-}
-
-func (a *Menu) getLevelCode(ctx context.Context, parentItem *schema.Menu) (string, error) {
-	params := schema.MenuQueryParam{}
-	if parentItem == nil {
-		var value string
-		params.ParentID = &value
-	} else {
-		params.LevelCode = parentItem.LevelCode
-	}
-	result, err := a.MenuModel.Query(ctx, params)
-	if err != nil {
-		return "", err
-	}
-
-	levelCodes := result.Data.ToLevelCodes()
-	levelCode := util.GetLevelCode(levelCodes)
-	if len(levelCode) == 0 {
-		return "", errors.NewInternalServerError("分级码生成失败")
-	}
-	return levelCode, nil
 }
 
 func (a *Menu) checkAndGetParent(ctx context.Context, item schema.Menu, oldItem *schema.Menu) (*schema.Menu, error) {
@@ -104,6 +85,18 @@ func (a *Menu) checkAndGetParent(ctx context.Context, item schema.Menu, oldItem 
 	return parentItem, nil
 }
 
+// 获取父级路径
+func (a *Menu) getParentPath(parentItem *schema.Menu) string {
+	var parentPath string
+	if parentItem != nil {
+		if v := parentItem.ParentPath; v != "" {
+			parentPath = v + "/"
+		}
+		parentPath = parentPath + parentItem.RecordID
+	}
+	return parentPath
+}
+
 // Create 创建数据
 func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, error) {
 	parentItem, err := a.checkAndGetParent(ctx, item, nil)
@@ -111,16 +104,9 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, erro
 		return nil, err
 	}
 
-	a.lock.Lock()
-	defer a.lock.Unlock()
-
+	item.ParentPath = a.getParentPath(parentItem)
 	item.RecordID = util.MustUUID()
 	err = a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
-		levelCode, err := a.getLevelCode(ctx, parentItem)
-		if err != nil {
-			return err
-		}
-		item.LevelCode = levelCode
 		return a.MenuModel.Create(ctx, item)
 	})
 	if err != nil {
@@ -147,22 +133,16 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 	if err != nil {
 		return err
 	}
-	item.LevelCode = oldItem.LevelCode
-
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	item.ParentPath = oldItem.ParentPath
 
 	return a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
-		// 如果父级更新，需要更新当前节点及节点下级的分级码
+		// 如果父级更新，需要更新当前节点及节点下级的父级路径
 		if item.ParentID != oldItem.ParentID {
-			levelCode, err := a.getLevelCode(ctx, parentItem)
-			if err != nil {
-				return err
-			}
-			item.LevelCode = levelCode
-			oldLevelCode := oldItem.LevelCode
+			item.ParentPath = a.getParentPath(parentItem)
+
+			opath := oldItem.ParentPath
 			result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-				LevelCode: oldLevelCode,
+				ParentPath: opath,
 			})
 			if err != nil {
 				return err
@@ -172,8 +152,11 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 				if menu.RecordID == recordID {
 					continue
 				}
-				newLevelCode := levelCode + menu.LevelCode[len(oldLevelCode):]
-				err = a.MenuModel.UpdateLevelCode(ctx, menu.RecordID, newLevelCode)
+				npath := item.ParentPath + menu.ParentPath[len(opath):]
+				if len(npath) > 0 && npath[0] == '/' {
+					npath = npath[1:]
+				}
+				err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath)
 				if err != nil {
 					return err
 				}

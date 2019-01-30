@@ -20,8 +20,8 @@ type IMenu interface {
 	Create(ctx context.Context, item schema.Menu) error
 	// 更新数据
 	Update(ctx context.Context, recordID string, item schema.Menu) error
-	// 更新数据和分级码
-	UpdateLevelCode(ctx context.Context, recordID, levelCode string) error
+	// 更新父级路径
+	UpdateParentPath(ctx context.Context, recordID, parentPath string) error
 	// 删除数据
 	Delete(ctx context.Context, recordID string) error
 }
