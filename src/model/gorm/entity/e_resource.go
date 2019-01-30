@@ -35,6 +35,10 @@ type Resource struct {
 	Creator  string `gorm:"column:creator;size:36;"`                // 创建者
 }
 
+func (a Resource) String() string {
+	return toString(a)
+}
+
 // TableName 表名
 func (a Resource) TableName() string {
 	return a.Model.TableName("resource")

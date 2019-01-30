@@ -3,6 +3,8 @@ package entity
 import (
 	"fmt"
 	"time"
+
+	"github.com/LyricTian/gin-admin/src/util"
 )
 
 var tablePrefix string
@@ -23,4 +25,8 @@ type Model struct {
 // TableName table name
 func (Model) TableName(name string) string {
 	return fmt.Sprintf("%s%s", tablePrefix, name)
+}
+
+func toString(v interface{}) string {
+	return util.JSONMarshalToString(v)
 }

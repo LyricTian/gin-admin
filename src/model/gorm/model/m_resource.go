@@ -107,9 +107,9 @@ func (a *Resource) Create(ctx context.Context, item schema.Resource) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
 	defer span.Finish()
 
-	demo := entity.SchemaResource(item).ToResource()
-	demo.Creator = FromUserID(ctx)
-	result := a.getResourceDB(ctx).Create(demo)
+	eitem := entity.SchemaResource(item).ToResource()
+	eitem.Creator = FromUserID(ctx)
+	result := a.getResourceDB(ctx).Create(eitem)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("创建数据发生错误")
@@ -122,8 +122,8 @@ func (a *Resource) Update(ctx context.Context, recordID string, item schema.Reso
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
 	defer span.Finish()
 
-	demo := entity.SchemaResource(item).ToResource()
-	result := a.getResourceDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(demo)
+	eitem := entity.SchemaResource(item).ToResource()
+	result := a.getResourceDB(ctx).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return errors.New("更新数据发生错误")

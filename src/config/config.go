@@ -74,6 +74,11 @@ func GetSwaggerDir() string {
 	return viper.GetString("swagger")
 }
 
+// IsAllowCreateResource 是否允许动态创建资源数据
+func IsAllowCreateResource() bool {
+	return viper.GetBool("allow_create_resource")
+}
+
 // RootUser root用户
 type RootUser struct {
 	UserName string `mapstructure:"user_name"`
