@@ -38,6 +38,10 @@ type Role struct {
 	Creator  string `gorm:"column:creator;size:36;"`                // 创建者
 }
 
+func (a Role) String() string {
+	return toString(a)
+}
+
 // TableName 表名
 func (a Role) TableName() string {
 	return a.Model.TableName("role")

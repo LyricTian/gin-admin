@@ -30,6 +30,18 @@ var (
 	routerRe   = regexp.MustCompile(`(.*):[^/]+(.*)`)
 )
 
+// GetRouterData 获取路由数据
+func GetRouterData() map[string]RouterItem {
+	data := make(map[string]RouterItem)
+
+	routerData.Range(func(key, value interface{}) bool {
+		data[key.(string)] = value.(RouterItem)
+		return true
+	})
+
+	return data
+}
+
 // RouterItem 路由项
 type RouterItem struct {
 	Code string // 路由编号

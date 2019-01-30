@@ -9,6 +9,11 @@ import (
 	"github.com/LyricTian/gin-admin/src/util"
 )
 
+// 定义错误
+var (
+	ErrResourcePathAndMethodExists = errors.NewBadRequestError("访问路径和请求方式已经存在")
+)
+
 // Resource 资源管理
 type Resource struct {
 	ResourceModel model.IResource `inject:"IResource"`
@@ -42,7 +47,7 @@ func (a *Resource) check(ctx context.Context, item schema.Resource, oldItem *sch
 		if err != nil {
 			return err
 		} else if exists {
-			return errors.NewBadRequestError("访问路径和请求方式已经存在")
+			return ErrResourcePathAndMethodExists
 		}
 	}
 	return nil

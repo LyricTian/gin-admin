@@ -40,6 +40,10 @@ type User struct {
 	Creator  string `gorm:"column:creator;size:36;"`                // 创建者
 }
 
+func (a User) String() string {
+	return toString(a)
+}
+
 // TableName 表名
 func (a User) TableName() string {
 	return a.Model.TableName("user")

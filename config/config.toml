@@ -16,6 +16,9 @@ db_mode = "gorm"
 # 认证模式(支持：session)
 auth_mode = "session"
 
+# 是否允许动态创建资源数据
+allow_create_resource = true
+
 # http配置
 [http]
 # http监听地址

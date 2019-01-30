@@ -47,6 +47,10 @@ type Menu struct {
 	Creator    string `gorm:"column:creator;size:36;"`                // 创建人
 }
 
+func (a Menu) String() string {
+	return toString(a)
+}
+
 // TableName 表名
 func (a Menu) TableName() string {
 	return a.Model.TableName("menu")

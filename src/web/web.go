@@ -3,10 +3,9 @@ package web
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/src/logger"
-
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
+	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/web/middleware"
 	"github.com/LyricTian/gin-admin/src/web/router"
 	"github.com/gin-gonic/gin"
@@ -41,6 +40,14 @@ func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 
 	// 注册/api路由
 	router.APIHandler(app, obj)
+
+	// 检查并创建资源数据
+	if config.IsAllowCreateResource() {
+		err := obj.CtlCommon.CheckAndCreateResource(ctx)
+		if err != nil {
+			span.Fatalf("检查并创建资源数据发生错误：%s", err.Error())
+		}
+	}
 
 	// 初始化casbin策略数据
 	err := obj.CtlCommon.LoadCasbinPolicyData(ctx)

@@ -35,6 +35,10 @@ type Demo struct {
 	Creator  string `gorm:"column:creator;size:36;"`                // 创建者
 }
 
+func (a Demo) String() string {
+	return toString(a)
+}
+
 // TableName 表名
 func (a Demo) TableName() string {
 	return a.Model.TableName("demo")
