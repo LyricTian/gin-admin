@@ -17,7 +17,10 @@ db_mode = "gorm"
 auth_mode = "session"
 
 # 是否允许动态创建资源数据
-allow_create_resource = true
+allow_create_resources = true
+
+# 是否允许初始化菜单数据
+allow_initialize_menus = true
 
 # http配置
 [http]

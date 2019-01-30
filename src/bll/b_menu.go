@@ -41,6 +41,11 @@ func (a *Menu) QueryTree(ctx context.Context, includeResource bool) ([]*schema.M
 	return result.Data.ToTreeList().ToTree(), nil
 }
 
+// GetCount 获取数量
+func (a *Menu) GetCount(ctx context.Context) (int, error) {
+	return a.MenuModel.GetCount(ctx)
+}
+
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	item, err := a.MenuModel.Get(ctx, recordID)

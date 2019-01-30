@@ -113,19 +113,21 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 // QueryUserMenuTree 查询当前用户的权限菜单树
 func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, error) {
 	userID := gcontext.FromUserID(ctx)
-	if a.CheckIsRoot(ctx, userID) {
+	isRoot := a.CheckIsRoot(ctx, userID)
+	if isRoot {
 		userID = ""
 	}
 
 	// 查询用户的权限
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		IsHide: 2,
 		UserID: userID,
 	})
 	if err != nil {
 		return nil, err
 	} else if len(result.Data) == 0 {
 		return nil, ErrNoPerm
+	} else if isRoot {
+		return result.Data.ToTreeList().ToTree(), nil
 	}
 
 	// 组装权限树

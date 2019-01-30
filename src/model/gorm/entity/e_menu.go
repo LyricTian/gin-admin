@@ -25,7 +25,6 @@ func (a SchemaMenu) ToMenu() *Menu {
 		Method:     a.Method,
 		ParentID:   a.ParentID,
 		ParentPath: a.ParentPath,
-		IsHide:     a.IsHide,
 	}
 	return item
 }
@@ -43,7 +42,6 @@ type Menu struct {
 	Method     string `gorm:"column:method;size:50;"`                 // 资源请求方式
 	ParentID   string `gorm:"column:parent_id;size:36;index;"`        // 父级内码
 	ParentPath string `gorm:"column:parent_path;size:518;index;"`     // 父级路径
-	IsHide     int    `gorm:"column:is_hide;index;"`                  // 是否隐藏(1:是 2:否)
 	Creator    string `gorm:"column:creator;size:36;"`                // 创建人
 }
 
@@ -69,7 +67,6 @@ func (a Menu) ToSchemaMenu() *schema.Menu {
 		Method:     a.Method,
 		ParentID:   a.ParentID,
 		ParentPath: a.ParentPath,
-		IsHide:     a.IsHide,
 	}
 	return item
 }

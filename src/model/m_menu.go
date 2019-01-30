@@ -12,6 +12,8 @@ type IMenu interface {
 	Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (schema.MenuQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string) (*schema.Menu, error)
+	//  获取数量
+	GetCount(ctx context.Context) (int, error)
 	// 检查编号是否存在
 	CheckCode(ctx context.Context, code string, parentID string) (bool, error)
 	// 检查子级是否存在

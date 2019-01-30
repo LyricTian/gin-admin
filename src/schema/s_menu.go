@@ -16,7 +16,6 @@ type Menu struct {
 	Method     string `json:"method" swaggo:"false,资源请求方式"`
 	ParentID   string `json:"parent_id" swaggo:"false,父级内码"`
 	ParentPath string `json:"parent_path" swaggo:"false,父级路径"`
-	IsHide     int    `json:"is_hide" binding:"required,max=2,min=1" swaggo:"true,是否隐藏(1:是 2:否)"`
 }
 
 // MenuQueryParam 菜单对象查询条件
@@ -25,7 +24,6 @@ type MenuQueryParam struct {
 	Code        string   // 菜单编号(模糊查询)
 	Name        string   // 菜单名称(模糊查询)
 	Types       []int    // 菜单类型(1：模块 2：功能 3：资源)
-	IsHide      int      // 是否隐藏(1:是 2:否)
 	ParentID    *string  // 父级内码
 	UserID      string   // 用户ID（查询用户所拥有的菜单权限）
 	ParentPath  string   // 父级路径(前缀模糊查询)
@@ -49,6 +47,7 @@ type MenuTree struct {
 	Code       string       `json:"code" binding:"required" swaggo:"true,菜单编号"`
 	Name       string       `json:"name" binding:"required" swaggo:"true,菜单名称"`
 	Type       int          `json:"type" binding:"required,max=3,min=1" swaggo:"true,菜单类型(1：模块 2：功能 3：资源)"`
+	Sequence   int          `json:"sequence" swaggo:"false,排序值"`
 	Icon       string       `json:"icon" swaggo:"false,菜单图标"`
 	Path       string       `json:"path" swaggo:"false,访问路径"`
 	ParentID   string       `json:"parent_id" swaggo:"false,父级内码"`
@@ -122,6 +121,7 @@ func (a Menus) ToTreeList() MenuTrees {
 			Code:       item.Code,
 			Name:       item.Name,
 			Type:       item.Type,
+			Sequence:   item.Sequence,
 			Icon:       item.Icon,
 			Path:       item.Path,
 			ParentID:   item.ParentID,

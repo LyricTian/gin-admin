@@ -74,9 +74,14 @@ func GetSwaggerDir() string {
 	return viper.GetString("swagger")
 }
 
-// IsAllowCreateResource 是否允许动态创建资源数据
-func IsAllowCreateResource() bool {
-	return viper.GetBool("allow_create_resource")
+// IsAllowCreateResources 是否允许动态创建资源数据
+func IsAllowCreateResources() bool {
+	return viper.GetBool("allow_create_resources")
+}
+
+// IsAllowInitializeMenus 是否允许初始化菜单数据
+func IsAllowInitializeMenus() bool {
+	return viper.GetBool("allow_initialize_menus")
 }
 
 // RootUser root用户
