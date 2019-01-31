@@ -1,7 +1,6 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/LyricTian/gin-admin/src/web/middleware"
@@ -12,15 +11,13 @@ import (
 func APIHandler(app *gin.Engine, obj *inject.Object) {
 	api := app.Group("/api")
 
-	switch {
-	case config.IsSessionAuth():
-		api.Use(middleware.VerifySessionMiddleware(
-			middleware.AllowMethodAndPathPrefixSkipper(
-				context.JoinRouter("GET", "/api/v1/login"),
-				context.JoinRouter("POST", "/api/v1/login"),
-			),
-		))
-	}
+	// 用户身份授权
+	api.Use(middleware.UserAuthMiddleware(
+		middleware.AllowMethodAndPathPrefixSkipper(
+			context.JoinRouter("GET", "/api/v1/login"),
+			context.JoinRouter("POST", "/api/v1/login"),
+		),
+	))
 
 	// 权限校验中间件
 	api.Use(middleware.CasbinMiddleware(obj.Enforcer,

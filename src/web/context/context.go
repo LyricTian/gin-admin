@@ -11,7 +11,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/gin-gonic/gin"
-	"github.com/go-session/gin-session"
 )
 
 // New 创建上下文实例
@@ -57,33 +56,6 @@ func (a *Context) Request() *http.Request {
 // ResponseWriter http response stream
 func (a *Context) ResponseWriter() http.ResponseWriter {
 	return a.gctx.Writer
-}
-
-// SaveUserIDToSession 将用户ID存储到当前会话
-func (a *Context) SaveUserIDToSession(userID string) error {
-	store, err := ginsession.Refresh(a.gctx)
-	if err != nil {
-		logger.StartSpan(a.CContext(), "更新会话", a.getFunctionName("SaveUserIDToSession")).Errorf(err.Error())
-		return errors.NewInternalServerError("更新会话发生错误")
-	}
-
-	store.Set(UserIDKey, userID)
-	err = store.Save()
-	if err != nil {
-		logger.StartSpan(a.CContext(), "存储会话", a.getFunctionName("SaveUserIDToSession")).Errorf(err.Error())
-		return errors.NewInternalServerError("存储会话发生错误")
-	}
-	return nil
-}
-
-// DestroySession 销毁会话
-func (a *Context) DestroySession() error {
-	err := ginsession.Destroy(a.gctx)
-	if err != nil {
-		logger.StartSpan(a.CContext(), "销毁会话", a.getFunctionName("DestroySession")).Errorf(err.Error())
-		return errors.NewInternalServerError("销毁会话发生错误")
-	}
-	return nil
 }
 
 // Param 获取路径参数(/foo/:id)

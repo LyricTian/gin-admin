@@ -9,6 +9,7 @@ import (
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/web/auth"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
@@ -110,7 +111,9 @@ func (a *Login) Login(ctx *context.Context) {
 	}
 	ctx.SetUserID(userID)
 
-	err = ctx.SaveUserIDToSession(userID)
+	err = auth.SaveUserInfo(ctx.GContext(), auth.UserInfo{
+		UserID: userID,
+	})
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -129,7 +132,8 @@ func (a *Login) Logout(ctx *context.Context) {
 	// 检查用户是否处于登录状态，如果是，则执行销毁
 	userID := ctx.GetUserID()
 	if userID != "" {
-		if err := ctx.DestroySession(); err != nil {
+		err := auth.Destroy(ctx.GContext())
+		if err != nil {
 			ctx.ResError(err)
 			return
 		}
