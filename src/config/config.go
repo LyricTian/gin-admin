@@ -128,17 +128,34 @@ func GetCaptchaConfig() CaptchaConfig {
 	return config
 }
 
-// RateLimiterConfig 请求限速配置参数
+// RateLimiterConfig 请求频率限制配置参数
 type RateLimiterConfig struct {
 	Enable  bool  `mapstructure:"enable"`
 	Count   int64 `mapstructure:"count"`
 	RedisDB int   `mapstructure:"redis_db"`
 }
 
-// GetRateLimiterConfig 获取请求限速配置参数
+// GetRateLimiterConfig 获取请求频率限制配置参数
 func GetRateLimiterConfig() RateLimiterConfig {
 	var config RateLimiterConfig
 	parse("rate_limiter", &config)
+	return config
+}
+
+// CORSConfig 跨域请求配置参数
+type CORSConfig struct {
+	Enable           bool     `mapstructure:"enable"`
+	AllowOrigins     []string `mapstructure:"allow_origins"`
+	AllowMethods     []string `mapstructure:"allow_methods"`
+	AllowHeaders     []string `mapstructure:"allow_headers"`
+	AllowCredentials bool     `mapstructure:"allow_credentials"`
+	MaxAge           int      `mapstructure:"max_age"`
+}
+
+// GetCORSConfig 获取跨域请求配置参数
+func GetCORSConfig() CORSConfig {
+	var config CORSConfig
+	parse("cors", &config)
 	return config
 }
 

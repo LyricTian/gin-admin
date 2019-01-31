@@ -12,11 +12,11 @@ import (
 	"github.com/go-redis/redis_rate"
 )
 
-// RateLimiterMiddleware 请求限速中间件
-func RateLimiterMiddleware(limiter *redis_rate.Limiter, skipper SkipperFunc) gin.HandlerFunc {
+// RateLimiterMiddleware 请求频率限制中间件
+func RateLimiterMiddleware(limiter *redis_rate.Limiter, skipper ...SkipperFunc) gin.HandlerFunc {
 	cfg := config.GetRateLimiterConfig()
 	return func(c *gin.Context) {
-		if (skipper != nil && skipper(c)) || limiter == nil {
+		if (len(skipper) > 0 && skipper[0](c)) || limiter == nil {
 			c.Next()
 			return
 		}

@@ -9,15 +9,18 @@ import (
 )
 
 // UserAuthMiddleware 用户授权中间件
-func UserAuthMiddleware(skipper SkipperFunc) gin.HandlerFunc {
+func UserAuthMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if skipper != nil && skipper(c) {
+		ctx := context.New(c)
+		userInfo, err := auth.GetUserInfo(c)
+		if len(skipper) > 0 && skipper[0](c) {
+			if userInfo != nil {
+				c.Set(context.UserIDKey, userInfo.UserID)
+			}
 			c.Next()
 			return
 		}
 
-		ctx := context.New(c)
-		userInfo, err := auth.GetUserInfo(c)
 		if err != nil {
 			ctx.ResError(err)
 			return
