@@ -34,17 +34,17 @@ func IsReleaseMode() bool {
 	return GetRunMode() == "release"
 }
 
-// GetAuthMode 获取认证模式
+// GetAuthMode 获取授权模式
 func GetAuthMode() string {
 	return viper.GetString("auth_mode")
 }
 
-// IsSessionAuth 会话认证
+// IsSessionAuth 会话授权
 func IsSessionAuth() bool {
 	return GetAuthMode() == "session"
 }
 
-// IsJWTAuth jwt认证
+// IsJWTAuth jwt授权
 func IsJWTAuth() bool {
 	return GetAuthMode() == "jwt"
 }
@@ -196,6 +196,21 @@ type SessionConfig struct {
 func GetSessionConfig() SessionConfig {
 	var config SessionConfig
 	parse("session", &config)
+	return config
+}
+
+// JWTConfig jwt配置参数
+type JWTConfig struct {
+	HeaderName string `mapstructure:"header_name"`
+	Secret     string `mapstructure:"secret"`
+	SignMethod string `mapstructure:"sign_method"`
+	Expired    int64  `mapstructure:"expired"`
+}
+
+// GetJWTConfig 获取jwt配置参数
+func GetJWTConfig() JWTConfig {
+	var config JWTConfig
+	parse("jwt", &config)
 	return config
 }
 

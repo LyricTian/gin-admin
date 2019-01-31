@@ -13,8 +13,8 @@ swagger = ""
 # 存储模式(支持：gorm)
 db_mode = "gorm"
 
-# 认证模式(支持：session)
-auth_mode = "session"
+# 用户授权模式(支持：session/jwt)
+auth_mode = "jwt"
 
 # 是否允许动态创建资源数据
 allow_create_resources = true
@@ -61,6 +61,16 @@ sign = "GINADMIN"
 expired = 7200
 # 是否启用写入存储（如果启用存储，则使用当前db的存储类型；否则默认使用内存存储）
 enable_store = true
+
+[jwt]
+# 存储在header中的标识
+header_name = "Access-Token"
+# 秘钥
+secret = "GINADMIN"
+# 签名方式(支持的签名方式：HS256/HS384/HS512)
+sign_method = "HS256"
+# 过期时长(单位秒)
+expired = 7200
 
 # 日志配置
 [log]
