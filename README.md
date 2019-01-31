@@ -3,6 +3,7 @@
 > 基于Gin + Casbin + Ant Design React 的RBAC权限管理脚手架
 
 ![screenshot](http://store.tiannianshou.com/static/github/gin_admin_default.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FLyricTian%2Fgin-admin.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FLyricTian%2Fgin-admin?ref=badge_shield)
 
 ## 1. 快速开始
 
@@ -88,3 +89,5 @@ yarn start
 ## MIT License
 
     Copyright (c) 2018 Lyric
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FLyricTian%2Fgin-admin.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FLyricTian%2Fgin-admin?ref=badge_large)
