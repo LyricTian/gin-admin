@@ -114,16 +114,31 @@ func GetHTTPConfig() HTTPConfig {
 
 // CaptchaConfig 图形验证码配置参数
 type CaptchaConfig struct {
-	Store  string `mapstructure:"store"`
-	Length int    `mapstructure:"length"`
-	Width  int    `mapstructure:"width"`
-	Height int    `mapstructure:"height"`
+	Store   string `mapstructure:"store"`
+	Length  int    `mapstructure:"length"`
+	Width   int    `mapstructure:"width"`
+	Height  int    `mapstructure:"height"`
+	RedisDB int    `mapstructure:"redis_db"`
 }
 
 // GetCaptchaConfig 获取图形验证码配置参数
 func GetCaptchaConfig() CaptchaConfig {
 	var config CaptchaConfig
 	parse("captcha", &config)
+	return config
+}
+
+// RateLimiterConfig 请求限速配置参数
+type RateLimiterConfig struct {
+	Enable  bool  `mapstructure:"enable"`
+	Count   int64 `mapstructure:"count"`
+	RedisDB int   `mapstructure:"redis_db"`
+}
+
+// GetRateLimiterConfig 获取请求限速配置参数
+func GetRateLimiterConfig() RateLimiterConfig {
+	var config RateLimiterConfig
+	parse("rate_limiter", &config)
 	return config
 }
 
@@ -135,7 +150,6 @@ func IsCaptchaRedisStore() bool {
 // RedisConfig redis配置参数
 type RedisConfig struct {
 	Addr     string `mapstructure:"addr"`
-	DB       int    `mapstructure:"db"`
 	Password string `mapstructure:"password"`
 }
 

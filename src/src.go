@@ -42,11 +42,11 @@ func Init(ctx context.Context) CallbackFunc {
 
 	// 初始化图形验证码
 	if config.IsCaptchaRedisStore() {
-		config := config.GetRedisConfig()
+		cfg := config.GetRedisConfig()
 		captcha.SetCustomStore(store.NewRedisStore(&store.RedisOptions{
-			Addr:     config.Password,
-			DB:       config.DB,
-			Password: config.Password,
+			Addr:     cfg.Password,
+			Password: cfg.Password,
+			DB:       config.GetCaptchaConfig().RedisDB,
 		}, captcha.Expiration, log.New(os.Stderr, "[captcha]", log.LstdFlags), "captcha_"))
 	}
 

@@ -50,6 +50,17 @@ length = 4
 width = 100
 # 图片高度
 height = 45
+# redis数据库(如果存储方式是redis，则指定存储的数据库)
+redis_db = 10
+
+# 请求限速(如果redis可用则使用redis，否则使用内存存储)
+[rate_limiter]
+# 是否启用
+enable = true
+# 每分钟每个用户允许的最大请求数量
+count = 120
+# redis数据库(如果存储方式是redis，则指定存储的数据库)
+redis_db = 11
 
 # 会话配置
 [session]
@@ -89,8 +100,6 @@ hook_max_buffer = 512
 [redis]
 # 地址
 addr = "192.168.33.90:6379"
-# 数据库
-db = "10"
 # 密码
 password = ""
 

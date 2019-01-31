@@ -30,6 +30,9 @@ func APIHandler(app *gin.Engine, obj *inject.Object) {
 		),
 	))
 
+	// 请求限速中间件
+	api.Use(middleware.RateLimiterMiddleware(obj.RateLimiter, nil))
+
 	c := obj.CtlCommon
 
 	// 注册路由

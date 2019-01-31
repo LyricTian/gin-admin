@@ -10,19 +10,25 @@ import (
 	"github.com/LyricTian/gin-admin/src/web/ctl"
 	"github.com/casbin/casbin"
 	"github.com/facebookgo/inject"
+	"github.com/go-redis/redis"
+	"github.com/go-redis/redis_rate"
+	"golang.org/x/time/rate"
 )
 
 // Object 注入对象
 type Object struct {
-	GormDB    *gormplus.DB
-	Enforcer  *casbin.Enforcer
-	CtlCommon *ctl.Common
+	GormDB      *gormplus.DB
+	Enforcer    *casbin.Enforcer
+	CtlCommon   *ctl.Common
+	RateLimiter *redis_rate.Limiter
 }
 
 // Init 初始化依赖注入
 func Init(ctx context.Context) (*Object, error) {
 	g := new(inject.Graph)
-	obj := new(Object)
+	obj := &Object{
+		RateLimiter: getRateLimiter(),
+	}
 
 	// 注入存储层
 	switch {
@@ -51,4 +57,23 @@ func Init(ctx context.Context) (*Object, error) {
 	}
 
 	return obj, nil
+}
+
+func getRateLimiter() *redis_rate.Limiter {
+	rateConfig := config.GetRateLimiterConfig()
+	if !rateConfig.Enable {
+		return nil
+	}
+
+	redisConfig := config.GetRedisConfig()
+	ring := redis.NewRing(&redis.RingOptions{
+		Addrs: map[string]string{
+			"server1": redisConfig.Addr,
+		},
+		Password: redisConfig.Password,
+		DB:       rateConfig.RedisDB,
+	})
+	limiter := redis_rate.NewLimiter(ring)
+	limiter.Fallback = rate.NewLimiter(rate.Inf, 0)
+	return limiter
 }
