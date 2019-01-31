@@ -25,6 +25,7 @@ func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 	}
 
 	app := gin.New()
+
 	app.NoMethod(middleware.NoMethodHandler())
 	app.NoRoute(middleware.NoRouteHandler())
 
@@ -34,13 +35,24 @@ func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(apiPrefixes...)))
 	}
 
+	// swagger文档
 	if dir := config.GetSwaggerDir(); dir != "" {
 		app.Static("/swagger", dir)
 	}
 
+	// 跟踪ID
 	app.Use(middleware.TraceMiddleware(middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
+	// 日志
 	app.Use(middleware.LoggerMiddleware(middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
+	// 崩溃恢复
 	app.Use(middleware.RecoveryMiddleware())
+
+	// 跨域请求
+	if config.GetCORSConfig().Enable {
+		app.Use(middleware.CORSMiddleware())
+	}
+
+	// 用户授权(session/jwt)
 	app.Use(auth.Entry(auth.SkipperFunc(middleware.NoAllowPathPrefixSkipper(apiPrefixes...))))
 
 	// 注册/api路由

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/LyricTian/gin-admin/src/web/middleware"
@@ -30,8 +31,10 @@ func APIHandler(app *gin.Engine, obj *inject.Object) {
 		),
 	))
 
-	// 请求限速中间件
-	api.Use(middleware.RateLimiterMiddleware(obj.RateLimiter, nil))
+	// 请求频率限制中间件
+	if config.GetRateLimiterConfig().Enable {
+		api.Use(middleware.RateLimiterMiddleware(obj.RateLimiter))
+	}
 
 	c := obj.CtlCommon
 

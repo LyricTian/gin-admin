@@ -9,9 +9,9 @@ import (
 )
 
 // CasbinMiddleware casbin中间件
-func CasbinMiddleware(enforcer *casbin.Enforcer, skipper SkipperFunc) gin.HandlerFunc {
+func CasbinMiddleware(enforcer *casbin.Enforcer, skipper ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if skipper != nil && skipper(c) {
+		if len(skipper) > 0 && skipper[0](c) {
 			c.Next()
 			return
 		}

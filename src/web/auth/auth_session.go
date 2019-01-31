@@ -45,10 +45,6 @@ func (a *sessionAuth) Entry(skipper SkipperFunc) gin.HandlerFunc {
 
 	if options.EnableStore && a.store != nil {
 		opts = append(opts, session.SetStore(a.store))
-		// if config.IsGormDB() && a.obj != nil && a.obj.GormDB != nil {
-		// tableName := config.GetGormTablePrefix() + "session"
-		// store := gormstore.NewStoreWithDB(a.obj.GormDB.DB, tableName, 0)
-		// }
 	}
 
 	ginConfig := ginsession.DefaultConfig
