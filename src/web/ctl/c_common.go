@@ -43,7 +43,7 @@ func (c *Common) CheckAndCreateResource(ctx context.Context) error {
 		if idx < 0 {
 			continue
 		}
-		method, path := k[:idx], k[idx+1:]
+		method, path := k[:idx], k[idx:]
 		_, err := c.ResourceAPI.ResourceBll.Create(ctx, schema.Resource{
 			Code:   item.Code,
 			Name:   item.Name,

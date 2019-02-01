@@ -56,7 +56,7 @@ redis_db = 10
 # 请求频率限制(如果redis可用则使用redis，否则使用内存存储)
 [rate_limiter]
 # 是否启用
-enable = true
+enable = false
 # 每分钟每个用户允许的最大请求数量
 count = 300
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
@@ -88,6 +88,7 @@ expired = 7200
 # 是否启用写入存储（如果启用存储，则使用当前db的存储类型；否则默认使用内存存储）
 enable_store = true
 
+# JWT配置
 [jwt]
 # 存储在header中的标识
 header_name = "Access-Token"
