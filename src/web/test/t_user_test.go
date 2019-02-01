@@ -23,7 +23,6 @@ func TestUser(t *testing.T) {
 		Sequence: 9999,
 		Icon:     "test",
 		Path:     "/test",
-		IsHide:   2,
 	}
 	engine.ServeHTTP(w, newPostRequest("v1/menus", addMenuItem))
 	assert.Equal(t, 200, w.Code)

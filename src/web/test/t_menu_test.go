@@ -23,7 +23,6 @@ func TestMenu(t *testing.T) {
 		Sequence: 9999,
 		Icon:     "test",
 		Path:     "/test",
-		IsHide:   2,
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
@@ -81,7 +80,6 @@ func TestMenu(t *testing.T) {
 	assert.Equal(t, getItem.Name, putItem.Name)
 	assert.Equal(t, getItem.Sequence, addItem.Sequence)
 	assert.Equal(t, getItem.Icon, addItem.Icon)
-	assert.Equal(t, getItem.IsHide, addItem.IsHide)
 
 	// delete /menus/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))
