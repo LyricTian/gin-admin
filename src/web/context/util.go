@@ -21,8 +21,8 @@ const (
 // 定义响应状态数据
 const (
 	StatusOK    = "OK"
-	StatusError = "error"
-	StatusFail  = "fail"
+	StatusError = "ERROR"
+	StatusFail  = "FAIL"
 )
 
 var (

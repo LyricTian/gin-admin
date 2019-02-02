@@ -16,7 +16,7 @@ import (
 	_ "github.com/LyricTian/gin-admin/src/web/ctl"
 )
 
-// @Version 1.2.0-dev
+// @Version 2.0.0-dev
 // @Title GinAdmin
 // @Description RBAC scaffolding based on GIN + GORM + CASBIN.
 // @Schemes http

@@ -2,12 +2,19 @@ package config
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/spf13/viper"
 )
 
+var (
+	lock sync.RWMutex
+)
+
 // 解析配置
 func parse(key string, value interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
 	err := viper.UnmarshalKey(key, value)
 	if err != nil {
 		panic("解析配置发生错误:" + err.Error())

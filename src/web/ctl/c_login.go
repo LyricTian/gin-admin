@@ -39,7 +39,7 @@ func (a *Login) GetCaptchaID(ctx *context.Context) {
 // GetCaptcha 获取图形验证码
 // @Summary 获取图形验证码
 // @Param id query string true "验证码ID"
-// @Param reload query int false "是否重新加载（1是）"
+// @Param reload query string false "重新加载"
 // @Success 200 file "图形验证码"
 // @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
@@ -51,7 +51,7 @@ func (a *Login) GetCaptcha(ctx *context.Context) {
 		return
 	}
 
-	if ctx.Query("reload") == "1" {
+	if ctx.Query("reload") != "" {
 		if !captcha.Reload(captchaID) {
 			ctx.ResError(errors.NewBadRequestError("无效的请求参数"))
 			return
@@ -90,7 +90,7 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
-	if !captcha.VerifyString(item.VerifyID, item.VerifyCode) {
+	if !captcha.VerifyString(item.CaptchaID, item.CaptchaCode) {
 		ctx.ResError(errors.NewBadRequestError("无效的验证码"))
 		return
 	}
