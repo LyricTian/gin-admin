@@ -7,25 +7,72 @@ export default {
   namespace: 'login',
 
   state: {
-    status: undefined,
+    status: '',
+    tip: '',
     submitting: false,
+    captchaID: '',
+    captcha: '',
   },
 
   effects: {
+    *loadCaptcha(_, { call, put }) {
+      const response = yield call(loginService.captchaID);
+      const { captcha_id: captchaID } = response;
+
+      yield put({
+        type: 'saveCaptchaID',
+        payload: captchaID,
+      });
+      yield put({
+        type: 'saveCaptcha',
+        payload: loginService.captcha(captchaID),
+      });
+    },
+    *reloadCaptcha(_, { put, select }) {
+      const captchaID = yield select(state => state.login.captchaID);
+      yield put({
+        type: 'saveCaptcha',
+        payload: `${loginService.captcha(captchaID)}&reload=${Math.random()}`,
+      });
+    },
     *submit({ payload }, { call, put }) {
       yield put({
         type: 'changeSubmitting',
         payload: true,
       });
       const response = yield call(loginService.login, payload);
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response.status,
-      });
-      yield put({
-        type: 'changeSubmitting',
-        payload: false,
-      });
+      if (response.error) {
+        const { message } = response.error;
+        yield [
+          put({
+            type: 'saveTip',
+            payload: message,
+          }),
+          put({
+            type: 'saveStatus',
+            payload: response.status >= 500 ? 'ERROR' : 'FAIL',
+          }),
+        ];
+        yield put({
+          type: 'changeSubmitting',
+          payload: false,
+        });
+        yield put({
+          type: 'loadCaptcha',
+        });
+        return;
+      }
+
+      yield [
+        put({
+          type: 'saveStatus',
+          payload: response.status,
+        }),
+        put({
+          type: 'changeSubmitting',
+          payload: false,
+        }),
+      ];
 
       if (response.status === 'OK') {
         sessionStorage.removeItem(storeLogoutKey);
@@ -39,15 +86,16 @@ export default {
       }
     },
     *logout(_, { put, call }) {
+      if (sessionStorage.getItem(storeLogoutKey) === '1') {
+        return;
+      }
+
       yield put({
-        type: 'changeLoginStatus',
-        payload: false,
+        type: 'saveStatus',
+        payload: '',
       });
       const response = yield call(loginService.logout);
       if (response.status === 'OK') {
-        if (sessionStorage.getItem(storeLogoutKey) === '1') {
-          return;
-        }
         sessionStorage.setItem(storeLogoutKey, '1');
         localStorage.removeItem(storeAccessTokenKey);
 
@@ -64,10 +112,28 @@ export default {
   },
 
   reducers: {
-    changeLoginStatus(state, { payload }) {
+    saveCaptchaID(state, { payload }) {
+      return {
+        ...state,
+        captchaID: payload,
+      };
+    },
+    saveCaptcha(state, { payload }) {
+      return {
+        ...state,
+        captcha: payload,
+      };
+    },
+    saveStatus(state, { payload }) {
       return {
         ...state,
         status: payload,
+      };
+    },
+    saveTip(state, { payload }) {
+      return {
+        ...state,
+        tip: payload,
       };
     },
     changeSubmitting(state, { payload }) {

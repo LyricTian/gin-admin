@@ -4,12 +4,13 @@ import { storeAccessTokenKey } from './utils';
 
 // 提供API前缀
 export const v1API = '/api/v1';
+const tokenKey = 'access-token';
 
-function handle() {
+function handle(showNotify) {
   return response => {
     const { status, data, headers } = response;
 
-    const { 'access-token': accessToken } = headers;
+    const accessToken = headers[tokenKey];
     if (accessToken) {
       sessionStorage.setItem(storeAccessTokenKey, accessToken);
     }
@@ -19,41 +20,42 @@ function handle() {
     }
 
     if (status === 401) {
-      const {
-        error: { code },
-      } = data;
-      if (code === 9999) {
-        /* eslint-disable no-underscore-dangle */
-        window.g_app._store.dispatch({ type: 'login/logout' });
-        return {};
-      }
+      /* eslint-disable no-underscore-dangle */
+      window.g_app._store.dispatch({ type: 'login/logout' });
+      return {};
     }
 
-    let message = '服务器发生错误';
+    const error = {
+      code: 0,
+      message: '服务器发生错误',
+    };
     if (status === 504) {
-      message = '未连接到服务器';
+      error.message = '未连接到服务器';
     } else if (data) {
       const {
-        error: { message: msg },
+        error: { message, code },
       } = data;
-      message = msg;
+      error.message = message;
+      error.code = code;
     } else if (status >= 400 && status < 500) {
-      message = '请求发生错误';
+      error.message = '请求发生错误';
     }
 
-    notification.error({
-      message,
-    });
+    if (showNotify) {
+      notification.error({
+        message: error.message,
+      });
+    }
 
-    return {};
+    return { error, status };
   };
 }
 
 export default async function request(url, options) {
-  const defaultHeader = {
-    'access-token': sessionStorage.getItem(storeAccessTokenKey) || '',
-  };
+  const defaultHeader = {};
+  defaultHeader[tokenKey] = sessionStorage.getItem(storeAccessTokenKey) || '';
 
+  let showNotify = true;
   const newOptions = {
     url,
     validateStatus() {
@@ -61,11 +63,16 @@ export default async function request(url, options) {
     },
     ...options,
   };
+
+  if (newOptions.notNotify) {
+    showNotify = false;
+  }
+
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
     defaultHeader['Content-Type'] = 'application/json; charset=utf-8';
     newOptions.data = newOptions.body;
   }
   newOptions.headers = { ...defaultHeader, ...newOptions.headers };
 
-  return axios.request(newOptions).then(handle());
+  return axios.request(newOptions).then(handle(showNotify));
 }

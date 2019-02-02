@@ -10,16 +10,30 @@ import styles from './Index.less';
 }))
 @Form.create()
 class Login extends PureComponent {
+  componentDidMount() {
+    this.dispatch({
+      type: 'login/loadCaptcha',
+    });
+  }
+
+  reloadCaptcha = () => {
+    this.dispatch({
+      type: 'login/reloadCaptcha',
+    });
+  };
+
   handleSubmit = e => {
     e.preventDefault();
 
-    const { form, dispatch } = this.props;
+    const { form, dispatch, login } = this.props;
     form.validateFields({ force: true }, (err, values) => {
       if (!err) {
         dispatch({
           type: 'login/submit',
           payload: {
             user_name: values.user_name,
+            captcha_code: values.captcha_code,
+            captcha_id: login.captchaID,
             password: md5Hash(values.password),
           },
         });
@@ -27,8 +41,13 @@ class Login extends PureComponent {
     });
   };
 
+  dispatch = action => {
+    const { dispatch } = this.props;
+    dispatch(action);
+  };
+
   renderMessage = (type, message) => (
-    <Alert style={{ marginBottom: 24 }} message={message} type={type} showIcon />
+    <Alert style={{ marginBottom: 24 }} message={message} type={type} closable />
   );
 
   render() {
@@ -40,13 +59,13 @@ class Login extends PureComponent {
     return (
       <div className={styles.main}>
         <Form onSubmit={this.handleSubmit}>
-          {login.status === 'fail' &&
+          {login.status === 'FAIL' &&
             login.submitting === false &&
-            this.renderMessage('warning', '用户名或密码错误，请重新输入！')}
+            this.renderMessage('warning', login.tip)}
 
-          {login.status === 'error' &&
+          {login.status === 'ERROR' &&
             login.submitting === false &&
-            this.renderMessage('error', '服务器发生错误，请联系管理员！')}
+            this.renderMessage('error', login.tip)}
 
           <Form.Item>
             {getFieldDecorator('user_name', {
@@ -81,7 +100,40 @@ class Login extends PureComponent {
               />
             )}
           </Form.Item>
-
+          <Form.Item>
+            <Input.Group compact>
+              {getFieldDecorator('captcha_code', {
+                rules: [
+                  {
+                    required: true,
+                    message: '请输入验证码！',
+                  },
+                ],
+              })(
+                <Input
+                  style={{ width: '70%', marginRight: 10 }}
+                  size="large"
+                  prefix={<Icon type="code" className={styles.prefixIcon} />}
+                  placeholder="请输入验证码"
+                />
+              )}
+              <div
+                style={{
+                  width: 100,
+                  height: 40,
+                }}
+              >
+                <img
+                  style={{ maxWidth: '100%', maxHeight: '100%' }}
+                  src={login.captcha}
+                  alt="验证码"
+                  onClick={() => {
+                    this.reloadCaptcha();
+                  }}
+                />
+              </div>
+            </Input.Group>
+          </Form.Item>
           <Form.Item className={styles.additional}>
             <Button
               size="large"
