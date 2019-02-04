@@ -1,2 +1,3 @@
 -- 创建数据库
+DROP DATABASE IF EXISTS `ginadmin`;
 CREATE DATABASE `ginadmin` DEFAULT CHARACTER SET = `utf8mb4`;

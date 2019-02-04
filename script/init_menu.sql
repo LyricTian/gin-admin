@@ -1,5 +1,5 @@
 -- 创建`g_menu`表
-CREATE TABLE `g_menu` (
+CREATE TABLE `ginadmin`.`g_menu` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `record_id` varchar(36) DEFAULT NULL,
   `code` varchar(50) DEFAULT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE `g_menu` (
   KEY `idx_is_hide` (`is_hide`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `g_menu` WRITE;
+LOCK TABLES `ginadmin`.`g_menu` WRITE;
 
-INSERT INTO `g_menu` (`id`, `record_id`, `code`, `name`, `type`, `sequence`, `icon`, `path`, `method`, `level_code`, `parent_id`, `is_hide`, `status`, `creator`, `created`, `updated`, `deleted`)
+INSERT INTO `ginadmin`.`g_menu` (`id`, `record_id`, `code`, `name`, `type`, `sequence`, `icon`, `path`, `method`, `level_code`, `parent_id`, `is_hide`, `status`, `creator`, `created`, `updated`, `deleted`)
 VALUES
 	(15,'047aecdc-76c8-4bfd-8dbc-02a37295d40b','admin','RBAC权限管理平台',10,90,'','','','01','',2,1,'',1543546798,1544539200,0),
 	(16,'d1ef3f75-ebc1-4b0d-be69-25e406b843af','system','系统管理',20,90,'setting','','','0101','047aecdc-76c8-4bfd-8dbc-02a37295d40b',2,1,'',1543546817,1543932539,0),
