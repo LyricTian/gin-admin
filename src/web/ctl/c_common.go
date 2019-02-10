@@ -64,6 +64,13 @@ func (c *Common) CheckAndCreateResource(ctx context.Context) error {
 func (c *Common) InitMenuData(ctx context.Context) error {
 	data := `
 [{
+	"code":"dashboard",
+	"name":"首页",
+	"icon":"dashboard",
+	"type":1,
+	"sequence":9,
+	"path":"/dashboard"
+},{
 	"code":"example",
 	"name":"演示用例",
 	"icon":"bulb",
@@ -87,11 +94,19 @@ func (c *Common) InitMenuData(ctx context.Context) error {
 	"sequence":1,
 	"children":[
 		{
+			"code":"resource",
+			"name":"资源管理",
+			"icon":"api",
+			"type":2,
+			"sequence":9,
+			"path":"/system/resource"
+		},
+		{
 			"code":"menu",
 			"name":"菜单管理",
 			"icon":"solution",
 			"type":2,
-			"sequence":9,
+			"sequence":8,
 			"path":"/system/menu"
 		},
 		{
@@ -99,7 +114,7 @@ func (c *Common) InitMenuData(ctx context.Context) error {
 			"name":"角色管理",
 			"icon":"audit",
 			"type":2,
-			"sequence":8,
+			"sequence":7,
 			"path":"/system/role"
 		},
 		{
@@ -107,7 +122,7 @@ func (c *Common) InitMenuData(ctx context.Context) error {
 			"name":"用户管理",
 			"icon":"user",
 			"type":2,
-			"sequence":7,
+			"sequence":6,
 			"path":"/system/user"
 		}
 	]

@@ -36,15 +36,3 @@ export async function delMany(params) {
     method: 'DELETE',
   });
 }
-
-export async function enable(params) {
-  return request(`${v1API}/${router}/${params.record_id}/enable`, {
-    method: 'PATCH',
-  });
-}
-
-export async function disable(params) {
-  return request(`${v1API}/${router}/${params.record_id}/disable`, {
-    method: 'PATCH',
-  });
-}

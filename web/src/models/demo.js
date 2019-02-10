@@ -15,12 +15,11 @@ export default {
     formID: '',
     formVisible: false,
     formData: {},
-    selectData: [],
   },
   effects: {
     *fetch({ search, pagination }, { call, put, select }) {
       let params = {
-        type: 'page',
+        q: 'page',
       };
 
       if (search) {

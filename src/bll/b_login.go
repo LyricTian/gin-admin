@@ -121,6 +121,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 	// 查询用户的权限
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		UserID: userID,
+		Types:  []int{1, 2},
 	})
 	if err != nil {
 		return nil, err

@@ -1,7 +1,7 @@
 import { stringify } from 'qs';
 import request, { v1API } from '../utils/request';
 
-const router = 'menus';
+const router = 'resources';
 
 export async function query(params) {
   return request(`${v1API}/${router}?${stringify(params)}`);

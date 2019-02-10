@@ -1,4 +1,3 @@
-import { getLevelCode, getMenuKeys } from '@/utils/utils';
 import * as loginService from '@/services/login';
 
 export default {
@@ -27,20 +26,21 @@ export default {
       }
 
       const menuPaths = yield select(state => state.global.menuPaths);
-      const menus = yield select(state => state.global.menus);
-      const keys = getMenuKeys(p, menuPaths, menus);
+      const item = menuPaths[p];
+      if (!item) {
+        return;
+      }
 
-      if (keys.length > 0) {
+      if (item.parent_path && item.parent_path !== '') {
         yield put({
           type: 'changeOpenKeys',
-          payload: keys.slice(0, keys.length - 1),
+          payload: item.parent_path.split('/'),
         });
       }
 
-      const levelCode = getLevelCode(p, menuPaths);
       yield put({
         type: 'changeSelectedKeys',
-        payload: [levelCode],
+        payload: [item.record_id],
       });
     },
     *fetchUser(_, { call, put }) {
@@ -50,8 +50,8 @@ export default {
         payload: response,
       });
     },
-    *fetchMenus({ pathname }, { call, put }) {
-      const response = yield call(loginService.queryCurrentMenus);
+    *fetchMenuTree({ pathname }, { call, put }) {
+      const response = yield call(loginService.queryMenuTree);
 
       const menuData = response.list || [];
       yield put({

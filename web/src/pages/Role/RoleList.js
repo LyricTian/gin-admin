@@ -1,20 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  Table,
-  Modal,
-  Icon,
-  Dropdown,
-  Menu,
-  Badge,
-  Select,
-} from 'antd';
+import { Row, Col, Card, Form, Input, Button, Table, Modal, Icon, Dropdown, Menu } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import RoleCard from './RoleCard';
 
@@ -59,20 +45,6 @@ class RoleList extends PureComponent {
       okType: 'danger',
       cancelText: '取消',
       onOk: this.onDelBatchOKClick.bind(this),
-    });
-  };
-
-  onItemDisableClick = id => {
-    this.dispatch({
-      type: 'role/changeStatus',
-      payload: { record_id: id, status: 2 },
-    });
-  };
-
-  onItemEnableClick = id => {
-    this.dispatch({
-      type: 'role/changeStatus',
-      payload: { record_id: id, status: 1 },
     });
   };
 
@@ -193,16 +165,6 @@ class RoleList extends PureComponent {
             </Form.Item>
           </Col>
           <Col md={8} sm={24}>
-            <Form.Item label="角色状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Select.Option value="1">正常</Select.Option>
-                  <Select.Option value="2">停用</Select.Option>
-                </Select>
-              )}
-            </Form.Item>
-          </Col>
-          <Col md={8} sm={24}>
             <div style={{ overflow: 'hidden' }}>
               <span style={{ marginBottom: 24 }}>
                 <Button type="primary" htmlType="submit">
@@ -249,25 +211,6 @@ class RoleList extends PureComponent {
                       </a>
                     </Menu.Item>
                     <Menu.Item>
-                      {record.status === 1 ? (
-                        <a
-                          onClick={() => {
-                            this.onItemDisableClick(val);
-                          }}
-                        >
-                          设置为停用
-                        </a>
-                      ) : (
-                        <a
-                          onClick={() => {
-                            this.onItemEnableClick(val);
-                          }}
-                        >
-                          设置为启用
-                        </a>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
                       <a
                         onClick={() => {
                           this.onItemDelClick(record);
@@ -295,16 +238,6 @@ class RoleList extends PureComponent {
         title: '角色备注',
         dataIndex: 'memo',
       },
-      {
-        title: '角色状态',
-        dataIndex: 'status',
-        render: val => {
-          if (val === 1) {
-            return <Badge status="success" text="正常" />;
-          }
-          return <Badge status="error" text="停用" />;
-        },
-      },
     ];
 
     const paginationProps = {
@@ -314,8 +247,10 @@ class RoleList extends PureComponent {
       ...pagination,
     };
 
+    const breadcrumbList = [{ title: '系统管理' }, { title: '角色管理', href: '/system/role' }];
+
     return (
-      <PageHeaderLayout title="角色管理">
+      <PageHeaderLayout title="角色管理" breadcrumbList={breadcrumbList}>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSearchForm()}</div>

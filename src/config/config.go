@@ -101,7 +101,7 @@ type RootUser struct {
 // GetRootUser 获取root用户
 func GetRootUser() RootUser {
 	var config RootUser
-	parse("root_user", &config)
+	parse("root", &config)
 	return config
 }
 
@@ -121,11 +121,12 @@ func GetHTTPConfig() HTTPConfig {
 
 // CaptchaConfig 图形验证码配置参数
 type CaptchaConfig struct {
-	Store   string `mapstructure:"store"`
-	Length  int    `mapstructure:"length"`
-	Width   int    `mapstructure:"width"`
-	Height  int    `mapstructure:"height"`
-	RedisDB int    `mapstructure:"redis_db"`
+	Store       string `mapstructure:"store"`
+	Length      int    `mapstructure:"length"`
+	Width       int    `mapstructure:"width"`
+	Height      int    `mapstructure:"height"`
+	RedisDB     int    `mapstructure:"redis_db"`
+	RedisPrefix string `mapstructure:"redis_prefix"`
 }
 
 // GetCaptchaConfig 获取图形验证码配置参数

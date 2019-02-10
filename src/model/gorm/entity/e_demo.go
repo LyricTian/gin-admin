@@ -47,11 +47,12 @@ func (a Demo) TableName() string {
 // ToSchemaDemo 转换为demo对象
 func (a Demo) ToSchemaDemo() *schema.Demo {
 	item := &schema.Demo{
-		RecordID: a.RecordID,
-		Code:     a.Code,
-		Name:     a.Name,
-		Memo:     a.Memo,
-		Status:   a.Status,
+		RecordID:  a.RecordID,
+		Code:      a.Code,
+		Name:      a.Name,
+		Memo:      a.Memo,
+		Status:    a.Status,
+		CreatedAt: a.CreatedAt,
 	}
 	return item
 }

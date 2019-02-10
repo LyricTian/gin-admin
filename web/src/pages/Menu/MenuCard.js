@@ -16,7 +16,6 @@ class MenuCard extends PureComponent {
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const formData = { ...values };
-        formData.status = parseInt(formData.status, 10);
         formData.is_hide = parseInt(formData.is_hide, 10);
         formData.type = parseInt(formData.type, 10);
         formData.sequence = parseInt(formData.sequence, 10);
@@ -41,6 +40,21 @@ class MenuCard extends PureComponent {
     dispatch(action);
   };
 
+  toTreeSelect = data => {
+    if (!data) {
+      return [];
+    }
+    const newData = [];
+    for (let i = 0; i < data.length; i += 1) {
+      const item = { ...data[i], title: data[i].name, value: data[i].record_id };
+      if (item.children && item.children.length > 0) {
+        item.children = this.toTreeSelect(item.children);
+      }
+      newData.push(item);
+    }
+    return newData;
+  };
+
   render() {
     const {
       menu: { formVisible, formTitle, formData, submitting, treeData },
@@ -56,15 +70,6 @@ class MenuCard extends PureComponent {
       },
       wrapperCol: {
         span: 18,
-      },
-    };
-
-    const formItemLayout2 = {
-      labelCol: {
-        span: 9,
-      },
-      wrapperCol: {
-        span: 15,
       },
     };
 
@@ -118,10 +123,9 @@ class MenuCard extends PureComponent {
                     <TreeSelect
                       showSearch
                       treeNodeFilterProp="title"
-                      treeDefaultExpandedKeys={[treeData.length > 0 && treeData[0].record_id]}
                       style={{ minWidth: 200 }}
                       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                      treeData={treeData}
+                      treeData={this.toTreeSelect(treeData)}
                       placeholder="请选择"
                     />
                   )}
@@ -130,19 +134,18 @@ class MenuCard extends PureComponent {
               <Col md={12}>
                 <Form.Item {...formItemLayout} label="菜单类型">
                   {getFieldDecorator('type', {
-                    initialValue: formData.type ? formData.type.toString() : '10',
+                    initialValue: formData.type ? formData.type.toString() : '1',
                   })(
                     <Radio.Group onChange={this.onTypeChange}>
-                      <Radio value="10">系统</Radio>
-                      <Radio value="20">模块</Radio>
-                      <Radio value="30">功能</Radio>
-                      <Radio value="40">资源</Radio>
+                      <Radio value="1">模块</Radio>
+                      <Radio value="2">功能</Radio>
+                      <Radio value="3">资源</Radio>
                     </Radio.Group>
                   )}
                 </Form.Item>
               </Col>
             </Row>
-            {formData.type !== 40 && (
+            {formData.type !== 3 && (
               <Row>
                 <Col md={12}>
                   <Form.Item {...formItemLayout} label="菜单图标">
@@ -160,7 +163,7 @@ class MenuCard extends PureComponent {
                 </Col>
               </Row>
             )}
-            {formData.type === 40 && (
+            {formData.type === 3 && (
               <Row>
                 <Col md={12}>
                   <Form.Item {...formItemLayout} label="资源路径">
@@ -199,27 +202,15 @@ class MenuCard extends PureComponent {
               </Row>
             )}
             <Row>
-              <Col md={8}>
-                <Form.Item {...formItemLayout2} label="排序值">
+              <Col md={12}>
+                <Form.Item {...formItemLayout} label="排序值">
                   {getFieldDecorator('sequence', {
                     initialValue: formData.sequence ? formData.sequence.toString() : '0',
                   })(<InputNumber min={1} style={{ width: '100%' }} />)}
                 </Form.Item>
               </Col>
-              <Col md={8}>
-                <Form.Item {...formItemLayout2} label="菜单状态">
-                  {getFieldDecorator('status', {
-                    initialValue: formData.status ? formData.status.toString() : '1',
-                  })(
-                    <Radio.Group>
-                      <Radio value="1">正常</Radio>
-                      <Radio value="2">停用</Radio>
-                    </Radio.Group>
-                  )}
-                </Form.Item>
-              </Col>
-              <Col md={8}>
-                <Form.Item {...formItemLayout2} label="隐藏菜单">
+              <Col md={12}>
+                <Form.Item {...formItemLayout} label="隐藏菜单">
                   {getFieldDecorator('is_hide', {
                     initialValue: formData.is_hide ? formData.is_hide.toString() : '2',
                   })(

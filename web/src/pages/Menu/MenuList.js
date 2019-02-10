@@ -8,7 +8,6 @@ import {
   Input,
   Button,
   Table,
-  Badge,
   Select,
   Modal,
   Icon,
@@ -31,11 +30,12 @@ class MenuList extends PureComponent {
   state = {
     selectedRows: [],
     treeSelectedKeys: [],
+    selectedType: 0,
   };
 
   componentDidMount() {
     this.dispatch({
-      type: 'menu/fetchSearchTree',
+      type: 'menu/fetchTree',
     });
 
     this.dispatch({
@@ -66,20 +66,6 @@ class MenuList extends PureComponent {
       okType: 'danger',
       cancelText: '取消',
       onOk: this.onDelBatchOKClick.bind(this),
-    });
-  };
-
-  onItemDisableClick = id => {
-    this.dispatch({
-      type: 'menu/changeStatus',
-      payload: { record_id: id, status: 2 },
-    });
-  };
-
-  onItemEnableClick = id => {
-    this.dispatch({
-      type: 'menu/changeStatus',
-      payload: { record_id: id, status: 1 },
     });
   };
 
@@ -156,9 +142,7 @@ class MenuList extends PureComponent {
         this.dispatch({
           type: 'menu/fetch',
           search: {
-            name: values.name,
-            status: values.status,
-            mtype: values.type,
+            ...values,
             parent_id: this.getParentID(),
           },
           pagination: {},
@@ -219,6 +203,11 @@ class MenuList extends PureComponent {
       <Form onSubmit={this.onSearchFormSubmit} layout="inline">
         <Row gutter={16}>
           <Col md={8} sm={24}>
+            <Form.Item label="菜单编号">
+              {getFieldDecorator('code')(<Input placeholder="请输入" />)}
+            </Form.Item>
+          </Col>
+          <Col md={8} sm={24}>
             <Form.Item label="菜单名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </Form.Item>
@@ -227,20 +216,9 @@ class MenuList extends PureComponent {
             <Form.Item label="菜单类型">
               {getFieldDecorator('type')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Select.Option value="10">系统</Select.Option>
-                  <Select.Option value="20">模块</Select.Option>
-                  <Select.Option value="30">功能</Select.Option>
-                  <Select.Option value="40">资源</Select.Option>
-                </Select>
-              )}
-            </Form.Item>
-          </Col>
-          <Col md={8} sm={24}>
-            <Form.Item label="菜单状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Select.Option value="1">正常</Select.Option>
-                  <Select.Option value="2">停用</Select.Option>
+                  <Select.Option value="1">模块</Select.Option>
+                  <Select.Option value="2">功能</Select.Option>
+                  <Select.Option value="3">资源</Select.Option>
                 </Select>
               )}
             </Form.Item>
@@ -265,12 +243,12 @@ class MenuList extends PureComponent {
       loading,
       menu: {
         data: { list, pagination },
-        searchTreeData,
+        treeData,
         expandedKeys,
       },
     } = this.props;
 
-    const { selectedRows } = this.state;
+    const { selectedRows, selectedType } = this.state;
 
     const columns = [
       {
@@ -290,25 +268,6 @@ class MenuList extends PureComponent {
                     >
                       编辑
                     </a>
-                  </Menu.Item>
-                  <Menu.Item>
-                    {record.status === 1 ? (
-                      <a
-                        onClick={() => {
-                          this.onItemDisableClick(val);
-                        }}
-                      >
-                        设置为停用
-                      </a>
-                    ) : (
-                      <a
-                        onClick={() => {
-                          this.onItemEnableClick(val);
-                        }}
-                      >
-                        设置为启用
-                      </a>
-                    )}
                   </Menu.Item>
                   <Menu.Item>
                     <a
@@ -346,16 +305,13 @@ class MenuList extends PureComponent {
         render: val => {
           let v = '';
           switch (val) {
-            case 10:
-              v = '系统';
-              break;
-            case 20:
+            case 1:
               v = '模块';
               break;
-            case 30:
+            case 2:
               v = '功能';
               break;
-            case 40:
+            case 3:
               v = '资源';
               break;
             default:
@@ -363,17 +319,6 @@ class MenuList extends PureComponent {
               break;
           }
           return <span>{v}</span>;
-        },
-      },
-      {
-        title: '菜单状态',
-        dataIndex: 'status',
-        width: 100,
-        render: val => {
-          if (val === 1) {
-            return <Badge status="success" text="正常" />;
-          }
-          return <Badge status="error" text="停用" />;
         },
       },
       {
@@ -400,29 +345,22 @@ class MenuList extends PureComponent {
       ...pagination,
     };
 
+    const breadcrumbList = [{ title: '系统管理' }, { title: '菜单管理', href: '/system/menu' }];
+
     return (
-      <PageHeaderLayout title="菜单管理">
+      <PageHeaderLayout title="菜单管理" breadcrumbList={breadcrumbList}>
         <Layout>
           <Layout.Sider
             width={200}
             style={{ background: '#fff', borderRight: '1px solid lightGray' }}
           >
-            <div>
-              <Input.Search
-                placeholder="请输入"
-                onChange={e => {
-                  const { value } = e.target;
-                  this.dispatch({
-                    type: 'menu/fetchSearchTree',
-                    payload: { name: value },
-                  });
-                }}
-              />
-            </div>
             <Tree
               expandedKeys={expandedKeys}
-              onSelect={keys => {
-                this.setState({ treeSelectedKeys: keys });
+              onSelect={(keys, { selectedNodes }) => {
+                this.setState({
+                  treeSelectedKeys: keys,
+                  selectedType: selectedNodes.length > 0 ? selectedNodes[0].props.dataRef.type : 0,
+                });
 
                 const {
                   menu: { search },
@@ -430,7 +368,6 @@ class MenuList extends PureComponent {
 
                 const item = {
                   parent_id: '',
-                  parent_type: '',
                 };
 
                 if (keys.length > 0) {
@@ -450,7 +387,7 @@ class MenuList extends PureComponent {
                 });
               }}
             >
-              {this.renderTreeNodes(searchTreeData)}
+              {this.renderTreeNodes(treeData)}
             </Tree>
           </Layout.Sider>
           <Layout.Content>
@@ -458,15 +395,18 @@ class MenuList extends PureComponent {
               <div className={styles.tableList}>
                 <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
                 <div className={styles.tableListOperator}>
+                  {selectedType === 2 && (
+                    <Button icon="select" type="primary" onClick={() => this.onBatchDelClick()}>
+                      选择资源
+                    </Button>
+                  )}
                   <Button icon="plus" type="primary" onClick={() => this.onAddClick()}>
                     新建
                   </Button>
                   {selectedRows.length > 0 && (
-                    <span>
-                      <Button icon="delete" type="danger" onClick={() => this.onBatchDelClick()}>
-                        删除
-                      </Button>
-                    </span>
+                    <Button icon="delete" type="danger" onClick={() => this.onBatchDelClick()}>
+                      删除
+                    </Button>
                   )}
                 </div>
                 <Table
@@ -480,7 +420,7 @@ class MenuList extends PureComponent {
                   columns={columns}
                   pagination={paginationProps}
                   onChange={this.onTableChange}
-                  scroll={{ x: 990 }}
+                  scroll={{ x: 890 }}
                   size="small"
                 />
               </div>
