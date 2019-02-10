@@ -32,7 +32,7 @@ port = 8086
 shutdown_timeout = 10
 
 # root用户
-[root_user]
+[root]
 # 登录用户名
 user_name = "root"
 # 登录密码
@@ -52,6 +52,8 @@ width = 300
 height = 120
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
 redis_db = 10
+# 存储到redis数据库中的键名前缀
+redis_prefix = "captcha_"
 
 # 请求频率限制(如果redis可用则使用redis，否则使用内存存储)
 [rate_limiter]
@@ -60,7 +62,7 @@ enable = false
 # 每分钟每个用户允许的最大请求数量
 count = 300
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
-redis_db = 11
+redis_db = 10
 
 # 跨域请求
 [cors]
@@ -115,7 +117,7 @@ hook_max_buffer = 512
 # redis配置
 [redis]
 # 地址
-addr = "192.168.33.90:6379"
+addr = "127.0.0.1:6379"
 # 密码
 password = ""
 

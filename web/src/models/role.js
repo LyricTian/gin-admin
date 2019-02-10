@@ -21,7 +21,7 @@ export default {
   effects: {
     *fetch({ search, pagination }, { call, put, select }) {
       let params = {
-        type: 'page',
+        q: 'page',
       };
 
       if (search) {
@@ -167,41 +167,9 @@ export default {
         yield put({ type: 'fetch' });
       }
     },
-    *changeStatus({ payload }, { call, put, select }) {
-      let response;
-      if (payload.status === 1) {
-        response = yield call(roleService.enable, payload);
-      } else {
-        response = yield call(roleService.disable, payload);
-      }
-
-      if (response.status === 'OK') {
-        let msg = '启用成功';
-        if (payload.status === 2) {
-          msg = '停用成功';
-        }
-        message.success(msg);
-        const data = yield select(state => state.role.data);
-        const newData = { list: [], pagination: data.pagination };
-
-        for (let i = 0; i < data.list.length; i += 1) {
-          const item = data.list[i];
-          if (item.record_id === payload.record_id) {
-            item.status = payload.status;
-          }
-          newData.list.push(item);
-        }
-
-        yield put({
-          type: 'saveData',
-          payload: newData,
-        });
-      }
-    },
     *fetchSelect(_, { call, put }) {
       const params = {
-        type: 'select',
-        status: 1,
+        q: 'select',
       };
       const response = yield call(roleService.query, params);
       yield put({

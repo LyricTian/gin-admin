@@ -19,7 +19,7 @@ export async function login(params) {
   });
 }
 
-// 登出
+// 退出
 export async function logout() {
   return request(`${v1API}/login/exit`, {
     method: 'POST',

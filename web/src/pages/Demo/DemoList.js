@@ -16,7 +16,7 @@ import {
   Select,
 } from 'antd';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
-import { formatTimestamp } from '@/utils/utils';
+import { formatDate } from '@/utils/utils';
 import DemoCard from './DemoCard';
 
 import styles from './DemoList.less';
@@ -312,8 +312,8 @@ class DemoList extends PureComponent {
       },
       {
         title: '创建时间',
-        dataIndex: 'created',
-        render: val => <span>{formatTimestamp(val, 'YYYY-MM-DD HH:mm')}</span>,
+        dataIndex: 'created_at',
+        render: val => <span>{formatDate(val, 'YYYY-MM-DD HH:mm')}</span>,
       },
     ];
 
@@ -324,8 +324,10 @@ class DemoList extends PureComponent {
       ...pagination,
     };
 
+    const breadcrumbList = [{ title: '演示用例' }, { title: '基础示例', href: '/example/demo' }];
+
     return (
-      <PageHeaderLayout title="基础示例管理">
+      <PageHeaderLayout title="基础示例" breadcrumbList={breadcrumbList}>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSearchForm()}</div>

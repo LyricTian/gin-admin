@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Modal, message, Card, Radio, Row, Col } from 'antd';
+import { Form, Input, Modal, message, Card, Row, Col } from 'antd';
 
 import MenuTree from '../Menu/MenuTree';
 
@@ -98,20 +98,6 @@ class RoleCard extends PureComponent {
                 {getFieldDecorator('memo', {
                   initialValue: formData.memo,
                 })(<Input.TextArea rows={2} placeholder="请输入备注" />)}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col md={24} sm={24}>
-              <Form.Item {...formItemLayout} label="角色状态">
-                {getFieldDecorator('status', {
-                  initialValue: formData.status ? formData.status.toString() : '1',
-                })(
-                  <Radio.Group>
-                    <Radio value="1">正常</Radio>
-                    <Radio value="2">停用</Radio>
-                  </Radio.Group>
-                )}
               </Form.Item>
             </Col>
           </Row>

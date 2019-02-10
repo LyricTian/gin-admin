@@ -56,7 +56,7 @@ class AdminLayout extends React.PureComponent {
     });
 
     this.dispatch({
-      type: 'global/fetchMenus',
+      type: 'global/fetchMenuTree',
       pathname,
     });
   }
@@ -136,7 +136,7 @@ class AdminLayout extends React.PureComponent {
                 item.name
               )
             }
-            key={item.level_code}
+            key={item.record_id}
           >
             {this.renderNavMenuItems(item.children)}
           </SubMenu>
@@ -150,7 +150,7 @@ class AdminLayout extends React.PureComponent {
       } = this.props;
 
       return (
-        <Menu.Item key={item.level_code}>
+        <Menu.Item key={item.record_id}>
           {itemPath.startsWith('http') ? (
             <a href={itemPath} target="_blank" rel="noopener noreferrer">
               {icon}
@@ -196,9 +196,9 @@ class AdminLayout extends React.PureComponent {
 
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item key="setting" disabled>
-          <Icon type="user" />
-          个人信息
+        <Menu.Item key="updatepwd">
+          <Icon type="lock" />
+          修改密码
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item key="logout">

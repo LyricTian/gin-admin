@@ -1,44 +1,24 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  Table,
-  Modal,
-  Icon,
-  Dropdown,
-  Menu,
-  Badge,
-  Select,
-} from 'antd';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import UserCard from './UserCard';
-import { formatDate } from '../../utils/utils';
+import { Row, Col, Card, Form, Input, Button, Table, Modal, Icon, Dropdown, Menu } from 'antd';
+import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import ResourceCard from './ResourceCard';
 
-import styles from './UserList.less';
+import styles from './ResourceList.less';
 
 @connect(state => ({
-  loading: state.loading.models.user,
-  user: state.user,
-  role: state.role,
+  loading: state.loading.models.resource,
+  resource: state.resource,
 }))
 @Form.create()
-class UserList extends PureComponent {
+class ResourceList extends PureComponent {
   state = {
     selectedRows: [],
   };
 
   componentDidMount() {
     this.dispatch({
-      type: 'role/fetchSelect',
-    });
-
-    this.dispatch({
-      type: 'user/fetch',
+      type: 'resource/fetch',
       search: {},
       pagination: {},
     });
@@ -53,7 +33,7 @@ class UserList extends PureComponent {
       selectedRows: [],
     });
     this.dispatch({
-      type: 'user/delMany',
+      type: 'resource/delMany',
       payload: { batch: selectedRows.join(',') },
     });
   };
@@ -68,23 +48,9 @@ class UserList extends PureComponent {
     });
   };
 
-  onItemDisableClick = id => {
-    this.dispatch({
-      type: 'user/changeStatus',
-      payload: { record_id: id, status: 2 },
-    });
-  };
-
-  onItemEnableClick = id => {
-    this.dispatch({
-      type: 'user/changeStatus',
-      payload: { record_id: id, status: 1 },
-    });
-  };
-
   onItemEditClick = id => {
     this.dispatch({
-      type: 'user/loadForm',
+      type: 'resource/loadForm',
       payload: {
         type: 'E',
         id,
@@ -94,7 +60,7 @@ class UserList extends PureComponent {
 
   onAddClick = () => {
     this.dispatch({
-      type: 'user/loadForm',
+      type: 'resource/loadForm',
       payload: {
         type: 'A',
       },
@@ -103,14 +69,14 @@ class UserList extends PureComponent {
 
   onDelOKClick(id) {
     this.dispatch({
-      type: 'user/del',
+      type: 'resource/del',
       payload: { record_id: id },
     });
   }
 
   onItemDelClick = item => {
     Modal.confirm({
-      title: `确定删除【用户数据：${item.user_name}】？`,
+      title: `确定删除【资源数据：${item.name}】？`,
       okText: '确认',
       okType: 'danger',
       cancelText: '取消',
@@ -126,7 +92,7 @@ class UserList extends PureComponent {
 
   onTableChange = pagination => {
     this.dispatch({
-      type: 'user/fetch',
+      type: 'resource/fetch',
       pagination: {
         current: pagination.current,
         pageSize: pagination.pageSize,
@@ -138,7 +104,7 @@ class UserList extends PureComponent {
     const { form } = this.props;
     form.resetFields();
     this.dispatch({
-      type: 'user/fetch',
+      type: 'resource/fetch',
       search: {},
       pagination: {},
     });
@@ -152,7 +118,7 @@ class UserList extends PureComponent {
     form.validateFields({ force: true }, (err, values) => {
       if (!err) {
         this.dispatch({
-          type: 'user/fetch',
+          type: 'resource/fetch',
           search: values,
           pagination: {},
         });
@@ -162,14 +128,14 @@ class UserList extends PureComponent {
 
   onDataFormSubmit = data => {
     this.dispatch({
-      type: 'user/submit',
+      type: 'resource/submit',
       payload: data,
     });
   };
 
   onDataFormCancel = () => {
     this.dispatch({
-      type: 'user/changeFormVisible',
+      type: 'resource/changeFormVisible',
       payload: false,
     });
   };
@@ -180,50 +146,24 @@ class UserList extends PureComponent {
   };
 
   renderDataForm() {
-    return <UserCard onCancel={this.onDataFormCancel} onSubmit={this.onDataFormSubmit} />;
+    return <ResourceCard onCancel={this.onDataFormCancel} onSubmit={this.onDataFormSubmit} />;
   }
 
   renderSearchForm() {
     const {
       form: { getFieldDecorator },
-      role: { selectData: roleData },
     } = this.props;
     return (
       <Form onSubmit={this.onSearchFormSubmit} layout="inline">
         <Row gutter={16}>
           <Col md={8} sm={24}>
-            <Form.Item label="用户名">
-              {getFieldDecorator('user_name')(<Input placeholder="请输入" />)}
+            <Form.Item label="名称">
+              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </Form.Item>
           </Col>
           <Col md={8} sm={24}>
-            <Form.Item label="真实姓名">
-              {getFieldDecorator('real_name')(<Input placeholder="请输入" />)}
-            </Form.Item>
-          </Col>
-          <Col md={8} sm={24}>
-            <Form.Item label="所属角色">
-              {getFieldDecorator('role_id')(
-                <Select style={{ width: '100%' }} placeholder="请选择">
-                  {roleData.map(item => (
-                    <Select.Option key={item.record_id} value={item.record_id}>
-                      {item.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col md={8} sm={24}>
-            <Form.Item label="用户状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Select.Option value="1">正常</Select.Option>
-                  <Select.Option value="2">停用</Select.Option>
-                </Select>
-              )}
+            <Form.Item label="访问路径">
+              {getFieldDecorator('path')(<Input placeholder="请输入" />)}
             </Form.Item>
           </Col>
           <Col md={8} sm={24}>
@@ -246,7 +186,7 @@ class UserList extends PureComponent {
   render() {
     const {
       loading,
-      user: {
+      resource: {
         data: { list, pagination },
       },
     } = this.props;
@@ -273,25 +213,6 @@ class UserList extends PureComponent {
                       </a>
                     </Menu.Item>
                     <Menu.Item>
-                      {record.status === 1 ? (
-                        <a
-                          onClick={() => {
-                            this.onItemDisableClick(val);
-                          }}
-                        >
-                          设置为停用
-                        </a>
-                      ) : (
-                        <a
-                          onClick={() => {
-                            this.onItemEnableClick(val);
-                          }}
-                        >
-                          设置为启用
-                        </a>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
                       <a
                         onClick={() => {
                           this.onItemDelClick(record);
@@ -312,41 +233,20 @@ class UserList extends PureComponent {
         ),
       },
       {
-        title: '用户名',
-        dataIndex: 'user_name',
+        title: '资源编号',
+        dataIndex: 'code',
       },
       {
-        title: '真实姓名',
-        dataIndex: 'real_name',
+        title: '资源名称',
+        dataIndex: 'name',
       },
       {
-        title: '角色名称',
-        dataIndex: 'roles',
-        render: val => {
-          if (!val || val.length === 0) {
-            return <span>-</span>;
-          }
-          const names = [];
-          for (let i = 0; i < val.length; i += 1) {
-            names.push(val[i].name);
-          }
-          return <span>{names.join('|')}</span>;
-        },
+        title: '访问路径',
+        dataIndex: 'path',
       },
       {
-        title: '用户状态',
-        dataIndex: 'status',
-        render: val => {
-          if (val === 1) {
-            return <Badge status="success" text="启用" />;
-          }
-          return <Badge status="error" text="停用" />;
-        },
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'created_at',
-        render: val => <span>{formatDate(val, 'YYYY-MM-DD HH:mm')}</span>,
+        title: '请求方式',
+        dataIndex: 'method',
       },
     ];
 
@@ -357,8 +257,10 @@ class UserList extends PureComponent {
       ...pagination,
     };
 
+    const breadcrumbList = [{ title: '系统管理' }, { title: '资源管理', href: '/system/resource' }];
+
     return (
-      <PageHeaderLayout title="用户管理">
+      <PageHeaderLayout title="资源管理" breadcrumbList={breadcrumbList}>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
@@ -397,4 +299,4 @@ class UserList extends PureComponent {
   }
 }
 
-export default UserList;
+export default ResourceList;

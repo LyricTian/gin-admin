@@ -89,6 +89,7 @@ export default {
       if (sessionStorage.getItem(storeLogoutKey) === '1') {
         return;
       }
+      sessionStorage.setItem(storeLogoutKey, '1');
 
       yield put({
         type: 'saveStatus',
@@ -96,7 +97,6 @@ export default {
       });
       const response = yield call(loginService.logout);
       if (response.status === 'OK') {
-        sessionStorage.setItem(storeLogoutKey, '1');
         localStorage.removeItem(storeAccessTokenKey);
 
         yield put(

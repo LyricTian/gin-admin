@@ -1,10 +1,11 @@
 import { message } from 'antd';
-import * as userService from '@/services/user';
+import * as resourceService from '@/services/resource';
 
 export default {
-  namespace: 'user',
+  namespace: 'resource',
   state: {
     search: {},
+    pagination: {},
     data: {
       list: [],
       pagination: {},
@@ -28,7 +29,7 @@ export default {
           payload: search,
         });
       } else {
-        const s = yield select(state => state.user.search);
+        const s = yield select(state => state.resource.search);
         if (s) {
           params = { ...params, ...s };
         }
@@ -41,13 +42,13 @@ export default {
           payload: pagination,
         });
       } else {
-        const p = yield select(state => state.user.pagination);
+        const p = yield select(state => state.resource.pagination);
         if (p) {
           params = { ...params, ...p };
         }
       }
 
-      const response = yield call(userService.query, params);
+      const response = yield call(resourceService.query, params);
       yield put({
         type: 'saveData',
         payload: response,
@@ -66,7 +67,7 @@ export default {
         }),
         put({
           type: 'saveFormTitle',
-          payload: '新建用户',
+          payload: '新建资源',
         }),
         put({
           type: 'saveFormID',
@@ -76,16 +77,13 @@ export default {
           type: 'saveFormData',
           payload: {},
         }),
-        put({
-          type: 'role/fetchSelect',
-        }),
       ];
 
       if (payload.type === 'E') {
         yield [
           put({
             type: 'saveFormTitle',
-            payload: '编辑用户',
+            payload: '编辑资源',
           }),
           put({
             type: 'saveFormID',
@@ -99,11 +97,13 @@ export default {
       }
     },
     *fetchForm({ payload }, { call, put }) {
-      const response = yield call(userService.get, payload);
-      yield put({
-        type: 'saveFormData',
-        payload: response,
-      });
+      const response = yield call(resourceService.get, payload);
+      yield [
+        put({
+          type: 'saveFormData',
+          payload: response,
+        }),
+      ];
     },
     *submit({ payload }, { call, put, select }) {
       yield put({
@@ -112,16 +112,16 @@ export default {
       });
 
       const params = { ...payload };
-      const formType = yield select(state => state.user.formType);
+      const formType = yield select(state => state.resource.formType);
       let success = false;
       if (formType === 'E') {
-        params.record_id = yield select(state => state.user.formID);
-        const response = yield call(userService.update, params);
+        params.record_id = yield select(state => state.resource.formID);
+        const response = yield call(resourceService.update, params);
         if (response.status === 'OK') {
           success = true;
         }
       } else {
-        const response = yield call(userService.create, params);
+        const response = yield call(resourceService.create, params);
         if (response.record_id && response.record_id !== '') {
           success = true;
         }
@@ -144,48 +144,17 @@ export default {
       }
     },
     *del({ payload }, { call, put }) {
-      const response = yield call(userService.del, payload);
+      const response = yield call(resourceService.del, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetch' });
       }
     },
     *delMany({ payload }, { call, put }) {
-      const response = yield call(userService.delMany, payload);
+      const response = yield call(resourceService.delMany, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetch' });
-      }
-    },
-    *changeStatus({ payload }, { call, put, select }) {
-      let response;
-      if (payload.status === 1) {
-        response = yield call(userService.enable, payload);
-      } else {
-        response = yield call(userService.disable, payload);
-      }
-
-      if (response.status === 'OK') {
-        let msg = '启用成功';
-        if (payload.status === 2) {
-          msg = '停用成功';
-        }
-        message.success(msg);
-        const data = yield select(state => state.user.data);
-        const newData = { list: [], pagination: data.pagination };
-
-        for (let i = 0; i < data.list.length; i += 1) {
-          const item = data.list[i];
-          if (item.record_id === payload.record_id) {
-            item.status = payload.status;
-          }
-          newData.list.push(item);
-        }
-
-        yield put({
-          type: 'saveData',
-          payload: newData,
-        });
       }
     },
   },
@@ -195,6 +164,9 @@ export default {
     },
     saveSearch(state, { payload }) {
       return { ...state, search: payload };
+    },
+    savePagination(state, { payload }) {
+      return { ...state, pagination: payload };
     },
     changeFormVisible(state, { payload }) {
       return { ...state, formVisible: payload };

@@ -11,14 +11,16 @@ export default [
     path: '/',
     component: '../layouts/AdminLayout',
     routes: [
-      { path: '/', redirect: '/system/menu' },
+      { path: '/', redirect: '/dashboard' },
+      { path: '/dashboard', component: './Dashboard/Home' },
       {
-        path: '/experiment',
-        routes: [{ path: '/experiment/demo', component: './Demo/DemoList' }],
+        path: '/example',
+        routes: [{ path: '/example/demo', component: './Demo/DemoList' }],
       },
       {
         path: '/system',
         routes: [
+          { path: '/system/resource', component: './Resource/ResourceList' },
           { path: '/system/menu', component: './Menu/MenuList' },
           { path: '/system/role', component: './Role/RoleList' },
           { path: '/system/user', component: './User/UserList' },

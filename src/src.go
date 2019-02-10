@@ -44,10 +44,10 @@ func Init(ctx context.Context) CallbackFunc {
 	if config.IsCaptchaRedisStore() {
 		cfg := config.GetRedisConfig()
 		captcha.SetCustomStore(store.NewRedisStore(&store.RedisOptions{
-			Addr:     cfg.Password,
+			Addr:     cfg.Addr,
 			Password: cfg.Password,
 			DB:       config.GetCaptchaConfig().RedisDB,
-		}, captcha.Expiration, log.New(os.Stderr, "[captcha]", log.LstdFlags), "captcha_"))
+		}, captcha.Expiration, log.New(os.Stderr, "[captcha]", log.LstdFlags), config.GetCaptchaConfig().RedisPrefix))
 	}
 
 	// 初始化HTTP服务
