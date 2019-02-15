@@ -3,13 +3,9 @@ package src
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	"time"
 
-	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/captcha/store"
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/logger"
@@ -39,16 +35,6 @@ func Init(ctx context.Context) CallbackFunc {
 
 	// 初始化日志钩子
 	loggerFunc := InitLoggerHook(ctx, obj)
-
-	// 初始化图形验证码
-	if config.IsCaptchaRedisStore() {
-		cfg := config.GetRedisConfig()
-		captcha.SetCustomStore(store.NewRedisStore(&store.RedisOptions{
-			Addr:     cfg.Addr,
-			Password: cfg.Password,
-			DB:       config.GetCaptchaConfig().RedisDB,
-		}, captcha.Expiration, log.New(os.Stderr, "[captcha]", log.LstdFlags), config.GetCaptchaConfig().RedisPrefix))
-	}
 
 	// 初始化HTTP服务
 	httpFunc := InitHTTPServer(ctx, webApp)
