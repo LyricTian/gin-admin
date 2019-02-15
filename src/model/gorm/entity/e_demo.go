@@ -27,7 +27,7 @@ func (a SchemaDemo) ToDemo() *Demo {
 // Demo demo实体
 type Demo struct {
 	Model
-	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
+	RecordID string `gorm:"column:record_id;size:36;index;"` // 记录内码
 	Code     string `gorm:"column:code;size:50;index;"`             // 编号
 	Name     string `gorm:"column:name;size:100;index;"`            // 名称
 	Memo     string `gorm:"column:memo;size:200;"`                  // 备注

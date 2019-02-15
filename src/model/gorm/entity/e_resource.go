@@ -27,7 +27,7 @@ func (a SchemaResource) ToResource() *Resource {
 // Resource 资源实体
 type Resource struct {
 	Model
-	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
+	RecordID string `gorm:"column:record_id;size:36;index;"` // 记录内码
 	Code     string `gorm:"column:code;size:50;index;"`             // 编号
 	Name     string `gorm:"column:name;size:100;index;"`            // 名称
 	Path     string `gorm:"column:path;size:256;"`                  // 访问路径
