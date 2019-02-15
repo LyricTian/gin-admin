@@ -32,7 +32,7 @@ func (a SchemaUser) ToUser() *User {
 // User 用户实体
 type User struct {
 	Model
-	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
+	RecordID string `gorm:"column:record_id;size:36;index;"` // 记录内码
 	UserName string `gorm:"column:user_name;size:64;index;"`        // 用户名
 	RealName string `gorm:"column:real_name;size:32;index;"`        // 真实姓名
 	Password string `gorm:"column:password;size:40;"`               // 密码(sha1(md5(明文))加密)

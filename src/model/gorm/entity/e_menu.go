@@ -32,7 +32,7 @@ func (a SchemaMenu) ToMenu() *Menu {
 // Menu 菜单实体
 type Menu struct {
 	Model
-	RecordID   string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
+	RecordID   string `gorm:"column:record_id;size:36;index;"` // 记录内码
 	Code       string `gorm:"column:code;size:50;"`                   // 菜单编号
 	Name       string `gorm:"column:name;size:50;index;"`             // 菜单名称
 	Type       int    `gorm:"column:type;index;"`                     // 菜单类型(1：模块 2：功能 3：资源)

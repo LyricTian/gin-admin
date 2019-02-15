@@ -31,7 +31,7 @@ func (a SchemaRole) ToRole() *Role {
 // Role 角色实体
 type Role struct {
 	Model
-	RecordID string `gorm:"column:record_id;size:36;unique_index;"` // 记录内码
+	RecordID string `gorm:"column:record_id;size:36;index;"` // 记录内码
 	Name     string `gorm:"column:name;size:100;index;"`            // 角色名称
 	Sequence int    `gorm:"column:sequence;index;"`                 // 排序值
 	Memo     string `gorm:"column:memo;size:200;"`                  // 备注
