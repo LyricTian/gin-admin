@@ -158,9 +158,6 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 					continue
 				}
 				npath := item.ParentPath + menu.ParentPath[len(opath):]
-				if len(npath) > 0 && npath[0] == '/' {
-					npath = npath[1:]
-				}
 				err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath)
 				if err != nil {
 					return err
