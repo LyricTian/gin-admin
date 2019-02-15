@@ -146,6 +146,11 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 			item.ParentPath = a.getParentPath(parentItem)
 
 			opath := oldItem.ParentPath
+			if opath != "" {
+				opath += "/"
+			}
+			opath += oldItem.RecordID
+
 			result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 				ParentPath: opath,
 			})
@@ -154,9 +159,6 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 			}
 
 			for _, menu := range result.Data {
-				if menu.RecordID == recordID {
-					continue
-				}
 				npath := item.ParentPath + menu.ParentPath[len(opath):]
 				err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath)
 				if err != nil {

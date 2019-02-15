@@ -69,7 +69,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 		db = db.Where("record_id IN(?)", roleMenuQuery)
 	}
 	if v := params.ParentPath; v != "" {
-		db = db.Where("parent_path LIKE ?", v+"/%")
+		db = db.Where("parent_path LIKE ?", v+"%")
 	}
 	if v := params.ParentPaths; len(v) > 0 {
 		db = db.Where("parent_path IN(?)", v)
