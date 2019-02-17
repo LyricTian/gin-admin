@@ -118,10 +118,8 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 		userID = ""
 	}
 
-	// 查询用户的权限
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		UserID: userID,
-		Types:  []int{1, 2},
 	})
 	if err != nil {
 		return nil, err
@@ -131,17 +129,14 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 		return result.Data.ToTreeList().ToTree(), nil
 	}
 
-	// 组装权限树
-	perms := result.Data
 	result, err = a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		RecordIDs: result.Data.SplitParentPathToRecordIDs(),
+		RecordIDs: result.Data.SplitAndGetAllRecordIDs(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	perms = append(result.Data, perms...)
 
-	return perms.ToTreeList().ToTree(), nil
+	return result.Data.ToTreeList().ToTree(), nil
 }
 
 // UpdatePassword 更新当前用户登录密码

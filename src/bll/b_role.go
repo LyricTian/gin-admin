@@ -102,7 +102,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 		return errors.ErrNotFound
 	}
 
-	leafMenuIDs, err := a.checkAndGetLeafMenuIDs(ctx, item, nil)
+	leafMenuIDs, err := a.checkAndGetLeafMenuIDs(ctx, item, oldItem)
 	if err != nil {
 		return err
 	}

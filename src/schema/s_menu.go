@@ -86,14 +86,15 @@ func (a MenuTrees) ToTree() []*MenuTree {
 // Menus 菜单列表
 type Menus []*Menu
 
-// SplitParentPathToRecordIDs 拆分父级路径为记录ID(去重)
-func (a Menus) SplitParentPathToRecordIDs() []string {
+// SplitAndGetAllRecordIDs 拆分父级路径并获取所有记录ID
+func (a Menus) SplitAndGetAllRecordIDs() []string {
 	var recordIDs []string
-
 	for _, item := range a {
+		recordIDs = append(recordIDs, item.RecordID)
 		if item.ParentPath == "" {
 			continue
 		}
+
 		pps := strings.Split(item.ParentPath, "/")
 		for _, pp := range pps {
 			var exists bool
@@ -108,7 +109,6 @@ func (a Menus) SplitParentPathToRecordIDs() []string {
 			}
 		}
 	}
-
 	return recordIDs
 }
 
@@ -131,21 +131,20 @@ func (a Menus) ToTreeList() MenuTrees {
 	return items
 }
 
+func (a Menus) fillLeafNodeID(tree *[]*MenuTree, leafNodeIDs *[]string) {
+	for _, node := range *tree {
+		if node.Children == nil || len(*node.Children) == 0 {
+			*leafNodeIDs = append(*leafNodeIDs, node.RecordID)
+			continue
+		}
+		a.fillLeafNodeID(node.Children, leafNodeIDs)
+	}
+}
+
 // ToLeafRecordIDs 转换为叶子节点记录ID列表
 func (a Menus) ToLeafRecordIDs() []string {
-	var recordIDs []string
-	for _, item := range a {
-		var exists bool
-		for _, item2 := range a {
-			if strings.HasPrefix(item2.ParentPath, item.ParentPath) &&
-				item2.ParentPath != item.ParentPath {
-				exists = true
-				break
-			}
-		}
-		if !exists {
-			recordIDs = append(recordIDs, item.RecordID)
-		}
-	}
-	return recordIDs
+	var leafNodeIDs []string
+	tree := a.ToTreeList().ToTree()
+	a.fillLeafNodeID(&tree, &leafNodeIDs)
+	return leafNodeIDs
 }
