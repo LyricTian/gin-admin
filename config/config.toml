@@ -36,9 +36,9 @@ shutdown_timeout = 10
 # 登录用户名
 user_name = "root"
 # 登录密码
-password = "123"
+password = "abc-123"
 # 显示的真实姓名
-real_name = "超级用户"
+real_name = "超级管理员"
 
 # 图形验证码
 [captcha]
@@ -149,7 +149,7 @@ password = "123456"
 # 数据库
 db_name = "gadmin"
 # 连接参数
-parameters = "charset=utf8&parseTime=True&loc=Local&allowNativePasswords=true"
+parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
 
 # postgres数据库配置
 [postgres]
