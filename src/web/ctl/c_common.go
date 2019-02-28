@@ -10,24 +10,24 @@ import (
 	wcontext "github.com/LyricTian/gin-admin/src/web/context"
 )
 
-// Common API模块
+// Common 控制器公共模块
 type Common struct {
-	DemoAPI     *Demo     `inject:""`
-	LoginAPI    *Login    `inject:""`
-	UserAPI     *User     `inject:""`
-	RoleAPI     *Role     `inject:""`
-	MenuAPI     *Menu     `inject:""`
-	ResourceAPI *Resource `inject:""`
+	DemoCtl     *Demo     `inject:""`
+	LoginCtl    *Login    `inject:""`
+	UserCtl     *User     `inject:""`
+	RoleCtl     *Role     `inject:""`
+	MenuCtl     *Menu     `inject:""`
+	ResourceCtl *Resource `inject:""`
 }
 
 // LoadCasbinPolicyData 加载casbin策略数据，包括角色权限数据、用户角色数据
 func (c *Common) LoadCasbinPolicyData(ctx context.Context) error {
-	err := c.RoleAPI.RoleBll.LoadAllPolicy(ctx)
+	err := c.RoleCtl.RoleBll.LoadAllPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	err = c.UserAPI.UserBll.LoadAllPolicy(ctx)
+	err = c.UserCtl.UserBll.LoadAllPolicy(ctx)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (c *Common) CheckAndCreateResource(ctx context.Context) error {
 			continue
 		}
 		method, path := k[:idx], k[idx:]
-		_, err := c.ResourceAPI.ResourceBll.Create(ctx, schema.Resource{
+		_, err := c.ResourceCtl.ResourceBll.Create(ctx, schema.Resource{
 			Code:   item.Code,
 			Name:   item.Name,
 			Path:   path,
@@ -130,7 +130,7 @@ func (c *Common) InitMenuData(ctx context.Context) error {
 `
 
 	// 检查是否存在数据，如果存在则不执行初始化
-	exists, err := c.MenuAPI.MenuBll.CheckDataInit(ctx)
+	exists, err := c.MenuCtl.MenuBll.CheckDataInit(ctx)
 	if err != nil {
 		return err
 	} else if exists {
@@ -143,7 +143,7 @@ func (c *Common) InitMenuData(ctx context.Context) error {
 		return err
 	}
 
-	err = c.MenuAPI.MenuBll.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
+	err = c.MenuCtl.MenuBll.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
 		return c.createMenu(ctx, "", items)
 	})
 
@@ -152,7 +152,7 @@ func (c *Common) InitMenuData(ctx context.Context) error {
 
 func (c *Common) createMenu(ctx context.Context, parentID string, items []*schema.MenuTree) error {
 	for _, item := range items {
-		newItem, err := c.MenuAPI.MenuBll.Create(ctx, schema.Menu{
+		newItem, err := c.MenuCtl.MenuBll.Create(ctx, schema.Menu{
 			Code:     item.Code,
 			Name:     item.Name,
 			Type:     item.Type,

@@ -46,16 +46,6 @@ func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 
 	apiPrefixes := []string{"/api/"}
 
-	// 静态站点
-	if dir := config.GetWWWDir(); dir != "" {
-		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(apiPrefixes...)))
-	}
-
-	// swagger文档
-	if dir := config.GetSwaggerDir(); dir != "" {
-		app.Static("/swagger", dir)
-	}
-
 	// 跟踪ID
 	app.Use(middleware.TraceMiddleware(middleware.NoAllowPathPrefixSkipper(apiPrefixes...)))
 
@@ -72,6 +62,16 @@ func Init(ctx context.Context, obj *inject.Object) *gin.Engine {
 
 	// 注册/api路由
 	router.APIHandler(app, obj)
+
+	// swagger文档
+	if dir := config.GetSwaggerDir(); dir != "" {
+		app.Static("/swagger", dir)
+	}
+
+	// 静态站点
+	if dir := config.GetWWWDir(); dir != "" {
+		app.Use(middleware.WWWMiddleware(dir))
+	}
 
 	return app
 }
