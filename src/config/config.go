@@ -2,23 +2,31 @@ package config
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/spf13/viper"
 )
 
 var (
-	lock sync.RWMutex
+	lock      sync.RWMutex
+	cacheData = new(sync.Map)
 )
 
 // 解析配置
 func parse(key string, value interface{}) {
+	if v, ok := cacheData.Load(key); ok {
+		reflect.Indirect(reflect.ValueOf(value)).Set(reflect.ValueOf(v))
+		return
+	}
+
 	lock.Lock()
 	defer lock.Unlock()
 	err := viper.UnmarshalKey(key, value)
 	if err != nil {
 		panic("解析配置发生错误:" + err.Error())
 	}
+	cacheData.Store(key, reflect.Indirect(reflect.ValueOf(value)).Interface())
 }
 
 // GetRunMode 获取运行模式

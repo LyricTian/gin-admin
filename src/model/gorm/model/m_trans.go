@@ -9,14 +9,15 @@ import (
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
 )
 
-// NewTrans 事务管理
-func NewTrans(db *gormplus.DB) *Trans {
-	return &Trans{db}
-}
-
 // Trans 事务管理
 type Trans struct {
 	db *gormplus.DB
+}
+
+// Init 初始化
+func (a *Trans) Init(db *gormplus.DB) *Trans {
+	a.db = db
+	return a
 }
 
 func (a *Trans) getFuncName(name string) string {

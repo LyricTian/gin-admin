@@ -9,7 +9,7 @@ import (
 // IUser 用户对象存储接口
 type IUser interface {
 	// 查询数据
-	Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (schema.UserQueryResult, error)
+	Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error)
 	// 根据用户名查询指定数据

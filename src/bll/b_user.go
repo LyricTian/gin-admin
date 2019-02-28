@@ -37,7 +37,7 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *
 		return nil, nil, err
 	}
 
-	pageResult := result.Data.ToPageShowList(roleResult.Data.ToMap())
+	pageResult := result.Data.ToPageShows(roleResult.Data.ToMap())
 	return pageResult, result.PageResult, nil
 }
 
@@ -51,6 +51,8 @@ func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
 	} else if item == nil {
 		return nil, errors.ErrNotFound
 	}
+	item.Password = ""
+
 	return item, nil
 }
 
@@ -82,6 +84,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.User, erro
 
 	item.Password = util.SHA1HashString(item.Password)
 	item.RecordID = util.MustUUID()
+	item.Creator = a.CommonBll.GetUserID(ctx)
 	err = a.UserModel.Create(ctx, item)
 	if err != nil {
 		return nil, err

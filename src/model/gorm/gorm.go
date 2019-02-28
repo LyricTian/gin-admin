@@ -24,12 +24,12 @@ func Init(ctx context.Context, g *inject.Graph) (*gormplus.DB, error) {
 	}
 
 	// 依赖注入
-	g.Provide(&inject.Object{Value: model.ITrans(gormmodel.NewTrans(db)), Name: "ITrans"})
-	g.Provide(&inject.Object{Value: model.IDemo(gormmodel.InitDemo(db)), Name: "IDemo"})
-	g.Provide(&inject.Object{Value: model.IMenu(gormmodel.InitMenu(db)), Name: "IMenu"})
-	g.Provide(&inject.Object{Value: model.IRole(gormmodel.InitRole(db)), Name: "IRole"})
-	g.Provide(&inject.Object{Value: model.IUser(gormmodel.InitUser(db)), Name: "IUser"})
-	g.Provide(&inject.Object{Value: model.IResource(gormmodel.InitResource(db)), Name: "IResource"})
+	g.Provide(&inject.Object{Value: model.ITrans(new(gormmodel.Trans).Init(db)), Name: "ITrans"})
+	g.Provide(&inject.Object{Value: model.IDemo(new(gormmodel.Demo).Init(db)), Name: "IDemo"})
+	g.Provide(&inject.Object{Value: model.IMenu(new(gormmodel.Menu).Init(db)), Name: "IMenu"})
+	g.Provide(&inject.Object{Value: model.IResource(new(gormmodel.Resource).Init(db)), Name: "IResource"})
+	g.Provide(&inject.Object{Value: model.IRole(new(gormmodel.Role).Init(db)), Name: "IRole"})
+	g.Provide(&inject.Object{Value: model.IUser(new(gormmodel.User).Init(db)), Name: "IUser"})
 	return db, nil
 }
 

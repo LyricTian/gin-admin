@@ -45,8 +45,10 @@ func (a *User) QueryPage(ctx *context.Context) {
 	var params schema.UserQueryParam
 	params.UserName = ctx.Query("user_name")
 	params.RealName = ctx.Query("real_name")
-	params.RoleID = ctx.Query("role_id")
 	params.Status = util.S(ctx.Query("status")).Int()
+	if v := ctx.Query("role_id"); v != "" {
+		params.RoleIDs = []string{v}
+	}
 
 	items, pr, err := a.UserBll.QueryPage(ctx.CContext(), params, ctx.GetPaginationParam())
 	if err != nil {

@@ -15,6 +15,11 @@ type Common struct {
 	TransModel model.ITrans `inject:"ITrans"`
 }
 
+// GetUserID 获取当前用户ID
+func (a *Common) GetUserID(ctx context.Context) string {
+	return gcontext.FromUserID(ctx)
+}
+
 // ExecTrans 执行事务
 func (a *Common) ExecTrans(ctx context.Context, fn TransFunc) error {
 	if _, ok := gcontext.FromTrans(ctx); ok {
