@@ -63,7 +63,13 @@ func (d *DB) FindPage(db *gorm.DB, pageIndex, pageSize uint, out interface{}) (i
 		return 0, nil
 	}
 
-	result = db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(out)
+	if pageIndex > 0 && pageSize > 0 {
+		db = db.Offset((pageIndex - 1) * pageSize)
+	}
+	if pageSize > 0 {
+		db = db.Limit(pageSize)
+	}
+	result = db.Find(out)
 	if err := result.Error; err != nil {
 		return 0, err
 	}

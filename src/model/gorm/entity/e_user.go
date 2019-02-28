@@ -1,17 +1,20 @@
 package entity
 
 import (
+	"context"
+
 	"github.com/LyricTian/gin-admin/src/schema"
+	"github.com/LyricTian/gin-admin/src/service/gormplus"
 )
 
-// GetUserTableName 获取用户表名
-func GetUserTableName() string {
-	return User{}.TableName()
+// GetUserDB 获取用户存储
+func GetUserDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+	return getDBWithModel(ctx, defDB, User{})
 }
 
-// GetUserRoleTableName 获取用户角色关联表名
-func GetUserRoleTableName() string {
-	return UserRole{}.TableName()
+// GetUserRoleDB 获取用户角色关联存储
+func GetUserRoleDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+	return getDBWithModel(ctx, defDB, UserRole{})
 }
 
 // SchemaUser 用户对象
@@ -25,19 +28,32 @@ func (a SchemaUser) ToUser() *User {
 		RealName: a.RealName,
 		Password: a.Password,
 		Status:   a.Status,
+		Creator:  a.Creator,
 	}
 	return item
+}
+
+// ToUserRoles 转换为用户角色关联列表
+func (a SchemaUser) ToUserRoles() []*UserRole {
+	list := make([]*UserRole, len(a.RoleIDs))
+	for i, roleID := range a.RoleIDs {
+		list[i] = &UserRole{
+			UserID: a.RecordID,
+			RoleID: roleID,
+		}
+	}
+	return list
 }
 
 // User 用户实体
 type User struct {
 	Model
 	RecordID string `gorm:"column:record_id;size:36;index;"` // 记录内码
-	UserName string `gorm:"column:user_name;size:64;index;"`        // 用户名
-	RealName string `gorm:"column:real_name;size:32;index;"`        // 真实姓名
-	Password string `gorm:"column:password;size:40;"`               // 密码(sha1(md5(明文))加密)
-	Status   int    `gorm:"column:status;index;"`                   // 状态(1:启用 2:停用)
-	Creator  string `gorm:"column:creator;size:36;"`                // 创建者
+	UserName string `gorm:"column:user_name;size:64;index;"` // 用户名
+	RealName string `gorm:"column:real_name;size:32;index;"` // 真实姓名
+	Password string `gorm:"column:password;size:40;"`        // 密码(sha1(md5(明文))加密)
+	Status   int    `gorm:"column:status;index;"`            // 状态(1:启用 2:停用)
+	Creator  string `gorm:"column:creator;size:36;"`         // 创建者
 }
 
 func (a User) String() string {
@@ -50,28 +66,27 @@ func (a User) TableName() string {
 }
 
 // ToSchemaUser 转换为用户对象
-func (a User) ToSchemaUser(includePassword bool) *schema.User {
+func (a User) ToSchemaUser() *schema.User {
 	item := &schema.User{
 		RecordID:  a.RecordID,
 		UserName:  a.UserName,
 		RealName:  a.RealName,
+		Password:  a.Password,
 		Status:    a.Status,
+		Creator:   a.Creator,
 		CreatedAt: a.CreatedAt,
-	}
-	if includePassword {
-		item.Password = a.Password
 	}
 	return item
 }
 
-// Users 用户列表
+// Users 用户实体列表
 type Users []*User
 
 // ToSchemaUsers 转换为用户对象列表
-func (a Users) ToSchemaUsers(includePassword bool) []*schema.User {
+func (a Users) ToSchemaUsers() []*schema.User {
 	list := make([]*schema.User, len(a))
 	for i, item := range a {
-		list[i] = item.ToSchemaUser(includePassword)
+		list[i] = item.ToSchemaUser()
 	}
 	return list
 }

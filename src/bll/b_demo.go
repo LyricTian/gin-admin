@@ -15,8 +15,8 @@ type Demo struct {
 	CommonBll *Common     `inject:""`
 }
 
-// Query 查询数据
-func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error) {
+// QueryPage 查询分页数据
+func (a *Demo) QueryPage(ctx context.Context, params schema.DemoQueryParam, pp *schema.PaginationParam) ([]*schema.Demo, *schema.PaginationResult, error) {
 	result, err := a.DemoModel.Query(ctx, params, schema.DemoQueryOptions{PageParam: pp})
 	if err != nil {
 		return nil, nil, err
@@ -56,6 +56,7 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.Demo, erro
 	}
 
 	item.RecordID = util.MustUUID()
+	item.Creator = a.CommonBll.GetUserID(ctx)
 	err = a.DemoModel.Create(ctx, item)
 	if err != nil {
 		return nil, err

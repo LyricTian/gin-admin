@@ -35,7 +35,7 @@ func (a *Role) QuerySelect(ctx context.Context) ([]*schema.RoleMini, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.Data.ToMiniList(), nil
+	return result.Data.ToMinis(), nil
 }
 
 // Get 查询指定数据
@@ -80,6 +80,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.Role, erro
 	}
 
 	item.RecordID = util.MustUUID()
+	item.Creator = a.CommonBll.GetUserID(ctx)
 	item.MenuIDs = leafMenuIDs
 	err = a.RoleModel.Create(ctx, item)
 	if err != nil {

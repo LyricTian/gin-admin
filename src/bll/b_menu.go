@@ -15,6 +15,17 @@ type Menu struct {
 	CommonBll *Common     `inject:""`
 }
 
+// CheckDataInit 检查数据是否初始化
+func (a *Menu) CheckDataInit(ctx context.Context) (bool, error) {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{}, schema.MenuQueryOptions{
+		PageParam: &schema.PaginationParam{PageSize: 1},
+	})
+	if err != nil {
+		return false, err
+	}
+	return result.PageResult.Total > 0, nil
+}
+
 // QueryPage 查询分页数据
 func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error) {
 	result, err := a.MenuModel.Query(ctx, params, schema.MenuQueryOptions{
@@ -38,12 +49,7 @@ func (a *Menu) QueryTree(ctx context.Context, includeResource bool) ([]*schema.M
 	if err != nil {
 		return nil, err
 	}
-	return result.Data.ToTreeList().ToTree(), nil
-}
-
-// GetCount 获取数量
-func (a *Menu) GetCount(ctx context.Context) (int, error) {
-	return a.MenuModel.GetCount(ctx)
+	return result.Data.ToTrees().ToTree(), nil
 }
 
 // Get 查询指定数据
@@ -59,7 +65,7 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 
 func (a *Menu) checkAndGetParent(ctx context.Context, item schema.Menu, oldItem *schema.Menu) (*schema.Menu, error) {
 	if oldItem == nil || oldItem.Code != item.Code {
-		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
+		exists, err := a.MenuModel.CheckCodeWithParentID(ctx, item.Code, item.ParentID)
 		if err != nil {
 			return nil, err
 		} else if exists {
@@ -79,8 +85,8 @@ func (a *Menu) checkAndGetParent(ctx context.Context, item schema.Menu, oldItem 
 	}
 
 	switch {
-	case item.Type == 3 && (parentItem == nil || parentItem.Type != 2):
-		return nil, errors.NewBadRequestError("资源类型只能依赖于功能")
+	case item.Type == 3 && (parentItem == nil || !(parentItem.Type == 2 || parentItem.Type == 1)):
+		return nil, errors.NewBadRequestError("资源类型只能依赖于模块或功能")
 	case item.Type == 2 && (parentItem == nil || parentItem.Type != 1):
 		return nil, errors.NewBadRequestError("功能类型只能依赖于模块")
 	case item.Type == 1 && parentItem != nil && parentItem.Type != 1:
@@ -111,6 +117,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, erro
 
 	item.ParentPath = a.getParentPath(parentItem)
 	item.RecordID = util.MustUUID()
+	item.Creator = a.CommonBll.GetUserID(ctx)
 	err = a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
 		return a.MenuModel.Create(ctx, item)
 	})

@@ -46,7 +46,7 @@ func (a *Demo) QueryPage(ctx *context.Context) {
 	params.Name = ctx.Query("name")
 	params.Status = util.S(ctx.Query("status")).Int()
 
-	items, pr, err := a.DemoBll.Query(ctx.CContext(), params, ctx.GetPaginationParam())
+	items, pr, err := a.DemoBll.QueryPage(ctx.CContext(), params, ctx.GetPaginationParam())
 	if err != nil {
 		ctx.ResError(err)
 		return

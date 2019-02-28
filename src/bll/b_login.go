@@ -55,7 +55,7 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (string, 
 		return rootUser.RecordID, nil
 	}
 
-	user, err := a.UserModel.GetByUserName(ctx, userName, schema.UserQueryOptions{IncludePassword: true})
+	user, err := a.UserModel.GetByUserName(ctx, userName)
 	if err != nil {
 		return "", err
 	} else if user == nil {
@@ -126,7 +126,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 	} else if len(result.Data) == 0 {
 		return nil, ErrNoPerm
 	} else if isRoot {
-		return result.Data.ToTreeList().ToTree(), nil
+		return result.Data.ToTrees().ToTree(), nil
 	}
 
 	result, err = a.MenuModel.Query(ctx, schema.MenuQueryParam{
@@ -136,7 +136,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 		return nil, err
 	}
 
-	return result.Data.ToTreeList().ToTree(), nil
+	return result.Data.ToTrees().ToTree(), nil
 }
 
 // UpdatePassword 更新当前用户登录密码
@@ -146,9 +146,7 @@ func (a *Login) UpdatePassword(ctx context.Context, params schema.UpdatePassword
 		return errors.NewBadRequestError("超级用户密码只能通过配置文件修改")
 	}
 
-	user, err := a.UserModel.Get(ctx, userID, schema.UserQueryOptions{
-		IncludePassword: true,
-	})
+	user, err := a.UserModel.Get(ctx, userID)
 	if err != nil {
 		return err
 	} else if user == nil {

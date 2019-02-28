@@ -9,9 +9,9 @@ import (
 // IDemo demo存储接口
 type IDemo interface {
 	// 查询数据
-	Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (schema.DemoQueryResult, error)
+	Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (*schema.DemoQueryResult, error)
 	// 查询指定数据
-	Get(ctx context.Context, recordID string) (*schema.Demo, error)
+	Get(ctx context.Context, recordID string, opts ...schema.DemoQueryOptions) (*schema.Demo, error)
 	// 检查编号是否存在
 	CheckCode(ctx context.Context, code string) (bool, error)
 	// 创建数据

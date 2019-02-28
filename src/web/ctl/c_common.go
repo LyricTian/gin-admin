@@ -130,10 +130,10 @@ func (c *Common) InitMenuData(ctx context.Context) error {
 `
 
 	// 检查是否存在数据，如果存在则不执行初始化
-	count, err := c.MenuAPI.MenuBll.GetCount(ctx)
+	exists, err := c.MenuAPI.MenuBll.CheckDataInit(ctx)
 	if err != nil {
 		return err
-	} else if count > 0 {
+	} else if exists {
 		return nil
 	}
 
