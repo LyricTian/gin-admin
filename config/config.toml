@@ -1,5 +1,5 @@
 # 运行模式(debug:调试,test:测试,release:正式)
-run_mode = "test"
+run_mode = "debug"
 
 # casbin模型配置文件(也可以启动服务时使用-m指定)
 casbin_model_conf = ""
@@ -67,7 +67,7 @@ redis_db = 10
 # 跨域请求
 [cors]
 # 是否启用
-enable = true
+enable = false
 # 允许跨域请求的域名列表(*表示全部允许)
 allow_origins = ["*"]
 # 允许跨域请求的请求方式列表

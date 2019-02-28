@@ -24,7 +24,7 @@ start-dev-server:
 	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf -swagger ./src/web/swagger
 
 start-dev-web:
-	cd web && yarn && yarn start
+	cd web && npm install && npm start
 
 swagger:
 	swaggo -s ./src/web/swagger.go -p ./src -o ./src/web/swagger
