@@ -12,15 +12,7 @@ import (
 	"time"
 )
 
-func mapUri(ptr interface{}, m map[string][]string) error {
-	return mapFormByTag(ptr, m, "uri")
-}
-
 func mapForm(ptr interface{}, form map[string][]string) error {
-	return mapFormByTag(ptr, form, "form")
-}
-
-func mapFormByTag(ptr interface{}, form map[string][]string, tag string) error {
 	typ := reflect.TypeOf(ptr).Elem()
 	val := reflect.ValueOf(ptr).Elem()
 	for i := 0; i < typ.NumField(); i++ {
@@ -31,7 +23,7 @@ func mapFormByTag(ptr interface{}, form map[string][]string, tag string) error {
 		}
 
 		structFieldKind := structField.Kind()
-		inputFieldName := typeField.Tag.Get(tag)
+		inputFieldName := typeField.Tag.Get("form")
 		inputFieldNameList := strings.Split(inputFieldName, ",")
 		inputFieldName = inputFieldNameList[0]
 		var defaultValue string
@@ -55,7 +47,7 @@ func mapFormByTag(ptr interface{}, form map[string][]string, tag string) error {
 				structFieldKind = structField.Kind()
 			}
 			if structFieldKind == reflect.Struct {
-				err := mapFormByTag(structField.Addr().Interface(), form, tag)
+				err := mapForm(structField.Addr().Interface(), form)
 				if err != nil {
 					return err
 				}
@@ -82,16 +74,16 @@ func mapFormByTag(ptr interface{}, form map[string][]string, tag string) error {
 				}
 			}
 			val.Field(i).Set(slice)
-			continue
-		}
-		if _, isTime := structField.Interface().(time.Time); isTime {
-			if err := setTimeField(inputValue[0], typeField, structField); err != nil {
+		} else {
+			if _, isTime := structField.Interface().(time.Time); isTime {
+				if err := setTimeField(inputValue[0], typeField, structField); err != nil {
+					return err
+				}
+				continue
+			}
+			if err := setWithProperType(typeField.Type.Kind(), inputValue[0], structField); err != nil {
 				return err
 			}
-			continue
-		}
-		if err := setWithProperType(typeField.Type.Kind(), inputValue[0], structField); err != nil {
-			return err
 		}
 	}
 	return nil
@@ -186,7 +178,7 @@ func setFloatField(val string, bitSize int, field reflect.Value) error {
 func setTimeField(val string, structField reflect.StructField, value reflect.Value) error {
 	timeFormat := structField.Tag.Get("time_format")
 	if timeFormat == "" {
-		timeFormat = time.RFC3339
+		return errors.New("Blank time format")
 	}
 
 	if val == "" {

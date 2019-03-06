@@ -24,8 +24,7 @@ func LoggerMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
 		p := c.Request.URL.Path
 		method := c.Request.Method
 		routerKey := context.JoinRouter(method, p)
-		routerItem := context.GetRouterItem(routerKey)
-		span := logger.StartSpan(ctx.CContext(), routerItem.Name, routerKey)
+		span := logger.StartSpan(ctx.GetContext(), "", routerKey)
 		start := time.Now()
 
 		fields := make(map[string]interface{})
@@ -41,8 +40,8 @@ func LoggerMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
 			mediaType, _, _ := mime.ParseMediaType(c.GetHeader("Content-Type"))
 			if mediaType == "application/json" {
 				body, err := ioutil.ReadAll(c.Request.Body)
+				c.Request.Body.Close()
 				if err == nil {
-					c.Request.Body.Close()
 					buf := bytes.NewBuffer(body)
 					c.Request.Body = ioutil.NopCloser(buf)
 					fields["content_length"] = c.Request.ContentLength

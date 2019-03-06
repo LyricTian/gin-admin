@@ -2,6 +2,8 @@ package gorm
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/errors"
@@ -16,7 +18,7 @@ import (
 // 参考官方文档：http://gorm.io/zh_CN/docs/
 func Init(ctx context.Context, g *inject.Graph) (*gormplus.DB, error) {
 	// 设定初始值
-	entity.SetTablePrefix(config.GetGormTablePrefix())
+	entity.SetTablePrefix(config.GetGorm().TablePrefix)
 
 	db, err := NewGormDB()
 	if err != nil {
@@ -35,16 +37,17 @@ func Init(ctx context.Context, g *inject.Graph) (*gormplus.DB, error) {
 
 // NewGormDB 实例化gorm存储
 func NewGormDB() (*gormplus.DB, error) {
-	cfg := config.GetGormConfig()
+	cfg := config.GetGorm()
 
 	var dsn string
 	switch cfg.DBType {
 	case "mysql":
-		dsn = config.GetMySQLConfig().DSN()
+		dsn = config.GetMySQL().DSN()
 	case "sqlite3":
-		dsn = config.GetSqlite3Config().DSN()
+		dsn = config.GetSqlite3().DSN()
+		os.MkdirAll(filepath.Dir(dsn), 0777)
 	case "postgres":
-		dsn = config.GetPostgresConfig().DSN()
+		dsn = config.GetPostgres().DSN()
 	default:
 		return nil, errors.New("unknown db")
 	}

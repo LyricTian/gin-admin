@@ -3,7 +3,6 @@ package entity
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
 	gcontext "github.com/LyricTian/gin-admin/src/context"
@@ -11,14 +10,17 @@ import (
 	"github.com/LyricTian/gin-admin/src/util"
 )
 
+// 表名前缀
 var tablePrefix string
-var once sync.Once
 
 // SetTablePrefix 设定表名前缀
 func SetTablePrefix(prefix string) {
-	once.Do(func() {
-		tablePrefix = prefix
-	})
+	tablePrefix = prefix
+}
+
+// GetTablePrefix 获取表名前缀
+func GetTablePrefix() string {
+	return tablePrefix
 }
 
 // Model base model
@@ -31,7 +33,7 @@ type Model struct {
 
 // TableName table name
 func (Model) TableName(name string) string {
-	return fmt.Sprintf("%s%s", tablePrefix, name)
+	return fmt.Sprintf("%s%s", GetTablePrefix(), name)
 }
 
 func toString(v interface{}) string {

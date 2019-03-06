@@ -49,34 +49,14 @@ func IsReleaseMode() bool {
 	return GetRunMode() == "release"
 }
 
-// GetAuthMode 获取授权模式
-func GetAuthMode() string {
-	return viper.GetString("auth_mode")
-}
-
-// IsSessionAuth 会话授权
-func IsSessionAuth() bool {
-	return GetAuthMode() == "session"
-}
-
-// IsJWTAuth jwt授权
-func IsJWTAuth() bool {
-	return GetAuthMode() == "jwt"
-}
-
-// GetDBMode 获取存储模式
-func GetDBMode() string {
-	return viper.GetString("db_mode")
-}
-
-// IsGormDB gorm存储
-func IsGormDB() bool {
-	return GetDBMode() == "gorm"
-}
-
 // GetCasbinModelConf 获取casbin的模型配置文件
 func GetCasbinModelConf() string {
 	return viper.GetString("casbin_model_conf")
+}
+
+// GetMenuJSONFile 获取存储菜单数据的JSON文件
+func GetMenuJSONFile() string {
+	return viper.GetString("menu_json_file")
 }
 
 // GetWWWDir 获取静态站点目录
@@ -89,46 +69,94 @@ func GetSwaggerDir() string {
 	return viper.GetString("swagger")
 }
 
-// IsAllowCreateResources 是否允许动态创建资源数据
-func IsAllowCreateResources() bool {
-	return viper.GetBool("allow_create_resources")
+// GetStore 获取存储
+func GetStore() string {
+	return viper.GetString("store")
 }
 
-// IsAllowInitializeMenus 是否允许初始化菜单数据
-func IsAllowInitializeMenus() bool {
-	return viper.GetBool("allow_initialize_menus")
+// Log 日志配置参数
+type Log struct {
+	Level         int    `mapstructure:"level"`
+	Format        string `mapstructure:"format"`
+	Output        string `mapstructure:"output"`
+	OutputFile    string `mapstructure:"output_file"`
+	EnableHook    bool   `mapstructure:"enable_hook"`
+	Hook          string `mapstructure:"hook"`
+	HookMaxThread int    `mapstructure:"hook_max_thread"`
+	HookMaxBuffer int    `mapstructure:"hook_max_buffer"`
 }
 
-// RootUser root用户
-type RootUser struct {
+// GetLog 获取日志配置参数
+func GetLog() Log {
+	var c Log
+	parse("log", &c)
+	return c
+}
+
+// LogGormHook 日志gorm钩子配置
+type LogGormHook struct {
+	DBType       string `mapstructure:"db_type"`
+	MaxLifetime  int    `mapstructure:"max_lifetime"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
+	Table        string `mapstructure:"table"`
+}
+
+// GetLogGormHook 获取gorm配置参数
+func GetLogGormHook() LogGormHook {
+	var c LogGormHook
+	parse("log_gorm_hook", &c)
+	return c
+}
+
+// Root root用户
+type Root struct {
 	UserName string `mapstructure:"user_name"`
 	Password string `mapstructure:"password"`
 	RealName string `mapstructure:"real_name"`
 }
 
-// GetRootUser 获取root用户
-func GetRootUser() RootUser {
-	var config RootUser
-	parse("root", &config)
-	return config
+// GetRoot 获取root用户
+func GetRoot() Root {
+	var c Root
+	parse("root", &c)
+	return c
 }
 
-// HTTPConfig http配置参数
-type HTTPConfig struct {
+// Auth 用户认证
+type Auth struct {
+	SigningMethod string `mapstructure:"signing_method"`
+	SigningKey    string `mapstructure:"signing_key"`
+	Expired       int    `mapstructure:"expired"`
+	Store         string `mapstructure:"store"`
+	FilePath      string `mapstructure:"file_path"`
+	RedisDB       int    `mapstructure:"redis_db"`
+	RedisPrefix   string `mapstructure:"redis_prefix"`
+}
+
+// GetAuth 获取用户认证
+func GetAuth() Auth {
+	var c Auth
+	parse("auth", &c)
+	return c
+}
+
+// HTTP http配置参数
+type HTTP struct {
 	Host            string `mapstructure:"host"`
 	Port            int    `mapstructure:"port"`
 	ShutdownTimeout int    `mapstructure:"shutdown_timeout"`
 }
 
-// GetHTTPConfig 获取HTTP地址
-func GetHTTPConfig() HTTPConfig {
-	var config HTTPConfig
-	parse("http", &config)
-	return config
+// GetHTTP 获取HTTP地址
+func GetHTTP() HTTP {
+	var c HTTP
+	parse("http", &c)
+	return c
 }
 
-// CaptchaConfig 图形验证码配置参数
-type CaptchaConfig struct {
+// Captcha 图形验证码配置参数
+type Captcha struct {
 	Store       string `mapstructure:"store"`
 	Length      int    `mapstructure:"length"`
 	Width       int    `mapstructure:"width"`
@@ -137,29 +165,29 @@ type CaptchaConfig struct {
 	RedisPrefix string `mapstructure:"redis_prefix"`
 }
 
-// GetCaptchaConfig 获取图形验证码配置参数
-func GetCaptchaConfig() CaptchaConfig {
-	var config CaptchaConfig
-	parse("captcha", &config)
-	return config
+// GetCaptcha 获取图形验证码配置参数
+func GetCaptcha() Captcha {
+	var c Captcha
+	parse("captcha", &c)
+	return c
 }
 
-// RateLimiterConfig 请求频率限制配置参数
-type RateLimiterConfig struct {
+// RateLimiter 请求频率限制配置参数
+type RateLimiter struct {
 	Enable  bool  `mapstructure:"enable"`
 	Count   int64 `mapstructure:"count"`
 	RedisDB int   `mapstructure:"redis_db"`
 }
 
-// GetRateLimiterConfig 获取请求频率限制配置参数
-func GetRateLimiterConfig() RateLimiterConfig {
-	var config RateLimiterConfig
-	parse("rate_limiter", &config)
-	return config
+// GetRateLimiter 获取请求频率限制配置参数
+func GetRateLimiter() RateLimiter {
+	var c RateLimiter
+	parse("rate_limiter", &c)
+	return c
 }
 
-// CORSConfig 跨域请求配置参数
-type CORSConfig struct {
+// CORS 跨域请求配置参数
+type CORS struct {
 	Enable           bool     `mapstructure:"enable"`
 	AllowOrigins     []string `mapstructure:"allow_origins"`
 	AllowMethods     []string `mapstructure:"allow_methods"`
@@ -168,49 +196,28 @@ type CORSConfig struct {
 	MaxAge           int      `mapstructure:"max_age"`
 }
 
-// GetCORSConfig 获取跨域请求配置参数
-func GetCORSConfig() CORSConfig {
-	var config CORSConfig
-	parse("cors", &config)
-	return config
+// GetCORS 获取跨域请求配置参数
+func GetCORS() CORS {
+	var c CORS
+	parse("cors", &c)
+	return c
 }
 
-// IsCaptchaRedisStore 图形验证码存储是否是redis存储
-func IsCaptchaRedisStore() bool {
-	return GetCaptchaConfig().Store == "redis"
-}
-
-// RedisConfig redis配置参数
-type RedisConfig struct {
+// Redis redis配置参数
+type Redis struct {
 	Addr     string `mapstructure:"addr"`
 	Password string `mapstructure:"password"`
 }
 
-// GetRedisConfig 获取redis配置参数
-func GetRedisConfig() RedisConfig {
-	var config RedisConfig
-	parse("redis", &config)
-	return config
+// GetRedis 获取redis配置参数
+func GetRedis() Redis {
+	var c Redis
+	parse("redis", &c)
+	return c
 }
 
-// LogConfig 日志配置参数
-type LogConfig struct {
-	Level         int    `mapstructure:"level"`
-	Format        string `mapstructure:"format"`
-	EnableHook    bool   `mapstructure:"enable_hook"`
-	HookMaxThread int    `mapstructure:"hook_max_thread"`
-	HookMaxBuffer int    `mapstructure:"hook_max_buffer"`
-}
-
-// GetLogConfig 获取日志配置参数
-func GetLogConfig() LogConfig {
-	var config LogConfig
-	parse("log", &config)
-	return config
-}
-
-// GormConfig gorm配置参数
-type GormConfig struct {
+// Gorm gorm配置参数
+type Gorm struct {
 	Debug        bool   `mapstructure:"debug"`
 	DBType       string `mapstructure:"db_type"`
 	MaxLifetime  int    `mapstructure:"max_lifetime"`
@@ -219,50 +226,15 @@ type GormConfig struct {
 	TablePrefix  string `mapstructure:"table_prefix"`
 }
 
-// GetGormConfig 获取gorm配置参数
-func GetGormConfig() GormConfig {
-	var config GormConfig
-	parse("gorm", &config)
-	return config
+// GetGorm 获取gorm配置参数
+func GetGorm() Gorm {
+	var c Gorm
+	parse("gorm", &c)
+	return c
 }
 
-// GetGormTablePrefix 获取gorm表名前缀
-func GetGormTablePrefix() string {
-	return GetGormConfig().TablePrefix
-}
-
-// SessionConfig 会话配置参数
-type SessionConfig struct {
-	HeaderName  string `mapstructure:"header_name"`
-	Sign        string `mapstructure:"sign"`
-	Expired     int64  `mapstructure:"expired"`
-	EnableStore bool   `mapstructure:"enable_store"`
-}
-
-// GetSessionConfig 获取会话配置参数
-func GetSessionConfig() SessionConfig {
-	var config SessionConfig
-	parse("session", &config)
-	return config
-}
-
-// JWTConfig jwt配置参数
-type JWTConfig struct {
-	HeaderName string `mapstructure:"header_name"`
-	Secret     string `mapstructure:"secret"`
-	SignMethod string `mapstructure:"sign_method"`
-	Expired    int64  `mapstructure:"expired"`
-}
-
-// GetJWTConfig 获取jwt配置参数
-func GetJWTConfig() JWTConfig {
-	var config JWTConfig
-	parse("jwt", &config)
-	return config
-}
-
-// MySQLConfig mysql配置参数
-type MySQLConfig struct {
+// MySQL mysql配置参数
+type MySQL struct {
 	Host       string `mapstructure:"host"`
 	Port       int    `mapstructure:"port"`
 	User       string `mapstructure:"user"`
@@ -272,20 +244,20 @@ type MySQLConfig struct {
 }
 
 // DSN 数据库连接串
-func (a MySQLConfig) DSN() string {
+func (a MySQL) DSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
 		a.User, a.Password, a.Host, a.Port, a.DBName, a.Parameters)
 }
 
-// GetMySQLConfig 获取mysql配置参数
-func GetMySQLConfig() MySQLConfig {
-	var config MySQLConfig
-	parse("mysql", &config)
-	return config
+// GetMySQL 获取mysql配置参数
+func GetMySQL() MySQL {
+	var c MySQL
+	parse("mysql", &c)
+	return c
 }
 
-// PostgresConfig postgres配置参数
-type PostgresConfig struct {
+// Postgres postgres配置参数
+type Postgres struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
 	User     string `mapstructure:"user"`
@@ -294,31 +266,31 @@ type PostgresConfig struct {
 }
 
 // DSN 数据库连接串
-func (a PostgresConfig) DSN() string {
+func (a Postgres) DSN() string {
 	return fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s",
 		a.Host, a.Port, a.User, a.DBName, a.Password)
 }
 
-// GetPostgresConfig 获取postgres配置参数
-func GetPostgresConfig() PostgresConfig {
-	var config PostgresConfig
-	parse("postgres", &config)
-	return config
+// GetPostgres 获取postgres配置参数
+func GetPostgres() Postgres {
+	var c Postgres
+	parse("postgres", &c)
+	return c
 }
 
-// Sqlite3Config sqlite3配置参数
-type Sqlite3Config struct {
+// Sqlite3 sqlite3配置参数
+type Sqlite3 struct {
 	Path string `mapstructure:"path"`
 }
 
 // DSN 数据库连接串
-func (a Sqlite3Config) DSN() string {
+func (a Sqlite3) DSN() string {
 	return a.Path
 }
 
-// GetSqlite3Config 获取sqlite3配置参数
-func GetSqlite3Config() Sqlite3Config {
-	var config Sqlite3Config
-	parse("sqlite3", &config)
-	return config
+// GetSqlite3 获取sqlite3配置参数
+func GetSqlite3() Sqlite3 {
+	var c Sqlite3
+	parse("sqlite3", &c)
+	return c
 }

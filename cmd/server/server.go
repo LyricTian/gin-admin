@@ -5,11 +5,14 @@ import (
 	"flag"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"sync/atomic"
 
 	"github.com/LyricTian/gin-admin/src"
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/logger"
+	loggerhook "github.com/LyricTian/gin-admin/src/logger/hook"
+	loggergormhook "github.com/LyricTian/gin-admin/src/logger/hook/gorm"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/spf13/viper"
 )
@@ -64,11 +67,7 @@ func main() {
 		viper.Set("swagger", swaggerDir)
 	}
 
-	// 设定日志初始化参数
-	logger.SetLevel(config.GetLogConfig().Level)
-	logger.SetFormatter(config.GetLogConfig().Format)
-	logger.SetVersion(VERSION)
-	logger.SetTraceIDFunc(util.MustUUID)
+	loggerReleaseFunc := loggerInit()
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
 	span := logger.StartSpanWithCall(ctx, "主函数", "main")
 	span().Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.GetRunMode(), VERSION, os.Getpid())
@@ -77,18 +76,95 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 
-	callback := src.Init(ctx)
+	releaseFunc := src.Init(ctx)
 	select {
 	case sig := <-sc:
 		atomic.StoreInt32(&state, 0)
 		span().Printf("获取到退出信号[%s]", sig.String())
 	}
 
-	// 等待回调函数执行完成
-	if callback != nil {
-		callback()
+	if releaseFunc != nil {
+		releaseFunc()
+	}
+	span().Printf("服务退出")
+
+	if loggerReleaseFunc != nil {
+		loggerReleaseFunc()
+	}
+	os.Exit(int(atomic.LoadInt32(&state)))
+}
+
+// 日志初始化
+func loggerInit() func() {
+	c := config.GetLog()
+
+	logger.SetLevel(c.Level)
+	logger.SetFormatter(c.Format)
+	logger.SetVersion(VERSION)
+	logger.SetTraceIDFunc(util.MustUUID)
+
+	// 设定日志输出
+	var file *os.File
+	if c.Output != "" {
+		switch c.Output {
+		case "stdout":
+			logger.SetOutput(os.Stdout)
+		case "stderr":
+			logger.SetOutput(os.Stderr)
+		case "file":
+			if name := c.OutputFile; name != "" {
+				os.MkdirAll(filepath.Dir(name), 0777)
+				f, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
+				if err != nil {
+					panic(err)
+				}
+				logger.SetOutput(f)
+				file = f
+			}
+		}
 	}
 
-	span().Printf("服务退出")
-	os.Exit(int(atomic.LoadInt32(&state)))
+	var hook *loggerhook.Hook
+	if c.EnableHook {
+		switch c.Hook {
+		case "gorm":
+			hc := config.GetLogGormHook()
+
+			var dsn string
+			switch hc.DBType {
+			case "mysql":
+				dsn = config.GetMySQL().DSN()
+			case "sqlite3":
+				dsn = config.GetSqlite3().DSN()
+			case "postgres":
+				dsn = config.GetPostgres().DSN()
+			default:
+				panic("unknown db")
+			}
+
+			h := loggerhook.New(loggergormhook.New(&loggergormhook.Config{
+				DBType:       hc.DBType,
+				DSN:          dsn,
+				MaxLifetime:  hc.MaxLifetime,
+				MaxOpenConns: hc.MaxOpenConns,
+				MaxIdleConns: hc.MaxIdleConns,
+				TableName:    hc.Table,
+			}),
+				loggerhook.SetMaxWorkers(c.HookMaxThread),
+				loggerhook.SetMaxQueues(c.HookMaxBuffer),
+			)
+			logger.AddHook(h)
+			hook = h
+		}
+	}
+
+	return func() {
+		if file != nil {
+			file.Close()
+		}
+
+		if hook != nil {
+			hook.Flush()
+		}
+	}
 }

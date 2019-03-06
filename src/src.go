@@ -6,49 +6,57 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/LyricTian/captcha"
+	"github.com/LyricTian/captcha/store"
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/LyricTian/gin-admin/src/service/logrus-hook"
 	"github.com/LyricTian/gin-admin/src/web"
-	"github.com/sirupsen/logrus"
 )
 
-// CallbackFunc 回调处理函数
-type CallbackFunc func()
+// ReleaseFunc 资源释放函数
+type ReleaseFunc func()
 
 // Init 初始化
-func Init(ctx context.Context) CallbackFunc {
-	span := logger.StartSpanWithCall(ctx, "初始化", "main.src.Init")
+func Init(ctx context.Context) ReleaseFunc {
+	span := logger.StartSpanWithCall(ctx, "服务初始化", "main.src.Init")
 
 	// 依赖注入
 	obj, err := inject.Init(ctx)
 	if err != nil {
-		span().Fatalf("初始化依赖注入发生错误：%s", err.Error())
+		span().Fatalf("依赖注入初始化发生错误：%s", err.Error())
 	}
 
-	// 初始化WEB
-	webApp := web.Init(ctx, obj)
+	// 图形验证码(redis存储)
+	if c := config.GetCaptcha(); c.Store == "redis" {
+		rc := config.GetRedis()
+		captcha.SetCustomStore(store.NewRedisStore(&store.RedisOptions{
+			Addr:     rc.Addr,
+			Password: rc.Password,
+			DB:       c.RedisDB,
+		}, captcha.Expiration, logger.StandardLogger(), c.RedisPrefix))
+	}
 
-	// 初始化数据
-	InitData(ctx, obj)
+	// 加载casbin策略数据
+	err = obj.CtlCommon.LoadCasbinPolicyData(ctx)
+	if err != nil {
+		span().Fatalf("加载casbin策略数据发生错误：%s", err.Error())
+	}
 
-	// 初始化日志钩子
-	loggerFunc := InitLoggerHook(ctx, obj)
+	// HTTP服务
+	httpReleaseFunc := httpServerInit(ctx, obj)
 
-	// 初始化HTTP服务
-	httpFunc := InitHTTPServer(ctx, webApp)
 	return func() {
 		// 等待HTTP服务关闭
-		if httpFunc != nil {
+		if httpReleaseFunc != nil {
 			span().Printf("关闭HTTP服务")
-			httpFunc()
+			httpReleaseFunc()
 		}
 
-		// 等待日志钩子写入完成
-		if loggerFunc != nil {
-			span().Printf("关闭日志服务")
-			loggerFunc()
+		if a := obj.Auth; a != nil {
+			if err := a.Release(); err != nil {
+				span().Errorf("释放认证资源发生错误: %s", err.Error())
+			}
 		}
 
 		// 关闭数据库
@@ -61,15 +69,15 @@ func Init(ctx context.Context) CallbackFunc {
 	}
 }
 
-// InitHTTPServer 初始化http服务
-func InitHTTPServer(ctx context.Context, handler http.Handler) CallbackFunc {
-	span := logger.StartSpanWithCall(ctx, "HTTP服务初始化", "main.src.InitHTTPServer")
+// httpServerInit HTTP服务初始化
+func httpServerInit(ctx context.Context, obj *inject.Object) ReleaseFunc {
+	span := logger.StartSpanWithCall(ctx, "HTTP服务初始化", "main.src.httpServerInit")
 
-	cfg := config.GetHTTPConfig()
+	cfg := config.GetHTTP()
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
 		Addr:           addr,
-		Handler:        handler,
+		Handler:        web.Init(ctx, obj),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -89,54 +97,5 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) CallbackFunc {
 		if err := srv.Shutdown(ctx); err != nil {
 			span().Errorf("关闭HTTP服务发生错误: %s", err.Error())
 		}
-	}
-}
-
-// InitLoggerHook 初始化日志钩子
-func InitLoggerHook(ctx context.Context, obj *inject.Object) CallbackFunc {
-	options := config.GetLogConfig()
-
-	if options.EnableHook {
-		var opts []logrushook.Option
-
-		if v := options.HookMaxThread; v > 0 {
-			opts = append(opts, logrushook.SetMaxWorkers(v))
-		}
-		if v := options.HookMaxBuffer; v > 0 {
-			opts = append(opts, logrushook.SetMaxQueues(v))
-		}
-
-		if config.IsGormDB() && obj.GormDB != nil {
-			hook := logrushook.NewGormHook(obj.GormDB.DB, opts...)
-			logrus.AddHook(hook)
-			return hook.Flush
-		}
-	}
-	return nil
-}
-
-// InitData 初始化数据
-func InitData(ctx context.Context, obj *inject.Object) {
-	span := logger.StartSpan(ctx, "初始化数据", "main.src.InitData")
-
-	if config.IsAllowCreateResources() {
-		// 检查并创建资源数据
-		err := obj.CtlCommon.CheckAndCreateResource(ctx)
-		if err != nil {
-			span.Fatalf("检查并创建资源数据发生错误：%s", err.Error())
-		}
-	}
-
-	if config.IsAllowInitializeMenus() {
-		err := obj.CtlCommon.InitMenuData(ctx)
-		if err != nil {
-			span.Fatalf("初始化菜单数据发生错误：%s", err.Error())
-		}
-	}
-
-	// 初始化casbin策略数据
-	err := obj.CtlCommon.LoadCasbinPolicyData(ctx)
-	if err != nil {
-		span.Fatalf("初始化casbin策略数据发生错误：%s", err.Error())
 	}
 }

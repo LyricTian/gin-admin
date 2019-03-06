@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/LyricTian/captcha"
+	"github.com/LyricTian/gin-admin/src/auth"
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/web/auth"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
@@ -18,9 +18,10 @@ import (
 // @Description 登录管理
 type Login struct {
 	LoginBll *bll.Login `inject:""`
+	Auth     *auth.Auth `inject:""`
 }
 
-func (a *Login) getFunctionName(name string) string {
+func (a *Login) getFuncName(name string) string {
 	return fmt.Sprintf("web.ctl.Login.%s", name)
 }
 
@@ -29,7 +30,7 @@ func (a *Login) getFunctionName(name string) string {
 // @Success 200 schema.LoginCaptcha
 // @Router GET /api/v1/login/captchaid
 func (a *Login) GetCaptchaID(ctx *context.Context) {
-	captchaID := captcha.NewLen(config.GetCaptchaConfig().Length)
+	captchaID := captcha.NewLen(config.GetCaptcha().Length)
 	data := schema.LoginCaptcha{
 		CaptchaID: captchaID,
 	}
@@ -59,14 +60,14 @@ func (a *Login) GetCaptcha(ctx *context.Context) {
 	}
 
 	w := ctx.ResponseWriter()
-	captchaConfig := config.GetCaptchaConfig()
+	captchaConfig := config.GetCaptcha()
 	err := captcha.WriteImage(w, captchaID, captchaConfig.Width, captchaConfig.Height)
 	if err != nil {
 		if err == captcha.ErrNotFound {
 			ctx.ResError(errors.NewBadRequestError("无效的请求参数"))
 			return
 		}
-		logger.StartSpan(ctx.CContext(), "获取图形验证码", a.getFunctionName("GetCaptcha")).Errorf(err.Error())
+		logger.StartSpan(ctx.GetContext(), "获取图形验证码", a.getFuncName("GetCaptcha")).Errorf(err.Error())
 		ctx.ResError(errors.NewInternalServerError())
 		return
 	}
@@ -79,7 +80,7 @@ func (a *Login) GetCaptcha(ctx *context.Context) {
 // Login 用户登录
 // @Summary 用户登录
 // @Param body body schema.LoginParam true
-// @Success 200 option.Interface "{status:OK}"
+// @Success 200 schema.LoginToken
 // @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/login
@@ -95,7 +96,7 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
-	userID, err := a.LoginBll.Verify(ctx.CContext(), item.UserName, item.Password)
+	userID, err := a.LoginBll.Verify(ctx.GetContext(), item.UserName, item.Password)
 	if err != nil {
 		switch err {
 		case bll.ErrInvalidUserName, bll.ErrInvalidPassword:
@@ -111,16 +112,16 @@ func (a *Login) Login(ctx *context.Context) {
 	}
 	ctx.SetUserID(userID)
 
-	err = auth.SaveUserInfo(ctx.GContext(), auth.UserInfo{
-		UserID: userID,
-	})
+	span := logger.StartSpan(ctx.GetContext(), "用户登录", a.getFuncName("Login"))
+	tokenString, err := a.Auth.GenerateToken(userID)
 	if err != nil {
-		ctx.ResError(err)
+		span.Errorf(err.Error())
+		ctx.ResError(errors.NewInternalServerError())
 		return
 	}
 
-	logger.StartSpan(ctx.CContext(), "用户登录", a.getFunctionName("Login")).Infof("登入系统")
-	ctx.ResOK()
+	span.Infof("登入系统")
+	ctx.ResSuccess(schema.LoginToken{Token: tokenString})
 }
 
 // Logout 用户登出
@@ -129,28 +130,45 @@ func (a *Login) Login(ctx *context.Context) {
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/login/exit
 func (a *Login) Logout(ctx *context.Context) {
-	// 检查用户是否处于登录状态，如果是，则执行销毁
+	// 检查用户是否处于登录状态，如果是则执行销毁
 	userID := ctx.GetUserID()
 	if userID != "" {
-		err := auth.Destroy(ctx.GContext())
+		span := logger.StartSpan(ctx.GetContext(), "用户登出", a.getFuncName("Logout"))
+		err := a.Auth.DestroyToken(ctx.GetToken())
 		if err != nil {
-			ctx.ResError(err)
-			return
+			span.Errorf(err.Error())
 		}
-		logger.StartSpan(ctx.CContext(), "用户登出", a.getFunctionName("Logout")).Infof("登出系统")
+		span.Infof("登出系统")
 	}
 	ctx.ResOK()
 }
 
+// RefreshToken 刷新令牌
+// @Summary 刷新令牌
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Success 200 schema.LoginToken
+// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
+// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Router POST /api/v1/refresh_token
+func (a *Login) RefreshToken(ctx *context.Context) {
+	tokenString, err := a.Auth.GenerateToken(ctx.GetUserID())
+	if err != nil {
+		logger.StartSpan(ctx.GetContext(), "刷新令牌", a.getFuncName("RefreshToken")).Errorf(err.Error())
+		ctx.ResError(errors.NewInternalServerError())
+		return
+	}
+	ctx.ResSuccess(schema.LoginToken{Token: tokenString})
+}
+
 // GetUserInfo 获取当前用户信息
 // @Summary 获取当前用户信息
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 schema.UserLoginInfo
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/current/user
 func (a *Login) GetUserInfo(ctx *context.Context) {
-	info, err := a.LoginBll.GetUserInfo(ctx.CContext())
+	info, err := a.LoginBll.GetUserInfo(ctx.GetContext())
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -160,13 +178,13 @@ func (a *Login) GetUserInfo(ctx *context.Context) {
 
 // QueryUserMenuTree 查询当前用户菜单树
 // @Summary 查询当前用户菜单树
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 option.Interface "查询结果：{list:菜单树}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/current/menutree
 func (a *Login) QueryUserMenuTree(ctx *context.Context) {
-	menus, err := a.LoginBll.QueryUserMenuTree(ctx.CContext())
+	menus, err := a.LoginBll.QueryUserMenuTree(ctx.GetContext())
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -189,7 +207,7 @@ func (a *Login) UpdatePassword(ctx *context.Context) {
 		return
 	}
 
-	err := a.LoginBll.UpdatePassword(ctx.CContext(), item)
+	err := a.LoginBll.UpdatePassword(ctx.GetContext(), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
