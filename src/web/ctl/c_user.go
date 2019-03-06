@@ -29,7 +29,7 @@ func (a *User) Query(ctx *context.Context) {
 
 // QueryPage 查询分页数据
 // @Summary 查询分页数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" 1
 // @Param pageSize query int true "分页大小" 10
 // @Param user_name query string false "用户名(模糊查询)"
@@ -50,7 +50,7 @@ func (a *User) QueryPage(ctx *context.Context) {
 		params.RoleIDs = []string{v}
 	}
 
-	items, pr, err := a.UserBll.QueryPage(ctx.CContext(), params, ctx.GetPaginationParam())
+	items, pr, err := a.UserBll.QueryPage(ctx.GetContext(), params, ctx.GetPaginationParam())
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -62,7 +62,7 @@ func (a *User) QueryPage(ctx *context.Context) {
 // Get 查询指定数据
 // Get 查询指定数据
 // @Summary 查询指定数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Success 200 schema.User
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
@@ -70,7 +70,7 @@ func (a *User) QueryPage(ctx *context.Context) {
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/users/{id}
 func (a *User) Get(ctx *context.Context) {
-	item, err := a.UserBll.Get(ctx.CContext(), ctx.Param("id"))
+	item, err := a.UserBll.Get(ctx.GetContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -81,7 +81,7 @@ func (a *User) Get(ctx *context.Context) {
 
 // Create 创建数据
 // @Summary 创建数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.User true
 // @Success 200 option.Interface "{record_id:记录ID}"
 // @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
@@ -95,18 +95,18 @@ func (a *User) Create(ctx *context.Context) {
 		return
 	}
 
-	newItem, err := a.UserBll.Create(ctx.CContext(), item)
+	newItem, err := a.UserBll.Create(ctx.GetContext(), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResSuccess(context.HTTPNewItem{RecordID: newItem.RecordID})
+	ctx.ResSuccess(schema.HTTPNewItem{RecordID: newItem.RecordID})
 }
 
 // Update 更新数据
 // @Summary 更新数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Param body body schema.User true
 // @Success 200 option.Interface "{status:OK}"
@@ -121,7 +121,7 @@ func (a *User) Update(ctx *context.Context) {
 		return
 	}
 
-	err := a.UserBll.Update(ctx.CContext(), ctx.Param("id"), item)
+	err := a.UserBll.Update(ctx.GetContext(), ctx.Param("id"), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -131,14 +131,14 @@ func (a *User) Update(ctx *context.Context) {
 
 // Delete 删除数据
 // @Summary 删除数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Success 200 option.Interface "{status:OK}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router DELETE /api/v1/users/{id}
 func (a *User) Delete(ctx *context.Context) {
-	err := a.UserBll.Delete(ctx.CContext(), ctx.Param("id"))
+	err := a.UserBll.Delete(ctx.GetContext(), ctx.Param("id"))
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -148,7 +148,7 @@ func (a *User) Delete(ctx *context.Context) {
 
 // DeleteMany 删除多条数据
 // @Summary 删除多条数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param batch query string true "记录ID（多个以,分隔）"
 // @Success 200 option.Interface "{status:OK}"
 // @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
@@ -163,7 +163,7 @@ func (a *User) DeleteMany(ctx *context.Context) {
 	}
 
 	for _, id := range ids {
-		err := a.UserBll.Delete(ctx.CContext(), id)
+		err := a.UserBll.Delete(ctx.GetContext(), id)
 		if err != nil {
 			ctx.ResError(err)
 			return
@@ -175,14 +175,14 @@ func (a *User) DeleteMany(ctx *context.Context) {
 
 // Enable 启用数据
 // @Summary 启用数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Success 200 option.Interface "{status:OK}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router PATCH /api/v1/users/{id}/enable
 func (a *User) Enable(ctx *context.Context) {
-	err := a.UserBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 1)
+	err := a.UserBll.UpdateStatus(ctx.GetContext(), ctx.Param("id"), 1)
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -192,14 +192,14 @@ func (a *User) Enable(ctx *context.Context) {
 
 // Disable 禁用数据
 // @Summary 禁用数据
-// @Param Access-Token header string false "访问令牌"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Success 200 option.Interface "{status:OK}"
 // @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
 // @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
 // @Router PATCH /api/v1/users/{id}/disable
 func (a *User) Disable(ctx *context.Context) {
-	err := a.UserBll.UpdateStatus(ctx.CContext(), ctx.Param("id"), 2)
+	err := a.UserBll.UpdateStatus(ctx.GetContext(), ctx.Param("id"), 2)
 	if err != nil {
 		ctx.ResError(err)
 		return

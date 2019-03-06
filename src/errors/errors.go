@@ -9,6 +9,7 @@ var (
 	New               = errors.New
 	Wrap              = errors.Wrap
 	Wrapf             = errors.Wrapf
+	ErrForbidden      = New("禁止访问")
 	ErrNotFound       = New("资源不存在")
 	ErrBadRequest     = New("请求无效")
 	ErrUnauthorized   = New("未授权")
@@ -23,6 +24,11 @@ func NewBadRequestError(msg ...string) error {
 // NewUnauthorizedError 创建未授权错误
 func NewUnauthorizedError(msg ...string) error {
 	return NewMessageError(ErrUnauthorized, msg...)
+}
+
+// NewForbiddenError 创建资源禁止访问错误
+func NewForbiddenError(msg ...string) error {
+	return NewMessageError(ErrForbidden, msg...)
 }
 
 // NewNotFoundError 创建资源不存在错误

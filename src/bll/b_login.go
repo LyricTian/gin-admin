@@ -3,7 +3,6 @@ package bll
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/src/config"
 	gcontext "github.com/LyricTian/gin-admin/src/context"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
@@ -22,37 +21,18 @@ var (
 
 // Login 登录管理
 type Login struct {
+	UserBll   *User       `inject:""`
 	UserModel model.IUser `inject:"IUser"`
 	RoleModel model.IRole `inject:"IRole"`
 	MenuModel model.IMenu `inject:"IMenu"`
 }
 
-// GetRootUser 获取root用户数据
-func (a *Login) GetRootUser() schema.User {
-	rootUser := config.GetRootUser()
-	return schema.User{
-		RecordID: rootUser.UserName,
-		UserName: rootUser.UserName,
-		RealName: rootUser.RealName,
-		Password: util.MD5HashString(rootUser.Password),
-	}
-}
-
-// CheckIsRoot 检查是否是超级用户
-func (a *Login) CheckIsRoot(ctx context.Context, recordID string) bool {
-	rootUser := a.GetRootUser()
-	if rootUser.RecordID == recordID {
-		return true
-	}
-	return false
-}
-
 // Verify 登录验证
 func (a *Login) Verify(ctx context.Context, userName, password string) (string, error) {
 	// 检查是否是超级用户
-	rootUser := a.GetRootUser()
-	if userName == rootUser.UserName && rootUser.Password == password {
-		return rootUser.RecordID, nil
+	root := a.UserBll.GetRoot()
+	if userName == root.UserName && root.Password == password {
+		return root.RecordID, nil
 	}
 
 	user, err := a.UserModel.GetByUserName(ctx, userName)
@@ -72,11 +52,11 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (string, 
 // GetUserInfo 获取当前用户登录信息
 func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) {
 	userID := gcontext.FromUserID(ctx)
-	if isRoot := a.CheckIsRoot(ctx, userID); isRoot {
-		user := a.GetRootUser()
+	if isRoot := a.UserBll.CheckIsRoot(ctx, userID); isRoot {
+		root := a.UserBll.GetRoot()
 		loginInfo := &schema.UserLoginInfo{
-			UserName: user.UserName,
-			RealName: user.RealName,
+			UserName: root.UserName,
+			RealName: root.RealName,
 		}
 		return loginInfo, nil
 	}
@@ -113,7 +93,7 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 // QueryUserMenuTree 查询当前用户的权限菜单树
 func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, error) {
 	userID := gcontext.FromUserID(ctx)
-	isRoot := a.CheckIsRoot(ctx, userID)
+	isRoot := a.UserBll.CheckIsRoot(ctx, userID)
 	if isRoot {
 		userID = ""
 	}
@@ -142,8 +122,8 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 // UpdatePassword 更新当前用户登录密码
 func (a *Login) UpdatePassword(ctx context.Context, params schema.UpdatePasswordParam) error {
 	userID := gcontext.FromUserID(ctx)
-	if a.CheckIsRoot(ctx, userID) {
-		return errors.NewBadRequestError("超级用户密码只能通过配置文件修改")
+	if a.UserBll.CheckIsRoot(ctx, userID) {
+		return errors.NewBadRequestError("超级管理员密码只能通过配置文件修改")
 	}
 
 	user, err := a.UserModel.Get(ctx, userID)

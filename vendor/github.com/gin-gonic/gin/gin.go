@@ -5,7 +5,6 @@
 package gin
 
 import (
-	"fmt"
 	"html/template"
 	"net"
 	"net/http"
@@ -15,7 +14,11 @@ import (
 	"github.com/gin-gonic/gin/render"
 )
 
-const defaultMultipartMemory = 32 << 20 // 32 MB
+const (
+	// Version is Framework's version.
+	Version                = "v1.3.0"
+	defaultMultipartMemory = 32 << 20 // 32 MB
+)
 
 var (
 	default404Body   = []byte("404 page not found")
@@ -23,10 +26,7 @@ var (
 	defaultAppEngine bool
 )
 
-// HandlerFunc defines the handler used by gin middleware as return value.
 type HandlerFunc func(*Context)
-
-// HandlersChain defines a HandlerFunc array.
 type HandlersChain []HandlerFunc
 
 // Last returns the last handler in the chain. ie. the last handler is the main own.
@@ -37,15 +37,12 @@ func (c HandlersChain) Last() HandlerFunc {
 	return nil
 }
 
-// RouteInfo represents a request route's specification which contains method and path and its handler.
 type RouteInfo struct {
-	Method      string
-	Path        string
-	Handler     string
-	HandlerFunc HandlerFunc
+	Method  string
+	Path    string
+	Handler string
 }
 
-// RoutesInfo defines a RouteInfo array.
 type RoutesInfo []RouteInfo
 
 // Engine is the framework's instance, it contains the muxer, middleware and configuration settings.
@@ -158,7 +155,6 @@ func (engine *Engine) allocateContext() *Context {
 	return &Context{engine: engine}
 }
 
-// Delims sets template left and right delims and returns a Engine instance.
 func (engine *Engine) Delims(left, right string) *Engine {
 	engine.delims = render.Delims{Left: left, Right: right}
 	return engine
@@ -268,12 +264,10 @@ func (engine *Engine) Routes() (routes RoutesInfo) {
 func iterate(path, method string, routes RoutesInfo, root *node) RoutesInfo {
 	path += root.path
 	if len(root.handlers) > 0 {
-		handlerFunc := root.handlers.Last()
 		routes = append(routes, RouteInfo{
-			Method:      method,
-			Path:        path,
-			Handler:     nameOfFunction(handlerFunc),
-			HandlerFunc: handlerFunc,
+			Method:  method,
+			Path:    path,
+			Handler: nameOfFunction(root.handlers.Last()),
 		})
 	}
 	for _, child := range root.children {
@@ -322,23 +316,6 @@ func (engine *Engine) RunUnix(file string) (err error) {
 	return
 }
 
-// RunFd attaches the router to a http.Server and starts listening and serving HTTP requests
-// through the specified file descriptor.
-// Note: this method will block the calling goroutine indefinitely unless an error happens.
-func (engine *Engine) RunFd(fd int) (err error) {
-	debugPrint("Listening and serving HTTP on fd@%d", fd)
-	defer func() { debugPrintError(err) }()
-
-	f := os.NewFile(uintptr(fd), fmt.Sprintf("fd@%d", fd))
-	listener, err := net.FileListener(f)
-	if err != nil {
-		return
-	}
-	defer listener.Close()
-	err = http.Serve(listener, engine)
-	return
-}
-
 // ServeHTTP conforms to the http.Handler interface.
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c := engine.pool.Get().(*Context)
@@ -357,6 +334,7 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (engine *Engine) HandleContext(c *Context) {
 	c.reset()
 	engine.handleHTTPRequest(c)
+	engine.pool.Put(c)
 }
 
 func (engine *Engine) handleHTTPRequest(c *Context) {
@@ -422,10 +400,7 @@ func serveError(c *Context, code int, defaultMessage []byte) {
 	}
 	if c.writermem.Status() == code {
 		c.writermem.Header()["Content-Type"] = mimePlain
-		_, err := c.Writer.Write(defaultMessage)
-		if err != nil {
-			debugPrint("cannot write message to writer during serve error: %v", err)
-		}
+		c.Writer.Write(defaultMessage)
 		return
 	}
 	c.writermem.WriteHeaderNow()

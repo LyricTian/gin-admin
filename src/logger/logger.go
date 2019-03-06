@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"io"
 	"sync/atomic"
 	"time"
 
@@ -28,6 +29,17 @@ var (
 	traceIDFunc TraceIDFunc
 )
 
+// Logger 定义日志别名
+type Logger = logrus.Logger
+
+// Hook 定义日志钩子别名
+type Hook = logrus.Hook
+
+// StandardLogger 获取标准日志
+func StandardLogger() *Logger {
+	return logrus.StandardLogger()
+}
+
 // SetLevel 设定日志级别
 func SetLevel(level int) {
 	logrus.SetLevel(logrus.Level(level))
@@ -43,6 +55,11 @@ func SetFormatter(format string) {
 	}
 }
 
+// SetOutput 设定日志输出
+func SetOutput(out io.Writer) {
+	logrus.SetOutput(out)
+}
+
 // SetVersion 设定版本
 func SetVersion(v string) {
 	version = v
@@ -51,6 +68,11 @@ func SetVersion(v string) {
 // SetTraceIDFunc 设定追踪ID的处理函数
 func SetTraceIDFunc(fn TraceIDFunc) {
 	traceIDFunc = fn
+}
+
+// AddHook 增加日志钩子
+func AddHook(hook Hook) {
+	logrus.AddHook(hook)
 }
 
 func getTraceID() string {
@@ -115,14 +137,14 @@ func FromUserIDContext(ctx context.Context) string {
 }
 
 // StartSpan 开始一个追踪单元
-func StartSpan(ctx context.Context, title, functionName string) *Entry {
+func StartSpan(ctx context.Context, title, funcName string) *Entry {
 	fields := map[string]interface{}{
 		StartedAtKey:    time.Now(),
 		UserIDKey:       FromUserIDContext(ctx),
 		TraceIDKey:      FromTraceIDContext(ctx),
 		SpanIDKey:       FromSpanIDContext(ctx),
 		SpanTitleKey:    title,
-		SpanFunctionKey: functionName,
+		SpanFunctionKey: funcName,
 		VersionKey:      version,
 	}
 
@@ -130,9 +152,9 @@ func StartSpan(ctx context.Context, title, functionName string) *Entry {
 }
 
 // StartSpanWithCall 开始一个追踪单元（回调执行）
-func StartSpanWithCall(ctx context.Context, title, functionName string) func() *Entry {
+func StartSpanWithCall(ctx context.Context, title, funcName string) func() *Entry {
 	return func() *Entry {
-		return StartSpan(ctx, title, functionName)
+		return StartSpan(ctx, title, funcName)
 	}
 }
 
@@ -165,7 +187,14 @@ func (e *Entry) checkAndDelete(fields map[string]interface{}, keys ...string) {
 // WithFields 结构化字段写入
 func (e *Entry) WithFields(fields map[string]interface{}) *Entry {
 	e.checkAndDelete(fields,
-		TraceIDKey, StartedAtKey, TimeConsumingKey, TraceIDKey, SpanIDKey, VersionKey)
+		StartedAtKey,
+		TraceIDKey,
+		UserIDKey,
+		SpanIDKey,
+		SpanTitleKey,
+		SpanFunctionKey,
+		VersionKey,
+		TimeConsumingKey)
 	return newEntry(e.entry.WithFields(fields))
 }
 

@@ -3,6 +3,7 @@ package bll
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
@@ -16,6 +17,22 @@ type User struct {
 	RoleModel model.IRole      `inject:"IRole"`
 	Enforcer  *casbin.Enforcer `inject:""`
 	CommonBll *Common          `inject:""`
+}
+
+// GetRoot 获取root用户数据
+func (a *User) GetRoot() schema.User {
+	user := config.GetRoot()
+	return schema.User{
+		RecordID: user.UserName,
+		UserName: user.UserName,
+		RealName: user.RealName,
+		Password: util.MD5HashString(user.Password),
+	}
+}
+
+// CheckIsRoot 检查是否是root
+func (a *User) CheckIsRoot(ctx context.Context, recordID string) bool {
+	return a.GetRoot().RecordID == recordID
 }
 
 // QueryPage 查询分页数据

@@ -13,4 +13,5 @@
 
 *.DS_Store
 /cmd/server/server
-release
+/release
+/data
