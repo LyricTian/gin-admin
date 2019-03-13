@@ -100,9 +100,9 @@ func (a *Context) Query(key string) string {
 }
 
 // GetPageIndex 获取分页的页索引
-func (a *Context) GetPageIndex() uint {
+func (a *Context) GetPageIndex() int {
 	if v := a.Query("current"); v != "" {
-		if iv := util.S(v).Uint(); iv > 0 {
+		if iv := util.S(v).Int(); iv > 0 {
 			return iv
 		}
 	}
@@ -110,9 +110,9 @@ func (a *Context) GetPageIndex() uint {
 }
 
 // GetPageSize 获取分页的页大小(最大50)
-func (a *Context) GetPageSize() uint {
+func (a *Context) GetPageSize() int {
 	if v := a.Query("pageSize"); v != "" {
-		if iv := util.S(v).Uint(); iv > 0 {
+		if iv := util.S(v).Int(); iv > 0 {
 			if iv > 50 {
 				iv = 50
 			}

@@ -7,34 +7,41 @@ import (
 
 // Menu 菜单对象
 type Menu struct {
-	RecordID   string    `json:"record_id" swaggo:"false,记录ID"`
-	Code       string    `json:"code" binding:"required" swaggo:"true,菜单编号"`
-	Name       string    `json:"name" binding:"required" swaggo:"true,菜单名称"`
-	Type       int       `json:"type" binding:"required,max=3,min=1" swaggo:"true,菜单类型(1：模块 2：功能 3：资源)"`
-	Sequence   int       `json:"sequence" swaggo:"false,排序值"`
-	Icon       string    `json:"icon" swaggo:"false,菜单图标"`
-	Path       string    `json:"path" swaggo:"false,访问路径"`
-	Method     string    `json:"method" swaggo:"false,资源请求方式"`
-	ParentID   string    `json:"parent_id" swaggo:"false,父级内码"`
-	ParentPath string    `json:"parent_path" swaggo:"false,父级路径"`
-	Creator    string    `json:"creator" swaggo:"false,创建者"`
-	CreatedAt  time.Time `json:"created_at" swaggo:"false,创建时间"`
+	RecordID   string        `json:"record_id" swaggo:"false,记录ID"`
+	Name       string        `json:"name" binding:"required" swaggo:"true,菜单名称"`
+	Sequence   int           `json:"sequence" swaggo:"false,排序值"`
+	Icon       string        `json:"icon" swaggo:"false,菜单图标"`
+	Router     string        `json:"router" swaggo:"false,访问路由"`
+	Hidden     int           `json:"hidden" swaggo:"false,隐藏菜单(0:不隐藏 1:隐藏)"`
+	ParentID   string        `json:"parent_id" swaggo:"false,父级ID"`
+	ParentPath string        `json:"parent_path" swaggo:"false,父级路径"`
+	Creator    string        `json:"creator" swaggo:"false,创建者"`
+	CreatedAt  *time.Time    `json:"created_at" swaggo:"false,创建时间"`
+	UpdatedAt  *time.Time    `json:"updated_at" swaggo:"false,更新时间"`
+	Resources  MenuResources `json:"resources" swaggo:"false,资源列表"`
+}
+
+// MenuResource 菜单资源对象
+type MenuResource struct {
+	RecordID string `json:"record_id" swaggo:"true,记录ID"`
+	Name     string `json:"name" swaggo:"true,资源名称"`
+	Method   string `json:"method" swaggo:"true,请求方式"`
+	Path     string `json:"path" swaggo:"true,请求路径"`
 }
 
 // MenuQueryParam 查询条件
 type MenuQueryParam struct {
-	RecordIDs  []string // 记录ID列表
-	Code       string   // 菜单编号(模糊查询)
-	Name       string   // 菜单名称(模糊查询)
-	Types      []int    // 菜单类型(1：模块 2：功能 3：资源)
-	ParentID   *string  // 父级内码
-	UserID     string   // 用户ID（查询用户所拥有的菜单权限）
-	ParentPath string   // 父级路径(前缀模糊查询)
+	RecordIDs        []string // 记录ID列表
+	LikeName         string   // 菜单名称(模糊查询)
+	ParentID         *string  // 父级内码
+	PrefixParentPath string   // 父级路径(前缀模糊查询)
+	Hidden           *int     // 隐藏菜单
 }
 
 // MenuQueryOptions 查询可选参数项
 type MenuQueryOptions struct {
-	PageParam *PaginationParam // 分页参数
+	PageParam        *PaginationParam // 分页参数
+	IncludeResources bool             // 包含资源列表
 }
 
 // MenuQueryResult 查询结果
@@ -45,6 +52,15 @@ type MenuQueryResult struct {
 
 // Menus 菜单列表
 type Menus []*Menu
+
+// ToMap 转换为键值映射
+func (a Menus) ToMap() map[string]*Menu {
+	m := make(map[string]*Menu)
+	for _, item := range a {
+		m[item.RecordID] = item
+	}
+	return m
+}
 
 // SplitAndGetAllRecordIDs 拆分父级路径并获取所有记录ID
 func (a Menus) SplitAndGetAllRecordIDs() []string {
@@ -72,20 +88,18 @@ func (a Menus) SplitAndGetAllRecordIDs() []string {
 	return recordIDs
 }
 
-// ToTrees 转换为菜单树列表
+// ToTrees 转换为菜单列表
 func (a Menus) ToTrees() MenuTrees {
 	list := make(MenuTrees, len(a))
 	for i, item := range a {
 		list[i] = &MenuTree{
 			RecordID:   item.RecordID,
-			Code:       item.Code,
 			Name:       item.Name,
-			Type:       item.Type,
-			Sequence:   item.Sequence,
 			Icon:       item.Icon,
-			Path:       item.Path,
+			Router:     item.Router,
 			ParentID:   item.ParentID,
 			ParentPath: item.ParentPath,
+			Resources:  item.Resources,
 		}
 	}
 	return list
@@ -109,22 +123,41 @@ func (a Menus) ToLeafRecordIDs() []string {
 	return leafNodeIDs
 }
 
+// MenuResources 菜单资源列表
+type MenuResources []*MenuResource
+
+// ToMap 转换为键值映射
+func (a MenuResources) ToMap() map[string]*MenuResource {
+	m := make(map[string]*MenuResource)
+	for _, item := range a {
+		m[item.RecordID] = item
+	}
+	return m
+}
+
 // MenuTree 菜单树
 type MenuTree struct {
-	RecordID   string       `json:"record_id" swaggo:"false,记录ID"`
-	Code       string       `json:"code" binding:"required" swaggo:"true,菜单编号"`
-	Name       string       `json:"name" binding:"required" swaggo:"true,菜单名称"`
-	Type       int          `json:"type" binding:"required,max=3,min=1" swaggo:"true,菜单类型(1：模块 2：功能 3：资源)"`
-	Sequence   int          `json:"sequence" swaggo:"false,排序值"`
-	Icon       string       `json:"icon" swaggo:"false,菜单图标"`
-	Path       string       `json:"path" swaggo:"false,访问路径"`
-	ParentID   string       `json:"parent_id" swaggo:"false,父级内码"`
-	ParentPath string       `json:"parent_path" swaggo:"false,父级路径"`
-	Children   *[]*MenuTree `json:"children,omitempty" swaggo:"false,子级树"`
+	RecordID   string        `json:"record_id" swaggo:"false,记录ID"`
+	Name       string        `json:"name" swaggo:"true,菜单名称"`
+	Icon       string        `json:"icon" swaggo:"false,菜单图标"`
+	Router     string        `json:"router" swaggo:"false,访问路由"`
+	ParentID   string        `json:"parent_id" swaggo:"false,父级ID"`
+	ParentPath string        `json:"parent_path" swaggo:"false,父级路径"`
+	OperPerm   string        `json:"oper_perm" swaggo:"false,操作权限(rw:读写 ro:只读)"`
+	Resources  MenuResources `json:"resources" swaggo:"false,资源列表"`
+	Children   *[]*MenuTree  `json:"children,omitempty" swaggo:"false,子级树"`
 }
 
 // MenuTrees 菜单树列表
 type MenuTrees []*MenuTree
+
+// ForEach 遍历数据项
+func (a MenuTrees) ForEach(fn func(*MenuTree, int)) MenuTrees {
+	for i, item := range a {
+		fn(item, i)
+	}
+	return a
+}
 
 // ToTree 转换为树形结构
 func (a MenuTrees) ToTree() []*MenuTree {

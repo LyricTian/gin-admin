@@ -1,8 +1,6 @@
 package ctl
 
 import (
-	"strings"
-
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
@@ -36,30 +34,29 @@ func (a *Role) Query(ctx *context.Context) {
 // @Param name query string false "角色名称(模糊查询)"
 // @Param status query int false "状态(1:启用 2:停用)"
 // @Success 200 []schema.Role "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
-// @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:未知的查询类型}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/roles?q=page
 func (a *Role) QueryPage(ctx *context.Context) {
 	var params schema.RoleQueryParam
-	params.Name = ctx.Query("name")
+	params.LikeName = ctx.Query("name")
 
 	items, pr, err := a.RoleBll.QueryPage(ctx.GetContext(), params, ctx.GetPaginationParam())
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
-
 	ctx.ResPage(items, pr)
 }
 
 // QuerySelect 查询选择数据
 // @Summary 查询选择数据
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Success 200 []schema.RoleMini "{list:角色列表}"
-// @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 []schema.Role "{list:角色列表}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:未知的查询类型}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/roles?q=select
 func (a *Role) QuerySelect(ctx *context.Context) {
 	items, err := a.RoleBll.QuerySelect(ctx.GetContext())
@@ -67,7 +64,6 @@ func (a *Role) QuerySelect(ctx *context.Context) {
 		ctx.ResError(err)
 		return
 	}
-
 	ctx.ResList(items)
 }
 
@@ -76,9 +72,9 @@ func (a *Role) QuerySelect(ctx *context.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Success 200 schema.Role
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 404 string "{error:{code:0,message:资源不存在}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 404 schema.HTTPError "{error:{code:0,message:资源不存在}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/roles/{id}
 func (a *Role) Get(ctx *context.Context) {
 	item, err := a.RoleBll.Get(ctx.GetContext(), ctx.Param("id"))
@@ -93,10 +89,10 @@ func (a *Role) Get(ctx *context.Context) {
 // @Summary 创建数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.Role true
-// @Success 200 option.Interface "{record_id:记录ID}"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.Role
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/roles
 func (a *Role) Create(ctx *context.Context) {
 	var item schema.Role
@@ -105,13 +101,13 @@ func (a *Role) Create(ctx *context.Context) {
 		return
 	}
 
-	newItem, err := a.RoleBll.Create(ctx.GetContext(), item)
+	nitem, err := a.RoleBll.Create(ctx.GetContext(), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
 
-	ctx.ResSuccess(schema.HTTPNewItem{RecordID: newItem.RecordID})
+	ctx.ResSuccess(nitem)
 }
 
 // Update 更新数据
@@ -119,10 +115,10 @@ func (a *Role) Create(ctx *context.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Param body body schema.Role true
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.Role
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router PUT /api/v1/roles/{id}
 func (a *Role) Update(ctx *context.Context) {
 	var item schema.Role
@@ -131,21 +127,21 @@ func (a *Role) Update(ctx *context.Context) {
 		return
 	}
 
-	err := a.RoleBll.Update(ctx.GetContext(), ctx.Param("id"), item)
+	nitem, err := a.RoleBll.Update(ctx.GetContext(), ctx.Param("id"), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
-	ctx.ResOK()
+	ctx.ResSuccess(nitem)
 }
 
 // Delete 删除数据
 // @Summary 删除数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.HTTPStatus "{status:OK}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router DELETE /api/v1/roles/{id}
 func (a *Role) Delete(ctx *context.Context) {
 	err := a.RoleBll.Delete(ctx.GetContext(), ctx.Param("id"))
@@ -153,30 +149,5 @@ func (a *Role) Delete(ctx *context.Context) {
 		ctx.ResError(err)
 		return
 	}
-	ctx.ResOK()
-}
-
-// DeleteMany 删除多条数据
-// @Summary 删除多条数据
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Param batch query string true "记录ID（多个以,分隔）"
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
-// @Router DELETE /api/v1/roles
-func (a *Role) DeleteMany(ctx *context.Context) {
-	ids := strings.Split(ctx.Query("batch"), ",")
-	if len(ids) == 0 {
-		ctx.ResError(errors.NewBadRequestError("无效的请求参数"))
-		return
-	}
-
-	err := a.RoleBll.Delete(ctx.GetContext(), ids...)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
-
 	ctx.ResOK()
 }

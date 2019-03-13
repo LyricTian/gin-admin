@@ -2,6 +2,7 @@ package bll
 
 import (
 	"context"
+	"sync"
 
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/errors"
@@ -17,17 +18,29 @@ type User struct {
 	RoleModel model.IRole      `inject:"IRole"`
 	Enforcer  *casbin.Enforcer `inject:""`
 	CommonBll *Common          `inject:""`
+	rootUser  *schema.User
+	rootOnce  sync.Once
 }
 
-// GetRoot 获取root用户数据
-func (a *User) GetRoot() schema.User {
+// LoadRootUser 加载root用户
+func (a *User) LoadRootUser() {
 	user := config.GetRoot()
-	return schema.User{
+	a.rootUser = &schema.User{
 		RecordID: user.UserName,
 		UserName: user.UserName,
 		RealName: user.RealName,
 		Password: util.MD5HashString(user.Password),
 	}
+}
+
+// GetRoot 获取root用户数据
+func (a *User) GetRoot() *schema.User {
+	if a.rootUser == nil {
+		a.rootOnce.Do(func() {
+			a.LoadRootUser()
+		})
+	}
+	return a.rootUser
 }
 
 // CheckIsRoot 检查是否是root
@@ -38,15 +51,16 @@ func (a *User) CheckIsRoot(ctx context.Context, recordID string) bool {
 // QueryPage 查询分页数据
 func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *schema.PaginationParam) ([]*schema.UserPageShow, *schema.PaginationResult, error) {
 	result, err := a.UserModel.Query(ctx, params, schema.UserQueryOptions{
-		PageParam:      pp,
-		IncludeRoleIDs: true,
+		PageParam:    pp,
+		IncludeRoles: true,
 	})
 	if err != nil {
 		return nil, nil, err
 	} else if len(result.Data) == 0 {
-		return nil, nil, nil
+		return nil, result.PageResult, nil
 	}
 
+	// 填充角色数据
 	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
 		RecordIDs: result.Data.ToRoleIDs(),
 	})
@@ -61,40 +75,36 @@ func (a *User) QueryPage(ctx context.Context, params schema.UserQueryParam, pp *
 // Get 查询指定数据
 func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
 	item, err := a.UserModel.Get(ctx, recordID, schema.UserQueryOptions{
-		IncludeRoleIDs: true,
+		IncludeRoles: true,
 	})
 	if err != nil {
 		return nil, err
 	} else if item == nil {
 		return nil, errors.ErrNotFound
 	}
+	// 不输出用户密码
 	item.Password = ""
 
 	return item, nil
 }
 
-func (a *User) check(ctx context.Context, item schema.User, oldItem *schema.User) error {
-	if oldItem == nil || oldItem.UserName != item.UserName {
-		exists, err := a.UserModel.CheckUserName(ctx, item.UserName)
-		if err != nil {
-			return err
-		} else if exists {
-			return errors.NewBadRequestError("用户名已经存在，请重新填写")
-		}
-	}
-
-	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{RecordIDs: item.RoleIDs})
+func (a *User) checkUserName(ctx context.Context, userName string) error {
+	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+		UserName: userName,
+	}, schema.UserQueryOptions{
+		PageParam: &schema.PaginationParam{PageSize: -1},
+	})
 	if err != nil {
 		return err
-	} else if len(roleResult.Data) == 0 {
-		return errors.NewBadRequestError("请选择有效的角色")
+	} else if result.PageResult.Total > 0 {
+		return errors.NewBadRequestError("用户名已经存在")
 	}
 	return nil
 }
 
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item schema.User) (*schema.User, error) {
-	err := a.check(ctx, item, nil)
+	err := a.checkUserName(ctx, item.UserName)
 	if err != nil {
 		return nil, err
 	}
@@ -107,25 +117,30 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.User, erro
 		return nil, err
 	}
 
-	err = a.LoadPolicy(ctx, item.RecordID)
+	nitem, err := a.Get(ctx, item.RecordID)
 	if err != nil {
 		return nil, err
 	}
-	return &item, nil
+
+	err = a.LoadPolicy(ctx, nitem)
+	if err != nil {
+		return nil, err
+	}
+	return nitem, nil
 }
 
 // Update 更新数据
-func (a *User) Update(ctx context.Context, recordID string, item schema.User) error {
+func (a *User) Update(ctx context.Context, recordID string, item schema.User) (*schema.User, error) {
 	oldItem, err := a.UserModel.Get(ctx, recordID)
 	if err != nil {
-		return err
+		return nil, err
 	} else if oldItem == nil {
-		return errors.ErrNotFound
-	}
-
-	err = a.check(ctx, item, oldItem)
-	if err != nil {
-		return err
+		return nil, errors.ErrNotFound
+	} else if oldItem.UserName != item.UserName {
+		err := a.checkUserName(ctx, item.UserName)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if item.Password != "" {
@@ -134,31 +149,28 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 
 	err = a.UserModel.Update(ctx, recordID, item)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return a.LoadPolicy(ctx, recordID)
+	nitem, err := a.Get(ctx, item.RecordID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = a.LoadPolicy(ctx, nitem)
+	if err != nil {
+		return nil, err
+	}
+	return nitem, nil
 }
 
 // Delete 删除数据
-func (a *User) Delete(ctx context.Context, recordIDs ...string) error {
-	err := a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
-		for _, recordID := range recordIDs {
-			err := a.UserModel.Delete(ctx, recordID)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+func (a *User) Delete(ctx context.Context, recordID string) error {
+	err := a.UserModel.Delete(ctx, recordID)
 	if err != nil {
 		return err
 	}
-
-	for _, recordID := range recordIDs {
-		a.Enforcer.DeleteUser(recordID)
-	}
-
+	a.Enforcer.DeleteUser(recordID)
 	return nil
 }
 
@@ -172,7 +184,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	if status == 2 {
 		a.Enforcer.DeleteUser(recordID)
 	} else {
-		err = a.LoadPolicy(ctx, recordID)
+		err = a.LoadPolicyWithRecordID(ctx, recordID)
 		if err != nil {
 			return err
 		}
@@ -185,32 +197,37 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 func (a *User) LoadAllPolicy(ctx context.Context) error {
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
 		Status: 1,
-	}, schema.UserQueryOptions{IncludeRoleIDs: true})
+	}, schema.UserQueryOptions{IncludeRoles: true})
 	if err != nil {
 		return err
 	}
 
 	for _, item := range result.Data {
-		for _, roleID := range item.RoleIDs {
-			a.Enforcer.AddRoleForUser(item.RecordID, roleID)
+		err := a.LoadPolicy(ctx, item)
+		if err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
 
-// LoadPolicy 加载用户权限策略
-func (a *User) LoadPolicy(ctx context.Context, recordID string) error {
+// LoadPolicyWithRecordID 加载用户权限策略
+func (a *User) LoadPolicyWithRecordID(ctx context.Context, recordID string) error {
 	item, err := a.UserModel.Get(ctx, recordID, schema.UserQueryOptions{
-		IncludeRoleIDs: true,
+		IncludeRoles: true,
 	})
 	if err != nil {
 		return err
 	}
+	return a.LoadPolicy(ctx, item)
+}
 
-	a.Enforcer.DeleteRolesForUser(recordID)
-	for _, roleID := range item.RoleIDs {
-		a.Enforcer.AddRoleForUser(recordID, roleID)
+// LoadPolicy 加载用户权限策略
+func (a *User) LoadPolicy(ctx context.Context, item *schema.User) error {
+	a.Enforcer.DeleteRolesForUser(item.RecordID)
+	for _, roleID := range item.Roles.ToRoleIDs() {
+		a.Enforcer.AddRoleForUser(item.RecordID, roleID)
 	}
 	return nil
 }

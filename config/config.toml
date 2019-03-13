@@ -52,7 +52,16 @@ host = "0.0.0.0"
 # http监听端口
 port = 8086
 # http优雅关闭等待超时时长(单位秒)
-shutdown_timeout = 10
+shutdown_timeout = 30
+
+# 服务监控(GOPS:https://github.com/google/gops)
+[monitor]
+# 是否启用
+enable = true
+# HTTP的监听地址和端口
+addr = "127.0.0.1:6060"
+# 配置文件目录(为空则使用默认目录)
+config_dir = ""
 
 # root用户
 [root]

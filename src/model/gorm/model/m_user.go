@@ -27,6 +27,14 @@ func (a *User) getFuncName(name string) string {
 	return fmt.Sprintf("gorm.model.User.%s", name)
 }
 
+func (a *User) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryOptions {
+	var opt schema.UserQueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+	return opt
+}
+
 // Query 查询数据
 func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
@@ -34,9 +42,12 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 
 	db := entity.GetUserDB(ctx, a.db).DB
 	if v := params.UserName; v != "" {
+		db = db.Where("user_name=?", v)
+	}
+	if v := params.LikeUserName; v != "" {
 		db = db.Where("user_name LIKE ?", "%"+v+"%")
 	}
-	if v := params.RealName; v != "" {
+	if v := params.LikeRealName; v != "" {
 		db = db.Where("real_name LIKE ?", "%"+v+"%")
 	}
 	if v := params.Status; v > 0 {
@@ -48,11 +59,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 	}
 	db = db.Order("id DESC")
 
-	var opt schema.UserQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-
+	opt := a.getQueryOption(opts...)
 	var list entity.Users
 	pr, err := WrapPageQuery(db, opt.PageParam, &list)
 	if err != nil {
@@ -77,43 +84,17 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 }
 
 func (a *User) fillSchemaUser(ctx context.Context, item *schema.User, opts ...schema.UserQueryOptions) error {
-	var opt schema.UserQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
+	opt := a.getQueryOption(opts...)
 
-	if opt.IncludeRoleIDs {
-		roleIDs, err := a.QueryRoleIDs(ctx, item.RecordID)
+	if opt.IncludeRoles {
+		list, err := a.queryRoles(ctx, item.RecordID)
 		if err != nil {
 			return err
 		}
-		item.RoleIDs = roleIDs
+		item.Roles = list.ToSchemaUserRoles()
 	}
 
 	return nil
-}
-
-// GetByUserName 根据用户名查询指定数据
-func (a *User) GetByUserName(ctx context.Context, userName string, opts ...schema.UserQueryOptions) (*schema.User, error) {
-	span := logger.StartSpan(ctx, "根据用户名查询指定数据", a.getFuncName("GetByUserName"))
-	defer span.Finish()
-
-	var item entity.User
-	ok, err := a.db.FindOne(entity.GetUserDB(ctx, a.db).Where("user_name=?", userName), &item)
-	if err != nil {
-		span.Errorf(err.Error())
-		return nil, errors.New("根据用户名查询指定数据发生错误")
-	} else if !ok {
-		return nil, nil
-	}
-
-	sitem := item.ToSchemaUser()
-	err = a.fillSchemaUser(ctx, sitem, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return sitem, nil
 }
 
 // Get 查询指定数据
@@ -137,20 +118,6 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 	}
 
 	return sitem, nil
-}
-
-// CheckUserName 检查用户名是否存在
-func (a *User) CheckUserName(ctx context.Context, userName string) (bool, error) {
-	span := logger.StartSpan(ctx, "检查用户名是否存在", a.getFuncName("CheckUserName"))
-	defer span.Finish()
-
-	db := entity.GetUserDB(ctx, a.db).Where("user_name=?", userName)
-	exists, err := a.db.Check(db)
-	if err != nil {
-		span.Errorf(err.Error())
-		return false, errors.New("检查用户名是否存在发生错误")
-	}
-	return exists, nil
 }
 
 // Create 创建数据
@@ -177,6 +144,38 @@ func (a *User) Create(ctx context.Context, item schema.User) error {
 	})
 }
 
+// 对比并获取需要新增，修改，删除的角色数据
+func (a *User) compareUpdateRole(oldList, newList []*entity.UserRole) (clist, dlist, ulist []*entity.UserRole) {
+	for _, nitem := range newList {
+		exists := false
+		for _, oitem := range oldList {
+			if oitem.RoleID == nitem.RoleID {
+				exists = true
+				ulist = append(ulist, nitem)
+				break
+			}
+		}
+		if !exists {
+			clist = append(clist, nitem)
+		}
+	}
+
+	for _, oitem := range oldList {
+		exists := false
+		for _, nitem := range newList {
+			if nitem.RoleID == oitem.RoleID {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			dlist = append(dlist, oitem)
+		}
+	}
+
+	return
+}
+
 // Update 更新数据
 func (a *User) Update(ctx context.Context, recordID string, item schema.User) error {
 	span := logger.StartSpan(ctx, "更新数据", a.getFuncName("Update"))
@@ -195,17 +194,33 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 			return errors.New("更新用户数据发生错误")
 		}
 
-		result = entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", recordID).Delete(entity.UserRole{})
-		if err := result.Error; err != nil {
-			span.Errorf(err.Error())
-			return errors.New("删除用户角色发生错误")
+		roles, err := a.queryRoles(ctx, recordID)
+		if err != nil {
+			return err
 		}
 
-		for _, eitem := range sitem.ToUserRoles() {
-			result := entity.GetUserRoleDB(ctx, a.db).Create(eitem)
+		clist, dlist, ulist := a.compareUpdateRole(roles, sitem.ToUserRoles())
+		for _, item := range clist {
+			result := entity.GetUserRoleDB(ctx, a.db).Create(item)
 			if err := result.Error; err != nil {
 				span.Errorf(err.Error())
-				return errors.New("创建用户角色发生错误")
+				return errors.New("创建用户角色数据发生错误")
+			}
+		}
+
+		for _, item := range dlist {
+			result := entity.GetUserRoleDB(ctx, a.db).Where("user_id AND role_id=?", recordID, item.RoleID).Delete(entity.UserRole{})
+			if err := result.Error; err != nil {
+				span.Errorf(err.Error())
+				return errors.New("删除用户角色数据发生错误")
+			}
+		}
+
+		for _, item := range ulist {
+			result := entity.GetUserRoleDB(ctx, a.db).Where("user_id=? AND role_id=?", recordID, item.RoleID).Omit("user_id", "role_id").Updates(item)
+			if err := result.Error; err != nil {
+				span.Errorf(err.Error())
+				return errors.New("更新用户角色数据发生错误")
 			}
 		}
 		return nil
@@ -260,17 +275,15 @@ func (a *User) UpdatePassword(ctx context.Context, recordID, password string) er
 	return nil
 }
 
-// QueryRoleIDs 查询角色ID列表
-func (a *User) QueryRoleIDs(ctx context.Context, recordID string) ([]string, error) {
-	span := logger.StartSpan(ctx, "查询角色ID列表", a.getFuncName("QueryRoleIDs"))
+func (a *User) queryRoles(ctx context.Context, userID string) (entity.UserRoles, error) {
+	span := logger.StartSpan(ctx, "查询用户角色数据", a.getFuncName("queryRoles"))
 	defer span.Finish()
 
 	var list entity.UserRoles
-	result := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", recordID).Find(&list)
+	result := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", userID).Find(&list)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return nil, errors.New("查询角色ID列表发生错误")
 	}
-
-	return list.ToRoleIDs(), nil
+	return list, nil
 }

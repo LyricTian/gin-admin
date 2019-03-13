@@ -2,6 +2,7 @@ package entity
 
 import (
 	"context"
+	"strings"
 
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/service/gormplus"
@@ -34,11 +35,13 @@ func (a SchemaRole) ToRole() *Role {
 
 // ToRoleMenus 转换为角色菜单实体列表
 func (a SchemaRole) ToRoleMenus() []*RoleMenu {
-	list := make([]*RoleMenu, len(a.MenuIDs))
-	for i, menuID := range a.MenuIDs {
+	list := make([]*RoleMenu, len(a.Menus))
+	for i, item := range a.Menus {
 		list[i] = &RoleMenu{
-			RoleID: a.RecordID,
-			MenuID: menuID,
+			RoleID:    a.RecordID,
+			MenuID:    item.MenuID,
+			Operation: item.Operation,
+			Resource:  strings.Join(item.Resources, ","),
 		}
 	}
 	return list
@@ -71,7 +74,8 @@ func (a Role) ToSchemaRole() *schema.Role {
 		Sequence:  a.Sequence,
 		Memo:      a.Memo,
 		Creator:   a.Creator,
-		CreatedAt: a.CreatedAt,
+		CreatedAt: &a.CreatedAt,
+		UpdatedAt: &a.UpdatedAt,
 	}
 	return item
 }
@@ -88,11 +92,26 @@ func (a Roles) ToSchemaRoles() []*schema.Role {
 	return list
 }
 
+// SchemaRoleMenu 角色菜单对象
+type SchemaRoleMenu schema.RoleMenu
+
+// ToRoleMenu 转换为角色菜单实体
+func (a SchemaRoleMenu) ToRoleMenu(roleID string) *RoleMenu {
+	return &RoleMenu{
+		RoleID:    roleID,
+		MenuID:    a.MenuID,
+		Operation: a.Operation,
+		Resource:  strings.Join(a.Resources, ","),
+	}
+}
+
 // RoleMenu 角色菜单关联实体
 type RoleMenu struct {
 	Model
-	RoleID string `gorm:"column:role_id;size:36;index;"` // 角色内码
-	MenuID string `gorm:"column:menu_id;size:36;index;"` // 菜单内码
+	RoleID    string `gorm:"column:role_id;size:36;index;"` // 角色内码
+	MenuID    string `gorm:"column:menu_id;size:36;index;"` // 菜单内码
+	Operation string `gorm:"column:operation;size:50;"`     // 操作权限(rw:读写 ro:只读)
+	Resource  string `gorm:"column:resource;size:2048;"`    // 资源权限(多个以英文逗号分隔)
 }
 
 // TableName 表名
@@ -100,14 +119,23 @@ func (a RoleMenu) TableName() string {
 	return a.Model.TableName("role_menu")
 }
 
+// ToSchemaRoleMenu 转换为角色菜单对象
+func (a RoleMenu) ToSchemaRoleMenu() *schema.RoleMenu {
+	return &schema.RoleMenu{
+		MenuID:    a.MenuID,
+		Operation: a.Operation,
+		Resources: strings.Split(a.Resource, ","),
+	}
+}
+
 // RoleMenus 角色菜单关联实体列表
 type RoleMenus []*RoleMenu
 
-// ToMenuIDs 转换为菜单ID列表
-func (a RoleMenus) ToMenuIDs() []string {
-	menuIDs := make([]string, len(a))
+// ToSchemaRoleMenus 转换为角色菜单对象列表
+func (a RoleMenus) ToSchemaRoleMenus() []*schema.RoleMenu {
+	list := make([]*schema.RoleMenu, len(a))
 	for i, item := range a {
-		menuIDs[i] = item.MenuID
+		list[i] = item.ToSchemaRoleMenu()
 	}
-	return menuIDs
+	return list
 }

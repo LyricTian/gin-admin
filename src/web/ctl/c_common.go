@@ -6,10 +6,11 @@ import (
 
 // Common 控制器公共模块
 type Common struct {
-	DemoCtl  *Demo  `inject:""`
-	LoginCtl *Login `inject:""`
-	UserCtl  *User  `inject:""`
+	MenuCtl  *Menu  `inject:""`
 	RoleCtl  *Role  `inject:""`
+	UserCtl  *User  `inject:""`
+	LoginCtl *Login `inject:""`
+	DemoCtl  *Demo  `inject:""`
 }
 
 // LoadCasbinPolicyData 加载casbin策略数据，包括角色权限数据、用户角色数据

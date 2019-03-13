@@ -54,13 +54,18 @@ type DB struct {
 }
 
 // FindPage 查询分页数据
-func (d *DB) FindPage(db *gorm.DB, pageIndex, pageSize uint, out interface{}) (int, error) {
+func (d *DB) FindPage(db *gorm.DB, pageIndex, pageSize int, out interface{}) (int, error) {
 	var count int
 	result := db.Count(&count)
 	if err := result.Error; err != nil {
 		return 0, err
 	} else if count == 0 {
 		return 0, nil
+	}
+
+	// 如果分页大小小于0，则不查询数据
+	if pageSize < 0 || pageIndex < 0 {
+		return count, nil
 	}
 
 	if pageIndex > 0 && pageSize > 0 {

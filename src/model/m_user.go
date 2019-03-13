@@ -12,10 +12,6 @@ type IUser interface {
 	Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error)
-	// 根据用户名查询指定数据
-	GetByUserName(ctx context.Context, userName string, opts ...schema.UserQueryOptions) (*schema.User, error)
-	// 检查用户名是否存在
-	CheckUserName(ctx context.Context, userName string) (bool, error)
 	// 创建数据
 	Create(ctx context.Context, item schema.User) error
 	// 更新数据

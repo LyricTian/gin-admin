@@ -13,6 +13,7 @@ require (
 	github.com/go-redis/redis v0.0.0-20190130112013-0d65bf56df00
 	github.com/go-redis/redis_rate v0.0.0-20180123081253-b7ae80ece379
 	github.com/go-sql-driver/mysql v0.0.0-20170512152933-382e13d099fc
+	github.com/google/gops v0.3.6
 	github.com/jinzhu/gorm v0.0.0-20190102133208-9f1a7f535111
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/json-iterator/go v1.1.5

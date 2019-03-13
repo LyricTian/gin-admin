@@ -27,25 +27,36 @@ func (a *Role) getFuncName(name string) string {
 	return fmt.Sprintf("gorm.model.Role.%s", name)
 }
 
+func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
+	var opt schema.RoleQueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+	return opt
+}
+
 // Query 查询数据
 func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
 	defer span.Finish()
 
 	db := entity.GetRoleDB(ctx, a.db).DB
-	if v := params.Name; v != "" {
-		db = db.Where("name LIKE ?", "%"+v+"%")
-	}
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
 	}
+	if v := params.Name; v != "" {
+		db = db.Where("name=?", v)
+	}
+	if v := params.LikeName; v != "" {
+		db = db.Where("name LIKE ?", "%"+v+"%")
+	}
+	if v := params.UserID; v != "" {
+		subQuery := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", v).Select("role_id").SubQuery()
+		db = db.Where("record_id IN(?)", subQuery)
+	}
 	db = db.Order("sequence DESC,id DESC")
 
-	var opt schema.RoleQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-
+	opt := a.getQueryOption(opts...)
 	var list entity.Roles
 	pr, err := WrapPageQuery(db, opt.PageParam, &list)
 	if err != nil {
@@ -57,12 +68,11 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		Data:       list.ToSchemaRoles(),
 	}
 
-	for i, item := range qr.Data {
+	for _, item := range qr.Data {
 		err := a.fillSchameRole(ctx, item, opts...)
 		if err != nil {
 			return nil, err
 		}
-		qr.Data[i] = item
 	}
 
 	return qr, nil
@@ -70,17 +80,14 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 
 // 填充角色对象
 func (a *Role) fillSchameRole(ctx context.Context, item *schema.Role, opts ...schema.RoleQueryOptions) error {
-	var opt schema.RoleQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
+	opt := a.getQueryOption(opts...)
 
-	if opt.IncludeMenuIDs {
-		menuIDs, err := a.QueryMenuIDs(ctx, item.RecordID)
+	if opt.IncludeMenus {
+		list, err := a.queryMenus(ctx, item.RecordID)
 		if err != nil {
 			return err
 		}
-		item.MenuIDs = menuIDs
+		item.Menus = list.ToSchemaRoleMenus()
 	}
 	return nil
 }
@@ -108,20 +115,6 @@ func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQuer
 	return sitem, nil
 }
 
-// CheckName 检查名称是否存在
-func (a *Role) CheckName(ctx context.Context, name string) (bool, error) {
-	span := logger.StartSpan(ctx, "检查名称是否存在", a.getFuncName("CheckName"))
-	defer span.Finish()
-
-	db := entity.GetRoleDB(ctx, a.db).Where("name=?", name)
-	exists, err := a.db.Check(db)
-	if err != nil {
-		span.Errorf(err.Error())
-		return false, errors.New("检查名称是否存在发生错误")
-	}
-	return exists, nil
-}
-
 // Create 创建数据
 func (a *Role) Create(ctx context.Context, item schema.Role) error {
 	span := logger.StartSpan(ctx, "创建数据", a.getFuncName("Create"))
@@ -135,8 +128,8 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 			return errors.New("创建角色数据发生错误")
 		}
 
-		for _, eitem := range sitem.ToRoleMenus() {
-			result := entity.GetRoleMenuDB(ctx, a.db).Create(eitem)
+		for _, item := range sitem.ToRoleMenus() {
+			result := entity.GetRoleMenuDB(ctx, a.db).Create(item)
 			if err := result.Error; err != nil {
 				span.Errorf(err.Error())
 				return errors.New("创建角色菜单数据发生错误")
@@ -145,6 +138,38 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 
 		return nil
 	})
+}
+
+// 对比并获取需要新增，修改，删除的菜单项
+func (a *Role) compareUpdate(oldList, newList []*entity.RoleMenu) (clist, dlist, ulist []*entity.RoleMenu) {
+	for _, nitem := range newList {
+		exists := false
+		for _, oitem := range oldList {
+			if oitem.MenuID == nitem.MenuID {
+				exists = true
+				ulist = append(ulist, nitem)
+				break
+			}
+		}
+		if !exists {
+			clist = append(clist, nitem)
+		}
+	}
+
+	for _, oitem := range oldList {
+		exists := false
+		for _, nitem := range newList {
+			if nitem.MenuID == oitem.MenuID {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			dlist = append(dlist, oitem)
+		}
+	}
+
+	return
 }
 
 // Update 更新数据
@@ -160,19 +185,36 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 			return errors.New("更新角色数据发生错误")
 		}
 
-		result = entity.GetRoleMenuDB(ctx, a.db).Where("role_id=?", recordID).Delete(entity.RoleMenu{})
-		if err := result.Error; err != nil {
-			span.Errorf(err.Error())
-			return errors.New("删除角色菜单发生错误")
+		oldMenus, err := a.queryMenus(ctx, recordID)
+		if err != nil {
+			return err
 		}
 
-		for _, eitem := range sitem.ToRoleMenus() {
-			result := entity.GetRoleMenuDB(ctx, a.db).Create(eitem)
+		clist, dlist, ulist := a.compareUpdate(oldMenus, sitem.ToRoleMenus())
+		for _, item := range clist {
+			result := entity.GetRoleMenuDB(ctx, a.db).Create(item)
 			if err := result.Error; err != nil {
 				span.Errorf(err.Error())
 				return errors.New("创建角色菜单数据发生错误")
 			}
 		}
+
+		for _, item := range dlist {
+			result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", recordID, item.MenuID).Delete(entity.RoleMenu{})
+			if err := result.Error; err != nil {
+				span.Errorf(err.Error())
+				return errors.New("删除角色菜单数据发生错误")
+			}
+		}
+
+		for _, item := range ulist {
+			result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", recordID, item.MenuID).Omit("role_id", "menu_id").Updates(item)
+			if err := result.Error; err != nil {
+				span.Errorf(err.Error())
+				return errors.New("更新角色菜单数据发生错误")
+			}
+		}
+
 		return nil
 	})
 }
@@ -199,17 +241,16 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	})
 }
 
-// QueryMenuIDs 查询角色菜单ID列表
-func (a *Role) QueryMenuIDs(ctx context.Context, roleID string) ([]string, error) {
-	span := logger.StartSpan(ctx, "查询角色菜单ID列表", a.getFuncName("QueryMenuIDs"))
+func (a *Role) queryMenus(ctx context.Context, roleID string) (entity.RoleMenus, error) {
+	span := logger.StartSpan(ctx, "查询角色菜单数据", a.getFuncName("queryMenus"))
 	defer span.Finish()
 
 	var list entity.RoleMenus
 	result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=?", roleID).Find(&list)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
-		return nil, errors.New("查询角色菜单ID列表发生错误")
+		return nil, errors.New("查询角色菜单数据发生错误")
 	}
 
-	return list.ToMenuIDs(), nil
+	return list, nil
 }

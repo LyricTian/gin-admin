@@ -67,7 +67,7 @@ func main() {
 		viper.Set("swagger", swaggerDir)
 	}
 
-	loggerReleaseFunc := loggerInit()
+	loggerFlush := loggerInit()
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
 	span := logger.StartSpanWithCall(ctx, "主函数", "main")
 	span().Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.GetRunMode(), VERSION, os.Getpid())
@@ -76,20 +76,20 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 
-	releaseFunc := src.Init(ctx)
+	rfunc := src.Init(ctx)
 	select {
 	case sig := <-sc:
 		atomic.StoreInt32(&state, 0)
 		span().Printf("获取到退出信号[%s]", sig.String())
 	}
 
-	if releaseFunc != nil {
-		releaseFunc()
+	if rfunc != nil {
+		rfunc()
 	}
 	span().Printf("服务退出")
 
-	if loggerReleaseFunc != nil {
-		loggerReleaseFunc()
+	if loggerFlush != nil {
+		loggerFlush()
 	}
 	os.Exit(int(atomic.LoadInt32(&state)))
 }

@@ -12,8 +12,6 @@ type IDemo interface {
 	Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (*schema.DemoQueryResult, error)
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.DemoQueryOptions) (*schema.Demo, error)
-	// 检查编号是否存在
-	CheckCode(ctx context.Context, code string) (bool, error)
 	// 创建数据
 	Create(ctx context.Context, item schema.Demo) error
 	// 更新数据
