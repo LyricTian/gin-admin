@@ -36,21 +36,23 @@ func (a *Demo) Get(ctx context.Context, recordID string) (*schema.Demo, error) {
 	return item, nil
 }
 
-func (a *Demo) check(ctx context.Context, item schema.Demo, oldItem *schema.Demo) error {
-	if oldItem == nil || oldItem.Code != item.Code {
-		exists, err := a.DemoModel.CheckCode(ctx, item.Code)
-		if err != nil {
-			return err
-		} else if exists {
-			return errors.NewBadRequestError("编号已经存在")
-		}
+func (a *Demo) checkCode(ctx context.Context, code string) error {
+	result, err := a.DemoModel.Query(ctx, schema.DemoQueryParam{
+		Code: code,
+	}, schema.DemoQueryOptions{
+		PageParam: &schema.PaginationParam{PageSize: -1},
+	})
+	if err != nil {
+		return err
+	} else if result.PageResult.Total > 0 {
+		return errors.NewBadRequestError("编号已经存在")
 	}
 	return nil
 }
 
 // Create 创建数据
 func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.Demo, error) {
-	err := a.check(ctx, item, nil)
+	err := a.checkCode(ctx, item.Code)
 	if err != nil {
 		return nil, err
 	}
@@ -61,37 +63,37 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.Demo, erro
 	if err != nil {
 		return nil, err
 	}
-	return &item, nil
+	return a.Get(ctx, item.RecordID)
 }
 
 // Update 更新数据
-func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
+func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) (*schema.Demo, error) {
 	oldItem, err := a.DemoModel.Get(ctx, recordID)
 	if err != nil {
-		return err
+		return nil, err
 	} else if oldItem == nil {
-		return errors.ErrNotFound
+		return nil, errors.ErrNotFound
+	} else if oldItem.Code != item.Code {
+		err := a.checkCode(ctx, item.Code)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	err = a.check(ctx, item, oldItem)
+	err = a.DemoModel.Update(ctx, recordID, item)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	return a.DemoModel.Update(ctx, recordID, item)
+	return a.Get(ctx, recordID)
 }
 
 // Delete 删除数据
-func (a *Demo) Delete(ctx context.Context, recordIDs ...string) error {
-	return a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
-		for _, recordID := range recordIDs {
-			err := a.DemoModel.Delete(ctx, recordID)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+func (a *Demo) Delete(ctx context.Context, recordID string) error {
+	err := a.DemoModel.Delete(ctx, recordID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateStatus 更新状态

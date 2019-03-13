@@ -24,20 +24,15 @@ type HTTPList struct {
 
 // HTTPPagination HTTP分页数据
 type HTTPPagination struct {
-	Total    int  `json:"total"`
-	Current  uint `json:"current"`
-	PageSize uint `json:"pageSize"`
-}
-
-// HTTPNewItem HTTP响应创建成功后的记录ID
-type HTTPNewItem struct {
-	RecordID string `json:"record_id"`
+	Total    int `json:"total"`
+	Current  int `json:"current"`
+	PageSize int `json:"pageSize"`
 }
 
 // PaginationParam 分页查询条件
 type PaginationParam struct {
-	PageIndex uint // 页索引
-	PageSize  uint // 页大小
+	PageIndex int // 页索引
+	PageSize  int // 页大小
 }
 
 // PaginationResult 分页查询结果

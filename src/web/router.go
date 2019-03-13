@@ -82,9 +82,15 @@ func registerAPIRouter(app *gin.Engine, obj *inject.Object) {
 		v1.POST("/demos", wrapCtx(c.DemoCtl.Create))
 		v1.PUT("/demos/:id", wrapCtx(c.DemoCtl.Update))
 		v1.DELETE("/demos/:id", wrapCtx(c.DemoCtl.Delete))
-		v1.DELETE("/demos", wrapCtx(c.DemoCtl.DeleteMany))
 		v1.PATCH("/demos/:id/enable", wrapCtx(c.DemoCtl.Enable))
 		v1.PATCH("/demos/:id/disable", wrapCtx(c.DemoCtl.Disable))
+
+		// 注册/api/v1/menus
+		v1.GET("/menus", wrapCtx(c.MenuCtl.Query))
+		v1.GET("/menus/:id", wrapCtx(c.MenuCtl.Get))
+		v1.POST("/menus", wrapCtx(c.MenuCtl.Create))
+		v1.PUT("/menus/:id", wrapCtx(c.MenuCtl.Update))
+		v1.DELETE("/menus/:id", wrapCtx(c.MenuCtl.Delete))
 
 		// 注册/api/v1/roles
 		v1.GET("/roles", wrapCtx(c.RoleCtl.Query))
@@ -92,7 +98,6 @@ func registerAPIRouter(app *gin.Engine, obj *inject.Object) {
 		v1.POST("/roles", wrapCtx(c.RoleCtl.Create))
 		v1.PUT("/roles/:id", wrapCtx(c.RoleCtl.Update))
 		v1.DELETE("/roles/:id", wrapCtx(c.RoleCtl.Delete))
-		v1.DELETE("/roles", wrapCtx(c.RoleCtl.DeleteMany))
 
 		// 注册/api/v1/users
 		v1.GET("/users", wrapCtx(c.UserCtl.Query))
@@ -100,7 +105,6 @@ func registerAPIRouter(app *gin.Engine, obj *inject.Object) {
 		v1.POST("/users", wrapCtx(c.UserCtl.Create))
 		v1.PUT("/users/:id", wrapCtx(c.UserCtl.Update))
 		v1.DELETE("/users/:id", wrapCtx(c.UserCtl.Delete))
-		v1.DELETE("/users", wrapCtx(c.UserCtl.DeleteMany))
 		v1.PATCH("/users/:id/enable", wrapCtx(c.UserCtl.Enable))
 		v1.PATCH("/users/:id/disable", wrapCtx(c.UserCtl.Disable))
 	}

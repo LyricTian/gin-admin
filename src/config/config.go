@@ -54,11 +54,6 @@ func GetCasbinModelConf() string {
 	return viper.GetString("casbin_model_conf")
 }
 
-// GetMenuJSONFile 获取存储菜单数据的JSON文件
-func GetMenuJSONFile() string {
-	return viper.GetString("menu_json_file")
-}
-
 // GetWWWDir 获取静态站点目录
 func GetWWWDir() string {
 	return viper.GetString("www")
@@ -148,10 +143,24 @@ type HTTP struct {
 	ShutdownTimeout int    `mapstructure:"shutdown_timeout"`
 }
 
-// GetHTTP 获取HTTP地址
+// GetHTTP 获取HTTP配置
 func GetHTTP() HTTP {
 	var c HTTP
 	parse("http", &c)
+	return c
+}
+
+// Monitor 监控配置参数
+type Monitor struct {
+	Enable    bool   `mapstructure:"enable"`
+	Addr      string `mapstructure:"addr"`
+	ConfigDir string `mapstructure:"config_dir"`
+}
+
+// GetMonitor 获取监控配置
+func GetMonitor() Monitor {
+	var c Monitor
+	parse("monitor", &c)
 	return c
 }
 

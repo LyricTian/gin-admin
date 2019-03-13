@@ -42,8 +42,8 @@ func (a *Login) GetCaptchaID(ctx *context.Context) {
 // @Param id query string true "验证码ID"
 // @Param reload query string false "重新加载"
 // @Success 200 file "图形验证码"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/login/captcha
 func (a *Login) GetCaptcha(ctx *context.Context) {
 	captchaID := ctx.Query("id")
@@ -81,8 +81,8 @@ func (a *Login) GetCaptcha(ctx *context.Context) {
 // @Summary 用户登录
 // @Param body body schema.LoginParam true
 // @Success 200 schema.LoginToken
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/login
 func (a *Login) Login(ctx *context.Context) {
 	var item schema.LoginParam
@@ -96,7 +96,7 @@ func (a *Login) Login(ctx *context.Context) {
 		return
 	}
 
-	userID, err := a.LoginBll.Verify(ctx.GetContext(), item.UserName, item.Password)
+	user, err := a.LoginBll.Verify(ctx.GetContext(), item.UserName, item.Password)
 	if err != nil {
 		switch err {
 		case bll.ErrInvalidUserName, bll.ErrInvalidPassword:
@@ -110,8 +110,9 @@ func (a *Login) Login(ctx *context.Context) {
 			return
 		}
 	}
-	ctx.SetUserID(userID)
 
+	userID := user.RecordID
+	ctx.SetUserID(userID)
 	span := logger.StartSpan(ctx.GetContext(), "用户登录", a.getFuncName("Login"))
 	tokenString, err := a.Auth.GenerateToken(userID)
 	if err != nil {
@@ -126,8 +127,7 @@ func (a *Login) Login(ctx *context.Context) {
 
 // Logout 用户登出
 // @Summary 用户登出
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.HTTPStatus "{status:OK}"
 // @Router POST /api/v1/login/exit
 func (a *Login) Logout(ctx *context.Context) {
 	// 检查用户是否处于登录状态，如果是则执行销毁
@@ -147,8 +147,8 @@ func (a *Login) Logout(ctx *context.Context) {
 // @Summary 刷新令牌
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 schema.LoginToken
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/refresh_token
 func (a *Login) RefreshToken(ctx *context.Context) {
 	tokenString, err := a.Auth.GenerateToken(ctx.GetUserID())
@@ -164,8 +164,8 @@ func (a *Login) RefreshToken(ctx *context.Context) {
 // @Summary 获取当前用户信息
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 schema.UserLoginInfo
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/current/user
 func (a *Login) GetUserInfo(ctx *context.Context) {
 	info, err := a.LoginBll.GetUserInfo(ctx.GetContext())
@@ -180,8 +180,8 @@ func (a *Login) GetUserInfo(ctx *context.Context) {
 // @Summary 查询当前用户菜单树
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 option.Interface "查询结果：{list:菜单树}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/current/menutree
 func (a *Login) QueryUserMenuTree(ctx *context.Context) {
 	menus, err := a.LoginBll.QueryUserMenuTree(ctx.GetContext())
@@ -194,11 +194,12 @@ func (a *Login) QueryUserMenuTree(ctx *context.Context) {
 
 // UpdatePassword 更新个人密码
 // @Summary 更新个人密码
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.UpdatePasswordParam true
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.HTTPStatus "{status:OK}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router PUT /api/v1/current/password
 func (a *Login) UpdatePassword(ctx *context.Context) {
 	var item schema.UpdatePasswordParam

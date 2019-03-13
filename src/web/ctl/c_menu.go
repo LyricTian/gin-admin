@@ -1,8 +1,6 @@
 package ctl
 
 import (
-	"strings"
-
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
@@ -34,27 +32,26 @@ func (a *Menu) Query(ctx *context.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" 1
 // @Param pageSize query int true "分页大小" 10
-// @Param code query string false "编号"
 // @Param name query string false "名称"
+// @Param hidden query int false "隐藏菜单(0:不隐藏 1:隐藏)"
 // @Param parent_id query string false "父级ID"
-// @Param type query int false "菜单类型(1：模块 2：功能 3：资源)"
 // @Success 200 []schema.Menu "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
-// @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:未知的查询类型}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/menus?q=page
 func (a *Menu) QueryPage(ctx *context.Context) {
 	params := schema.MenuQueryParam{
-		Code: ctx.Query("code"),
-		Name: ctx.Query("name"),
+		LikeName: ctx.Query("name"),
 	}
 
 	if v := ctx.Query("parent_id"); v != "" {
 		params.ParentID = &v
 	}
 
-	if v := ctx.Query("type"); v != "" {
-		params.Types = []int{util.S(v).Int()}
+	if v := ctx.Query("hidden"); v != "" {
+		hidden := util.S(v).Int()
+		params.Hidden = &hidden
 	}
 
 	items, pr, err := a.MenuBll.QueryPage(ctx.GetContext(), params, ctx.GetPaginationParam())
@@ -62,22 +59,20 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 		ctx.ResError(err)
 		return
 	}
-
 	ctx.ResPage(items, pr)
 }
 
 // QueryTree 查询菜单树
 // @Summary 查询菜单树
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Param include_resource query string false "是否包含资源层级(1是)"
+// @Param include_resources query int false "是否包含资源数据(1是)"
 // @Success 200 option.Interface "查询结果：{list:菜单树}"
-// @Failure 400 option.Interface "{error:{code:0,message:未知的查询类型}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:未知的查询类型}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/menus?q=tree
 func (a *Menu) QueryTree(ctx *context.Context) {
-	includeResource := ctx.Query("include_resource") == "1"
-	treeData, err := a.MenuBll.QueryTree(ctx.GetContext(), includeResource)
+	treeData, err := a.MenuBll.QueryTree(ctx.GetContext(), ctx.Query("include_resources") == "1")
 	if err != nil {
 		ctx.ResError(err)
 		return
@@ -91,9 +86,9 @@ func (a *Menu) QueryTree(ctx *context.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Success 200 schema.Menu
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 404 string "{error:{code:0,message:资源不存在}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 404 schema.HTTPError "{error:{code:0,message:资源不存在}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/menus/{id}
 func (a *Menu) Get(ctx *context.Context) {
 	item, err := a.MenuBll.Get(ctx.GetContext(), ctx.Param("id"))
@@ -108,10 +103,10 @@ func (a *Menu) Get(ctx *context.Context) {
 // @Summary 创建数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.Menu true
-// @Success 200 option.Interface "{record_id:记录ID}"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.Menu
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/menus
 func (a *Menu) Create(ctx *context.Context) {
 	var item schema.Menu
@@ -120,13 +115,12 @@ func (a *Menu) Create(ctx *context.Context) {
 		return
 	}
 
-	newItem, err := a.MenuBll.Create(ctx.GetContext(), item)
+	nitem, err := a.MenuBll.Create(ctx.GetContext(), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
-
-	ctx.ResSuccess(schema.HTTPNewItem{RecordID: newItem.RecordID})
+	ctx.ResSuccess(nitem)
 }
 
 // Update 更新数据
@@ -134,10 +128,10 @@ func (a *Menu) Create(ctx *context.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Param body body schema.Menu true
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.Menu
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router PUT /api/v1/menus/{id}
 func (a *Menu) Update(ctx *context.Context) {
 	var item schema.Menu
@@ -146,21 +140,21 @@ func (a *Menu) Update(ctx *context.Context) {
 		return
 	}
 
-	err := a.MenuBll.Update(ctx.GetContext(), ctx.Param("id"), item)
+	nitem, err := a.MenuBll.Update(ctx.GetContext(), ctx.Param("id"), item)
 	if err != nil {
 		ctx.ResError(err)
 		return
 	}
-	ctx.ResOK()
+	ctx.ResSuccess(nitem)
 }
 
 // Delete 删除数据
 // @Summary 删除数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
+// @Success 200 schema.HTTPStatus "{status:OK}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router DELETE /api/v1/menus/{id}
 func (a *Menu) Delete(ctx *context.Context) {
 	err := a.MenuBll.Delete(ctx.GetContext(), ctx.Param("id"))
@@ -168,30 +162,5 @@ func (a *Menu) Delete(ctx *context.Context) {
 		ctx.ResError(err)
 		return
 	}
-	ctx.ResOK()
-}
-
-// DeleteMany 删除多条数据
-// @Summary 删除多条数据
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Param batch query string true "记录ID（多个以,分隔）"
-// @Success 200 option.Interface "{status:OK}"
-// @Failure 400 option.Interface "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 option.Interface "{error:{code:0,message:未授权}}"
-// @Failure 500 option.Interface "{error:{code:0,message:服务器错误}}"
-// @Router DELETE /api/v1/menus
-func (a *Menu) DeleteMany(ctx *context.Context) {
-	ids := strings.Split(ctx.Query("batch"), ",")
-	if len(ids) == 0 {
-		ctx.ResError(errors.NewBadRequestError("无效的请求参数"))
-		return
-	}
-
-	err := a.MenuBll.Delete(ctx.GetContext(), ids...)
-	if err != nil {
-		ctx.ResError(err)
-		return
-	}
-
 	ctx.ResOK()
 }

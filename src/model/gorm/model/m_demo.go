@@ -27,6 +27,14 @@ func (a *Demo) getFuncName(name string) string {
 	return fmt.Sprintf("gorm.model.Demo.%s", name)
 }
 
+func (a *Demo) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryOptions {
+	var opt schema.DemoQueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+	return opt
+}
+
 // Query 查询数据
 func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (*schema.DemoQueryResult, error) {
 	span := logger.StartSpan(ctx, "查询数据", a.getFuncName("Query"))
@@ -34,9 +42,12 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 
 	db := entity.GetDemoDB(ctx, a.db).DB
 	if v := params.Code; v != "" {
+		db = db.Where("code=?", v)
+	}
+	if v := params.LikeCode; v != "" {
 		db = db.Where("code LIKE ?", "%"+v+"%")
 	}
-	if v := params.Name; v != "" {
+	if v := params.LikeName; v != "" {
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
 	if v := params.Status; v > 0 {
@@ -44,11 +55,7 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 	}
 	db = db.Order("id DESC")
 
-	var opt schema.DemoQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-
+	opt := a.getQueryOption(opts...)
 	var list entity.Demos
 	pr, err := WrapPageQuery(db, opt.PageParam, &list)
 	if err != nil {
@@ -79,20 +86,6 @@ func (a *Demo) Get(ctx context.Context, recordID string, opts ...schema.DemoQuer
 	}
 
 	return item.ToSchemaDemo(), nil
-}
-
-// CheckCode 检查编号是否存在
-func (a *Demo) CheckCode(ctx context.Context, code string) (bool, error) {
-	span := logger.StartSpan(ctx, "检查编号是否存在", a.getFuncName("CheckCode"))
-	defer span.Finish()
-
-	db := entity.GetDemoDB(ctx, a.db).Where("code=?", code)
-	exists, err := a.db.Check(db)
-	if err != nil {
-		span.Errorf(err.Error())
-		return false, errors.New("检查编号是否存在发生错误")
-	}
-	return exists, nil
 }
 
 // Create 创建数据

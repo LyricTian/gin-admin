@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/gops/agent"
+
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/captcha/store"
 	"github.com/LyricTian/gin-admin/src/config"
@@ -44,13 +46,21 @@ func Init(ctx context.Context) ReleaseFunc {
 	}
 
 	// HTTP服务
-	httpReleaseFunc := httpServerInit(ctx, obj)
+	httpRFunc := httpServerInit(ctx, obj)
+
+	// 监控
+	if c := config.GetMonitor(); c.Enable {
+		err = agent.Listen(agent.Options{Addr: c.Addr, ConfigDir: c.ConfigDir})
+		if err != nil {
+			span().Errorf("开启监控发生错误：%s", err.Error())
+		}
+	}
 
 	return func() {
 		// 等待HTTP服务关闭
-		if httpReleaseFunc != nil {
+		if httpRFunc != nil {
 			span().Printf("关闭HTTP服务")
-			httpReleaseFunc()
+			httpRFunc()
 		}
 
 		if a := obj.Auth; a != nil {
@@ -66,6 +76,11 @@ func Init(ctx context.Context) ReleaseFunc {
 				span().Errorf("关闭数据库发生错误: %s", err.Error())
 			}
 		}
+
+		// 如果启用监控，则关闭
+		if config.GetMonitor().Enable {
+			agent.Close()
+		}
 	}
 }
 
@@ -76,11 +91,11 @@ func httpServerInit(ctx context.Context, obj *inject.Object) ReleaseFunc {
 	cfg := config.GetHTTP()
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
-		Addr:           addr,
-		Handler:        web.Init(ctx, obj),
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		Addr:         addr,
+		Handler:      web.Init(ctx, obj),
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  15 * time.Second,
 	}
 
 	go func() {
@@ -94,6 +109,8 @@ func httpServerInit(ctx context.Context, obj *inject.Object) ReleaseFunc {
 	return func() {
 		ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(cfg.ShutdownTimeout))
 		defer cancel()
+
+		srv.SetKeepAlivesEnabled(false)
 		if err := srv.Shutdown(ctx); err != nil {
 			span().Errorf("关闭HTTP服务发生错误: %s", err.Error())
 		}

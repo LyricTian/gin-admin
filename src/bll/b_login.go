@@ -28,25 +28,30 @@ type Login struct {
 }
 
 // Verify 登录验证
-func (a *Login) Verify(ctx context.Context, userName, password string) (string, error) {
+func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
 	// 检查是否是超级用户
 	root := a.UserBll.GetRoot()
 	if userName == root.UserName && root.Password == password {
-		return root.RecordID, nil
+		return root, nil
 	}
 
-	user, err := a.UserModel.GetByUserName(ctx, userName)
+	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+		UserName: userName,
+	})
 	if err != nil {
-		return "", err
-	} else if user == nil {
-		return "", ErrInvalidUserName
-	} else if user.Password != util.SHA1HashString(password) {
-		return "", ErrInvalidPassword
-	} else if user.Status != 1 {
-		return "", ErrUserDisable
+		return nil, err
+	} else if len(result.Data) == 0 {
+		return nil, ErrInvalidUserName
 	}
 
-	return user.RecordID, nil
+	item := result.Data[0]
+	if item.Password != util.SHA1HashString(password) {
+		return nil, ErrInvalidPassword
+	} else if item.Status != 1 {
+		return nil, ErrUserDisable
+	}
+
+	return item, nil
 }
 
 // GetUserInfo 获取当前用户登录信息
@@ -62,7 +67,7 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 	}
 
 	user, err := a.UserModel.Get(ctx, userID, schema.UserQueryOptions{
-		IncludeRoleIDs: true,
+		IncludeRoles: true,
 	})
 	if err != nil {
 		return nil, err
@@ -77,16 +82,15 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 		RealName: user.RealName,
 	}
 
-	if len(user.RoleIDs) > 0 {
+	if roleIDs := user.Roles.ToRoleIDs(); len(roleIDs) > 0 {
 		roles, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-			RecordIDs: user.RoleIDs,
+			RecordIDs: roleIDs,
 		})
 		if err != nil {
 			return nil, err
 		}
 		loginInfo.RoleNames = roles.Data.ToNames()
 	}
-
 	return loginInfo, nil
 }
 
@@ -94,29 +98,56 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.UserLoginInfo, error) 
 func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, error) {
 	userID := gcontext.FromUserID(ctx)
 	isRoot := a.UserBll.CheckIsRoot(ctx, userID)
+
+	// 如果是root用户，则查询所有显示的菜单树，并设定所有的菜单操作权限为读写权限
 	if isRoot {
-		userID = ""
+		hidden := 0
+		result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+			Hidden: &hidden,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return result.Data.ToTrees().ForEach(func(item *schema.MenuTree, _ int) {
+			item.OperPerm = "rw"
+		}).ToTree(), nil
 	}
 
-	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
 		UserID: userID,
+	}, schema.RoleQueryOptions{
+		IncludeMenus: true,
 	})
 	if err != nil {
 		return nil, err
-	} else if len(result.Data) == 0 {
+	} else if len(roleResult.Data) == 0 {
 		return nil, ErrNoPerm
-	} else if isRoot {
-		return result.Data.ToTrees().ToTree(), nil
 	}
 
-	result, err = a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		RecordIDs: result.Data.SplitAndGetAllRecordIDs(),
+	// 查询角色权限菜单列表
+	menuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		RecordIDs: roleResult.Data.ToMenuIDs(),
 	})
 	if err != nil {
 		return nil, err
+	} else if len(menuResult.Data) == 0 {
+		return nil, ErrNoPerm
 	}
 
-	return result.Data.ToTrees().ToTree(), nil
+	// 拆分并查询菜单树
+	menuResult, err = a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		RecordIDs: menuResult.Data.SplitAndGetAllRecordIDs(),
+	})
+	if err != nil {
+		return nil, err
+	} else if len(menuResult.Data) == 0 {
+		return nil, ErrNoPerm
+	}
+
+	pm := roleResult.Data.ToMenuIDPermMap()
+	return menuResult.Data.ToTrees().ForEach(func(item *schema.MenuTree, _ int) {
+		item.OperPerm = pm[item.RecordID]
+	}).ToTree(), nil
 }
 
 // UpdatePassword 更新当前用户登录密码
@@ -137,5 +168,6 @@ func (a *Login) UpdatePassword(ctx context.Context, params schema.UpdatePassword
 		return errors.NewBadRequestError("旧密码不正确")
 	}
 
+	params.NewPassword = util.SHA1HashString(params.NewPassword)
 	return a.UserModel.UpdatePassword(ctx, userID, params.NewPassword)
 }
