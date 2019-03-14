@@ -29,6 +29,18 @@ func Init(ctx context.Context) ReleaseFunc {
 		span().Fatalf("依赖注入初始化发生错误：%s", err.Error())
 	}
 
+	// 初始化菜单数据
+	if config.GetAllowInitMenu() {
+		if err := obj.CtlCommon.InitMenuData(ctx); err != nil {
+			span().Fatalf("初始化菜单数据发生错误：%s", err.Error())
+		}
+	}
+
+	// 加载casbin策略数据
+	if err := obj.CtlCommon.LoadCasbinPolicyData(ctx); err != nil {
+		span().Fatalf("加载casbin策略数据发生错误：%s", err.Error())
+	}
+
 	// 图形验证码(redis存储)
 	if c := config.GetCaptcha(); c.Store == "redis" {
 		rc := config.GetRedis()
@@ -39,16 +51,10 @@ func Init(ctx context.Context) ReleaseFunc {
 		}, captcha.Expiration, logger.StandardLogger(), c.RedisPrefix))
 	}
 
-	// 加载casbin策略数据
-	err = obj.CtlCommon.LoadCasbinPolicyData(ctx)
-	if err != nil {
-		span().Fatalf("加载casbin策略数据发生错误：%s", err.Error())
-	}
-
 	// HTTP服务
 	httpRFunc := httpServerInit(ctx, obj)
 
-	// 监控
+	// 服务监控
 	if c := config.GetMonitor(); c.Enable {
 		err = agent.Listen(agent.Options{Addr: c.Addr, ConfigDir: c.ConfigDir})
 		if err != nil {

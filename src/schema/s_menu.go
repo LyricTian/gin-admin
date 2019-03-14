@@ -95,8 +95,10 @@ func (a Menus) ToTrees() MenuTrees {
 		list[i] = &MenuTree{
 			RecordID:   item.RecordID,
 			Name:       item.Name,
+			Sequence:   item.Sequence,
 			Icon:       item.Icon,
 			Router:     item.Router,
+			Hidden:     item.Hidden,
 			ParentID:   item.ParentID,
 			ParentPath: item.ParentPath,
 			Resources:  item.Resources,
@@ -126,6 +128,14 @@ func (a Menus) ToLeafRecordIDs() []string {
 // MenuResources 菜单资源列表
 type MenuResources []*MenuResource
 
+// ForEach 遍历资源数据
+func (a MenuResources) ForEach(fn func(*MenuResource, int)) MenuResources {
+	for i, item := range a {
+		fn(item, i)
+	}
+	return a
+}
+
 // ToMap 转换为键值映射
 func (a MenuResources) ToMap() map[string]*MenuResource {
 	m := make(map[string]*MenuResource)
@@ -138,9 +148,11 @@ func (a MenuResources) ToMap() map[string]*MenuResource {
 // MenuTree 菜单树
 type MenuTree struct {
 	RecordID   string        `json:"record_id" swaggo:"false,记录ID"`
-	Name       string        `json:"name" swaggo:"true,菜单名称"`
+	Name       string        `json:"name" binding:"required" swaggo:"true,菜单名称"`
+	Sequence   int           `json:"sequence" swaggo:"false,排序值"`
 	Icon       string        `json:"icon" swaggo:"false,菜单图标"`
 	Router     string        `json:"router" swaggo:"false,访问路由"`
+	Hidden     int           `json:"hidden" swaggo:"false,隐藏菜单(0:不隐藏 1:隐藏)"`
 	ParentID   string        `json:"parent_id" swaggo:"false,父级ID"`
 	ParentPath string        `json:"parent_path" swaggo:"false,父级路径"`
 	OperPerm   string        `json:"oper_perm" swaggo:"false,操作权限(rw:读写 ro:只读)"`
