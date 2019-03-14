@@ -69,6 +69,11 @@ func GetStore() string {
 	return viper.GetString("store")
 }
 
+// GetAllowInitMenu 获取是否允许初始化菜单数据
+func GetAllowInitMenu() bool {
+	return viper.GetBool("allow_init_menu")
+}
+
 // Log 日志配置参数
 type Log struct {
 	Level         int    `mapstructure:"level"`

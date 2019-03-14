@@ -32,6 +32,9 @@ swagger:
 test:
 	@go test -cover -race ./...
 
+clean:
+	rm -rf data release $(SERVER_BIN)
+
 pack: build-server build-web
 	rm -rf $(RELEASE_ROOT)
 	mkdir -p $(RELEASE_SERVER)

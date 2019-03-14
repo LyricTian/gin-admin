@@ -13,6 +13,9 @@ swagger = ""
 # 数据存储(支持：gorm)
 store = "gorm"
 
+# 是否允许初始化菜单数据(检查当前数据库中是否存在菜单数据，如果不存在则执行数据初始化)
+allow_init_menu = true
+
 # 日志配置
 [log]
 # 日志级别(1:fatal 2:error,3:warn,4:info,5:debug)
