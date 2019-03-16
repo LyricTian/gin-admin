@@ -38,10 +38,10 @@ func (a SchemaRole) ToRoleMenus() []*RoleMenu {
 	list := make([]*RoleMenu, len(a.Menus))
 	for i, item := range a.Menus {
 		list[i] = &RoleMenu{
-			RoleID:    a.RecordID,
-			MenuID:    item.MenuID,
-			Operation: item.Operation,
-			Resource:  strings.Join(item.Resources, ","),
+			RoleID:   a.RecordID,
+			MenuID:   item.MenuID,
+			Action:   strings.Join(item.Actions, ","),
+			Resource: strings.Join(item.Resources, ","),
 		}
 	}
 	return list
@@ -98,20 +98,20 @@ type SchemaRoleMenu schema.RoleMenu
 // ToRoleMenu 转换为角色菜单实体
 func (a SchemaRoleMenu) ToRoleMenu(roleID string) *RoleMenu {
 	return &RoleMenu{
-		RoleID:    roleID,
-		MenuID:    a.MenuID,
-		Operation: a.Operation,
-		Resource:  strings.Join(a.Resources, ","),
+		RoleID:   roleID,
+		MenuID:   a.MenuID,
+		Action:   strings.Join(a.Actions, ","),
+		Resource: strings.Join(a.Resources, ","),
 	}
 }
 
 // RoleMenu 角色菜单关联实体
 type RoleMenu struct {
 	Model
-	RoleID    string `gorm:"column:role_id;size:36;index;"` // 角色内码
-	MenuID    string `gorm:"column:menu_id;size:36;index;"` // 菜单内码
-	Operation string `gorm:"column:operation;size:50;"`     // 操作权限(rw:读写 ro:只读)
-	Resource  string `gorm:"column:resource;size:2048;"`    // 资源权限(多个以英文逗号分隔)
+	RoleID   string `gorm:"column:role_id;size:36;index;"` // 角色内码
+	MenuID   string `gorm:"column:menu_id;size:36;index;"` // 菜单内码
+	Action   string `gorm:"column:action;size:2048;"`      // 动作权限(多个以英文逗号分隔)
+	Resource string `gorm:"column:resource;size:2048;"`    // 资源权限(多个以英文逗号分隔)
 }
 
 // TableName 表名
@@ -123,7 +123,7 @@ func (a RoleMenu) TableName() string {
 func (a RoleMenu) ToSchemaRoleMenu() *schema.RoleMenu {
 	return &schema.RoleMenu{
 		MenuID:    a.MenuID,
-		Operation: a.Operation,
+		Actions:   strings.Split(a.Action, ","),
 		Resources: strings.Split(a.Resource, ","),
 	}
 }
@@ -138,4 +138,13 @@ func (a RoleMenus) ToSchemaRoleMenus() []*schema.RoleMenu {
 		list[i] = item.ToSchemaRoleMenu()
 	}
 	return list
+}
+
+// ToMap 转换为键值映射
+func (a RoleMenus) ToMap() map[string]*RoleMenu {
+	m := make(map[string]*RoleMenu)
+	for _, item := range a {
+		m[item.MenuID] = item
+	}
+	return m
 }

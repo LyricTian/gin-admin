@@ -23,7 +23,7 @@ level = 5
 # 日志格式（支持输出格式：text/json）
 format = "text"
 # 日志输出(支持：stdout/stderr/file)
-output = "file"
+output = "stdout"
 # 指定日志输出的文件路径
 output_file = "data/ginadmin.log"
 # 是否启用日志钩子

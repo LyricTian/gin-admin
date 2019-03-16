@@ -18,7 +18,11 @@ type Menu struct {
 
 // Init 初始化
 func (a *Menu) Init(db *gormplus.DB) *Menu {
-	db.AutoMigrate(new(entity.Menu), new(entity.MenuResource))
+	db.AutoMigrate(
+		new(entity.Menu),
+		new(entity.MenuAction),
+		new(entity.MenuResource),
+	)
 	a.db = db
 	return a
 }
@@ -80,8 +84,17 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	return qr, nil
 }
 
+// 填充菜单对象数据
 func (a *Menu) fillSchemaMenu(ctx context.Context, item *schema.Menu, opts ...schema.MenuQueryOptions) error {
 	opt := a.getQueryOption(opts...)
+
+	if opt.IncludeActions {
+		list, err := a.queryActions(ctx, item.RecordID)
+		if err != nil {
+			return err
+		}
+		item.Actions = list.ToSchemaMenuActions()
+	}
 
 	if opt.IncludeResources {
 		list, err := a.queryResources(ctx, item.RecordID)
@@ -129,6 +142,14 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 			return errors.New("创建菜单数据发生错误")
 		}
 
+		for _, item := range sitem.ToMenuActions() {
+			result := entity.GetMenuActionDB(ctx, a.db).Create(item)
+			if err := result.Error; err != nil {
+				span.Errorf(err.Error())
+				return errors.New("创建菜单动作数据发生错误")
+			}
+		}
+
 		for _, item := range sitem.ToMenuResources() {
 			result := entity.GetMenuResourceDB(ctx, a.db).Create(item)
 			if err := result.Error; err != nil {
@@ -141,36 +162,112 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 	})
 }
 
-// 对比并获取需要新增，修改，删除的资源项
-func (a *Menu) compareUpdate(oldList, newList []*entity.MenuResource) (clist, dlist, ulist []*entity.MenuResource) {
+// 对比并获取需要新增，修改，删除的动作项
+func (a *Menu) compareUpdateAction(oldList, newList entity.MenuActions) (clist, dlist, ulist []*entity.MenuAction) {
+	oldMap, newMap := oldList.ToMap(), newList.ToMap()
+
 	for _, nitem := range newList {
-		exists := false
-		for _, oitem := range oldList {
-			if oitem.RecordID == nitem.RecordID {
-				exists = true
-				ulist = append(ulist, nitem)
-				break
-			}
+		if _, ok := oldMap[nitem.Code]; ok {
+			ulist = append(ulist, nitem)
+			continue
 		}
-		if !exists {
-			clist = append(clist, nitem)
-		}
+		clist = append(clist, nitem)
 	}
 
 	for _, oitem := range oldList {
-		exists := false
-		for _, nitem := range newList {
-			if nitem.RecordID == oitem.RecordID {
-				exists = true
-				break
-			}
-		}
-		if !exists {
+		if _, ok := newMap[oitem.Code]; !ok {
 			dlist = append(dlist, oitem)
 		}
 	}
-
 	return
+}
+
+// 更新动作数据
+func (a *Menu) updateActions(ctx context.Context, span *logger.Entry, menuID string, items entity.MenuActions) error {
+	list, err := a.queryActions(ctx, menuID)
+	if err != nil {
+		return err
+	}
+
+	clist, dlist, ulist := a.compareUpdateAction(list, items)
+	for _, item := range clist {
+		result := entity.GetMenuActionDB(ctx, a.db).Create(item)
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("创建菜单动作数据发生错误")
+		}
+	}
+
+	for _, item := range dlist {
+		result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id AND code=?", menuID, item.Code).Delete(entity.MenuAction{})
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("删除菜单动作数据发生错误")
+		}
+	}
+
+	for _, item := range ulist {
+		result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=? AND code=?", menuID, item.Code).Omit("menu_id", "code").Updates(item)
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("更新菜单动作数据发生错误")
+		}
+	}
+	return nil
+}
+
+// 对比并获取需要新增，修改，删除的资源项
+func (a *Menu) compareUpdateResource(oldList, newList entity.MenuResources) (clist, dlist, ulist []*entity.MenuResource) {
+	oldMap, newMap := oldList.ToMap(), newList.ToMap()
+
+	for _, nitem := range newList {
+		if _, ok := oldMap[nitem.Code]; ok {
+			ulist = append(ulist, nitem)
+			continue
+		}
+		clist = append(clist, nitem)
+	}
+
+	for _, oitem := range oldList {
+		if _, ok := newMap[oitem.Code]; !ok {
+			dlist = append(dlist, oitem)
+		}
+	}
+	return
+}
+
+// 更新资源数据
+func (a *Menu) updateResources(ctx context.Context, span *logger.Entry, menuID string, items entity.MenuResources) error {
+	list, err := a.queryResources(ctx, menuID)
+	if err != nil {
+		return err
+	}
+
+	clist, dlist, ulist := a.compareUpdateResource(list, items)
+	for _, item := range clist {
+		result := entity.GetMenuResourceDB(ctx, a.db).Create(item)
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("创建菜单资源数据发生错误")
+		}
+	}
+
+	for _, item := range dlist {
+		result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id AND code=?", menuID, item.Code).Delete(entity.MenuResource{})
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("删除菜单资源数据发生错误")
+		}
+	}
+
+	for _, item := range ulist {
+		result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id=? AND code=?", menuID, item.Code).Omit("menu_id", "code").Updates(item)
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("更新菜单资源数据发生错误")
+		}
+	}
+	return nil
 }
 
 // Update 更新数据
@@ -186,35 +283,14 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 			return errors.New("更新数据发生错误")
 		}
 
-		// 对比资源列表，找出需要创建、更新、删除的资源数据
-		reslist, err := a.queryResources(ctx, recordID)
+		err := a.updateActions(ctx, span, recordID, sitem.ToMenuActions())
 		if err != nil {
 			return err
 		}
 
-		clist, dlist, ulist := a.compareUpdate(reslist, sitem.ToMenuResources())
-		for _, item := range clist {
-			result := entity.GetMenuResourceDB(ctx, a.db).Create(item)
-			if err := result.Error; err != nil {
-				span.Errorf(err.Error())
-				return errors.New("创建菜单资源数据发生错误")
-			}
-		}
-
-		for _, item := range dlist {
-			result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id AND record_id=?", recordID, item.RecordID).Delete(entity.MenuResource{})
-			if err := result.Error; err != nil {
-				span.Errorf(err.Error())
-				return errors.New("删除菜单资源数据发生错误")
-			}
-		}
-
-		for _, item := range ulist {
-			result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id=? AND record_id=?", recordID, item.RecordID).Omit("record_id", "menu_id").Updates(item)
-			if err := result.Error; err != nil {
-				span.Errorf(err.Error())
-				return errors.New("更新菜单资源数据发生错误")
-			}
+		err = a.updateResources(ctx, span, recordID, sitem.ToMenuResources())
+		if err != nil {
+			return err
 		}
 
 		return nil
@@ -246,6 +322,12 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 			return errors.New("删除数据发生错误")
 		}
 
+		result = entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", recordID).Delete(entity.MenuAction{})
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("删除菜单动作数据发生错误")
+		}
+
 		result = entity.GetMenuResourceDB(ctx, a.db).Where("menu_id=?", recordID).Delete(entity.MenuResource{})
 		if err := result.Error; err != nil {
 			span.Errorf(err.Error())
@@ -253,6 +335,20 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 		}
 		return nil
 	})
+}
+
+func (a *Menu) queryActions(ctx context.Context, menuID string) (entity.MenuActions, error) {
+	span := logger.StartSpan(ctx, "查询菜单动作数据", a.getFuncName("queryActions"))
+	defer span.Finish()
+
+	var list entity.MenuActions
+	result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", menuID).Find(&list)
+	if err := result.Error; err != nil {
+		span.Errorf(err.Error())
+		return nil, errors.New("查询菜单动作数据发生错误")
+	}
+
+	return list, nil
 }
 
 func (a *Menu) queryResources(ctx context.Context, menuID string) (entity.MenuResources, error) {

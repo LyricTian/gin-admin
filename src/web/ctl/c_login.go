@@ -80,7 +80,7 @@ func (a *Login) GetCaptcha(ctx *context.Context) {
 // Login 用户登录
 // @Summary 用户登录
 // @Param body body schema.LoginParam true
-// @Success 200 schema.LoginToken
+// @Success 200 auth.TokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
 // @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/login
@@ -114,7 +114,7 @@ func (a *Login) Login(ctx *context.Context) {
 	userID := user.RecordID
 	ctx.SetUserID(userID)
 	span := logger.StartSpan(ctx.GetContext(), "用户登录", a.getFuncName("Login"))
-	tokenString, err := a.Auth.GenerateToken(userID)
+	tokenInfo, err := a.Auth.GenerateToken(userID)
 	if err != nil {
 		span.Errorf(err.Error())
 		ctx.ResError(errors.NewInternalServerError())
@@ -122,7 +122,7 @@ func (a *Login) Login(ctx *context.Context) {
 	}
 
 	span.Infof("登入系统")
-	ctx.ResSuccess(schema.LoginToken{Token: tokenString})
+	ctx.ResSuccess(tokenInfo)
 }
 
 // Logout 用户登出
@@ -146,18 +146,18 @@ func (a *Login) Logout(ctx *context.Context) {
 // RefreshToken 刷新令牌
 // @Summary 刷新令牌
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Success 200 schema.LoginToken
+// @Success 200 auth.TokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
 // @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/refresh_token
 func (a *Login) RefreshToken(ctx *context.Context) {
-	tokenString, err := a.Auth.GenerateToken(ctx.GetUserID())
+	tokenInfo, err := a.Auth.GenerateToken(ctx.GetUserID())
 	if err != nil {
 		logger.StartSpan(ctx.GetContext(), "刷新令牌", a.getFuncName("RefreshToken")).Errorf(err.Error())
 		ctx.ResError(errors.NewInternalServerError())
 		return
 	}
-	ctx.ResSuccess(schema.LoginToken{Token: tokenString})
+	ctx.ResSuccess(tokenInfo)
 }
 
 // GetUserInfo 获取当前用户信息
