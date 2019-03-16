@@ -60,6 +60,7 @@ func (a *Common) createMenus(ctx context.Context, parentID string, list schema.M
 				Router:    item.Router,
 				Hidden:    item.Hidden,
 				ParentID:  parentID,
+				Actions:   item.Actions,
 				Resources: item.Resources,
 			}
 			nsitem, err := a.MenuCtl.MenuBll.Create(ctx, sitem)

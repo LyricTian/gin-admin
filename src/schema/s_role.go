@@ -17,7 +17,7 @@ type Role struct {
 // RoleMenu 角色菜单对象
 type RoleMenu struct {
 	MenuID    string   `json:"menu_id" swaggo:"false,菜单ID"`
-	Operation string   `json:"operation" swaggo:"false,操作权限(rw:读写 ro:只读)"`
+	Actions   []string `json:"actions" swaggo:"false,动作权限列表"`
 	Resources []string `json:"resources" swaggo:"false,资源权限列表"`
 }
 
@@ -61,16 +61,33 @@ func (a Roles) ToMenuIDs() []string {
 	return idList
 }
 
-// ToMenuIDPermMap 转换为菜单ID权限映射(如果菜单ID重复，则使用rw权限)
-func (a Roles) ToMenuIDPermMap() map[string]string {
-	m := make(map[string]string)
+func (a Roles) mergeStrings(olds, news []string) []string {
+	for _, n := range news {
+		exists := false
+		for _, o := range olds {
+			if o == n {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			olds = append(olds, n)
+		}
+	}
+	return olds
+}
+
+// ToMenuIDActionsMap 转换为菜单ID的动作权限列表映射
+func (a Roles) ToMenuIDActionsMap() map[string][]string {
+	m := make(map[string][]string)
 	for _, item := range a {
-		for _, pitem := range item.Menus {
-			v, ok := m[pitem.MenuID]
-			if ok && v == "rw" {
+		for _, menu := range item.Menus {
+			v, ok := m[menu.MenuID]
+			if ok {
+				m[menu.MenuID] = a.mergeStrings(v, menu.Actions)
 				continue
 			}
-			m[pitem.MenuID] = pitem.Operation
+			m[menu.MenuID] = menu.Actions
 		}
 	}
 	return m

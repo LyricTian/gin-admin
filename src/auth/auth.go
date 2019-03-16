@@ -14,6 +14,7 @@ var (
 
 var defaultKey = []byte("GINADMIN")
 var defaultOptions = options{
+	tokenType:     "Bearer",
 	expired:       7200,
 	signingMethod: jwt.SigningMethodHS512,
 	signingKey:    defaultKey,
@@ -31,6 +32,7 @@ type options struct {
 	signingKey    interface{}
 	keyfunc       jwt.Keyfunc
 	expired       int
+	tokenType     string
 }
 
 // Option 定义参数项
@@ -88,16 +90,35 @@ type Auth struct {
 	opts *options
 }
 
+// TokenInfo 令牌信息
+type TokenInfo struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
+}
+
 // GenerateToken 生成令牌
-func (a *Auth) GenerateToken(userID string) (string, error) {
+func (a *Auth) GenerateToken(userID string) (*TokenInfo, error) {
 	now := time.Now()
+
 	token := jwt.NewWithClaims(a.opts.signingMethod, &jwt.StandardClaims{
 		IssuedAt:  now.Unix(),
 		ExpiresAt: now.Add(time.Duration(a.opts.expired) * time.Second).Unix(),
 		NotBefore: now.Unix(),
 		Subject:   userID,
 	})
-	return token.SignedString(a.opts.signingKey)
+
+	tokenString, err := token.SignedString(a.opts.signingKey)
+	if err != nil {
+		return nil, err
+	}
+
+	tokenInfo := &TokenInfo{
+		ExpiresIn:   a.opts.expired,
+		TokenType:   a.opts.tokenType,
+		AccessToken: tokenString,
+	}
+	return tokenInfo, nil
 }
 
 // 解析令牌

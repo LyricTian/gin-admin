@@ -141,35 +141,57 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 }
 
 // 对比并获取需要新增，修改，删除的菜单项
-func (a *Role) compareUpdate(oldList, newList []*entity.RoleMenu) (clist, dlist, ulist []*entity.RoleMenu) {
+func (a *Role) compareUpdateMenu(oldList, newList entity.RoleMenus) (clist, dlist, ulist entity.RoleMenus) {
+	oldMap, newMap := oldList.ToMap(), newList.ToMap()
+
 	for _, nitem := range newList {
-		exists := false
-		for _, oitem := range oldList {
-			if oitem.MenuID == nitem.MenuID {
-				exists = true
-				ulist = append(ulist, nitem)
-				break
-			}
+		if _, ok := oldMap[nitem.MenuID]; ok {
+			ulist = append(ulist, nitem)
+			continue
 		}
-		if !exists {
-			clist = append(clist, nitem)
-		}
+		clist = append(clist, nitem)
 	}
 
 	for _, oitem := range oldList {
-		exists := false
-		for _, nitem := range newList {
-			if nitem.MenuID == oitem.MenuID {
-				exists = true
-				break
-			}
-		}
-		if !exists {
+		if _, ok := newMap[oitem.MenuID]; !ok {
 			dlist = append(dlist, oitem)
 		}
 	}
-
 	return
+}
+
+// 更新菜单数据
+func (a *Role) updateMenus(ctx context.Context, span *logger.Entry, roleID string, items entity.RoleMenus) error {
+	list, err := a.queryMenus(ctx, roleID)
+	if err != nil {
+		return err
+	}
+
+	clist, dlist, ulist := a.compareUpdateMenu(list, items)
+	for _, item := range clist {
+		result := entity.GetRoleMenuDB(ctx, a.db).Create(item)
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("创建角色菜单数据发生错误")
+		}
+	}
+
+	for _, item := range dlist {
+		result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id AND menu_id=?", roleID, item.MenuID).Delete(entity.RoleMenu{})
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("删除角色菜单数据发生错误")
+		}
+	}
+
+	for _, item := range ulist {
+		result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", roleID, item.MenuID).Omit("role_id", "menu_id").Updates(item)
+		if err := result.Error; err != nil {
+			span.Errorf(err.Error())
+			return errors.New("更新角色菜单数据发生错误")
+		}
+	}
+	return nil
 }
 
 // Update 更新数据
@@ -185,34 +207,9 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 			return errors.New("更新角色数据发生错误")
 		}
 
-		oldMenus, err := a.queryMenus(ctx, recordID)
+		err := a.updateMenus(ctx, span, recordID, sitem.ToRoleMenus())
 		if err != nil {
 			return err
-		}
-
-		clist, dlist, ulist := a.compareUpdate(oldMenus, sitem.ToRoleMenus())
-		for _, item := range clist {
-			result := entity.GetRoleMenuDB(ctx, a.db).Create(item)
-			if err := result.Error; err != nil {
-				span.Errorf(err.Error())
-				return errors.New("创建角色菜单数据发生错误")
-			}
-		}
-
-		for _, item := range dlist {
-			result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", recordID, item.MenuID).Delete(entity.RoleMenu{})
-			if err := result.Error; err != nil {
-				span.Errorf(err.Error())
-				return errors.New("删除角色菜单数据发生错误")
-			}
-		}
-
-		for _, item := range ulist {
-			result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", recordID, item.MenuID).Omit("role_id", "menu_id").Updates(item)
-			if err := result.Error; err != nil {
-				span.Errorf(err.Error())
-				return errors.New("更新角色菜单数据发生错误")
-			}
 		}
 
 		return nil

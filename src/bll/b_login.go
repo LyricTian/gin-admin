@@ -99,18 +99,18 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 	userID := gcontext.FromUserID(ctx)
 	isRoot := a.UserBll.CheckIsRoot(ctx, userID)
 
-	// 如果是root用户，则查询所有显示的菜单树，并设定所有的菜单操作权限为读写权限
+	// 如果是root用户，则查询所有显示的菜单树
 	if isRoot {
 		hidden := 0
 		result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 			Hidden: &hidden,
+		}, schema.MenuQueryOptions{
+			IncludeActions: true,
 		})
 		if err != nil {
 			return nil, err
 		}
-		return result.Data.ToTrees().ForEach(func(item *schema.MenuTree, _ int) {
-			item.OperPerm = "rw"
-		}).ToTree(), nil
+		return result.Data.ToTrees().ToTree(), nil
 	}
 
 	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
@@ -137,6 +137,8 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 	// 拆分并查询菜单树
 	menuResult, err = a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		RecordIDs: menuResult.Data.SplitAndGetAllRecordIDs(),
+	}, schema.MenuQueryOptions{
+		IncludeActions: true,
 	})
 	if err != nil {
 		return nil, err
@@ -144,9 +146,19 @@ func (a *Login) QueryUserMenuTree(ctx context.Context) ([]*schema.MenuTree, erro
 		return nil, ErrNoPerm
 	}
 
-	pm := roleResult.Data.ToMenuIDPermMap()
+	menuActions := roleResult.Data.ToMenuIDActionsMap()
 	return menuResult.Data.ToTrees().ForEach(func(item *schema.MenuTree, _ int) {
-		item.OperPerm = pm[item.RecordID]
+		// 遍历菜单动作权限
+		var actions []*schema.MenuAction
+		for _, code := range menuActions[item.RecordID] {
+			for _, aitem := range item.Actions {
+				if aitem.Code == code {
+					actions = append(actions, aitem)
+					break
+				}
+			}
+		}
+		item.Actions = actions
 	}).ToTree(), nil
 }
 

@@ -85,12 +85,6 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, erro
 		return nil, err
 	}
 
-	item.Resources.ForEach(func(item *schema.MenuResource, _ int) {
-		if item.RecordID == "" {
-			item.RecordID = util.MustUUID()
-		}
-	})
-
 	item.ParentPath = parentPath
 	item.RecordID = util.MustUUID()
 	item.Creator = a.CommonBll.GetUserID(ctx)
