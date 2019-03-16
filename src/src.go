@@ -6,14 +6,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/gops/agent"
-
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/captcha/store"
 	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/inject"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/web"
+	"github.com/google/gops/agent"
 )
 
 // ReleaseFunc 资源释放函数

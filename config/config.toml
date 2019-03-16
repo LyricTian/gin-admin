@@ -23,7 +23,7 @@ level = 5
 # 日志格式（支持输出格式：text/json）
 format = "text"
 # 日志输出(支持：stdout/stderr/file)
-output = "stdout"
+output = "file"
 # 指定日志输出的文件路径
 output_file = "data/ginadmin.log"
 # 是否启用日志钩子
@@ -143,7 +143,7 @@ password = ""
 # 是否开启调试模式
 debug = false
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
-db_type = "sqlite3"
+db_type = "mysql"
 # 设置连接可以重用的最长时间(单位：秒)
 max_lifetime = 7200
 # 设置数据库的最大打开连接数

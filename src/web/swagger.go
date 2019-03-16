@@ -18,7 +18,7 @@ import (
 
 // @Version 2.0.0-dev
 // @Title GinAdmin
-// @Description RBAC scaffolding based on GIN + GORM + CASBIN + AntDesign React.
+// @Description RBAC scaffolding based on GIN + GORM + CASBIN.
 // @Schemes http
 // @Host 127.0.0.1:8086
 // @BasePath /
