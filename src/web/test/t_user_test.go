@@ -17,28 +17,35 @@ func TestUser(t *testing.T) {
 
 	// post /menus
 	addMenuItem := &schema.Menu{
-		Code:     util.MustUUID(),
-		Name:     "测试角色菜单",
-		Type:     1,
-		Sequence: 9999,
-		Icon:     "test",
-		Path:     "/test",
+		Name:     util.MustUUID(),
+		Sequence: 9999999,
+		Actions: []*schema.MenuAction{
+			{Code: "query", Name: "query"},
+		},
+		Resources: []*schema.MenuResource{
+			{Code: "query", Name: "query", Method: "GET", Path: "/test/v1/menus"},
+		},
 	}
 	engine.ServeHTTP(w, newPostRequest("v1/menus", addMenuItem))
 	assert.Equal(t, 200, w.Code)
-
-	var addMenuNewItem schema.Menu
-	err = parseReader(w.Body, &addMenuNewItem)
+	var addNewMenuItem schema.Menu
+	err = parseReader(w.Body, &addNewMenuItem)
+	assert.Nil(t, err)
 
 	// post /roles
 	addRoleItem := &schema.Role{
-		Name:    util.MustUUID(),
-		Memo:    "角色备注",
-		MenuIDs: []string{addMenuNewItem.RecordID},
+		Name:     util.MustUUID(),
+		Sequence: 9999999,
+		Menus: []*schema.RoleMenu{
+			{
+				MenuID:    addNewMenuItem.RecordID,
+				Actions:   []string{"query"},
+				Resources: []string{"query"},
+			},
+		},
 	}
 	engine.ServeHTTP(w, newPostRequest("v1/roles", addRoleItem))
 	assert.Equal(t, 200, w.Code)
-
 	var addNewRoleItem schema.Role
 	err = parseReader(w.Body, &addNewRoleItem)
 	assert.Nil(t, err)
@@ -46,32 +53,26 @@ func TestUser(t *testing.T) {
 	// post /users
 	addItem := &schema.User{
 		UserName: util.MustUUID(),
-		RealName: "测试用户1",
-		Password: util.MD5HashString("123456"),
+		RealName: util.MustUUID(),
+		Password: util.MD5HashString("123"),
 		Status:   1,
-		RoleIDs:  []string{addNewRoleItem.RecordID},
+		Roles: []*schema.UserRole{
+			{RoleID: addNewRoleItem.RecordID},
+		},
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
-
 	var addNewItem schema.User
 	err = parseReader(w.Body, &addNewItem)
 	assert.Nil(t, err)
+	assert.Equal(t, addItem.UserName, addNewItem.UserName)
+	assert.Equal(t, addItem.RealName, addNewItem.RealName)
+	assert.Equal(t, addItem.Status, addNewItem.Status)
+	assert.Equal(t, len(addItem.Roles), len(addNewItem.Roles))
+	assert.Empty(t, addNewItem.Password)
+	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// get /users/:id
-	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-
-	var addGetItem schema.User
-	err = parseReader(w.Body, &addGetItem)
-	assert.Equal(t, addItem.UserName, addGetItem.UserName)
-	assert.Equal(t, addItem.RealName, addGetItem.RealName)
-	assert.Equal(t, addItem.Status, addGetItem.Status)
-	assert.Equal(t, addItem.RoleIDs, addGetItem.RoleIDs)
-	assert.NotEmpty(t, addGetItem.RecordID)
-	assert.Empty(t, addGetItem.Password)
-
-	// get /users?q=page
+	// query /users?q=page
 	engine.ServeHTTP(w, newGetRequest(router,
 		newPageParam(map[string]string{"q": "page"})))
 	assert.Equal(t, 200, w.Code)
@@ -79,44 +80,44 @@ func TestUser(t *testing.T) {
 	err = parsePageReader(w.Body, &pageItems)
 	assert.Nil(t, err)
 	assert.Equal(t, len(pageItems), 1)
-	assert.Equal(t, pageItems[0].RecordID, addNewItem.RecordID)
+	if len(pageItems) > 0 {
+		assert.Equal(t, addNewItem.RecordID, pageItems[0].RecordID)
+		assert.Equal(t, addNewItem.UserName, pageItems[0].UserName)
+		assert.Equal(t, addNewItem.RealName, pageItems[0].RealName)
+		assert.Equal(t, addNewItem.Status, pageItems[0].Status)
+	}
 
-	// get /users/:id
+	// put /users/:id
 	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
 	var putItem schema.User
 	err = parseReader(w.Body, &putItem)
-
-	// put /users/:id
 	putItem.UserName = util.MustUUID()
-	putItem.RealName = "测试用户2"
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
-	releaseReader(w.Body)
-
-	// get /users/:id
-	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-	var getItem schema.User
-	err = parseReader(w.Body, &getItem)
-
+	var putNewItem schema.User
+	err = parseReader(w.Body, &putNewItem)
 	assert.Nil(t, err)
-	assert.Equal(t, getItem.RecordID, addNewItem.RecordID)
-	assert.Equal(t, getItem.UserName, putItem.UserName)
-	assert.Equal(t, getItem.RealName, putItem.RealName)
+	assert.Equal(t, putItem.UserName, putNewItem.UserName)
+	assert.Equal(t, putItem.RealName, putNewItem.RealName)
+	assert.Equal(t, putItem.Status, putNewItem.Status)
+	assert.Equal(t, len(putItem.Roles), len(putNewItem.Roles))
 
-	// delete /users/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))
+	// delete /menus/:id
+	engine.ServeHTTP(w, newDeleteRequest("%s/%s", "v1/menus", addNewMenuItem.RecordID))
 	assert.Equal(t, 200, w.Code)
-	releaseReader(w.Body)
+	err = parseOK(w.Body)
+	assert.Nil(t, err)
 
 	// delete /roles/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", "v1/roles", addNewRoleItem.RecordID))
 	assert.Equal(t, 200, w.Code)
-	releaseReader(w.Body)
+	err = parseOK(w.Body)
+	assert.Nil(t, err)
 
-	// delete /menus/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", "v1/menus", addMenuNewItem.RecordID))
+	// delete /users/:id
+	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
-	releaseReader(w.Body)
+	err = parseOK(w.Body)
+	assert.Nil(t, err)
 }

@@ -48,7 +48,12 @@ func (a *Menu) QueryTree(ctx context.Context, includeResources bool) ([]*schema.
 
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
-	item, err := a.MenuModel.Get(ctx, recordID, schema.MenuQueryOptions{IncludeResources: true})
+	item, err := a.MenuModel.Get(ctx, recordID,
+		schema.MenuQueryOptions{
+			IncludeResources: true,
+			IncludeActions:   true,
+		},
+	)
 	if err != nil {
 		return nil, err
 	} else if item == nil {

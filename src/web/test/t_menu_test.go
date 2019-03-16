@@ -9,16 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRole(t *testing.T) {
-	const router = "v1/roles"
+func TestMenu(t *testing.T) {
+	const router = "v1/menus"
 	var err error
 
 	w := httptest.NewRecorder()
 
 	// post /menus
-	addMenuItem := &schema.Menu{
+	addItem := &schema.Menu{
 		Name:     util.MustUUID(),
 		Sequence: 9999999,
+		Router:   "/system/menu",
 		Actions: []*schema.MenuAction{
 			{Code: "query", Name: "query"},
 		},
@@ -26,39 +27,24 @@ func TestRole(t *testing.T) {
 			{Code: "query", Name: "query", Method: "GET", Path: "/test/v1/menus"},
 		},
 	}
-	engine.ServeHTTP(w, newPostRequest("v1/menus", addMenuItem))
-	assert.Equal(t, 200, w.Code)
-	var addNewMenuItem schema.Menu
-	err = parseReader(w.Body, &addNewMenuItem)
-	assert.Nil(t, err)
-
-	// post /roles
-	addItem := &schema.Role{
-		Name:     util.MustUUID(),
-		Sequence: 9999999,
-		Menus: []*schema.RoleMenu{
-			{
-				MenuID:    addNewMenuItem.RecordID,
-				Actions:   []string{"query"},
-				Resources: []string{"query"},
-			},
-		},
-	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
-	var addNewItem schema.Role
+
+	var addNewItem schema.Menu
 	err = parseReader(w.Body, &addNewItem)
 	assert.Nil(t, err)
 	assert.Equal(t, addItem.Name, addNewItem.Name)
+	assert.Equal(t, addItem.Router, addNewItem.Router)
 	assert.Equal(t, addItem.Sequence, addNewItem.Sequence)
-	assert.Equal(t, len(addItem.Menus), len(addNewItem.Menus))
+	assert.Equal(t, len(addItem.Actions), len(addNewItem.Actions))
+	assert.Equal(t, len(addItem.Resources), len(addNewItem.Resources))
 	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// query /roles?q=page
+	// query /menus?q=page
 	engine.ServeHTTP(w, newGetRequest(router,
 		newPageParam(map[string]string{"q": "page"})))
 	assert.Equal(t, 200, w.Code)
-	var pageItems []*schema.Role
+	var pageItems []*schema.Menu
 	err = parsePageReader(w.Body, &pageItems)
 	assert.Nil(t, err)
 	assert.Equal(t, len(pageItems), 1)
@@ -67,27 +53,22 @@ func TestRole(t *testing.T) {
 		assert.Equal(t, addNewItem.Name, pageItems[0].Name)
 	}
 
-	// put /roles/:id
+	// put /menus/:id
 	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
-	var putItem schema.Role
+	var putItem schema.Menu
 	err = parseReader(w.Body, &putItem)
 	putItem.Name = util.MustUUID()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
-	var putNewItem schema.Role
+	var putNewItem schema.Menu
 	err = parseReader(w.Body, &putNewItem)
 	assert.Nil(t, err)
 	assert.Equal(t, putItem.Name, putNewItem.Name)
-	assert.Equal(t, len(putItem.Menus), len(putNewItem.Menus))
+	assert.Equal(t, len(putItem.Actions), len(putNewItem.Actions))
+	assert.Equal(t, len(putItem.Resources), len(putNewItem.Resources))
 
 	// delete /menus/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", "v1/menus", addNewMenuItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-	err = parseOK(w.Body)
-	assert.Nil(t, err)
-
-	// delete /roles/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)

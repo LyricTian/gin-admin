@@ -89,6 +89,10 @@ func (a *User) Get(ctx context.Context, recordID string) (*schema.User, error) {
 }
 
 func (a *User) checkUserName(ctx context.Context, userName string) error {
+	if userName == a.GetRoot().UserName {
+		return errors.NewBadRequestError("用户名不合法")
+	}
+
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
 		UserName: userName,
 	}, schema.UserQueryOptions{
@@ -104,6 +108,10 @@ func (a *User) checkUserName(ctx context.Context, userName string) error {
 
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item schema.User) (*schema.User, error) {
+	if item.Password == "" {
+		return nil, errors.NewBadRequestError("用户密码不允许为空")
+	}
+
 	err := a.checkUserName(ctx, item.UserName)
 	if err != nil {
 		return nil, err

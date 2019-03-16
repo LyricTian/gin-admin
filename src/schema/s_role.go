@@ -11,7 +11,7 @@ type Role struct {
 	Creator   string     `json:"creator" swaggo:"false,创建者"`
 	CreatedAt *time.Time `json:"created_at" swaggo:"false,创建时间"`
 	UpdatedAt *time.Time `json:"updated_at" swaggo:"false,更新时间"`
-	Menus     RoleMenus  `json:"menus" swaggo:"false,菜单权限"`
+	Menus     RoleMenus  `json:"menus" binding:"required,gt=0" swaggo:"false,菜单权限"`
 }
 
 // RoleMenu 角色菜单对象

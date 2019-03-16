@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,8 +15,6 @@ import (
 	"github.com/LyricTian/gin-admin/src/web"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
@@ -28,7 +27,7 @@ var engine *gin.Engine
 func init() {
 	viper.SetConfigFile(configFile)
 	if err := viper.ReadInConfig(); err != nil {
-		panic("加载配置文件发生错误：" + err.Error())
+		panic("Load config error：" + err.Error())
 	}
 	viper.Set("run_mode", "debug")
 	viper.Set("casbin_model_conf", "../../../config/model.conf")
@@ -50,6 +49,20 @@ func toReader(v interface{}) io.Reader {
 
 func parseReader(r io.Reader, v interface{}) error {
 	return json.NewDecoder(r).Decode(v)
+}
+
+func parseOK(r io.Reader) error {
+	var status struct {
+		Status string `json:"status"`
+	}
+	err := parseReader(r, &status)
+	if err != nil {
+		return err
+	}
+	if status.Status != "OK" {
+		return errors.New("not OK")
+	}
+	return nil
 }
 
 func releaseReader(r io.Reader) {

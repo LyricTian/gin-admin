@@ -33,7 +33,7 @@ test:
 	@go test -cover -race ./...
 
 clean:
-	rm -rf data release $(SERVER_BIN)
+	rm -rf data release $(SERVER_BIN) src/web/test/data
 
 pack: build-server build-web
 	rm -rf $(RELEASE_ROOT)
