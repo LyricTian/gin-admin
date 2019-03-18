@@ -72,14 +72,14 @@ class Login extends PureComponent {
               rules: [
                 {
                   required: true,
-                  message: '请输入账户名！',
+                  message: '请输入用户名！',
                 },
               ],
             })(
               <Input
                 size="large"
                 prefix={<Icon type="user" className={styles.prefixIcon} />}
-                placeholder="用户名：demo"
+                placeholder="请输入用户名"
               />
             )}
           </Form.Item>
@@ -96,7 +96,7 @@ class Login extends PureComponent {
                 size="large"
                 prefix={<Icon type="lock" className={styles.prefixIcon} />}
                 type="password"
-                placeholder="密码：888888"
+                placeholder="请输入密码"
               />
             )}
           </Form.Item>

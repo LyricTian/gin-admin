@@ -45,7 +45,7 @@ func (a *blackStore) Check(tokenString string) (bool, error) {
 	var exists bool
 	err := a.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(tokenString)
-		if err != nil {
+		if err != nil && err != buntdb.ErrNotFound {
 			return err
 		}
 		exists = val == "1"

@@ -1,20 +1,71 @@
 import axios from 'axios';
 import { notification } from 'antd';
-import { storeAccessTokenKey } from './utils';
+import moment from 'moment';
+import store from './store';
 
-// 提供API前缀
-export const v1API = '/api/v1';
-const tokenKey = 'access-token';
+function checkAccessTokenExpires(expiresAt) {
+  const now = moment().unix();
+  if (expiresAt - now <= 0) {
+    return -1;
+  }
+  if (expiresAt - now <= 600) {
+    return 0;
+  }
+  return 1;
+}
 
-function handle(showNotify) {
-  return response => {
-    const { status, data, headers } = response;
+async function getAccessToken() {
+  const tokenInfo = store.getAccessToken();
+  if (!tokenInfo) {
+    return '';
+  }
 
-    const accessToken = headers[tokenKey];
-    if (accessToken) {
-      sessionStorage.setItem(storeAccessTokenKey, accessToken);
-    }
+  if (checkAccessTokenExpires(tokenInfo.expires_at) === 0) {
+    return axios
+      .request({
+        url: '/api/v1/refresh_token',
+        method: 'POST',
+        headers: {
+          Authorization: `${tokenInfo.token_type} ${tokenInfo.access_token}`,
+        },
+      })
+      .then(response => {
+        const { status, data } = response;
+        if (status === 200) {
+          store.setAccessToken(data);
+          return `${data.token_type} ${data.access_token}`;
+        }
+        return '';
+      });
+  }
+  return `${tokenInfo.token_type} ${tokenInfo.access_token}`;
+}
 
+export default async function request(url, options) {
+  let showNotify = true;
+  const opts = {
+    baseURL: '/api',
+    url,
+    validateStatus() {
+      return true;
+    },
+    ...options,
+  };
+  if (opts.notNotify) {
+    showNotify = false;
+  }
+
+  const defaultHeader = {
+    Authorization: await getAccessToken(),
+  };
+  if (opts.method === 'POST' || opts.method === 'PUT') {
+    defaultHeader['Content-Type'] = 'application/json; charset=utf-8';
+    opts.data = opts.body;
+  }
+  opts.headers = { ...defaultHeader, ...opts.headers };
+
+  return axios.request(opts).then(response => {
+    const { status, data } = response;
     if (status >= 200 && status < 300) {
       return data;
     }
@@ -48,31 +99,5 @@ function handle(showNotify) {
     }
 
     return { error, status };
-  };
-}
-
-export default async function request(url, options) {
-  const defaultHeader = {};
-  defaultHeader[tokenKey] = sessionStorage.getItem(storeAccessTokenKey) || '';
-
-  let showNotify = true;
-  const newOptions = {
-    url,
-    validateStatus() {
-      return true;
-    },
-    ...options,
-  };
-
-  if (newOptions.notNotify) {
-    showNotify = false;
-  }
-
-  if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
-    defaultHeader['Content-Type'] = 'application/json; charset=utf-8';
-    newOptions.data = newOptions.body;
-  }
-  newOptions.headers = { ...defaultHeader, ...newOptions.headers };
-
-  return axios.request(newOptions).then(handle(showNotify));
+  });
 }

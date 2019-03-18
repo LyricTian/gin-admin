@@ -45,7 +45,7 @@ export default {
   // Theme for antd
   // https://ant.design/docs/react/customize-theme-cn
   theme: {
-    'primary-color': '#1890FF',
+    'primary-color': '#FA8C16',
   },
   proxy: {
     '/api/': {

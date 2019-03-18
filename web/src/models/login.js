@@ -1,7 +1,9 @@
 import { routerRedux } from 'dva/router';
 import { stringify, parse } from 'qs';
-import { storeLogoutKey, storeAccessTokenKey } from '@/utils/utils';
+import store from '@/utils/store';
 import * as loginService from '@/services/login';
+
+let isLogout = false;
 
 export default {
   namespace: 'login',
@@ -63,42 +65,30 @@ export default {
         return;
       }
 
-      yield [
-        put({
-          type: 'saveStatus',
-          payload: response.status,
-        }),
-        put({
-          type: 'changeSubmitting',
-          payload: false,
-        }),
-      ];
+      // 保存访问令牌
+      store.setAccessToken(response);
+      yield put({
+        type: 'changeSubmitting',
+        payload: false,
+      });
 
-      if (response.status === 'OK') {
-        sessionStorage.removeItem(storeLogoutKey);
-        const params = parse(window.location.href.split('?')[1]);
-        const { redirect } = params;
-        if (redirect) {
-          window.location.href = redirect;
-          return;
-        }
-        yield put(routerRedux.replace('/'));
-      }
-    },
-    *logout(_, { put, call }) {
-      if (sessionStorage.getItem(storeLogoutKey) === '1') {
+      isLogout = false;
+      const params = parse(window.location.href.split('?')[1]);
+      const { redirect } = params;
+      if (redirect) {
+        window.location.href = redirect;
         return;
       }
-      sessionStorage.setItem(storeLogoutKey, '1');
+      yield put(routerRedux.replace('/'));
+    },
+    *logout(_, { put, call }) {
+      if (isLogout) {
+        return;
+      }
+      isLogout = true;
 
-      yield put({
-        type: 'saveStatus',
-        payload: '',
-      });
       const response = yield call(loginService.logout);
       if (response.status === 'OK') {
-        localStorage.removeItem(storeAccessTokenKey);
-
         yield put(
           routerRedux.push({
             pathname: '/user/login',
@@ -108,6 +98,7 @@ export default {
           })
         );
       }
+      store.clearAccessToken();
     },
   },
 

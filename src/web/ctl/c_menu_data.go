@@ -6,7 +6,7 @@ const menuData = `
   {
     "name": "首页",
     "icon": "dashboard",
-    "path": "/dashboard",
+    "router": "/dashboard",
     "sequence": 1900000
   },
   {
@@ -17,7 +17,7 @@ const menuData = `
       {
         "name": "菜单管理",
         "icon": "solution",
-        "path": "/system/menu",
+        "router": "/system/menu",
         "sequence": 1190000,
         "actions": [
           { "code": "add", "name": "新增" },
@@ -61,7 +61,7 @@ const menuData = `
       {
         "name": "角色管理",
         "icon": "audit",
-        "path": "/system/role",
+        "router": "/system/role",
         "sequence": 1180000,
         "actions": [
           { "code": "add", "name": "新增" },
@@ -111,7 +111,7 @@ const menuData = `
       {
         "name": "用户管理",
         "icon": "user",
-        "path": "/system/user",
+        "router": "/system/user",
         "sequence": 1170000,
         "actions": [
           { "code": "add", "name": "新增" },
