@@ -20,7 +20,6 @@ export default [
       {
         path: '/system',
         routes: [
-          { path: '/system/resource', component: './Resource/ResourceList' },
           { path: '/system/menu', component: './Menu/MenuList' },
           { path: '/system/role', component: './Role/RoleList' },
           { path: '/system/user', component: './User/UserList' },

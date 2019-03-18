@@ -94,16 +94,17 @@ type Auth struct {
 type TokenInfo struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
+	ExpiresAt   int64  `json:"expires_at"`
 }
 
 // GenerateToken 生成令牌
 func (a *Auth) GenerateToken(userID string) (*TokenInfo, error) {
 	now := time.Now()
+	expiresAt := now.Add(time.Duration(a.opts.expired) * time.Second).Unix()
 
 	token := jwt.NewWithClaims(a.opts.signingMethod, &jwt.StandardClaims{
 		IssuedAt:  now.Unix(),
-		ExpiresAt: now.Add(time.Duration(a.opts.expired) * time.Second).Unix(),
+		ExpiresAt: expiresAt,
 		NotBefore: now.Unix(),
 		Subject:   userID,
 	})
@@ -114,7 +115,7 @@ func (a *Auth) GenerateToken(userID string) (*TokenInfo, error) {
 	}
 
 	tokenInfo := &TokenInfo{
-		ExpiresIn:   a.opts.expired,
+		ExpiresAt:   expiresAt,
 		TokenType:   a.opts.tokenType,
 		AccessToken: tokenString,
 	}

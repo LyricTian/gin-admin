@@ -4,8 +4,9 @@ export default {
   namespace: 'global',
 
   state: {
-    title: 'RBAC权限管理脚手架',
-    copyRight: '2018 LyricTian',
+    title: '权限管理脚手架',
+    copyRight: '2019 LyricTian',
+    defaultURL: '/dashboard',
     collapsed: false,
     openKeys: [],
     selectedKeys: [],
@@ -20,9 +21,9 @@ export default {
 
   effects: {
     *menuEvent({ pathname }, { put, select }) {
-      const p = pathname;
+      let p = pathname;
       if (p === '/') {
-        return;
+        p = yield select(state => state.global.defaultURL);
       }
 
       const menuPaths = yield select(state => state.global.menuPaths);
@@ -62,8 +63,8 @@ export default {
       const menuPaths = {};
       function findPath(data) {
         for (let i = 0; i < data.length; i += 1) {
-          if (data[i].path !== '') {
-            menuPaths[data[i].path] = data[i];
+          if (data[i].router !== '') {
+            menuPaths[data[i].router] = data[i];
           }
           if (data[i].children && data[i].children.length > 0) {
             findPath(data[i].children);

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Card } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from './Home.less';
@@ -23,6 +22,26 @@ class Home extends PureComponent {
     clearInterval(this.interval);
   }
 
+  getHeaderContent = () => {
+    const {
+      global: { user },
+    } = this.props;
+
+    const { role_names: roleNames } = user;
+
+    const text = [];
+    if (roleNames && roleNames.length > 0) {
+      text.push(
+        <span key="role" style={{ marginRight: 20 }}>{`所属角色：${roleNames.join('/')}`}</span>
+      );
+    }
+
+    if (text.length > 0) {
+      return text;
+    }
+    return null;
+  };
+
   render() {
     const {
       global: { user },
@@ -34,13 +53,12 @@ class Home extends PureComponent {
 
     return (
       <PageHeaderLayout
-        title={`您好，${user.real_name}，祝你开心每一天！`}
+        title={`您好，${user.real_name}，祝您开心每一天！`}
         breadcrumbList={breadcrumbList}
-        content={user.role_names && user.role_names.length > 0 ? user.role_names.join('|') : null}
+        content={this.getHeaderContent()}
+        action={<span>当前时间：{currentTime}</span>}
       >
-        <Card bordered={false}>
-          <div className={styles.showTime}>{currentTime}</div>
-        </Card>
+        <div className={styles.index} />
       </PageHeaderLayout>
     );
   }

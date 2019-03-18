@@ -143,7 +143,7 @@ class AdminLayout extends React.PureComponent {
         );
       }
 
-      const itemPath = item.path;
+      const { router } = item;
       const icon = item.icon && <Icon type={item.icon} />;
       const {
         location: { pathname },
@@ -151,13 +151,13 @@ class AdminLayout extends React.PureComponent {
 
       return (
         <Menu.Item key={item.record_id}>
-          {itemPath.startsWith('http') ? (
-            <a href={itemPath} target="_blank" rel="noopener noreferrer">
+          {router.startsWith('http') ? (
+            <a href={router} target="_blank" rel="noopener noreferrer">
               {icon}
               <span>{item.name}</span>
             </a>
           ) : (
-            <Link to={itemPath} replace={itemPath === pathname}>
+            <Link to={router} replace={router === pathname}>
               {icon}
               <span>{item.name}</span>
             </Link>
@@ -229,7 +229,6 @@ class AdminLayout extends React.PureComponent {
             </Link>
           </div>
           <Menu
-            theme="dark"
             mode="inline"
             {...menuProps}
             onOpenChange={this.onMenuOpenChange}

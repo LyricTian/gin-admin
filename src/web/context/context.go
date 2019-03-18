@@ -246,4 +246,5 @@ func (a *Context) ResJSON(status int, v interface{}) {
 	}
 	a.gctx.Set(ResBodyKey, buf)
 	a.gctx.Data(status, "application/json; charset=utf-8", buf)
+	a.gctx.Abort()
 }
