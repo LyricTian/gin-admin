@@ -199,7 +199,7 @@ func (a *Menu) updateActions(ctx context.Context, span *logger.Entry, menuID str
 	}
 
 	for _, item := range dlist {
-		result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id AND code=?", menuID, item.Code).Delete(entity.MenuAction{})
+		result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=? AND code=?", menuID, item.Code).Delete(entity.MenuAction{})
 		if err := result.Error; err != nil {
 			span.Errorf(err.Error())
 			return errors.New("删除菜单动作数据发生错误")
@@ -253,7 +253,7 @@ func (a *Menu) updateResources(ctx context.Context, span *logger.Entry, menuID s
 	}
 
 	for _, item := range dlist {
-		result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id AND code=?", menuID, item.Code).Delete(entity.MenuResource{})
+		result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id=? AND code=?", menuID, item.Code).Delete(entity.MenuResource{})
 		if err := result.Error; err != nil {
 			span.Errorf(err.Error())
 			return errors.New("删除菜单资源数据发生错误")
