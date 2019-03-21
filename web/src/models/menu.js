@@ -57,7 +57,7 @@ export default {
         payload: response,
       });
     },
-    *loadForm({ payload }, { call, put, select }) {
+    *loadForm({ payload }, { put, select }) {
       yield put({
         type: 'changeFormVisible',
         payload: true,
@@ -80,22 +80,8 @@ export default {
           type: 'saveFormData',
           payload: {},
         }),
+        put({ type: 'fetchTree' }),
       ];
-
-      if (payload.type === 'A') {
-        const search = yield select(state => state.menu.search);
-        if (search.parent_id) {
-          const { parent_id: parentID } = search;
-          const response = yield call(menuService.get, { record_id: parentID });
-          yield put({
-            type: 'saveFormData',
-            payload: {
-              parent_id: parentID,
-              type: response.type + 1,
-            },
-          });
-        }
-      }
 
       if (payload.type === 'E') {
         yield [
@@ -112,6 +98,12 @@ export default {
             payload: { record_id: payload.id },
           }),
         ];
+      } else {
+        const search = yield select(state => state.menu.search);
+        yield put({
+          type: 'saveFormData',
+          payload: { parent_id: search.parent_id ? search.parent_id : '' },
+        });
       }
     },
     *fetchForm({ payload }, { call, put }) {
@@ -128,54 +120,17 @@ export default {
       });
 
       const params = { ...payload };
-      const { type, parent_id: parentID } = params;
-
-      let valid = true;
-
-      if (parentID && parentID === '') {
-        if (type === 2) {
-          message.error('功能依赖于模块');
-          valid = false;
-        } else if (type === 3) {
-          message.error('资源依赖于功能');
-          valid = false;
-        }
-      } else {
-        const parent = yield call(menuService.get, { record_id: parentID });
-        const { type: ptype } = parent;
-        if (type === 1 && ptype !== 1) {
-          message.error('模块依赖于模块');
-          valid = false;
-        } else if (type === 2 && ptype !== 1) {
-          message.error('功能依赖于模块');
-          valid = false;
-        } else if (type === 3 && ptype !== 2) {
-          message.error('资源依赖于功能');
-          valid = false;
-        }
-      }
-
-      if (!valid) {
-        yield put({
-          type: 'changeSubmitting',
-          payload: false,
-        });
-        return;
-      }
-
       const formType = yield select(state => state.menu.formType);
       let success = false;
+      let response;
       if (formType === 'E') {
         params.record_id = yield select(state => state.menu.formID);
-        const response = yield call(menuService.update, params);
-        if (response.status === 'OK') {
-          success = true;
-        }
+        response = yield call(menuService.update, params);
       } else {
-        const response = yield call(menuService.create, params);
-        if (response.record_id && response.record_id !== '') {
-          success = true;
-        }
+        response = yield call(menuService.create, params);
+      }
+      if (response.record_id && response.record_id !== '') {
+        success = true;
       }
 
       yield put({
@@ -196,14 +151,6 @@ export default {
     },
     *del({ payload }, { call, put }) {
       const response = yield call(menuService.del, payload);
-      if (response.status === 'OK') {
-        message.success('删除成功');
-        yield put({ type: 'fetchTree' });
-        yield put({ type: 'fetch' });
-      }
-    },
-    *delMany({ payload }, { call, put }) {
-      const response = yield call(menuService.delMany, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetchTree' });

@@ -1,5 +1,5 @@
 import { stringify } from 'qs';
-import request from '../utils/request';
+import request from '@/utils/request';
 
 const router = 'menus';
 
@@ -27,12 +27,6 @@ export async function update(params) {
 
 export async function del(params) {
   return request(`/v1/${router}/${params.record_id}`, {
-    method: 'DELETE',
-  });
-}
-
-export async function delMany(params) {
-  return request(`/v1/${router}?${stringify(params)}`, {
     method: 'DELETE',
   });
 }

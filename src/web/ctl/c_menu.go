@@ -50,8 +50,9 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 	}
 
 	if v := ctx.Query("hidden"); v != "" {
-		hidden := util.S(v).Int()
-		params.Hidden = &hidden
+		if hidden := util.S(v).Int(); hidden > -1 {
+			params.Hidden = &hidden
+		}
 	}
 
 	items, pr, err := a.MenuBll.QueryPage(ctx.GetContext(), params, ctx.GetPaginationParam())

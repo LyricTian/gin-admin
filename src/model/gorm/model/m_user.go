@@ -209,7 +209,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 		}
 
 		for _, item := range dlist {
-			result := entity.GetUserRoleDB(ctx, a.db).Where("user_id AND role_id=?", recordID, item.RoleID).Delete(entity.UserRole{})
+			result := entity.GetUserRoleDB(ctx, a.db).Where("user_id=? AND role_id=?", recordID, item.RoleID).Delete(entity.UserRole{})
 			if err := result.Error; err != nil {
 				span.Errorf(err.Error())
 				return errors.New("删除用户角色数据发生错误")

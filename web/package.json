@@ -33,7 +33,8 @@
     "react-container-query": "^0.11.0",
     "react-document-title": "^2.0.3",
     "setprototypeof": "^1.1.0",
-    "url-polyfill": "^1.0.10"
+    "url-polyfill": "^1.0.10",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/react": "^16.7.7",

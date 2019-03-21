@@ -177,7 +177,7 @@ func (a *Role) updateMenus(ctx context.Context, span *logger.Entry, roleID strin
 	}
 
 	for _, item := range dlist {
-		result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id AND menu_id=?", roleID, item.MenuID).Delete(entity.RoleMenu{})
+		result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", roleID, item.MenuID).Delete(entity.RoleMenu{})
 		if err := result.Error; err != nil {
 			span.Errorf(err.Error())
 			return errors.New("删除角色菜单数据发生错误")
