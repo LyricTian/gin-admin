@@ -10,6 +10,7 @@ import GlobalFooter from '@/components/GlobalFooter';
 import CopyRight from '@/components/CopyRight';
 import styles from './AdminLayout.less';
 import logo from '../assets/logo.svg';
+import GetGlobalContext from '@/utils/context';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -44,6 +45,7 @@ const query = {
   user: state.global.user,
   menuPaths: state.global.menuPaths,
   menus: state.global.menus,
+  global: state.global,
 }))
 class AdminLayout extends React.PureComponent {
   componentDidMount() {
@@ -192,7 +194,10 @@ class AdminLayout extends React.PureComponent {
       openKeys,
       title,
       selectedKeys,
+      global,
     } = this.props;
+
+    const GlobalContext = GetGlobalContext();
 
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
@@ -261,7 +266,9 @@ class AdminLayout extends React.PureComponent {
             </div>
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
-            <div style={{ minHeight: 'calc(100vh - 260px)' }}>{children}</div>
+            <div style={{ minHeight: 'calc(100vh - 260px)' }}>
+              <GlobalContext.Provider value={global}>{children}</GlobalContext.Provider>
+            </div>
             <GlobalFooter copyright={<CopyRight title={copyRight} />} />
           </Content>
         </Layout>

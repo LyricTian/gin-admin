@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Row, Col, Card, Form, Input, Button, Table, Radio, Modal, Layout, Tree } from 'antd';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import PButton from '@/components/PermButton';
 import MenuCard from './MenuCard';
 
 import styles from './MenuList.less';
@@ -317,21 +318,33 @@ class MenuList extends PureComponent {
               <div className={styles.tableList}>
                 <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
                 <div className={styles.tableListOperator}>
-                  <Button icon="plus" type="primary" onClick={() => this.handleAddClick()}>
+                  <PButton
+                    key="add"
+                    code="add"
+                    icon="plus"
+                    type="primary"
+                    onClick={() => this.handleAddClick()}
+                  >
                     新建
-                  </Button>
+                  </PButton>
                   {selectedRowKeys.length === 1 && [
-                    <Button key="edit" icon="edit" onClick={() => this.handleEditClick()}>
+                    <PButton
+                      key="edit"
+                      code="edit"
+                      icon="edit"
+                      onClick={() => this.handleEditClick()}
+                    >
                       编辑
-                    </Button>,
-                    <Button
+                    </PButton>,
+                    <PButton
                       key="del"
+                      code="del"
                       icon="delete"
                       type="danger"
                       onClick={() => this.handleDelClick()}
                     >
                       删除
-                    </Button>,
+                    </PButton>,
                   ]}
                 </div>
                 <Table
