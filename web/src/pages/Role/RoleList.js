@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Card, Form, Input, Button, Table, Modal, Icon, Dropdown, Menu } from 'antd';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { Row, Col, Card, Form, Input, Button, Table, Modal } from 'antd';
+import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import PButton from '@/components/PermButton';
 import RoleCard from './RoleCard';
 
 import styles from './RoleList.less';
@@ -13,6 +14,7 @@ import styles from './RoleList.less';
 @Form.create()
 class RoleList extends PureComponent {
   state = {
+    selectedRowKeys: [],
     selectedRows: [],
   };
 
@@ -24,41 +26,16 @@ class RoleList extends PureComponent {
     });
   }
 
-  onDelBatchOKClick = () => {
-    const { selectedRows } = this.state;
-    if (selectedRows.length === 0) {
-      return;
-    }
-    this.setState({
-      selectedRows: [],
-    });
-    this.dispatch({
-      type: 'role/delMany',
-      payload: { batch: selectedRows.join(',') },
-    });
+  clearSelectRows = () => {
+    this.setState({ selectedRowKeys: [], selectedRows: [] });
   };
 
-  onBatchDelClick = () => {
-    Modal.confirm({
-      title: '确认删除选中的数据吗？',
-      okText: '确认',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: this.onDelBatchOKClick.bind(this),
-    });
+  dispatch = action => {
+    const { dispatch } = this.props;
+    dispatch(action);
   };
 
-  onItemEditClick = id => {
-    this.dispatch({
-      type: 'role/loadForm',
-      payload: {
-        type: 'E',
-        id,
-      },
-    });
-  };
-
-  onAddClick = () => {
+  handleAddClick = () => {
     this.dispatch({
       type: 'role/loadForm',
       payload: {
@@ -67,30 +44,34 @@ class RoleList extends PureComponent {
     });
   };
 
-  onDelOKClick(id) {
+  handleEditClick = item => {
     this.dispatch({
-      type: 'role/del',
-      payload: { record_id: id },
+      type: 'role/loadForm',
+      payload: {
+        type: 'E',
+        id: item.record_id,
+      },
     });
-  }
+  };
 
-  onItemDelClick = item => {
+  handleDelClick = item => {
     Modal.confirm({
       title: `确定删除【角色数据：${item.name}】？`,
       okText: '确认',
       okType: 'danger',
       cancelText: '取消',
-      onOk: this.onDelOKClick.bind(this, item.record_id),
+      onOk: this.handleDelOKClick.bind(this, item.record_id),
     });
   };
 
-  onTableSelectRow = rows => {
+  handleTableSelectRow = (keys, rows) => {
     this.setState({
+      selectedRowKeys: keys,
       selectedRows: rows,
     });
   };
 
-  onTableChange = pagination => {
+  handleTableChange = pagination => {
     this.dispatch({
       type: 'role/fetch',
       pagination: {
@@ -100,7 +81,7 @@ class RoleList extends PureComponent {
     });
   };
 
-  onResetFormClick = () => {
+  handleResetFormClick = () => {
     const { form } = this.props;
     form.resetFields();
 
@@ -111,44 +92,50 @@ class RoleList extends PureComponent {
     });
   };
 
-  onSearchFormSubmit = e => {
+  handleSearchFormSubmit = e => {
     if (e) {
       e.preventDefault();
     }
 
     const { form } = this.props;
     form.validateFields({ force: true }, (err, values) => {
-      if (!err) {
-        this.dispatch({
-          type: 'role/fetch',
-          search: values,
-          pagination: {},
-        });
+      if (err) {
+        return;
       }
+      this.dispatch({
+        type: 'role/fetch',
+        search: values,
+        pagination: {},
+      });
+      this.clearSelectRows();
     });
   };
 
-  onDataFormSubmit = data => {
+  handleDataFormSubmit = data => {
     this.dispatch({
       type: 'role/submit',
       payload: data,
     });
+    this.clearSelectRows();
   };
 
-  onDataFormCancel = () => {
+  handleDataFormCancel = () => {
     this.dispatch({
       type: 'role/changeFormVisible',
       payload: false,
     });
   };
 
-  dispatch = action => {
-    const { dispatch } = this.props;
-    dispatch(action);
-  };
+  handleDelOKClick(id) {
+    this.dispatch({
+      type: 'role/del',
+      payload: { record_id: id },
+    });
+    this.clearSelectRows();
+  }
 
   renderDataForm() {
-    return <RoleCard onCancel={this.onDataFormCancel} onSubmit={this.onDataFormSubmit} />;
+    return <RoleCard onCancel={this.handleDataFormCancel} onSubmit={this.handleDataFormSubmit} />;
   }
 
   renderSearchForm() {
@@ -157,7 +144,7 @@ class RoleList extends PureComponent {
     } = this.props;
 
     return (
-      <Form onSubmit={this.onSearchFormSubmit} layout="inline">
+      <Form onSubmit={this.handleSearchFormSubmit} layout="inline">
         <Row gutter={16}>
           <Col md={8} sm={24}>
             <Form.Item label="角色名称">
@@ -170,7 +157,7 @@ class RoleList extends PureComponent {
                 <Button type="primary" htmlType="submit">
                   查询
                 </Button>
-                <Button style={{ marginLeft: 8 }} onClick={this.onResetFormClick}>
+                <Button style={{ marginLeft: 8 }} onClick={this.handleResetFormClick}>
                   重置
                 </Button>
               </span>
@@ -189,50 +176,18 @@ class RoleList extends PureComponent {
       },
     } = this.props;
 
-    const { selectedRows } = this.state;
+    const { selectedRowKeys, selectedRows } = this.state;
 
     const columns = [
       {
-        dataIndex: 'record_id',
-        width: 80,
-        render: (val, record) => (
-          <div>
-            {
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item>
-                      <a
-                        onClick={() => {
-                          this.onItemEditClick(val);
-                        }}
-                      >
-                        编辑
-                      </a>
-                    </Menu.Item>
-                    <Menu.Item>
-                      <a
-                        onClick={() => {
-                          this.onItemDelClick(record);
-                        }}
-                      >
-                        删除
-                      </a>
-                    </Menu.Item>
-                  </Menu>
-                }
-              >
-                <a>
-                  操作 <Icon type="down" />
-                </a>
-              </Dropdown>
-            }
-          </div>
-        ),
-      },
-      {
         title: '角色名称',
         dataIndex: 'name',
+        width: 200,
+      },
+      {
+        title: '排序值',
+        dataIndex: 'sequence',
+        width: 100,
       },
       {
         title: '角色备注',
@@ -255,29 +210,41 @@ class RoleList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.onAddClick()}>
+              <PButton code="add" icon="plus" type="primary" onClick={() => this.handleAddClick()}>
                 新建
-              </Button>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Button icon="delete" type="danger" onClick={() => this.onBatchDelClick()}>
-                    删除
-                  </Button>
-                </span>
-              )}
+              </PButton>
+              {selectedRows.length === 1 && [
+                <PButton
+                  key="edit"
+                  code="edit"
+                  icon="edit"
+                  onClick={() => this.handleEditClick(selectedRows[0])}
+                >
+                  编辑
+                </PButton>,
+                <PButton
+                  key="del"
+                  code="del"
+                  icon="delete"
+                  type="danger"
+                  onClick={() => this.handleDelClick(selectedRows[0])}
+                >
+                  删除
+                </PButton>,
+              ]}
             </div>
             <div>
               <Table
                 rowSelection={{
-                  selectedRowKeys: selectedRows,
-                  onChange: this.onTableSelectRow,
+                  selectedRowKeys,
+                  onChange: this.handleTableSelectRow,
                 }}
                 loading={loading}
                 rowKey={record => record.record_id}
                 dataSource={list}
                 columns={columns}
                 pagination={paginationProps}
-                onChange={this.onTableChange}
+                onChange={this.handleTableChange}
                 size="small"
               />
             </div>

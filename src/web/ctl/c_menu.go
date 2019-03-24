@@ -66,6 +66,7 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 // QueryTree 查询菜单树
 // @Summary 查询菜单树
 // @Param Authorization header string false "Bearer 用户令牌"
+// @Param include_actions query int false "是否包含动作数据(1是)"
 // @Param include_resources query int false "是否包含资源数据(1是)"
 // @Success 200 option.Interface "查询结果：{list:菜单树}"
 // @Failure 400 schema.HTTPError "{error:{code:0,message:未知的查询类型}}"
@@ -73,7 +74,7 @@ func (a *Menu) QueryPage(ctx *context.Context) {
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router GET /api/v1/menus?q=tree
 func (a *Menu) QueryTree(ctx *context.Context) {
-	treeData, err := a.MenuBll.QueryTree(ctx.GetContext(), ctx.Query("include_resources") == "1")
+	treeData, err := a.MenuBll.QueryTree(ctx.GetContext(), ctx.Query("include_actions") == "1", ctx.Query("include_resources") == "1")
 	if err != nil {
 		ctx.ResError(err)
 		return

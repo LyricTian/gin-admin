@@ -38,8 +38,11 @@ func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pp *
 }
 
 // QueryTree 查询菜单树
-func (a *Menu) QueryTree(ctx context.Context, includeResources bool) ([]*schema.MenuTree, error) {
-	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{}, schema.MenuQueryOptions{IncludeResources: includeResources})
+func (a *Menu) QueryTree(ctx context.Context, includeActions, includeResources bool) ([]*schema.MenuTree, error) {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{}, schema.MenuQueryOptions{
+		IncludeActions:   includeActions,
+		IncludeResources: includeResources,
+	})
 	if err != nil {
 		return nil, err
 	}

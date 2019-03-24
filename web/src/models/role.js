@@ -16,7 +16,6 @@ export default {
     formVisible: false,
     formData: {},
     selectData: [],
-    menuKeys: [],
   },
   effects: {
     *fetch({ search, pagination }, { call, put, select }) {
@@ -79,10 +78,6 @@ export default {
           type: 'saveFormData',
           payload: {},
         }),
-        put({
-          type: 'saveMenuKeys',
-          payload: [],
-        }),
       ];
 
       if (payload.type === 'E') {
@@ -109,10 +104,6 @@ export default {
           type: 'saveFormData',
           payload: response,
         }),
-        put({
-          type: 'saveMenuKeys',
-          payload: response.menu_ids || [],
-        }),
       ];
     },
     *submit({ payload }, { call, put, select }) {
@@ -123,18 +114,13 @@ export default {
 
       const params = { ...payload };
       const formType = yield select(state => state.role.formType);
-      let success = false;
+
+      let response;
       if (formType === 'E') {
         params.record_id = yield select(state => state.role.formID);
-        const response = yield call(roleService.update, params);
-        if (response.status === 'OK') {
-          success = true;
-        }
+        response = yield call(roleService.update, params);
       } else {
-        const response = yield call(roleService.create, params);
-        if (response.record_id && response.record_id !== '') {
-          success = true;
-        }
+        response = yield call(roleService.create, params);
       }
 
       yield put({
@@ -142,7 +128,7 @@ export default {
         payload: false,
       });
 
-      if (success) {
+      if (response.record_id && response.record_id !== '') {
         message.success('保存成功');
         yield put({
           type: 'changeFormVisible',
@@ -155,13 +141,6 @@ export default {
     },
     *del({ payload }, { call, put }) {
       const response = yield call(roleService.del, payload);
-      if (response.status === 'OK') {
-        message.success('删除成功');
-        yield put({ type: 'fetch' });
-      }
-    },
-    *delMany({ payload }, { call, put }) {
-      const response = yield call(roleService.delMany, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetch' });
@@ -208,9 +187,6 @@ export default {
     },
     saveSelectData(state, { payload }) {
       return { ...state, selectData: payload };
-    },
-    saveMenuKeys(state, { payload }) {
-      return { ...state, menuKeys: payload };
     },
   },
 };

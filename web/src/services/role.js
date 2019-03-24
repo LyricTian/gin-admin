@@ -30,9 +30,3 @@ export async function del(params) {
     method: 'DELETE',
   });
 }
-
-export async function delMany(params) {
-  return request(`/v1/${router}?${stringify(params)}`, {
-    method: 'DELETE',
-  });
-}
