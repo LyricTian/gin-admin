@@ -81,7 +81,7 @@ class MenuCard extends PureComponent {
         onOk={this.onOKClick}
         onCancel={onCancel}
         style={{ top: 20 }}
-        bodyStyle={{ height: 550, overflowY: 'scroll' }}
+        bodyStyle={{ maxHeight: 'calc( 100vh - 158px )', overflowY: 'auto' }}
       >
         <Card bordered={false}>
           <Form>

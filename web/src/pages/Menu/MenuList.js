@@ -107,7 +107,6 @@ class MenuList extends PureComponent {
       if (err) {
         return;
       }
-      this.setState({ selectedRowKeys: [], selectedRows: [] });
       this.dispatch({
         type: 'menu/fetch',
         search: {
@@ -116,18 +115,16 @@ class MenuList extends PureComponent {
         },
         pagination: {},
       });
+      this.clearSelectRows();
     });
   };
 
   handleFormSubmit = data => {
-    this.setState({
-      selectedRowKeys: [],
-      selectedRows: [],
-    });
     this.dispatch({
       type: 'menu/submit',
       payload: data,
     });
+    this.clearSelectRows();
   };
 
   handleFormCancel = () => {
@@ -135,6 +132,10 @@ class MenuList extends PureComponent {
       type: 'menu/changeFormVisible',
       payload: false,
     });
+  };
+
+  clearSelectRows = () => {
+    this.setState({ selectedRowKeys: [], selectedRows: [] });
   };
 
   dispatch = action => {
@@ -156,6 +157,7 @@ class MenuList extends PureComponent {
       type: 'menu/del',
       payload: { record_id: id },
     });
+    this.clearSelectRows();
   }
 
   renderDataForm() {
@@ -319,7 +321,6 @@ class MenuList extends PureComponent {
                 <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
                 <div className={styles.tableListOperator}>
                   <PButton
-                    key="add"
                     code="add"
                     icon="plus"
                     type="primary"
