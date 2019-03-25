@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import Debounce from 'lodash-decorators/debounce';
 import GlobalFooter from '@/components/GlobalFooter';
 import CopyRight from '@/components/CopyRight';
+import UpdatePasswordDialog from '@/components/UpdatePasswordDialog';
 import styles from './AdminLayout.less';
 import logo from '../assets/logo.svg';
 import GetGlobalContext from '@/utils/context';
@@ -48,6 +49,10 @@ const query = {
   global: state.global,
 }))
 class AdminLayout extends React.PureComponent {
+  state = {
+    updatePwdVisible: false,
+  };
+
   componentDidMount() {
     const {
       location: { pathname },
@@ -80,6 +85,8 @@ class AdminLayout extends React.PureComponent {
       this.dispatch({
         type: 'login/logout',
       });
+    } else if (key === 'updatepwd') {
+      this.setState({ updatePwdVisible: true });
     }
   };
 
@@ -114,6 +121,10 @@ class AdminLayout extends React.PureComponent {
     const event = document.createEvent('HTMLEvents');
     event.initEvent('resize', true, false);
     window.dispatchEvent(event);
+  };
+
+  handleUpdatePwdCancel = () => {
+    this.setState({ updatePwdVisible: false });
   };
 
   renderNavMenuItems(menusData) {
@@ -197,6 +208,7 @@ class AdminLayout extends React.PureComponent {
       global,
     } = this.props;
 
+    const { updatePwdVisible } = this.state;
     const GlobalContext = GetGlobalContext();
 
     const menu = (
@@ -272,6 +284,7 @@ class AdminLayout extends React.PureComponent {
             <GlobalFooter copyright={<CopyRight title={copyRight} />} />
           </Content>
         </Layout>
+        <UpdatePasswordDialog visible={updatePwdVisible} onCancel={this.handleUpdatePwdCancel} />
       </Layout>
     );
 

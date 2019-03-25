@@ -26,6 +26,14 @@ export async function logout() {
   });
 }
 
+// 更新个人密码
+export async function updatePwd(params) {
+  return request(`/v1/current/password`, {
+    method: 'PUT',
+    body: params,
+  });
+}
+
 // 获取当前用户信息
 export async function getCurrentUser() {
   return request(`/v1/current/user`);
