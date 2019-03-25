@@ -85,6 +85,7 @@ class MenuList extends PureComponent {
         pageSize: pagination.pageSize,
       },
     });
+    this.clearSelectRows();
   };
 
   onResetFormClick = () => {
@@ -135,6 +136,10 @@ class MenuList extends PureComponent {
   };
 
   clearSelectRows = () => {
+    const { selectedRowKeys } = this.state;
+    if (selectedRowKeys.length === 0) {
+      return;
+    }
     this.setState({ selectedRowKeys: [], selectedRows: [] });
   };
 

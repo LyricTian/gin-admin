@@ -40,17 +40,17 @@ class RoleCard extends PureComponent {
 
     const formItemLayout = {
       labelCol: {
-        span: 6,
+        span: 4,
       },
       wrapperCol: {
-        span: 16,
+        span: 18,
       },
     };
 
     return (
       <Modal
         title={formTitle}
-        width={750}
+        width={800}
         visible={formVisible}
         maskClosable={false}
         confirmLoading={submitting}
@@ -85,7 +85,7 @@ class RoleCard extends PureComponent {
                       message: '请输入排序值',
                     },
                   ],
-                })(<InputNumber min={1} style={{ width: '80%' }} />)}
+                })(<InputNumber min={1} style={{ width: '100%' }} />)}
               </Form.Item>
             </Col>
             <Col>

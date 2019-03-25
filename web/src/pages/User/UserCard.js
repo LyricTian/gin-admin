@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Modal, Select, Radio } from 'antd';
+import { Form, Input, Modal, Radio } from 'antd';
 import { md5Hash } from '../../utils/utils';
+import RoleSelect from './RoleSelect';
 
 @connect(state => ({
   user: state.user,
-  role: state.role,
 }))
 @Form.create()
 class UserCard extends PureComponent {
@@ -33,7 +33,6 @@ class UserCard extends PureComponent {
     const {
       onCancel,
       user: { formType, formTitle, formVisible, formData, submitting },
-      role: { selectData: roleData },
       form: { getFieldDecorator },
     } = this.props;
 
@@ -59,6 +58,7 @@ class UserCard extends PureComponent {
         onOk={this.onOKClick}
         onCancel={onCancel}
         style={{ top: 20 }}
+        bodyStyle={{ maxHeight: 'calc( 100vh - 158px )', overflowY: 'auto' }}
       >
         <Form>
           <Form.Item {...formItemLayout} label="用户名">
@@ -100,23 +100,15 @@ class UserCard extends PureComponent {
             })(<Input placeholder="请输入真实姓名" />)}
           </Form.Item>
           <Form.Item {...formItemLayout} label="所属角色">
-            {getFieldDecorator('role_ids', {
-              initialValue: formData.role_ids,
+            {getFieldDecorator('roles', {
+              initialValue: formData.roles,
               rules: [
                 {
                   required: true,
                   message: '请选择所属角色',
                 },
               ],
-            })(
-              <Select mode="tags" style={{ width: '100%' }} placeholder="请选择">
-                {roleData.map(item => (
-                  <Select.Option key={item.record_id} value={item.record_id}>
-                    {item.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            )}
+            })(<RoleSelect />)}
           </Form.Item>
           <Form.Item {...formItemLayout} label="用户状态">
             {getFieldDecorator('status', {

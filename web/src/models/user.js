@@ -76,9 +76,6 @@ export default {
           type: 'saveFormData',
           payload: {},
         }),
-        put({
-          type: 'role/fetchSelect',
-        }),
       ];
 
       if (payload.type === 'E') {
@@ -113,18 +110,12 @@ export default {
 
       const params = { ...payload };
       const formType = yield select(state => state.user.formType);
-      let success = false;
+      let response;
       if (formType === 'E') {
         params.record_id = yield select(state => state.user.formID);
-        const response = yield call(userService.update, params);
-        if (response.status === 'OK') {
-          success = true;
-        }
+        response = yield call(userService.update, params);
       } else {
-        const response = yield call(userService.create, params);
-        if (response.record_id && response.record_id !== '') {
-          success = true;
-        }
+        response = yield call(userService.create, params);
       }
 
       yield put({
@@ -132,7 +123,7 @@ export default {
         payload: false,
       });
 
-      if (success) {
+      if (response.record_id && response.record_id !== '') {
         message.success('保存成功');
         yield put({
           type: 'changeFormVisible',
@@ -145,13 +136,6 @@ export default {
     },
     *del({ payload }, { call, put }) {
       const response = yield call(userService.del, payload);
-      if (response.status === 'OK') {
-        message.success('删除成功');
-        yield put({ type: 'fetch' });
-      }
-    },
-    *delMany({ payload }, { call, put }) {
-      const response = yield call(userService.delMany, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetch' });
