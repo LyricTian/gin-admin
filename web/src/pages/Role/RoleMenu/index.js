@@ -92,30 +92,32 @@ export default class RoleMenu extends PureComponent {
     }
   };
 
-  handleSelectedRow = (keys, rows) => {
+  handleSelectedRow = (_, rows) => {
     const { dataSource } = this.state;
     const list = [];
 
-    for (let i = 0; i < keys.length; i += 1) {
+    for (let i = 0; i < rows.length; i += 1) {
       let exists = false;
       for (let j = 0; j < dataSource.length; j += 1) {
-        if (dataSource[j].menu_id === keys[i]) {
+        if (dataSource[j].menu_id === rows[i].record_id) {
           exists = true;
-          list.push(dataSource[i]);
+          list.push({ ...dataSource[j] });
           break;
         }
       }
+
       if (!exists) {
         list.push({
-          menu_id: keys[i],
+          menu_id: rows[i].record_id,
           actions: rows[i].actions ? rows[i].actions.map(v => v.code) : [],
           resources: rows[i].resources ? rows[i].resources.map(v => v.code) : [],
         });
       }
     }
 
-    this.setState({ dataSource: list });
-    this.triggerChange(list);
+    this.setState({ dataSource: list }, () => {
+      this.triggerChange(list);
+    });
   };
 
   render() {
