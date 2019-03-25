@@ -1,6 +1,8 @@
 package ctl
 
 import (
+	"strings"
+
 	"github.com/LyricTian/gin-admin/src/bll"
 	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/schema"
@@ -32,7 +34,7 @@ func (a *User) Query(ctx *context.Context) {
 // @Param pageSize query int true "分页大小" 10
 // @Param user_name query string false "用户名(模糊查询)"
 // @Param real_name query string false "真实姓名(模糊查询)"
-// @Param role_id query string false "角色ID"
+// @Param role_ids query string false "角色ID(多个以英文逗号分隔)"
 // @Param status query int false "状态(1:启用 2:停用)"
 // @Success 200 []schema.UserPageShow "分页查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 400 schema.HTTPError "{error:{code:0,message:未知的查询类型}}"
@@ -43,9 +45,12 @@ func (a *User) QueryPage(ctx *context.Context) {
 	var params schema.UserQueryParam
 	params.LikeUserName = ctx.Query("user_name")
 	params.LikeRealName = ctx.Query("real_name")
-	params.Status = util.S(ctx.Query("status")).Int()
-	if v := ctx.Query("role_id"); v != "" {
-		params.RoleIDs = []string{v}
+	if v := util.S(ctx.Query("status")).Int(); v > 0 {
+		params.Status = v
+	}
+
+	if v := ctx.Query("role_ids"); v != "" {
+		params.RoleIDs = strings.Split(v, ",")
 	}
 
 	items, pr, err := a.UserBll.QueryPage(ctx.GetContext(), params, ctx.GetPaginationParam())

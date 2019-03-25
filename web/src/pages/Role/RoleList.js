@@ -27,6 +27,10 @@ class RoleList extends PureComponent {
   }
 
   clearSelectRows = () => {
+    const { selectedRowKeys } = this.state;
+    if (selectedRowKeys.length === 0) {
+      return;
+    }
     this.setState({ selectedRowKeys: [], selectedRows: [] });
   };
 
@@ -79,6 +83,7 @@ class RoleList extends PureComponent {
         pageSize: pagination.pageSize,
       },
     });
+    this.clearSelectRows();
   };
 
   handleResetFormClick = () => {

@@ -31,12 +31,6 @@ export async function del(params) {
   });
 }
 
-export async function delMany(params) {
-  return request(`/v1/${router}?${stringify(params)}`, {
-    method: 'DELETE',
-  });
-}
-
 export async function enable(params) {
   return request(`/v1/${router}/${params.record_id}/enable`, {
     method: 'PATCH',

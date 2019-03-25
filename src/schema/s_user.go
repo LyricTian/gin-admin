@@ -21,7 +21,7 @@ type User struct {
 
 // UserRole 用户角色
 type UserRole struct {
-	RoleID string
+	RoleID string `json:"role_id" swaggo:"true,角色ID"`
 }
 
 // UserQueryParam 查询条件

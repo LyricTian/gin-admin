@@ -12,16 +12,19 @@ export default class RoleMenu extends PureComponent {
       {
         title: '菜单名称',
         dataIndex: 'name',
+        width: '30%',
       },
       {
         title: '动作权限',
         dataIndex: 'actions',
         editable: true,
+        width: '30%',
       },
       {
         title: '资源权限',
         dataIndex: 'resources',
         editable: true,
+        width: '40%',
       },
     ];
 
