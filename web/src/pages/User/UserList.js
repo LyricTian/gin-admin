@@ -228,17 +228,14 @@ class UserList extends PureComponent {
       {
         title: '用户名',
         dataIndex: 'user_name',
-        width: 150,
       },
       {
         title: '真实姓名',
         dataIndex: 'real_name',
-        width: 150,
       },
       {
         title: '角色名称',
         dataIndex: 'roles',
-        width: 250,
         render: val => {
           if (!val || val.length === 0) {
             return <span>-</span>;
@@ -253,13 +250,20 @@ class UserList extends PureComponent {
       {
         title: '用户状态',
         dataIndex: 'status',
-        width: 100,
         render: val => {
           if (val === 1) {
             return <Badge status="success" text="启用" />;
           }
           return <Badge status="error" text="停用" />;
         },
+      },
+      {
+        title: '邮箱',
+        dataIndex: 'email',
+      },
+      {
+        title: '手机号',
+        dataIndex: 'phone',
       },
       {
         title: '创建时间',
