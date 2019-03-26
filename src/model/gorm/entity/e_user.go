@@ -29,6 +29,8 @@ func (a SchemaUser) ToUser() *User {
 		Password: a.Password,
 		Status:   a.Status,
 		Creator:  a.Creator,
+		Email:    a.Email,
+		Phone:    a.Phone,
 	}
 	return item
 }

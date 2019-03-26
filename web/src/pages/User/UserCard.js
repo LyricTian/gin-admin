@@ -120,6 +120,16 @@ class UserCard extends PureComponent {
               </Radio.Group>
             )}
           </Form.Item>
+          <Form.Item {...formItemLayout} label="邮箱">
+            {getFieldDecorator('email', {
+              initialValue: formData.email,
+            })(<Input placeholder="请输入邮箱" />)}
+          </Form.Item>
+          <Form.Item {...formItemLayout} label="手机号">
+            {getFieldDecorator('phone', {
+              initialValue: formData.phone,
+            })(<Input placeholder="请输入手机号" />)}
+          </Form.Item>
         </Form>
       </Modal>
     );
