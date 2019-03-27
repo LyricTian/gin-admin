@@ -55,7 +55,7 @@ go build -o ./cmd/server/server ./cmd/server
 #### 温馨提醒
 
 1. 默认配置采用的是 sqlite 数据库，数据库文件在`data/gadmin.db`。如果想切换为`mysql`或`postgres`，需要先创建数据库（数据库创建脚本在`script`目录下）。
-2. 日志的默认配置为写入本地文件，日志文件在`data/gadmin.log`。如果想切换到输出控制台或写入到 gorm 存储，可以自行切换配置。
+2. 日志的默认配置为标准输出，如果想切换到写入文件或写入到 gorm 存储，可以自行切换配置。
 
 #### 安装依赖包并运行前端
 
