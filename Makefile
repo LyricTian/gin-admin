@@ -12,7 +12,7 @@ build-server:
 	@go build -ldflags "-w -s" -o $(SERVER_BIN) ./cmd/server
 
 build-web:
-	cd web && yarn && yarn run build
+	cd web && npm install && npm run build
 
 build: build-server build-web
 
