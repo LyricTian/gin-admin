@@ -2,15 +2,14 @@
 
 <div align="center">
  基于 Gin + GORM + Casbin + Ant Design React 实现的RBAC权限管理脚手架，目的是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
+<br/>
 
 [![ReportCard][reportcard-image]][reportcard-url] [![GoDoc][godoc-image]][godoc-url] [![License][license-image]][license-url]
 
-![](./screenshot_main.png)
-
 </div>
 
-- :label: [在线演示地址](https://demo.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
-- :label: [Swagger 文档地址](https://demo.tiannianshou.com/swagger/)
+- [在线演示地址](https://demo.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
+- [Swagger 文档地址](https://demo.tiannianshou.com/swagger/)
 
 ![](./screenshot_swagger.png)
 
@@ -18,16 +17,15 @@
 
 - 遵循 RESTful API 设计规范
 - 基于 Casbin 的 RBAC 访问控制模型
-- 依赖注入
 - 存储分离(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离，可以非常方便的更换存储方式)
 - 支持统一的事务管理
 - 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，日志钩子支持 gorm)
 - JWT 认证(采用黑名单方式，存储支持：file/redis)
 - 支持 Swagger 文档
+- 依赖注入
 - 支持跨域请求
 - 支持请求频次限制
 - 支持静态站点
-- HTTP 优雅重启
 - 单元测试
 
 ## 下载并运行
@@ -40,13 +38,13 @@ go get -v github.com/LyricTian/gin-admin/...
 
 ### 运行
 
-> root 用户的用户名及密码在配置文件(config/config.toml)中，默认为：root/abc-123
+> root 用户的用户名及密码在配置文件(`config/config.toml`)中，默认为：root/abc-123
 
 #### 编译并运行服务
 
-> 也可以使用脚本运行(详情可查看`Makefile`)：make start-dev-server
+> 也可以使用脚本运行(详情可查看`Makefile`)：`make start-dev-server`
 
-```
+```bash
 cd $GOPATH/src/github.com/LyricTian/gin-admin
 go build -o ./cmd/server/server ./cmd/server
 ./cmd/server/server -c ./config/config.toml -m ./config/model.conf -swagger ./src/web/swagger
@@ -54,16 +52,15 @@ go build -o ./cmd/server/server ./cmd/server
 
 #### 温馨提醒
 
-1. 默认配置采用的是 sqlite 数据库，数据库文件在`data/gadmin.db`。如果想切换为`mysql`或`postgres`，需要先创建数据库（数据库创建脚本在`script`目录下）。
+1. 默认配置采用的是 sqlite 数据库，数据库文件在`data/gadmin.db`。如果想切换为`mysql`或`postgres`，请更改配置文件，并创建数据库（数据库创建脚本在`script`目录下）。
 2. 日志的默认配置为标准输出，如果想切换到写入文件或写入到 gorm 存储，可以自行切换配置。
 
 #### 安装依赖包并运行前端
 
-> 也可以使用脚本运行(详情可查看`Makefile`)：make start-dev-web
+> 也可以使用脚本运行(详情可查看`Makefile`)：`make start-dev-web`
 
-```
-cd $GOPATH/src/github.com/LyricTian/gin-admin
-cd web
+```bash
+cd $GOPATH/src/github.com/LyricTian/gin-admin/web
 npm install
 npm start
 ```
@@ -84,6 +81,7 @@ swaggo -s ./swagger.go -p ../ -o ./swagger
 
 ## 项目结构概览
 
+```
 - cmd：存放用于编译可运行程序的 main 源码
   - server：主服务
 - config：配置文件
@@ -122,6 +120,7 @@ swaggo -s ./swagger.go -p ../ -o ./swagger
     - pages：页面组件
     - services：接口调用服务
     - utils：工具函数
+```
 
 ## 感谢以下框架的开源
 
