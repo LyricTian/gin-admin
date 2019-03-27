@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"sync/atomic"
+	"syscall"
 
 	"github.com/LyricTian/gin-admin/src"
 	"github.com/LyricTian/gin-admin/src/config"
@@ -18,8 +19,8 @@ import (
 )
 
 // VERSION 版本号，
-// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=2.0.0-dev"
-var VERSION = "2.0.0-dev"
+// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=2.0.0"
+var VERSION = "2.0.0"
 
 var (
 	configFile string
@@ -73,8 +74,8 @@ func main() {
 	span().Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.GetRunMode(), VERSION, os.Getpid())
 
 	var state int32 = 1
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt, os.Kill)
+	sc := make(chan os.Signal)
+	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	rfunc := src.Init(ctx)
 	select {
