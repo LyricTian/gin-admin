@@ -16,11 +16,11 @@ import (
 	_ "github.com/LyricTian/gin-admin/src/web/ctl"
 )
 
-// @Version 2.0.0-dev
+// @Version 2.0.0
 // @Title GinAdmin
 // @Description RBAC scaffolding based on GIN + GORM + CASBIN.
 // @Schemes http
-// @Host 127.0.0.1:8086
+// @Host 127.0.0.1:10088
 // @BasePath /
 // @Name LyricTian
 // @Contact tiannianshou@gmail.com
