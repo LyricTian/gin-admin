@@ -84,50 +84,50 @@ swaggo -s ./swagger.go -p ../ -o ./swagger
 
 ## 项目结构概览
 
-- cmd #存放用于编译可运行程序的 main 源码
-  - server #主服务
-- config #配置文件
-- doc #文档
-- script #脚本
-- src #go源码目录
-  - auth #认证模块
-  - bll #业务逻辑处理模块
-  - config #配置文件（主要用于go源码与配置文件之间的映射）
-  - context #全局上下文（提供统一的用户ID和事务的上下文数据）
-  - errors #统一的错误处理模块
-  - inject #依赖注入初始化模块
-  - logger #日志模块
-  - model #存储层模块（提供统一的存储层接口及实现）
-    - gorm #gorm存储层实现
-      - entity #数据库实体与表的映射
-      - model #存储层实现
-  - schema #数据模型对象，与数据库无关
-  - service #对外部服务的封装
-  - util #工具函数
-  - web #HTTP服务源码
-    - context #提供HTTP处理上下文
-    - ctl #控制器
-    - middleware #gin中间件
-    - swagger #swagger库静态文件
-    - test #API接口的单元测试
-- vendor #go 依赖包
-- web #前端源码目录
-  - config #配置文件
-  - public #公共访问资源
-  - src #前端源码
-    - assets #前端项目中使用的静态文件
-    - components #前端公共组件库
-    - layouts #模板文件
-    - models #dva model
-    - pages #页面组件
-    - services #接口调用服务
-    - utils #工具函数
+- cmd：存放用于编译可运行程序的 main 源码
+  - server：主服务
+- config：配置文件
+- doc：文档
+- script：脚本
+- src：go源码目录
+  - auth：认证模块
+  - bll：业务逻辑处理模块
+  - config：配置文件（主要用于go源码与配置文件之间的映射）
+  - context：全局上下文（提供统一的用户ID和事务的上下文数据）
+  - errors：统一的错误处理模块
+  - inject：依赖注入初始化模块
+  - logger：日志模块
+  - model：存储层模块（提供统一的存储层接口及实现）
+    - gorm：gorm存储层实现
+      - entity：数据库实体与表的映射
+      - model：存储层实现
+  - schema：数据模型对象，与数据库无关
+  - service：对外部服务的封装
+  - util：工具函数
+  - web：HTTP服务源码
+    - context：提供HTTP处理上下文
+    - ctl：控制器
+    - middleware：gin中间件
+    - swagger：swagger库静态文件
+    - test：API接口的单元测试
+- vendor：go 依赖包
+- web：前端源码目录
+  - config：配置文件
+  - public：公共访问资源
+  - src：前端源码
+    - assets：前端项目中使用的静态文件
+    - components：前端公共组件库
+    - layouts：模板文件
+    - models：dva model
+    - pages：页面组件
+    - services：接口调用服务
+    - utils：工具函数
 
 ## 感谢以下框架的开源
 
 - [Gin] - [https://gin-gonic.com/](https://gin-gonic.com/)
-- [Casbin] - [https://casbin.org/](https://casbin.org/)
 - [GORM] - [http://gorm.io/](http://gorm.io/)
+- [Casbin] - [https://casbin.org/](https://casbin.org/)
 - [Ant Design] - [https://ant.design/](https://ant.design/)
 
 ## MIT License
