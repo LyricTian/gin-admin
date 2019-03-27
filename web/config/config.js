@@ -49,7 +49,7 @@ export default {
   },
   proxy: {
     '/api/': {
-      target: 'http://127.0.0.1:8086/',
+      target: 'http://127.0.0.1:10088/',
       changeOrigin: true,
     },
   },
