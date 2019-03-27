@@ -53,6 +53,7 @@ class DemoCard extends PureComponent {
         onOk={this.onOKClick}
         onCancel={onCancel}
         style={{ top: 20 }}
+        bodyStyle={{ maxHeight: 'calc( 100vh - 158px )', overflowY: 'auto' }}
       >
         <Form>
           <Form.Item {...formItemLayout} label="编号">

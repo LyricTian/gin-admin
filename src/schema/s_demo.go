@@ -1,33 +1,33 @@
 package schema
 
-// Demo 示例程序
+import "time"
+
+// Demo demo对象
 type Demo struct {
-	ID       int64  `json:"id" db:"id,primarykey,autoincrement" structs:"id"`         // 唯一标识(自增ID)
-	RecordID string `json:"record_id" db:"record_id,size:36" structs:"record_id"`     // 记录内码(uuid)
-	Code     string `json:"code" db:"code,size:50" structs:"code" binding:"required"` // 编号
-	Name     string `json:"name" db:"name,size:50" structs:"name" binding:"required"` // 名称
-	Memo     string `json:"memo" db:"memo,size:200" structs:"memo"`                   // 备注
-	Status   int    `json:"status" db:"status" structs:"status" binding:"required"`   // 状态(1:启用 2:停用)
-	Creator  string `json:"creator" db:"creator,size:36" structs:"creator"`           // 创建者
-	Created  int64  `json:"created" db:"created" structs:"created"`                   // 创建时间戳
-	Updated  int64  `json:"updated" db:"updated" structs:"updated"`                   // 更新时间戳
-	Deleted  int64  `json:"deleted" db:"deleted" structs:"deleted"`                   // 删除时间戳
+	RecordID  string    `json:"record_id" swaggo:"false,记录ID"`
+	Code      string    `json:"code" binding:"required" swaggo:"true,编号"`
+	Name      string    `json:"name" binding:"required" swaggo:"true,名称"`
+	Memo      string    `json:"memo" swaggo:"false,备注"`
+	Status    int       `json:"status" binding:"required,max=2,min=1" swaggo:"true,状态(1:启用 2:停用)"`
+	Creator   string    `json:"creator" swaggo:"false,创建者"`
+	CreatedAt time.Time `json:"created_at" swaggo:"false,创建时间"`
 }
 
-// DemoQueryParam 示例查询条件
+// DemoQueryParam 查询条件
 type DemoQueryParam struct {
-	Code   string // 编号
-	Name   string // 名称
-	Status int    // 状态(1:启用 2:停用)
+	Code     string // 编号
+	Status   int    // 状态(1:启用 2:停用)
+	LikeCode string // 编号(模糊查询)
+	LikeName string // 名称(模糊查询)
 }
 
-// DemoQueryResult 示例查询结果
+// DemoQueryOptions demo对象查询可选参数项
+type DemoQueryOptions struct {
+	PageParam *PaginationParam // 分页参数
+}
+
+// DemoQueryResult demo对象查询结果
 type DemoQueryResult struct {
-	ID       int64  `json:"id" db:"id"`               // 唯一标识(自增ID)
-	RecordID string `json:"record_id" db:"record_id"` // 记录内码(uuid)
-	Code     string `json:"code" db:"code"`           // 编号
-	Name     string `json:"name" db:"name"`           // 名称
-	Memo     string `json:"memo" db:"memo"`           // 备注
-	Status   int    `json:"status" db:"status"`       // 状态(1:启用 2:停用)
-	Created  int64  `json:"created" db:"created"`     // 创建时间戳
+	Data       []*Demo
+	PageResult *PaginationResult
 }

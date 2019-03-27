@@ -22,10 +22,14 @@ import (
 	"github.com/casbin/casbin/rbac"
 )
 
+type MatchingFunc func(arg1, arg2 string) bool
+
 // RoleManager provides a default implementation for the RoleManager interface
 type RoleManager struct {
 	allRoles          *sync.Map
 	maxHierarchyLevel int
+	hasPattern        bool
+	matchingFunc      MatchingFunc
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -34,15 +38,41 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm := RoleManager{}
 	rm.allRoles = &sync.Map{}
 	rm.maxHierarchyLevel = maxHierarchyLevel
+	rm.hasPattern = false
+
 	return &rm
 }
 
+func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
+	rm.hasPattern = true
+	rm.matchingFunc = fn
+}
+
 func (rm *RoleManager) hasRole(name string) bool {
-	_, ok := rm.allRoles.Load(name)
+	var ok bool
+	if rm.hasPattern {
+		rm.allRoles.Range(func(key, value interface{}) bool {
+			if rm.matchingFunc(name, key.(string)) {
+				ok = true
+			}
+			return true
+		})
+	} else {
+		_, ok = rm.allRoles.Load(name)
+	}
+
 	return ok
 }
 
 func (rm *RoleManager) createRole(name string) *Role {
+	if rm.hasPattern {
+		rm.allRoles.Range(func(key, value interface{}) bool {
+			if rm.matchingFunc(name, key.(string)) {
+				name = key.(string)
+			}
+			return true
+		})
+	}
 	role, _ := rm.allRoles.LoadOrStore(name, newRole(name))
 	return role.(*Role)
 }

@@ -8,26 +8,23 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/src/logger"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
 )
 
-// LoggerMiddleware GIN的日志中间件
-func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.HandlerFunc {
+// LoggerMiddleware 日志中间件
+func LoggerMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		p := c.Request.URL.Path
-		if !util.CheckPrefix(p, allowPrefixes...) ||
-			util.CheckPrefix(p, skipPrefixes...) {
+		if len(skipper) > 0 && skipper[0](c) {
 			c.Next()
 			return
 		}
 
-		nctx := context.New(c)
+		ctx := context.New(c)
+		p := c.Request.URL.Path
 		method := c.Request.Method
-
-		stitle, skey := context.GetRouterTitleAndKey(method, p)
-		span := logger.StartSpan(nctx.CContext(), stitle, skey)
+		routerKey := context.JoinRouter(method, p)
+		span := logger.StartSpan(ctx.GetContext(), "", routerKey)
 		start := time.Now()
 
 		fields := make(map[string]interface{})
@@ -43,8 +40,8 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 			mediaType, _, _ := mime.ParseMediaType(c.GetHeader("Content-Type"))
 			if mediaType == "application/json" {
 				body, err := ioutil.ReadAll(c.Request.Body)
+				c.Request.Body.Close()
 				if err == nil {
-					c.Request.Body.Close()
 					buf := bytes.NewBuffer(body)
 					c.Request.Body = ioutil.NopCloser(buf)
 					fields["content_length"] = c.Request.ContentLength
@@ -55,15 +52,14 @@ func LoggerMiddleware(allowPrefixes []string, skipPrefixes ...string) gin.Handle
 		c.Next()
 
 		timeConsuming := time.Since(start).Nanoseconds() / 1e6
-		fields["time_consuming"] = timeConsuming
 		fields["res_status"] = c.Writer.Status()
 		fields["res_length"] = c.Writer.Size()
-		if v, ok := c.Get(util.ContextKeyResBody); ok {
+		if v, ok := c.Get(context.ResBodyKey); ok {
 			if b, ok := v.([]byte); ok {
 				fields["res_body"] = string(b)
 			}
 		}
-		fields[logger.UserIDKey] = nctx.GetUserID()
+		fields[logger.UserIDKey] = ctx.GetUserID()
 		span.WithFields(fields).Infof("[http] %s-%s-%s-%d(%dms)",
 			p, c.Request.Method, c.ClientIP(), c.Writer.Status(), timeConsuming)
 	}

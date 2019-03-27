@@ -9,6 +9,7 @@ class MenuTree extends PureComponent {
   componentDidMount() {
     this.dispatch({
       type: 'menu/fetchTree',
+      payload: { include_resource: 1 },
     });
   }
 

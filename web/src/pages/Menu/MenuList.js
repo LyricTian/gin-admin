@@ -1,23 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  Table,
-  Badge,
-  Select,
-  Modal,
-  Icon,
-  Dropdown,
-  Menu,
-  Layout,
-  Tree,
-} from 'antd';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { Row, Col, Card, Form, Input, Button, Table, Radio, Modal, Layout, Tree } from 'antd';
+import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import PButton from '@/components/PermButton';
 import MenuCard from './MenuCard';
 
 import styles from './MenuList.less';
@@ -29,13 +14,14 @@ import styles from './MenuList.less';
 @Form.create()
 class MenuList extends PureComponent {
   state = {
+    selectedRowKeys: [],
     selectedRows: [],
     treeSelectedKeys: [],
   };
 
   componentDidMount() {
     this.dispatch({
-      type: 'menu/fetchSearchTree',
+      type: 'menu/fetchTree',
     });
 
     this.dispatch({
@@ -45,55 +31,22 @@ class MenuList extends PureComponent {
     });
   }
 
-  onDelBatchOKClick = () => {
+  handleEditClick = () => {
     const { selectedRows } = this.state;
     if (selectedRows.length === 0) {
       return;
     }
-    this.setState({
-      selectedRows: [],
-    });
-    this.dispatch({
-      type: 'menu/delMany',
-      payload: { batch: selectedRows.join(',') },
-    });
-  };
-
-  onBatchDelClick = () => {
-    Modal.confirm({
-      title: '确认删除选中的菜单吗？',
-      okText: '确认',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: this.onDelBatchOKClick.bind(this),
-    });
-  };
-
-  onItemDisableClick = id => {
-    this.dispatch({
-      type: 'menu/changeStatus',
-      payload: { record_id: id, status: 2 },
-    });
-  };
-
-  onItemEnableClick = id => {
-    this.dispatch({
-      type: 'menu/changeStatus',
-      payload: { record_id: id, status: 1 },
-    });
-  };
-
-  onItemEditClick = id => {
+    const item = selectedRows[0];
     this.dispatch({
       type: 'menu/loadForm',
       payload: {
         type: 'E',
-        id,
+        id: item.record_id,
       },
     });
   };
 
-  onAddClick = () => {
+  handleAddClick = () => {
     this.dispatch({
       type: 'menu/loadForm',
       payload: {
@@ -102,26 +55,25 @@ class MenuList extends PureComponent {
     });
   };
 
-  onDelOKClick(id) {
-    this.dispatch({
-      type: 'menu/del',
-      payload: { record_id: id },
-    });
-  }
-
-  onItemDelClick = item => {
+  handleDelClick = () => {
+    const { selectedRows } = this.state;
+    if (selectedRows.length === 0) {
+      return;
+    }
+    const item = selectedRows[0];
     Modal.confirm({
       title: `确定删除【菜单数据：${item.name}】？`,
       okText: '确认',
       okType: 'danger',
       cancelText: '取消',
-      onOk: this.onDelOKClick.bind(this, item.record_id),
+      onOk: this.handleDelOKClick.bind(this, item.record_id),
     });
   };
 
-  onTableSelectRow = rows => {
+  onTableSelectRow = (selectedRowKeys, selectedRows) => {
     this.setState({
-      selectedRows: rows,
+      selectedRowKeys,
+      selectedRows,
     });
   };
 
@@ -133,6 +85,7 @@ class MenuList extends PureComponent {
         pageSize: pagination.pageSize,
       },
     });
+    this.clearSelectRows();
   };
 
   onResetFormClick = () => {
@@ -151,34 +104,48 @@ class MenuList extends PureComponent {
     }
 
     const { form } = this.props;
-    form.validateFields({ force: true }, (err, values) => {
-      if (!err) {
-        this.dispatch({
-          type: 'menu/fetch',
-          search: {
-            name: values.name,
-            status: values.status,
-            mtype: values.type,
-            parent_id: this.getParentID(),
-          },
-          pagination: {},
-        });
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
       }
+      this.dispatch({
+        type: 'menu/fetch',
+        search: {
+          ...values,
+          parent_id: this.getParentID(),
+        },
+        pagination: {},
+      });
+      this.clearSelectRows();
     });
   };
 
-  onDataFormSubmit = data => {
+  handleFormSubmit = data => {
     this.dispatch({
       type: 'menu/submit',
       payload: data,
     });
+    this.clearSelectRows();
   };
 
-  onDataFormCancel = () => {
+  handleFormCancel = () => {
     this.dispatch({
       type: 'menu/changeFormVisible',
       payload: false,
     });
+  };
+
+  clearSelectRows = () => {
+    const { selectedRowKeys } = this.state;
+    if (selectedRowKeys.length === 0) {
+      return;
+    }
+    this.setState({ selectedRowKeys: [], selectedRows: [] });
+  };
+
+  dispatch = action => {
+    const { dispatch } = this.props;
+    dispatch(action);
   };
 
   getParentID = () => {
@@ -190,13 +157,16 @@ class MenuList extends PureComponent {
     return parentID;
   };
 
-  dispatch = action => {
-    const { dispatch } = this.props;
-    dispatch(action);
-  };
+  handleDelOKClick(id) {
+    this.dispatch({
+      type: 'menu/del',
+      payload: { record_id: id },
+    });
+    this.clearSelectRows();
+  }
 
   renderDataForm() {
-    return <MenuCard onCancel={this.onDataFormCancel} onSubmit={this.onDataFormSubmit} />;
+    return <MenuCard onCancel={this.handleFormCancel} onSubmit={this.handleFormSubmit} />;
   }
 
   renderTreeNodes = data =>
@@ -217,45 +187,38 @@ class MenuList extends PureComponent {
     } = this.props;
     return (
       <Form onSubmit={this.onSearchFormSubmit} layout="inline">
-        <Row gutter={16}>
-          <Col md={8} sm={24}>
+        <Row gutter={8}>
+          <Col span={8}>
             <Form.Item label="菜单名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </Form.Item>
           </Col>
-          <Col md={8} sm={24}>
-            <Form.Item label="菜单类型">
-              {getFieldDecorator('type')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Select.Option value="10">系统</Select.Option>
-                  <Select.Option value="20">模块</Select.Option>
-                  <Select.Option value="30">功能</Select.Option>
-                  <Select.Option value="40">资源</Select.Option>
-                </Select>
+          <Col span={10}>
+            <Form.Item label="隐藏状态">
+              {getFieldDecorator('hidden', {
+                initialValue: '-1',
+              })(
+                <Radio.Group>
+                  <Radio value="-1">全部</Radio>
+                  <Radio value="0">显示</Radio>
+                  <Radio value="1">隐藏</Radio>
+                </Radio.Group>
               )}
             </Form.Item>
           </Col>
-          <Col md={8} sm={24}>
-            <Form.Item label="菜单状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Select.Option value="1">正常</Select.Option>
-                  <Select.Option value="2">停用</Select.Option>
-                </Select>
-              )}
-            </Form.Item>
+          <Col span={6}>
+            <div style={{ overflow: 'hidden' }}>
+              <span style={{ marginBottom: 24 }}>
+                <Button type="primary" htmlType="submit">
+                  查询
+                </Button>
+                <Button style={{ marginLeft: 8 }} onClick={this.onResetFormClick}>
+                  重置
+                </Button>
+              </span>
+            </div>
           </Col>
         </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <span style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.onResetFormClick}>
-              重置
-            </Button>
-          </span>
-        </div>
       </Form>
     );
   }
@@ -265,121 +228,35 @@ class MenuList extends PureComponent {
       loading,
       menu: {
         data: { list, pagination },
-        searchTreeData,
+        treeData,
         expandedKeys,
       },
     } = this.props;
 
-    const { selectedRows } = this.state;
+    const { selectedRowKeys } = this.state;
 
     const columns = [
       {
-        dataIndex: 'record_id',
-        width: 80,
-        fixed: 'left',
-        render: (val, record) => (
-          <div>
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item>
-                    <a
-                      onClick={() => {
-                        this.onItemEditClick(val);
-                      }}
-                    >
-                      编辑
-                    </a>
-                  </Menu.Item>
-                  <Menu.Item>
-                    {record.status === 1 ? (
-                      <a
-                        onClick={() => {
-                          this.onItemDisableClick(val);
-                        }}
-                      >
-                        设置为停用
-                      </a>
-                    ) : (
-                      <a
-                        onClick={() => {
-                          this.onItemEnableClick(val);
-                        }}
-                      >
-                        设置为启用
-                      </a>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    <a
-                      onClick={() => {
-                        this.onItemDelClick(record);
-                      }}
-                    >
-                      删除
-                    </a>
-                  </Menu.Item>
-                </Menu>
-              }
-            >
-              <a>
-                操作 <Icon type="down" />
-              </a>
-            </Dropdown>
-          </div>
-        ),
-      },
-      {
         title: '菜单名称',
         dataIndex: 'name',
-        width: 180,
-      },
-      {
-        title: '菜单编号',
-        dataIndex: 'code',
         width: 150,
-      },
-      {
-        title: '菜单类型',
-        dataIndex: 'type',
-        width: 100,
-        render: val => {
-          let v = '';
-          switch (val) {
-            case 10:
-              v = '系统';
-              break;
-            case 20:
-              v = '模块';
-              break;
-            case 30:
-              v = '功能';
-              break;
-            case 40:
-              v = '资源';
-              break;
-            default:
-              v = '-';
-              break;
-          }
-          return <span>{v}</span>;
-        },
-      },
-      {
-        title: '菜单状态',
-        dataIndex: 'status',
-        width: 100,
-        render: val => {
-          if (val === 1) {
-            return <Badge status="success" text="正常" />;
-          }
-          return <Badge status="error" text="停用" />;
-        },
       },
       {
         title: '排序值',
         dataIndex: 'sequence',
-        width: 80,
+        width: 100,
+      },
+      {
+        title: '隐藏状态',
+        dataIndex: 'hidden',
+        width: 100,
+        render: val => {
+          let title = '显示';
+          if (val === 1) {
+            title = '隐藏';
+          }
+          return <span>{title}</span>;
+        },
       },
       {
         title: '菜单图标',
@@ -387,9 +264,8 @@ class MenuList extends PureComponent {
         width: 100,
       },
       {
-        title: '访问路径',
-        dataIndex: 'path',
-        width: 200,
+        title: '访问路由',
+        dataIndex: 'router',
       },
     ];
 
@@ -400,29 +276,21 @@ class MenuList extends PureComponent {
       ...pagination,
     };
 
+    const breadcrumbList = [{ title: '系统管理' }, { title: '菜单管理', href: '/system/menu' }];
+
     return (
-      <PageHeaderLayout title="菜单管理">
+      <PageHeaderLayout title="菜单管理" breadcrumbList={breadcrumbList}>
         <Layout>
           <Layout.Sider
             width={200}
             style={{ background: '#fff', borderRight: '1px solid lightGray' }}
           >
-            <div>
-              <Input.Search
-                placeholder="请输入"
-                onChange={e => {
-                  const { value } = e.target;
-                  this.dispatch({
-                    type: 'menu/fetchSearchTree',
-                    payload: { name: value },
-                  });
-                }}
-              />
-            </div>
             <Tree
               expandedKeys={expandedKeys}
               onSelect={keys => {
-                this.setState({ treeSelectedKeys: keys });
+                this.setState({
+                  treeSelectedKeys: keys,
+                });
 
                 const {
                   menu: { search },
@@ -430,7 +298,6 @@ class MenuList extends PureComponent {
 
                 const item = {
                   parent_id: '',
-                  parent_type: '',
                 };
 
                 if (keys.length > 0) {
@@ -450,7 +317,7 @@ class MenuList extends PureComponent {
                 });
               }}
             >
-              {this.renderTreeNodes(searchTreeData)}
+              {this.renderTreeNodes(treeData)}
             </Tree>
           </Layout.Sider>
           <Layout.Content>
@@ -458,20 +325,37 @@ class MenuList extends PureComponent {
               <div className={styles.tableList}>
                 <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
                 <div className={styles.tableListOperator}>
-                  <Button icon="plus" type="primary" onClick={() => this.onAddClick()}>
+                  <PButton
+                    code="add"
+                    icon="plus"
+                    type="primary"
+                    onClick={() => this.handleAddClick()}
+                  >
                     新建
-                  </Button>
-                  {selectedRows.length > 0 && (
-                    <span>
-                      <Button icon="delete" type="danger" onClick={() => this.onBatchDelClick()}>
-                        删除
-                      </Button>
-                    </span>
-                  )}
+                  </PButton>
+                  {selectedRowKeys.length === 1 && [
+                    <PButton
+                      key="edit"
+                      code="edit"
+                      icon="edit"
+                      onClick={() => this.handleEditClick()}
+                    >
+                      编辑
+                    </PButton>,
+                    <PButton
+                      key="del"
+                      code="del"
+                      icon="delete"
+                      type="danger"
+                      onClick={() => this.handleDelClick()}
+                    >
+                      删除
+                    </PButton>,
+                  ]}
                 </div>
                 <Table
                   rowSelection={{
-                    selectedRowKeys: selectedRows,
+                    selectedRowKeys,
                     onChange: this.onTableSelectRow,
                   }}
                   loading={loading}
@@ -480,7 +364,6 @@ class MenuList extends PureComponent {
                   columns={columns}
                   pagination={paginationProps}
                   onChange={this.onTableChange}
-                  scroll={{ x: 990 }}
                   size="small"
                 />
               </div>

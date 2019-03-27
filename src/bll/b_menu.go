@@ -2,160 +2,171 @@ package bll
 
 import (
 	"context"
-	"sync"
-	"time"
 
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
-	"github.com/pkg/errors"
 )
 
 // Menu 菜单管理
 type Menu struct {
 	MenuModel model.IMenu `inject:"IMenu"`
-	lock      sync.RWMutex
+	CommonBll *Common     `inject:""`
+}
+
+// CheckDataInit 检查数据是否初始化
+func (a *Menu) CheckDataInit(ctx context.Context) (bool, error) {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{}, schema.MenuQueryOptions{
+		PageParam: &schema.PaginationParam{PageSize: -1},
+	})
+	if err != nil {
+		return false, err
+	}
+	return result.PageResult.Total > 0, nil
 }
 
 // QueryPage 查询分页数据
-func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pageIndex, pageSize uint) (int64, []*schema.MenuQueryResult, error) {
-	return a.MenuModel.QueryPage(ctx, params, pageIndex, pageSize)
+func (a *Menu) QueryPage(ctx context.Context, params schema.MenuQueryParam, pp *schema.PaginationParam) ([]*schema.Menu, *schema.PaginationResult, error) {
+	result, err := a.MenuModel.Query(ctx, params, schema.MenuQueryOptions{
+		PageParam: pp,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return result.Data, result.PageResult, nil
 }
 
 // QueryTree 查询菜单树
-func (a *Menu) QueryTree(ctx context.Context, params schema.MenuSelectQueryParam) ([]map[string]interface{}, error) {
-	items, err := a.MenuModel.QuerySelect(ctx, params)
+func (a *Menu) QueryTree(ctx context.Context, includeActions, includeResources bool) ([]*schema.MenuTree, error) {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{}, schema.MenuQueryOptions{
+		IncludeActions:   includeActions,
+		IncludeResources: includeResources,
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	treeData := util.Slice2Tree(util.StructsToMapSlice(items), "record_id", "parent_id")
-	return util.ConvertToViewTree(treeData, "name", "record_id", "record_id"), nil
+	return result.Data.ToTrees().ToTree(), nil
 }
 
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
-	item, err := a.MenuModel.Get(ctx, recordID)
+	item, err := a.MenuModel.Get(ctx, recordID,
+		schema.MenuQueryOptions{
+			IncludeResources: true,
+			IncludeActions:   true,
+		},
+	)
 	if err != nil {
 		return nil, err
 	} else if item == nil {
-		return nil, util.ErrNotFound
+		return nil, errors.ErrNotFound
 	}
-
 	return item, nil
 }
 
-// Create 创建数据
-func (a *Menu) Create(ctx context.Context, item *schema.Menu) error {
-	if item.Code != "" {
-		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
-		if err != nil {
-			return err
-		} else if exists {
-			return errors.New("编号已经存在")
-		}
+// 获取父级路径
+func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, error) {
+	if parentID == "" {
+		return "", nil
 	}
 
-	a.lock.Lock()
-	defer a.lock.Unlock()
-
-	levelCodes, err := a.MenuModel.QueryLevelCodesByParentID(item.ParentID)
+	pitem, err := a.MenuModel.Get(ctx, parentID)
 	if err != nil {
-		return err
+		return "", err
+	} else if pitem == nil {
+		return "", errors.NewBadRequestError("无效的父级节点")
 	}
 
-	levelCode := util.GetLevelCode(levelCodes)
-	if len(levelCode) == 0 {
-		return errors.New("无效的分级码")
+	var parentPath string
+	if v := pitem.ParentPath; v != "" {
+		parentPath = v + "/"
+	}
+	parentPath = parentPath + pitem.RecordID
+	return parentPath, nil
+}
+
+// Create 创建数据
+func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, error) {
+	parentPath, err := a.getParentPath(ctx, item.ParentID)
+	if err != nil {
+		return nil, err
 	}
 
-	item.LevelCode = levelCode
-	item.ID = 0
+	item.ParentPath = parentPath
 	item.RecordID = util.MustUUID()
-	item.Created = time.Now().Unix()
-	item.Deleted = 0
-	return a.MenuModel.Create(ctx, item)
+	item.Creator = a.CommonBll.GetUserID(ctx)
+	err = a.MenuModel.Create(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return a.Get(ctx, item.RecordID)
 }
 
 // Update 更新数据
-func (a *Menu) Update(ctx context.Context, recordID string, item *schema.Menu) error {
+func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*schema.Menu, error) {
 	if recordID == item.ParentID {
-		return errors.New("不能使用自己作为菜单上级")
+		return nil, errors.NewBadRequestError("不允许使用节点自身作为父级节点")
 	}
 
 	oldItem, err := a.MenuModel.Get(ctx, recordID)
 	if err != nil {
-		return err
+		return nil, err
 	} else if oldItem == nil {
-		return util.ErrNotFound
-	} else if item.Code != oldItem.Code {
-		exists, err := a.MenuModel.CheckCode(ctx, item.Code, item.ParentID)
-		if err != nil {
-			return err
-		} else if exists {
-			return errors.New("编号已经存在")
-		}
+		return nil, errors.ErrNotFound
 	}
+	item.ParentPath = oldItem.ParentPath
 
-	info := util.StructToMap(item)
-	delete(info, "id")
-	delete(info, "record_id")
-	delete(info, "level_code")
-	delete(info, "creator")
-	delete(info, "created")
-	delete(info, "updated")
-	delete(info, "deleted")
+	err = a.CommonBll.ExecTrans(ctx, func(ctx context.Context) error {
+		// 如果父级更新，需要更新当前节点及节点下级的父级路径
+		if item.ParentID != oldItem.ParentID {
+			parentPath, err := a.getParentPath(ctx, item.ParentID)
+			if err != nil {
+				return err
+			}
+			item.ParentPath = parentPath
 
-	if item.ParentID != oldItem.ParentID {
-		a.lock.Lock()
-		defer a.lock.Unlock()
+			opath := oldItem.ParentPath
+			if opath != "" {
+				opath += "/"
+			}
+			opath += oldItem.RecordID
 
-		levelCodes, err := a.MenuModel.QueryLevelCodesByParentID(item.ParentID)
-		if err != nil {
-			return err
+			result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+				PrefixParentPath: opath,
+			})
+			if err != nil {
+				return err
+			}
+
+			for _, menu := range result.Data {
+				npath := item.ParentPath + menu.ParentPath[len(opath):]
+				err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath)
+				if err != nil {
+					return err
+				}
+			}
 		}
 
-		levelCode := util.GetLevelCode(levelCodes)
-		if len(levelCode) == 0 {
-			return errors.New("无效的分级码")
-		}
-
-		return a.MenuModel.UpdateWithLevelCode(ctx, recordID, info, oldItem.LevelCode, levelCode)
+		return a.MenuModel.Update(ctx, recordID, item)
+	})
+	if err != nil {
+		return nil, err
 	}
-
-	return a.MenuModel.Update(ctx, recordID, info)
+	return a.Get(ctx, recordID)
 }
 
 // Delete 删除数据
 func (a *Menu) Delete(ctx context.Context, recordID string) error {
-	exists, err := a.MenuModel.Check(ctx, recordID)
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		ParentID: &recordID,
+	}, schema.MenuQueryOptions{PageParam: &schema.PaginationParam{PageSize: -1}})
 	if err != nil {
 		return err
-	} else if !exists {
-		return util.ErrNotFound
-	}
-
-	exists, err = a.MenuModel.CheckChild(ctx, recordID)
-	if err != nil {
-		return err
-	} else if exists {
-		return errors.New("含有子级菜单，不能删除")
+	} else if result.PageResult.Total > 0 {
+		return errors.NewBadRequestError("含有子级菜单，不能删除")
 	}
 
 	return a.MenuModel.Delete(ctx, recordID)
-}
-
-// UpdateStatus 更新状态
-func (a *Menu) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	exists, err := a.MenuModel.Check(ctx, recordID)
-	if err != nil {
-		return err
-	} else if !exists {
-		return util.ErrNotFound
-	}
-
-	info := map[string]interface{}{
-		"status": status,
-	}
-	return a.MenuModel.Update(ctx, recordID, info)
 }

@@ -1,22 +1,9 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  Table,
-  Modal,
-  Icon,
-  Dropdown,
-  Menu,
-  Badge,
-  Select,
-} from 'antd';
+import { Row, Col, Card, Form, Input, Button, Table, Modal, Badge, Select } from 'antd';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
-import { formatTimestamp } from '@/utils/utils';
+import PButton from '@/components/PermButton';
+import { formatDate } from '@/utils/utils';
 import DemoCard from './DemoCard';
 
 import styles from './DemoList.less';
@@ -28,6 +15,7 @@ import styles from './DemoList.less';
 @Form.create()
 class DemoList extends PureComponent {
   state = {
+    selectedRowKeys: [],
     selectedRows: [],
   };
 
@@ -39,50 +27,26 @@ class DemoList extends PureComponent {
     });
   }
 
-  onDelBatchOKClick = () => {
-    const { selectedRows } = this.state;
-    if (selectedRows.length === 0) {
-      return;
-    }
-    this.setState({
-      selectedRows: [],
-    });
-    this.dispatch({
-      type: 'demo/delMany',
-      payload: { batch: selectedRows.join(',') },
-    });
-  };
-
-  onBatchDelClick = () => {
-    Modal.confirm({
-      title: '确认删除选中的数据吗？',
-      okText: '确认',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: this.onDelBatchOKClick.bind(this),
-    });
-  };
-
-  onItemDisableClick = id => {
+  onItemDisableClick = item => {
     this.dispatch({
       type: 'demo/changeStatus',
-      payload: { record_id: id, status: 2 },
+      payload: { record_id: item.record_id, status: 2 },
     });
   };
 
-  onItemEnableClick = id => {
+  onItemEnableClick = item => {
     this.dispatch({
       type: 'demo/changeStatus',
-      payload: { record_id: id, status: 1 },
+      payload: { record_id: item.record_id, status: 1 },
     });
   };
 
-  onItemEditClick = id => {
+  onItemEditClick = item => {
     this.dispatch({
       type: 'demo/loadForm',
       payload: {
         type: 'E',
-        id,
+        id: item.record_id,
       },
     });
   };
@@ -101,7 +65,16 @@ class DemoList extends PureComponent {
       type: 'demo/del',
       payload: { record_id: id },
     });
+    this.clearSelectRows();
   }
+
+  clearSelectRows = () => {
+    const { selectedRowKeys } = this.state;
+    if (selectedRowKeys.length === 0) {
+      return;
+    }
+    this.setState({ selectedRowKeys: [], selectedRows: [] });
+  };
 
   onItemDelClick = item => {
     Modal.confirm({
@@ -113,8 +86,9 @@ class DemoList extends PureComponent {
     });
   };
 
-  onTableSelectRow = rows => {
+  onTableSelectRow = (keys, rows) => {
     this.setState({
+      selectedRowKeys: keys,
       selectedRows: rows,
     });
   };
@@ -127,6 +101,7 @@ class DemoList extends PureComponent {
         pageSize: pagination.pageSize,
       },
     });
+    this.clearSelectRows();
   };
 
   onResetFormClick = () => {
@@ -145,13 +120,15 @@ class DemoList extends PureComponent {
     }
     const { form } = this.props;
     form.validateFields({ force: true }, (err, values) => {
-      if (!err) {
-        this.dispatch({
-          type: 'demo/fetch',
-          search: values,
-          pagination: {},
-        });
+      if (err) {
+        return;
       }
+      this.dispatch({
+        type: 'demo/fetch',
+        search: values,
+        pagination: {},
+      });
+      this.clearSelectRows();
     });
   };
 
@@ -160,6 +137,7 @@ class DemoList extends PureComponent {
       type: 'demo/submit',
       payload: data,
     });
+    this.clearSelectRows();
   };
 
   onDataFormCancel = () => {
@@ -228,66 +206,9 @@ class DemoList extends PureComponent {
       },
     } = this.props;
 
-    const { selectedRows } = this.state;
+    const { selectedRows, selectedRowKeys } = this.state;
 
     const columns = [
-      {
-        dataIndex: 'record_id',
-        width: 80,
-        render: (val, record) => (
-          <div>
-            {
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item>
-                      <a
-                        onClick={() => {
-                          this.onItemEditClick(val);
-                        }}
-                      >
-                        编辑
-                      </a>
-                    </Menu.Item>
-                    <Menu.Item>
-                      {record.status === 1 ? (
-                        <a
-                          onClick={() => {
-                            this.onItemDisableClick(val);
-                          }}
-                        >
-                          设置为停用
-                        </a>
-                      ) : (
-                        <a
-                          onClick={() => {
-                            this.onItemEnableClick(val);
-                          }}
-                        >
-                          设置为启用
-                        </a>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      <a
-                        onClick={() => {
-                          this.onItemDelClick(record);
-                        }}
-                      >
-                        删除
-                      </a>
-                    </Menu.Item>
-                  </Menu>
-                }
-              >
-                <a>
-                  操作 <Icon type="down" />
-                </a>
-              </Dropdown>
-            }
-          </div>
-        ),
-      },
       {
         title: '编号',
         dataIndex: 'code',
@@ -312,8 +233,8 @@ class DemoList extends PureComponent {
       },
       {
         title: '创建时间',
-        dataIndex: 'created',
-        render: val => <span>{formatTimestamp(val, 'YYYY-MM-DD HH:mm')}</span>,
+        dataIndex: 'created_at',
+        render: val => <span>{formatDate(val, 'YYYY-MM-DD HH:mm')}</span>,
       },
     ];
 
@@ -324,27 +245,62 @@ class DemoList extends PureComponent {
       ...pagination,
     };
 
+    const breadcrumbList = [{ title: '演示用例' }, { title: '基础示例', href: '/example/demo' }];
+
     return (
-      <PageHeaderLayout title="基础示例管理">
+      <PageHeaderLayout title="基础示例" breadcrumbList={breadcrumbList}>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.onAddClick()}>
+              <PButton code="add" icon="plus" type="primary" onClick={() => this.onAddClick()}>
                 新建
-              </Button>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Button icon="delete" type="danger" onClick={() => this.onBatchDelClick()}>
-                    删除
-                  </Button>
-                </span>
-              )}
+              </PButton>
+              {selectedRows.length === 1 && [
+                <PButton
+                  key="edit"
+                  code="edit"
+                  icon="edit"
+                  onClick={() => this.onItemEditClick(selectedRows[0])}
+                >
+                  编辑
+                </PButton>,
+                <PButton
+                  key="del"
+                  code="del"
+                  icon="delete"
+                  type="danger"
+                  onClick={() => this.onItemDelClick(selectedRows[0])}
+                >
+                  删除
+                </PButton>,
+                selectedRows[0].status === 2 && (
+                  <PButton
+                    key="enable"
+                    code="enable"
+                    icon="check"
+                    onClick={() => this.onItemEnableClick(selectedRows[0])}
+                  >
+                    启用
+                  </PButton>
+                ),
+                selectedRows[0].status === 1 && (
+                  <PButton
+                    key="disable"
+                    code="disable"
+                    icon="stop"
+                    type="danger"
+                    onClick={() => this.onItemDisableClick(selectedRows[0])}
+                  >
+                    禁用
+                  </PButton>
+                ),
+              ]}
             </div>
             <div>
               <Table
                 rowSelection={{
-                  selectedRowKeys: selectedRows,
+                  selectedRowKeys,
                   onChange: this.onTableSelectRow,
                 }}
                 loading={loading}
