@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Modal, message, Card, Radio, Row, Col } from 'antd';
+import { Form, Input, Modal, message, Card, Row, Col, InputNumber } from 'antd';
 
-import MenuTree from '../Menu/MenuTree';
+import RoleMenu from './RoleMenu';
 
 @connect(state => ({
   role: state.role,
@@ -10,23 +10,19 @@ import MenuTree from '../Menu/MenuTree';
 @Form.create()
 class RoleCard extends PureComponent {
   onOKClick = () => {
-    const {
-      form,
-      role: { menuKeys },
-      onSubmit,
-    } = this.props;
+    const { form, onSubmit } = this.props;
 
     form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        if (menuKeys.length === 0) {
-          message.warning('请选择权限菜单！');
-          return;
-        }
-
-        const formData = { ...values, menu_ids: menuKeys };
-        formData.status = parseInt(formData.status, 10);
-        onSubmit(formData);
+      if (err) {
+        return;
       }
+      const formData = { ...values };
+      formData.sequence = parseInt(formData.sequence, 10);
+      if (!formData.menus || formData.menus.length === 0) {
+        message.warning('请选择菜单权限！');
+        return;
+      }
+      onSubmit(formData);
     });
   };
 
@@ -37,36 +33,24 @@ class RoleCard extends PureComponent {
 
   render() {
     const {
-      role: { formTitle, formVisible, formData, submitting, menuKeys },
+      role: { formTitle, formVisible, formData, submitting },
       form: { getFieldDecorator },
       onCancel,
     } = this.props;
 
     const formItemLayout = {
       labelCol: {
-        xs: { span: 24 },
-        sm: { span: 6 },
+        span: 4,
       },
       wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 18 },
-      },
-    };
-
-    const menuTreeProps = {
-      checkedKeys: menuKeys,
-      onCheck: keys => {
-        this.dispatch({
-          type: 'role/saveMenuKeys',
-          payload: keys,
-        });
+        span: 18,
       },
     };
 
     return (
       <Modal
         title={formTitle}
-        width={450}
+        width={800}
         visible={formVisible}
         maskClosable={false}
         confirmLoading={submitting}
@@ -74,11 +58,11 @@ class RoleCard extends PureComponent {
         onOk={this.onOKClick}
         onCancel={onCancel}
         style={{ top: 20 }}
-        bodyStyle={{ height: 550, overflowY: 'scroll' }}
+        bodyStyle={{ maxHeight: 'calc( 100vh - 158px )', overflowY: 'auto' }}
       >
         <Form>
           <Row>
-            <Col md={24} sm={24}>
+            <Col>
               <Form.Item {...formItemLayout} label="角色名称">
                 {getFieldDecorator('name', {
                   initialValue: formData.name,
@@ -91,9 +75,20 @@ class RoleCard extends PureComponent {
                 })(<Input placeholder="请输入角色名称" />)}
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Col md={24} sm={24}>
+            <Col>
+              <Form.Item {...formItemLayout} label="排序值">
+                {getFieldDecorator('sequence', {
+                  initialValue: formData.sequence ? formData.sequence.toString() : '1000000',
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入排序值',
+                    },
+                  ],
+                })(<InputNumber min={1} style={{ width: '100%' }} />)}
+              </Form.Item>
+            </Col>
+            <Col>
               <Form.Item {...formItemLayout} label="备注">
                 {getFieldDecorator('memo', {
                   initialValue: formData.memo,
@@ -102,25 +97,15 @@ class RoleCard extends PureComponent {
             </Col>
           </Row>
           <Row>
-            <Col md={24} sm={24}>
-              <Form.Item {...formItemLayout} label="角色状态">
-                {getFieldDecorator('status', {
-                  initialValue: formData.status ? formData.status.toString() : '1',
-                })(
-                  <Radio.Group>
-                    <Radio value="1">正常</Radio>
-                    <Radio value="2">停用</Radio>
-                  </Radio.Group>
-                )}
-              </Form.Item>
+            <Col span={24}>
+              <Card title="选择菜单权限" bordered={false}>
+                {getFieldDecorator('menus', {
+                  initialValue: formData.menus,
+                })(<RoleMenu />)}
+              </Card>
             </Col>
           </Row>
         </Form>
-        <Card title="选择菜单权限">
-          <div style={{ paddingLeft: 20 }}>
-            <MenuTree treeProps={menuTreeProps} />
-          </div>
-        </Card>
       </Modal>
     );
   }

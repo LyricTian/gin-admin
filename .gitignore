@@ -13,4 +13,7 @@
 
 *.DS_Store
 /cmd/server/server
-release
+/release
+/data
+/src/web/test/data
+/src/model/gorm/model/data

@@ -4,23 +4,22 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
-	"github.com/LyricTian/gin-admin/src"
-	"github.com/LyricTian/gin-admin/src/util"
+	"github.com/LyricTian/gin-admin/src/inject"
+	"github.com/LyricTian/gin-admin/src/web"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
 	configFile = "../../../config/config.toml"
-	apiPrefix  = "/api/v1/"
+	apiPrefix  = "/api/"
 )
 
 var engine *gin.Engine
@@ -28,13 +27,18 @@ var engine *gin.Engine
 func init() {
 	viper.SetConfigFile(configFile)
 	if err := viper.ReadInConfig(); err != nil {
-		panic("加载配置文件发生错误：" + err.Error())
+		panic("Load config error：" + err.Error())
 	}
 	viper.Set("run_mode", "debug")
-	viper.Set("casbin_model", "../../../config/model.conf")
+	viper.Set("casbin_model_conf", "../../../config/model.conf")
 
-	ctx := util.NewTraceIDContext(context.Background(), util.MustUUID())
-	engine, _ = src.Init(ctx, "1.2.0-test")
+	ctx := context.Background()
+	obj, err := inject.Init(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	engine = web.Init(ctx, obj)
 }
 
 func toReader(v interface{}) io.Reader {
@@ -45,6 +49,20 @@ func toReader(v interface{}) io.Reader {
 
 func parseReader(r io.Reader, v interface{}) error {
 	return json.NewDecoder(r).Decode(v)
+}
+
+func parseOK(r io.Reader) error {
+	var status struct {
+		Status string `json:"status"`
+	}
+	err := parseReader(r, &status)
+	if err != nil {
+		return err
+	}
+	if status.Status != "OK" {
+		return errors.New("not OK")
+	}
+	return nil
 }
 
 func releaseReader(r io.Reader) {

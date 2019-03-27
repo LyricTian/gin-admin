@@ -1,0 +1,19 @@
+sudo: false
+language: go
+
+services:
+  - redis-server
+
+go:
+  - 1.7
+  - 1.8
+  - 1.9
+  - tip
+
+matrix:
+  allow_failures:
+    - go: tip
+
+install:
+  - go get github.com/go-redis/redis
+  - go get golang.org/x/time/rate

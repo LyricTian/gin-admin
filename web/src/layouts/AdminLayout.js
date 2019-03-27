@@ -8,8 +8,10 @@ import classNames from 'classnames';
 import Debounce from 'lodash-decorators/debounce';
 import GlobalFooter from '@/components/GlobalFooter';
 import CopyRight from '@/components/CopyRight';
+import UpdatePasswordDialog from '@/components/UpdatePasswordDialog';
 import styles from './AdminLayout.less';
 import logo from '../assets/logo.svg';
+import GetGlobalContext from '@/utils/context';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -44,8 +46,13 @@ const query = {
   user: state.global.user,
   menuPaths: state.global.menuPaths,
   menus: state.global.menus,
+  global: state.global,
 }))
 class AdminLayout extends React.PureComponent {
+  state = {
+    updatePwdVisible: false,
+  };
+
   componentDidMount() {
     const {
       location: { pathname },
@@ -56,7 +63,7 @@ class AdminLayout extends React.PureComponent {
     });
 
     this.dispatch({
-      type: 'global/fetchMenus',
+      type: 'global/fetchMenuTree',
       pathname,
     });
   }
@@ -78,6 +85,8 @@ class AdminLayout extends React.PureComponent {
       this.dispatch({
         type: 'login/logout',
       });
+    } else if (key === 'updatepwd') {
+      this.setState({ updatePwdVisible: true });
     }
   };
 
@@ -114,6 +123,10 @@ class AdminLayout extends React.PureComponent {
     window.dispatchEvent(event);
   };
 
+  handleUpdatePwdCancel = () => {
+    this.setState({ updatePwdVisible: false });
+  };
+
   renderNavMenuItems(menusData) {
     if (!menusData) {
       return [];
@@ -136,28 +149,28 @@ class AdminLayout extends React.PureComponent {
                 item.name
               )
             }
-            key={item.level_code}
+            key={item.record_id}
           >
             {this.renderNavMenuItems(item.children)}
           </SubMenu>
         );
       }
 
-      const itemPath = item.path;
+      const { router } = item;
       const icon = item.icon && <Icon type={item.icon} />;
       const {
         location: { pathname },
       } = this.props;
 
       return (
-        <Menu.Item key={item.level_code}>
-          {itemPath.startsWith('http') ? (
-            <a href={itemPath} target="_blank" rel="noopener noreferrer">
+        <Menu.Item key={item.record_id}>
+          {router.startsWith('http') ? (
+            <a href={router} target="_blank" rel="noopener noreferrer">
               {icon}
               <span>{item.name}</span>
             </a>
           ) : (
-            <Link to={itemPath} replace={itemPath === pathname}>
+            <Link to={router} replace={router === pathname}>
               {icon}
               <span>{item.name}</span>
             </Link>
@@ -192,13 +205,17 @@ class AdminLayout extends React.PureComponent {
       openKeys,
       title,
       selectedKeys,
+      global,
     } = this.props;
+
+    const { updatePwdVisible } = this.state;
+    const GlobalContext = GetGlobalContext();
 
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item key="setting" disabled>
-          <Icon type="user" />
-          个人信息
+        <Menu.Item key="updatepwd">
+          <Icon type="lock" />
+          修改密码
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item key="logout">
@@ -229,7 +246,6 @@ class AdminLayout extends React.PureComponent {
             </Link>
           </div>
           <Menu
-            theme="dark"
             mode="inline"
             {...menuProps}
             onOpenChange={this.onMenuOpenChange}
@@ -262,10 +278,13 @@ class AdminLayout extends React.PureComponent {
             </div>
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
-            <div style={{ minHeight: 'calc(100vh - 260px)' }}>{children}</div>
+            <div style={{ minHeight: 'calc(100vh - 260px)' }}>
+              <GlobalContext.Provider value={global}>{children}</GlobalContext.Provider>
+            </div>
             <GlobalFooter copyright={<CopyRight title={copyRight} />} />
           </Content>
         </Layout>
+        <UpdatePasswordDialog visible={updatePwdVisible} onCancel={this.handleUpdatePwdCancel} />
       </Layout>
     );
 

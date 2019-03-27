@@ -193,16 +193,9 @@ func (n *node) addRoute(path string, handlers HandlersChain) {
 						}
 					}
 
-					pathSeg := path
-					if n.nType != catchAll {
-						pathSeg = strings.SplitN(path, "/", 2)[0]
-					}
-					prefix := fullPath[:strings.Index(fullPath, pathSeg)] + n.path
-					panic("'" + pathSeg +
-						"' in new path '" + fullPath +
+					panic("path segment '" + path +
 						"' conflicts with existing wildcard '" + n.path +
-						"' in existing prefix '" + prefix +
-						"'")
+						"' in path '" + fullPath + "'")
 				}
 
 				c := path[0]
