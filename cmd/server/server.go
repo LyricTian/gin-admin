@@ -74,7 +74,7 @@ func main() {
 
 	var state int32 = 1
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt)
+	signal.Notify(sc, os.Interrupt, os.Kill)
 
 	rfunc := src.Init(ctx)
 	select {
