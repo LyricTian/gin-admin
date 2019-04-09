@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build darwin dragonfly freebsd linux netbsd openbsd solaris
+// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris
 
 package unix
 
 import (
 	"bytes"
-	"runtime"
+	"sort"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -20,19 +20,17 @@ var (
 	Stderr = 2
 )
 
-const (
-	darwin64Bit    = runtime.GOOS == "darwin" && sizeofPtr == 8
-	dragonfly64Bit = runtime.GOOS == "dragonfly" && sizeofPtr == 8
-	netbsd32Bit    = runtime.GOOS == "netbsd" && sizeofPtr == 4
-	solaris64Bit   = runtime.GOOS == "solaris" && sizeofPtr == 8
-)
-
 // Do the interface allocations only once for common
 // Errno values.
 var (
 	errEAGAIN error = syscall.EAGAIN
 	errEINVAL error = syscall.EINVAL
 	errENOENT error = syscall.ENOENT
+)
+
+var (
+	signalNameMapOnce sync.Once
+	signalNameMap     map[string]syscall.Signal
 )
 
 // errnoErr returns common boxed Errno values, to prevent
@@ -49,6 +47,41 @@ func errnoErr(e syscall.Errno) error {
 		return errENOENT
 	}
 	return e
+}
+
+// ErrnoName returns the error name for error number e.
+func ErrnoName(e syscall.Errno) string {
+	i := sort.Search(len(errorList), func(i int) bool {
+		return errorList[i].num >= e
+	})
+	if i < len(errorList) && errorList[i].num == e {
+		return errorList[i].name
+	}
+	return ""
+}
+
+// SignalName returns the signal name for signal number s.
+func SignalName(s syscall.Signal) string {
+	i := sort.Search(len(signalList), func(i int) bool {
+		return signalList[i].num >= s
+	})
+	if i < len(signalList) && signalList[i].num == s {
+		return signalList[i].name
+	}
+	return ""
+}
+
+// SignalNum returns the syscall.Signal for signal named s,
+// or 0 if a signal with such name is not found.
+// The signal name should start with "SIG".
+func SignalNum(s string) syscall.Signal {
+	signalNameMapOnce.Do(func() {
+		signalNameMap = make(map[string]syscall.Signal)
+		for _, signal := range signalList {
+			signalNameMap[signal.name] = signal.num
+		}
+	})
+	return signalNameMap[s]
 }
 
 // clen returns the index of the first NULL byte in n or len(n) if n contains no NULL byte.
@@ -196,7 +229,7 @@ func Getpeername(fd int) (sa Sockaddr, err error) {
 	if err = getpeername(fd, &rsa, &len); err != nil {
 		return
 	}
-	return anyToSockaddr(&rsa)
+	return anyToSockaddr(fd, &rsa)
 }
 
 func GetsockoptByte(fd, level, opt int) (value byte, err error) {
@@ -268,7 +301,7 @@ func Recvfrom(fd int, p []byte, flags int) (n int, from Sockaddr, err error) {
 		return
 	}
 	if rsa.Addr.Family != AF_UNSPEC {
-		from, err = anyToSockaddr(&rsa)
+		from, err = anyToSockaddr(fd, &rsa)
 	}
 	return
 }
@@ -334,13 +367,6 @@ func Socketpair(domain, typ, proto int) (fd [2]int, err error) {
 		fd[1] = int(fdx[1])
 	}
 	return
-}
-
-func Sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
-	if raceenabled {
-		raceReleaseMerge(unsafe.Pointer(&ioSync))
-	}
-	return sendfile(outfd, infd, offset, count)
 }
 
 var ioSync int64

@@ -15,12 +15,11 @@ export default {
     formID: '',
     formVisible: false,
     formData: {},
-    selectData: [],
   },
   effects: {
     *fetch({ search, pagination }, { call, put, select }) {
       let params = {
-        type: 'page',
+        q: 'page',
       };
 
       if (search) {
@@ -114,18 +113,12 @@ export default {
 
       const params = { ...payload };
       const formType = yield select(state => state.demo.formType);
-      let success = false;
+      let response;
       if (formType === 'E') {
         params.record_id = yield select(state => state.demo.formID);
-        const response = yield call(demoService.update, params);
-        if (response.status === 'OK') {
-          success = true;
-        }
+        response = yield call(demoService.update, params);
       } else {
-        const response = yield call(demoService.create, params);
-        if (response.record_id && response.record_id !== '') {
-          success = true;
-        }
+        response = yield call(demoService.create, params);
       }
 
       yield put({
@@ -133,7 +126,7 @@ export default {
         payload: false,
       });
 
-      if (success) {
+      if (response.record_id && response.record_id !== '') {
         message.success('保存成功');
         yield put({
           type: 'changeFormVisible',
@@ -146,13 +139,6 @@ export default {
     },
     *del({ payload }, { call, put }) {
       const response = yield call(demoService.del, payload);
-      if (response.status === 'OK') {
-        message.success('删除成功');
-        yield put({ type: 'fetch' });
-      }
-    },
-    *delMany({ payload }, { call, put }) {
-      const response = yield call(demoService.delMany, payload);
       if (response.status === 'OK') {
         message.success('删除成功');
         yield put({ type: 'fetch' });

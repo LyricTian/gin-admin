@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "RBAC权限管理脚手架",
   "private": true,
   "scripts": {
@@ -16,9 +16,9 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.36",
-    "antd": "^3.11.2",
+    "@babel/runtime": "^7.3.1",
+    "antd": "^3.15.2",
     "axios": "^0.18.0",
-    "brace": "^0.11.1",
     "classnames": "^2.2.5",
     "dva": "^2.4.1",
     "history": "^4.7.2",
@@ -33,7 +33,8 @@
     "react-container-query": "^0.11.0",
     "react-document-title": "^2.0.3",
     "setprototypeof": "^1.1.0",
-    "url-polyfill": "^1.0.10"
+    "url-polyfill": "^1.0.10",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/react": "^16.7.7",
@@ -59,8 +60,8 @@
     "tslint": "^5.10.0",
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.6.0",
-    "umi": "^2.2.7",
-    "umi-plugin-react": "^1.2.0"
+    "umi": "^2.4.4",
+    "umi-plugin-react": "^1.4.2"
   },
   "lint-staged": {
     "**/*.{js,jsx,less}": [

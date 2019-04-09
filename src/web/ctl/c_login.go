@@ -2,109 +2,216 @@ package ctl
 
 import (
 	"fmt"
-	"net/http"
 
+	"github.com/LyricTian/captcha"
+	"github.com/LyricTian/gin-admin/src/auth"
 	"github.com/LyricTian/gin-admin/src/bll"
+	"github.com/LyricTian/gin-admin/src/config"
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/schema"
-	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/LyricTian/gin-admin/src/web/context"
 )
 
 // Login 登录管理
+// @Name Login
+// @Description 登录管理
 type Login struct {
 	LoginBll *bll.Login `inject:""`
+	Auth     *auth.Auth `inject:""`
+}
+
+func (a *Login) getFuncName(name string) string {
+	return fmt.Sprintf("web.ctl.Login.%s", name)
+}
+
+// GetCaptchaID 获取验证码ID
+// @Summary 获取验证码ID
+// @Success 200 schema.LoginCaptcha
+// @Router GET /api/v1/login/captchaid
+func (a *Login) GetCaptchaID(ctx *context.Context) {
+	captchaID := captcha.NewLen(config.GetCaptcha().Length)
+	data := schema.LoginCaptcha{
+		CaptchaID: captchaID,
+	}
+	ctx.ResSuccess(data)
+}
+
+// GetCaptcha 获取图形验证码
+// @Summary 获取图形验证码
+// @Param id query string true "验证码ID"
+// @Param reload query string false "重新加载"
+// @Success 200 file "图形验证码"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router GET /api/v1/login/captcha
+func (a *Login) GetCaptcha(ctx *context.Context) {
+	captchaID := ctx.Query("id")
+	if captchaID == "" {
+		ctx.ResError(errors.NewBadRequestError("无效的请求参数"))
+		return
+	}
+
+	if ctx.Query("reload") != "" {
+		if !captcha.Reload(captchaID) {
+			ctx.ResError(errors.NewBadRequestError("无效的请求参数"))
+			return
+		}
+	}
+
+	w := ctx.ResponseWriter()
+	captchaConfig := config.GetCaptcha()
+	err := captcha.WriteImage(w, captchaID, captchaConfig.Width, captchaConfig.Height)
+	if err != nil {
+		if err == captcha.ErrNotFound {
+			ctx.ResError(errors.NewBadRequestError("无效的请求参数"))
+			return
+		}
+		logger.StartSpan(ctx.GetContext(), "获取图形验证码", a.getFuncName("GetCaptcha")).Errorf(err.Error())
+		ctx.ResError(errors.NewInternalServerError())
+		return
+	}
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Content-Type", "image/png")
 }
 
 // Login 用户登录
+// @Summary 用户登录
+// @Param body body schema.LoginParam true
+// @Success 200 auth.TokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router POST /api/v1/login
 func (a *Login) Login(ctx *context.Context) {
 	var item schema.LoginParam
 	if err := ctx.ParseJSON(&item); err != nil {
-		ctx.ResBadRequest(err)
+		ctx.ResError(err)
 		return
 	}
 
-	var result context.HTTPStatus
-	userInfo, err := a.LoginBll.Verify(ctx.CContext(), item.UserName, item.Password)
+	if !captcha.VerifyString(item.CaptchaID, item.CaptchaCode) {
+		ctx.ResError(errors.NewBadRequestError("无效的验证码"))
+		return
+	}
+
+	user, err := a.LoginBll.Verify(ctx.GetContext(), item.UserName, item.Password)
 	if err != nil {
-		result.Status = context.StatusError
-		if err == bll.ErrInvalidPassword ||
-			err == bll.ErrInvalidUserName ||
-			err == bll.ErrUserDisable {
-			result.Status = context.StatusFail
-		} else {
-			logger.Start(ctx.CContext()).Errorf("用户登录发生错误：%s", err.Error())
+		switch err {
+		case bll.ErrInvalidUserName, bll.ErrInvalidPassword:
+			ctx.ResError(errors.NewBadRequestError("用户名或密码错误"))
+			return
+		case bll.ErrUserDisable:
+			ctx.ResError(errors.NewBadRequestError("用户被禁用，请联系管理员"))
+			return
+		default:
+			ctx.ResError(errors.NewInternalServerError())
+			return
 		}
-
-		ctx.ResSuccess(result)
-		return
 	}
-	ctx.SetUserID(userInfo.RecordID)
 
-	nctx := ctx.CContext()
-	span := logger.StartSpan(nctx, "用户登录", "Login")
-	// 更新会话
-	store, err := ctx.RefreshSession()
+	userID := user.RecordID
+	ctx.SetUserID(userID)
+	span := logger.StartSpan(ctx.GetContext(), "用户登录", a.getFuncName("Login"))
+	tokenInfo, err := a.Auth.GenerateToken(userID)
 	if err != nil {
-		result.Status = context.StatusError
-		span.Errorf("更新会话发生错误：%s", err.Error())
-		ctx.ResSuccess(result)
+		span.Errorf(err.Error())
+		ctx.ResError(errors.NewInternalServerError())
 		return
 	}
 
-	store.Set(util.SessionKeyUserID, userInfo.RecordID)
-	err = store.Save()
-	if err != nil {
-		result.Status = context.StatusError
-		span.Errorf("存储会话发生错误：%s", err.Error())
-		ctx.ResSuccess(result)
-		return
-	}
 	span.Infof("登入系统")
-
-	ctx.ResOK()
+	ctx.ResSuccess(tokenInfo)
 }
 
 // Logout 用户登出
+// @Summary 用户登出
+// @Success 200 schema.HTTPStatus "{status:OK}"
+// @Router POST /api/v1/login/exit
 func (a *Login) Logout(ctx *context.Context) {
+	// 检查用户是否处于登录状态，如果是则执行销毁
 	userID := ctx.GetUserID()
 	if userID != "" {
-		nctx := ctx.CContext()
-		span := logger.StartSpan(nctx, "用户登出", "Logout")
-		if err := ctx.DestroySession(); err != nil {
-			span.Errorf("登出系统发生错误：%s", err.Error())
-			ctx.ResInternalServerError(err)
-			return
+		span := logger.StartSpan(ctx.GetContext(), "用户登出", a.getFuncName("Logout"))
+		err := a.Auth.DestroyToken(ctx.GetToken())
+		if err != nil {
+			span.Errorf(err.Error())
 		}
 		span.Infof("登出系统")
 	}
-
 	ctx.ResOK()
 }
 
-// GetCurrentUserInfo 获取当前用户信息
-func (a *Login) GetCurrentUserInfo(ctx *context.Context) {
-	userID := ctx.GetUserID()
-
-	info, err := a.LoginBll.GetCurrentUserInfo(ctx.CContext(), userID)
+// RefreshToken 刷新令牌
+// @Summary 刷新令牌
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Success 200 auth.TokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router POST /api/v1/refresh_token
+func (a *Login) RefreshToken(ctx *context.Context) {
+	tokenInfo, err := a.Auth.GenerateToken(ctx.GetUserID())
 	if err != nil {
-		ctx.ResInternalServerError(err)
+		logger.StartSpan(ctx.GetContext(), "刷新令牌", a.getFuncName("RefreshToken")).Errorf(err.Error())
+		ctx.ResError(errors.NewInternalServerError())
+		return
+	}
+	ctx.ResSuccess(tokenInfo)
+}
+
+// GetUserInfo 获取当前用户信息
+// @Summary 获取当前用户信息
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Success 200 schema.UserLoginInfo
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router GET /api/v1/current/user
+func (a *Login) GetUserInfo(ctx *context.Context) {
+	info, err := a.LoginBll.GetUserInfo(ctx.GetContext())
+	if err != nil {
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResSuccess(info)
 }
 
-// QueryCurrentUserMenus 查询当前用户菜单
-func (a *Login) QueryCurrentUserMenus(ctx *context.Context) {
-	userID := ctx.GetUserID()
-
-	menus, err := a.LoginBll.QueryCurrentUserMenus(ctx.CContext(), userID)
+// QueryUserMenuTree 查询当前用户菜单树
+// @Summary 查询当前用户菜单树
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Success 200 schema.Menu "查询结果：{list:菜单树}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router GET /api/v1/current/menutree
+func (a *Login) QueryUserMenuTree(ctx *context.Context) {
+	menus, err := a.LoginBll.QueryUserMenuTree(ctx.GetContext())
 	if err != nil {
-		ctx.ResInternalServerError(err)
-		return
-	} else if len(menus) == 0 {
-		ctx.ResError(fmt.Errorf("用户未授权"), http.StatusUnauthorized, 9998)
+		ctx.ResError(err)
 		return
 	}
 	ctx.ResList(menus)
+}
+
+// UpdatePassword 更新个人密码
+// @Summary 更新个人密码
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param body body schema.UpdatePasswordParam true
+// @Success 200 schema.HTTPStatus "{status:OK}"
+// @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router PUT /api/v1/current/password
+func (a *Login) UpdatePassword(ctx *context.Context) {
+	var item schema.UpdatePasswordParam
+	if err := ctx.ParseJSON(&item); err != nil {
+		ctx.ResError(err)
+		return
+	}
+
+	err := a.LoginBll.UpdatePassword(ctx.GetContext(), item)
+	if err != nil {
+		ctx.ResError(err)
+		return
+	}
+	ctx.ResOK()
 }

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"runtime"
 
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/logger"
 	"github.com/LyricTian/gin-admin/src/web/context"
 	"github.com/gin-gonic/gin"
@@ -23,15 +23,12 @@ var (
 func RecoveryMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
-			nctx := context.New(c)
 			if err := recover(); err != nil {
+				ctx := context.New(c)
 				stack := stack(3)
-
-				logger.Start(nctx.CContext()).
-					WithField("stack", string(stack)).
-					Errorf("[Recover]: %s", err)
-
-				nctx.ResError(nil, http.StatusInternalServerError)
+				logger.StartSpan(ctx.GetContext(), "崩溃恢复中间件", "RecoveryMiddleware").
+					WithField("stack", string(stack)).Errorf("[recover]: %v", err)
+				ctx.ResError(errors.NewInternalServerError())
 			}
 		}()
 		c.Next()

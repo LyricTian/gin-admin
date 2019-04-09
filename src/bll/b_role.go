@@ -2,156 +2,137 @@ package bll
 
 import (
 	"context"
-	"strings"
-	"time"
 
+	"github.com/LyricTian/gin-admin/src/errors"
 	"github.com/LyricTian/gin-admin/src/model"
 	"github.com/LyricTian/gin-admin/src/schema"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/casbin/casbin"
-	"github.com/pkg/errors"
 )
 
 // Role 角色管理
 type Role struct {
 	RoleModel model.IRole      `inject:"IRole"`
 	MenuModel model.IMenu      `inject:"IMenu"`
-	UserModel model.IUser      `inject:"IUser"`
 	Enforcer  *casbin.Enforcer `inject:""`
+	CommonBll *Common          `inject:""`
 }
 
 // QueryPage 查询分页数据
-func (a *Role) QueryPage(ctx context.Context, params schema.RoleQueryParam, pageIndex, pageSize uint) (int64, []*schema.RoleQueryResult, error) {
-	return a.RoleModel.QueryPage(ctx, params, pageIndex, pageSize)
+func (a *Role) QueryPage(ctx context.Context, params schema.RoleQueryParam, pp *schema.PaginationParam) ([]*schema.Role, *schema.PaginationResult, error) {
+	result, err := a.RoleModel.Query(ctx, params, schema.RoleQueryOptions{
+		PageParam: pp,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return result.Data, result.PageResult, nil
 }
 
 // QuerySelect 查询选择数据
-func (a *Role) QuerySelect(ctx context.Context, params schema.RoleSelectQueryParam) ([]*schema.RoleSelectQueryResult, error) {
-	return a.RoleModel.QuerySelect(ctx, params)
+func (a *Role) QuerySelect(ctx context.Context) ([]*schema.Role, error) {
+	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{})
+	if err != nil {
+		return nil, err
+	}
+
+	// 清空部分字段数据
+	return result.Data.ForEach(func(item *schema.Role, _ int) {
+		item.Memo = ""
+		item.Sequence = 0
+		item.Creator = ""
+		item.CreatedAt = nil
+		item.UpdatedAt = nil
+	}), nil
 }
 
 // Get 查询指定数据
 func (a *Role) Get(ctx context.Context, recordID string) (*schema.Role, error) {
-	item, err := a.RoleModel.Get(ctx, recordID, true)
+	item, err := a.RoleModel.Get(ctx, recordID, schema.RoleQueryOptions{IncludeMenus: true})
 	if err != nil {
 		return nil, err
 	} else if item == nil {
-		return nil, util.ErrNotFound
+		return nil, errors.ErrNotFound
 	}
 
 	return item, nil
 }
 
-// 过滤叶子节点
-func (a *Role) filterLeafMenuIDs(ctx context.Context, menuIDs []string) ([]string, error) {
-	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
-		RecordIDs: menuIDs,
-		Status:    1,
+func (a *Role) checkName(ctx context.Context, name string) error {
+	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+		Name: name,
+	}, schema.RoleQueryOptions{
+		PageParam: &schema.PaginationParam{PageSize: -1},
 	})
+	if err != nil {
+		return err
+	} else if result.PageResult.Total > 0 {
+		return errors.NewBadRequestError("角色名称已经存在")
+	}
+	return nil
+}
+
+// Create 创建数据
+func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.Role, error) {
+	err := a.checkName(ctx, item.Name)
+	if err != nil {
+		return nil, nil
+	}
+
+	item.RecordID = util.MustUUID()
+	item.Creator = a.CommonBll.GetUserID(ctx)
+	err = a.RoleModel.Create(ctx, item)
 	if err != nil {
 		return nil, err
 	}
 
-	var leafMenuIDs []string
-	for _, m := range menus {
-		var exists bool
-		for _, m2 := range menus {
-			if strings.HasPrefix(m2.LevelCode, m.LevelCode) &&
-				m2.LevelCode != m.LevelCode {
-				exists = true
-				break
-			}
-		}
-		if !exists {
-			leafMenuIDs = append(leafMenuIDs, m.RecordID)
-		}
-	}
-
-	return leafMenuIDs, nil
-}
-
-// Create 创建数据
-func (a *Role) Create(ctx context.Context, item *schema.Role) error {
-	exists, err := a.RoleModel.CheckName(ctx, item.Name)
+	nitem, err := a.Get(ctx, item.RecordID)
 	if err != nil {
-		return err
-	} else if exists {
-		return errors.New("角色名称已经存在")
+		return nil, err
 	}
 
-	leafMenuIDs, err := a.filterLeafMenuIDs(ctx, item.MenuIDs)
+	err = a.LoadPolicy(ctx, nitem)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	item.MenuIDs = leafMenuIDs
-
-	item.ID = 0
-	item.RecordID = util.MustUUID()
-	item.Created = time.Now().Unix()
-	item.Deleted = 0
-	err = a.RoleModel.Create(ctx, item)
-	if err != nil {
-		return err
-	}
-
-	return a.LoadPolicy(ctx, item.RecordID)
+	return nitem, nil
 }
 
 // Update 更新数据
-func (a *Role) Update(ctx context.Context, recordID string, item *schema.Role) error {
-	oldItem, err := a.RoleModel.Get(ctx, recordID, false)
+func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) (*schema.Role, error) {
+	oldItem, err := a.RoleModel.Get(ctx, recordID)
 	if err != nil {
-		return err
+		return nil, err
 	} else if oldItem == nil {
-		return util.ErrNotFound
+		return nil, errors.ErrNotFound
 	} else if oldItem.Name != item.Name {
-		exists, err := a.RoleModel.CheckName(ctx, item.Name)
+		err := a.checkName(ctx, item.Name)
 		if err != nil {
-			return err
-		} else if exists {
-			return errors.New("角色名称已经存在")
+			return nil, err
 		}
 	}
 
-	leafMenuIDs, err := a.filterLeafMenuIDs(ctx, item.MenuIDs)
+	err = a.RoleModel.Update(ctx, recordID, item)
 	if err != nil {
-		return err
-	}
-	item.MenuIDs = leafMenuIDs
-
-	info := util.StructToMap(item)
-	delete(info, "id")
-	delete(info, "record_id")
-	delete(info, "creator")
-	delete(info, "created")
-	delete(info, "updated")
-	delete(info, "deleted")
-
-	err = a.RoleModel.UpdateWithMenuIDs(ctx, recordID, info, item.MenuIDs)
-	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return a.LoadPolicy(ctx, item.RecordID)
+	nitem, err := a.Get(ctx, item.RecordID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = a.LoadPolicy(ctx, nitem)
+	if err != nil {
+		return nil, err
+	}
+	return nitem, nil
 }
 
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, recordID string) error {
-	exists, err := a.RoleModel.Check(ctx, recordID)
-	if err != nil {
-		return err
-	} else if !exists {
-		return util.ErrNotFound
-	}
-
-	exists, err = a.UserModel.CheckByRoleID(ctx, recordID)
-	if err != nil {
-		return err
-	} else if exists {
-		return errors.New("该角色已被赋予用户，不能删除！")
-	}
-
-	err = a.RoleModel.Delete(ctx, recordID)
+	// TODO: 如果用户已经被赋予该角色，则不允许删除
+	err := a.RoleModel.Delete(ctx, recordID)
 	if err != nil {
 		return err
 	}
@@ -160,28 +141,16 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	return nil
 }
 
-// UpdateStatus 更新状态
-func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	exists, err := a.RoleModel.Check(ctx, recordID)
-	if err != nil {
-		return err
-	} else if !exists {
-		return util.ErrNotFound
-	}
-
-	info := map[string]interface{}{
-		"status": status,
-	}
-
-	err = a.RoleModel.Update(ctx, recordID, info)
+// LoadAllPolicy 加载所有的角色策略
+func (a *Role) LoadAllPolicy(ctx context.Context) error {
+	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{},
+		schema.RoleQueryOptions{IncludeMenus: true})
 	if err != nil {
 		return err
 	}
 
-	if status == 2 {
-		a.Enforcer.DeletePermissionsForUser(recordID)
-	} else {
-		err = a.LoadPolicy(ctx, recordID)
+	for _, role := range result.Data {
+		err = a.LoadPolicy(ctx, role)
 		if err != nil {
 			return err
 		}
@@ -190,44 +159,46 @@ func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) er
 	return nil
 }
 
-// LoadAllPolicy 加载所有的角色策略
-func (a *Role) LoadAllPolicy() error {
-	ctx := context.Background()
-
-	roles, err := a.RoleModel.QuerySelect(ctx, schema.RoleSelectQueryParam{
-		Status: 1,
-	})
+// LoadPolicyWithRecordID 加载角色权限策略
+func (a *Role) LoadPolicyWithRecordID(ctx context.Context, recordID string) error {
+	role, err := a.RoleModel.Get(ctx, recordID, schema.RoleQueryOptions{IncludeMenus: true})
 	if err != nil {
 		return err
+	} else if role == nil {
+		return nil
 	}
 
-	for _, role := range roles {
-		err = a.LoadPolicy(ctx, role.RecordID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return a.LoadPolicy(ctx, role)
 }
 
 // LoadPolicy 加载角色权限策略
-func (a *Role) LoadPolicy(ctx context.Context, roleID string) error {
-	menus, err := a.MenuModel.QuerySelect(ctx, schema.MenuSelectQueryParam{
-		Status: 1,
-		Types:  []int{40},
-		RoleID: roleID,
+func (a *Role) LoadPolicy(ctx context.Context, item *schema.Role) error {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		RecordIDs: item.Menus.ToMenuIDs(),
+	}, schema.MenuQueryOptions{
+		IncludeResources: true,
 	})
 	if err != nil {
 		return err
 	}
 
+	menuMap := result.Data.ToMap()
+	roleID := item.RecordID
 	a.Enforcer.DeletePermissionsForUser(roleID)
-	for _, menu := range menus {
-		if menu.Path == "" || menu.Method == "" {
+
+	for _, item := range item.Menus {
+		mitem, ok := menuMap[item.MenuID]
+		if !ok {
 			continue
 		}
-		a.Enforcer.AddPermissionForUser(roleID, menu.Path, menu.Method)
+		resMap := mitem.Resources.ToMap()
+		for _, res := range item.Resources {
+			ritem, ok := resMap[res]
+			if !ok || ritem.Path == "" || ritem.Method == "" {
+				continue
+			}
+			a.Enforcer.AddPermissionForUser(roleID, ritem.Path, ritem.Method)
+		}
 	}
 
 	return nil

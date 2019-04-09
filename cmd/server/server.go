@@ -3,29 +3,30 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"sync/atomic"
-	"time"
+	"syscall"
 
 	"github.com/LyricTian/gin-admin/src"
+	"github.com/LyricTian/gin-admin/src/config"
 	"github.com/LyricTian/gin-admin/src/logger"
+	loggerhook "github.com/LyricTian/gin-admin/src/logger/hook"
+	loggergormhook "github.com/LyricTian/gin-admin/src/logger/hook/gorm"
 	"github.com/LyricTian/gin-admin/src/util"
 	"github.com/spf13/viper"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 // VERSION 版本号，
-// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=1.2.0-dev"
-var VERSION = "1.2.0-dev"
+// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=2.0.0"
+var VERSION = "2.0.0"
 
 var (
 	configFile string
 	modelFile  string
-	webDir     string
+	wwwDir     string
+	swaggerDir string
 )
 
 func init() {
@@ -33,7 +34,8 @@ func init() {
 	flag.StringVar(&configFile, "c", "", "配置文件(.json,.yaml,.toml)")
 	flag.StringVar(&modelFile, "model", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
-	flag.StringVar(&webDir, "www", "", "静态站点目录")
+	flag.StringVar(&wwwDir, "www", "", "静态站点目录")
+	flag.StringVar(&swaggerDir, "swagger", "", "swagger目录")
 }
 
 func main() {
@@ -49,67 +51,121 @@ func main() {
 		panic("加载配置文件发生错误：" + err.Error())
 	}
 
-	if v := viper.GetString("casbin_model"); v == "" && modelFile == "" {
-		panic("请使用-m指定Casbin的访问控制模型")
+	casbinModelConfKey := "casbin_model_conf"
+	if modelFile == "" && viper.GetString(casbinModelConfKey) == "" {
+		panic("请使用-m指定casbin的访问控制模型")
 	}
-
-	fmt.Printf("开始运行服务，服务版本号：%s \n", VERSION)
 
 	if modelFile != "" {
-		viper.Set("casbin_model", modelFile)
+		viper.Set(casbinModelConfKey, modelFile)
 	}
 
-	if webDir != "" {
-		viper.Set("web_dir", webDir)
+	if wwwDir != "" {
+		viper.Set("www", wwwDir)
 	}
 
+	if swaggerDir != "" {
+		viper.Set("swagger", swaggerDir)
+	}
+
+	loggerFlush := loggerInit()
 	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
-	httpHandler, callback := src.Init(ctx, VERSION)
-	srv := &http.Server{
-		Addr:           viper.GetString("http_addr"),
-		Handler:        httpHandler,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-
-	ac := make(chan error)
-	span := logger.Start(ctx)
-
-	// 开启HTTP监听
-	go func() {
-		span.Infof("HTTP服务开始启动，监听地址为：[%s]", viper.GetString("http_addr"))
-		err := srv.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
-			ac <- err
-		}
-	}()
+	span := logger.StartSpanWithCall(ctx, "主函数", "main")
+	span().Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.GetRunMode(), VERSION, os.Getpid())
 
 	var state int32 = 1
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt)
+	sc := make(chan os.Signal)
+	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
+	rfunc := src.Init(ctx)
 	select {
-	case err := <-ac:
-		if err != nil && atomic.LoadInt32(&state) == 1 {
-			span.Errorf("监听HTTP服务发生错误:%s", err.Error())
-		}
 	case sig := <-sc:
 		atomic.StoreInt32(&state, 0)
-		span.Infof("获取到退出信号[%s]", sig.String())
+		span().Printf("获取到退出信号[%s]", sig.String())
 	}
 
-	// 优雅关闭服务
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		span.Errorf("关闭HTTP服务发生错误:%s", err.Error())
+	if rfunc != nil {
+		rfunc()
 	}
+	span().Printf("服务退出")
 
-	if callback != nil {
-		callback()
+	if loggerFlush != nil {
+		loggerFlush()
 	}
-
-	// 退出应用
 	os.Exit(int(atomic.LoadInt32(&state)))
+}
+
+// 日志初始化
+func loggerInit() func() {
+	c := config.GetLog()
+
+	logger.SetLevel(c.Level)
+	logger.SetFormatter(c.Format)
+	logger.SetVersion(VERSION)
+	logger.SetTraceIDFunc(util.MustUUID)
+
+	// 设定日志输出
+	var file *os.File
+	if c.Output != "" {
+		switch c.Output {
+		case "stdout":
+			logger.SetOutput(os.Stdout)
+		case "stderr":
+			logger.SetOutput(os.Stderr)
+		case "file":
+			if name := c.OutputFile; name != "" {
+				os.MkdirAll(filepath.Dir(name), 0777)
+				f, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
+				if err != nil {
+					panic(err)
+				}
+				logger.SetOutput(f)
+				file = f
+			}
+		}
+	}
+
+	var hook *loggerhook.Hook
+	if c.EnableHook {
+		switch c.Hook {
+		case "gorm":
+			hc := config.GetLogGormHook()
+
+			var dsn string
+			switch hc.DBType {
+			case "mysql":
+				dsn = config.GetMySQL().DSN()
+			case "sqlite3":
+				dsn = config.GetSqlite3().DSN()
+			case "postgres":
+				dsn = config.GetPostgres().DSN()
+			default:
+				panic("unknown db")
+			}
+
+			h := loggerhook.New(loggergormhook.New(&loggergormhook.Config{
+				DBType:       hc.DBType,
+				DSN:          dsn,
+				MaxLifetime:  hc.MaxLifetime,
+				MaxOpenConns: hc.MaxOpenConns,
+				MaxIdleConns: hc.MaxIdleConns,
+				TableName:    hc.Table,
+			}),
+				loggerhook.SetMaxWorkers(c.HookMaxThread),
+				loggerhook.SetMaxQueues(c.HookMaxBuffer),
+			)
+			logger.AddHook(h)
+			hook = h
+		}
+	}
+
+	return func() {
+		if file != nil {
+			file.Close()
+		}
+
+		if hook != nil {
+			hook.Flush()
+		}
+	}
 }

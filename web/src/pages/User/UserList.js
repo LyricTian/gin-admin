@@ -1,42 +1,26 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  Table,
-  Modal,
-  Icon,
-  Dropdown,
-  Menu,
-  Badge,
-  Select,
-} from 'antd';
+import { Row, Col, Card, Form, Input, Button, Table, Modal, Badge, Radio } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import PButton from '@/components/PermButton';
 import UserCard from './UserCard';
-import { formatTimestamp } from '../../utils/utils';
+import RoleSelect from './RoleSelect';
+import { formatDate } from '../../utils/utils';
 
 import styles from './UserList.less';
 
 @connect(state => ({
   loading: state.loading.models.user,
   user: state.user,
-  role: state.role,
 }))
 @Form.create()
 class UserList extends PureComponent {
   state = {
+    selectedRowKeys: [],
     selectedRows: [],
   };
 
   componentDidMount() {
-    this.dispatch({
-      type: 'role/fetchSelect',
-    });
-
     this.dispatch({
       type: 'user/fetch',
       search: {},
@@ -44,50 +28,26 @@ class UserList extends PureComponent {
     });
   }
 
-  onDelBatchOKClick = () => {
-    const { selectedRows } = this.state;
-    if (selectedRows.length === 0) {
-      return;
-    }
-    this.setState({
-      selectedRows: [],
-    });
-    this.dispatch({
-      type: 'user/delMany',
-      payload: { batch: selectedRows.join(',') },
-    });
-  };
-
-  onBatchDelClick = () => {
-    Modal.confirm({
-      title: '确认删除选中的数据吗？',
-      okText: '确认',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: this.onDelBatchOKClick.bind(this),
-    });
-  };
-
-  onItemDisableClick = id => {
+  onItemDisableClick = item => {
     this.dispatch({
       type: 'user/changeStatus',
-      payload: { record_id: id, status: 2 },
+      payload: { record_id: item.record_id, status: 2 },
     });
   };
 
-  onItemEnableClick = id => {
+  onItemEnableClick = item => {
     this.dispatch({
       type: 'user/changeStatus',
-      payload: { record_id: id, status: 1 },
+      payload: { record_id: item.record_id, status: 1 },
     });
   };
 
-  onItemEditClick = id => {
+  onItemEditClick = item => {
     this.dispatch({
       type: 'user/loadForm',
       payload: {
         type: 'E',
-        id,
+        id: item.record_id,
       },
     });
   };
@@ -106,7 +66,16 @@ class UserList extends PureComponent {
       type: 'user/del',
       payload: { record_id: id },
     });
+    this.clearSelectRows();
   }
+
+  clearSelectRows = () => {
+    const { selectedRowKeys } = this.state;
+    if (selectedRowKeys.length === 0) {
+      return;
+    }
+    this.setState({ selectedRowKeys: [], selectedRows: [] });
+  };
 
   onItemDelClick = item => {
     Modal.confirm({
@@ -118,8 +87,9 @@ class UserList extends PureComponent {
     });
   };
 
-  onTableSelectRow = rows => {
+  onTableSelectRow = (keys, rows) => {
     this.setState({
+      selectedRowKeys: keys,
       selectedRows: rows,
     });
   };
@@ -132,6 +102,7 @@ class UserList extends PureComponent {
         pageSize: pagination.pageSize,
       },
     });
+    this.clearSelectRows();
   };
 
   onResetFormClick = () => {
@@ -150,13 +121,23 @@ class UserList extends PureComponent {
     }
     const { form } = this.props;
     form.validateFields({ force: true }, (err, values) => {
-      if (!err) {
-        this.dispatch({
-          type: 'user/fetch',
-          search: values,
-          pagination: {},
-        });
+      if (err) {
+        return;
       }
+
+      let roleIDs = '';
+      if (values.role_ids) {
+        roleIDs = values.role_ids.map(v => v.role_id).join(',');
+      }
+      this.dispatch({
+        type: 'user/fetch',
+        search: {
+          ...values,
+          role_ids: roleIDs,
+        },
+        pagination: {},
+      });
+      this.clearSelectRows();
     });
   };
 
@@ -165,6 +146,7 @@ class UserList extends PureComponent {
       type: 'user/submit',
       payload: data,
     });
+    this.clearSelectRows();
   };
 
   onDataFormCancel = () => {
@@ -186,47 +168,37 @@ class UserList extends PureComponent {
   renderSearchForm() {
     const {
       form: { getFieldDecorator },
-      role: { selectData: roleData },
     } = this.props;
     return (
-      <Form onSubmit={this.onSearchFormSubmit} layout="inline">
+      <Form onSubmit={this.onSearchFormSubmit}>
         <Row gutter={16}>
-          <Col md={8} sm={24}>
+          <Col span={8}>
             <Form.Item label="用户名">
               {getFieldDecorator('user_name')(<Input placeholder="请输入" />)}
             </Form.Item>
           </Col>
-          <Col md={8} sm={24}>
+          <Col span={8}>
             <Form.Item label="真实姓名">
               {getFieldDecorator('real_name')(<Input placeholder="请输入" />)}
             </Form.Item>
           </Col>
-          <Col md={8} sm={24}>
-            <Form.Item label="所属角色">
-              {getFieldDecorator('role_id')(
-                <Select style={{ width: '100%' }} placeholder="请选择">
-                  {roleData.map(item => (
-                    <Select.Option key={item.record_id} value={item.record_id}>
-                      {item.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-            </Form.Item>
+          <Col span={8}>
+            <Form.Item label="所属角色">{getFieldDecorator('role_ids')(<RoleSelect />)}</Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
-          <Col md={8} sm={24}>
+          <Col span={8}>
             <Form.Item label="用户状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Select.Option value="1">正常</Select.Option>
-                  <Select.Option value="2">停用</Select.Option>
-                </Select>
+              {getFieldDecorator('status', { initialValue: '0' })(
+                <Radio.Group>
+                  <Radio value="0">全部</Radio>
+                  <Radio value="1">正常</Radio>
+                  <Radio value="2">停用</Radio>
+                </Radio.Group>
               )}
             </Form.Item>
           </Col>
-          <Col md={8} sm={24}>
+          <Col span={8}>
             <div style={{ overflow: 'hidden' }}>
               <span style={{ marginBottom: 24 }}>
                 <Button type="primary" htmlType="submit">
@@ -251,66 +223,8 @@ class UserList extends PureComponent {
       },
     } = this.props;
 
-    const { selectedRows } = this.state;
-
+    const { selectedRows, selectedRowKeys } = this.state;
     const columns = [
-      {
-        dataIndex: 'record_id',
-        width: 80,
-        render: (val, record) => (
-          <div>
-            {
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item>
-                      <a
-                        onClick={() => {
-                          this.onItemEditClick(val);
-                        }}
-                      >
-                        编辑
-                      </a>
-                    </Menu.Item>
-                    <Menu.Item>
-                      {record.status === 1 ? (
-                        <a
-                          onClick={() => {
-                            this.onItemDisableClick(val);
-                          }}
-                        >
-                          设置为停用
-                        </a>
-                      ) : (
-                        <a
-                          onClick={() => {
-                            this.onItemEnableClick(val);
-                          }}
-                        >
-                          设置为启用
-                        </a>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      <a
-                        onClick={() => {
-                          this.onItemDelClick(record);
-                        }}
-                      >
-                        删除
-                      </a>
-                    </Menu.Item>
-                  </Menu>
-                }
-              >
-                <a>
-                  操作 <Icon type="down" />
-                </a>
-              </Dropdown>
-            }
-          </div>
-        ),
-      },
       {
         title: '用户名',
         dataIndex: 'user_name',
@@ -321,8 +235,17 @@ class UserList extends PureComponent {
       },
       {
         title: '角色名称',
-        dataIndex: 'role_names',
-        render: val => <span>{val ? val.join(';') : ''}</span>,
+        dataIndex: 'roles',
+        render: val => {
+          if (!val || val.length === 0) {
+            return <span>-</span>;
+          }
+          const names = [];
+          for (let i = 0; i < val.length; i += 1) {
+            names.push(val[i].name);
+          }
+          return <span>{names.join(' | ')}</span>;
+        },
       },
       {
         title: '用户状态',
@@ -335,9 +258,17 @@ class UserList extends PureComponent {
         },
       },
       {
+        title: '邮箱',
+        dataIndex: 'email',
+      },
+      {
+        title: '手机号',
+        dataIndex: 'phone',
+      },
+      {
         title: '创建时间',
-        dataIndex: 'created',
-        render: val => <span>{formatTimestamp(val)}</span>,
+        dataIndex: 'created_at',
+        render: val => <span>{formatDate(val, 'YYYY-MM-DD HH:mm')}</span>,
       },
     ];
 
@@ -354,21 +285,54 @@ class UserList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSearchForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.onAddClick()}>
+              <PButton code="add" icon="plus" type="primary" onClick={() => this.onAddClick()}>
                 新建
-              </Button>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Button icon="delete" type="danger" onClick={() => this.onBatchDelClick()}>
-                    删除
-                  </Button>
-                </span>
-              )}
+              </PButton>
+              {selectedRows.length === 1 && [
+                <PButton
+                  key="edit"
+                  code="edit"
+                  icon="edit"
+                  onClick={() => this.onItemEditClick(selectedRows[0])}
+                >
+                  编辑
+                </PButton>,
+                <PButton
+                  key="del"
+                  code="del"
+                  icon="delete"
+                  type="danger"
+                  onClick={() => this.onItemDelClick(selectedRows[0])}
+                >
+                  删除
+                </PButton>,
+                selectedRows[0].status === 2 && (
+                  <PButton
+                    key="enable"
+                    code="enable"
+                    icon="check"
+                    onClick={() => this.onItemEnableClick(selectedRows[0])}
+                  >
+                    启用
+                  </PButton>
+                ),
+                selectedRows[0].status === 1 && (
+                  <PButton
+                    key="disable"
+                    code="disable"
+                    icon="stop"
+                    type="danger"
+                    onClick={() => this.onItemDisableClick(selectedRows[0])}
+                  >
+                    禁用
+                  </PButton>
+                ),
+              ]}
             </div>
             <div>
               <Table
                 rowSelection={{
-                  selectedRowKeys: selectedRows,
+                  selectedRowKeys,
                   onChange: this.onTableSelectRow,
                 }}
                 loading={loading}

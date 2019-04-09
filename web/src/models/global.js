@@ -1,12 +1,12 @@
-import { getLevelCode, getMenuKeys } from '@/utils/utils';
 import * as loginService from '@/services/login';
 
 export default {
   namespace: 'global',
 
   state: {
-    title: 'RBAC权限管理脚手架',
-    copyRight: '2018 LyricTian',
+    title: '权限管理脚手架',
+    copyRight: '2019 LyricTian',
+    defaultURL: '/dashboard',
     collapsed: false,
     openKeys: [],
     selectedKeys: [],
@@ -21,26 +21,27 @@ export default {
 
   effects: {
     *menuEvent({ pathname }, { put, select }) {
-      const p = pathname;
+      let p = pathname;
       if (p === '/') {
-        return;
+        p = yield select(state => state.global.defaultURL);
       }
 
       const menuPaths = yield select(state => state.global.menuPaths);
-      const menus = yield select(state => state.global.menus);
-      const keys = getMenuKeys(p, menuPaths, menus);
+      const item = menuPaths[p];
+      if (!item) {
+        return;
+      }
 
-      if (keys.length > 0) {
+      if (item.parent_path && item.parent_path !== '') {
         yield put({
           type: 'changeOpenKeys',
-          payload: keys.slice(0, keys.length - 1),
+          payload: item.parent_path.split('/'),
         });
       }
 
-      const levelCode = getLevelCode(p, menuPaths);
       yield put({
         type: 'changeSelectedKeys',
-        payload: [levelCode],
+        payload: [item.record_id],
       });
     },
     *fetchUser(_, { call, put }) {
@@ -50,8 +51,8 @@ export default {
         payload: response,
       });
     },
-    *fetchMenus({ pathname }, { call, put }) {
-      const response = yield call(loginService.queryCurrentMenus);
+    *fetchMenuTree({ pathname }, { call, put }) {
+      const response = yield call(loginService.queryMenuTree);
 
       const menuData = response.list || [];
       yield put({
@@ -62,8 +63,8 @@ export default {
       const menuPaths = {};
       function findPath(data) {
         for (let i = 0; i < data.length; i += 1) {
-          if (data[i].path !== '') {
-            menuPaths[data[i].path] = data[i];
+          if (data[i].router !== '') {
+            menuPaths[data[i].router] = data[i];
           }
           if (data[i].children && data[i].children.length > 0) {
             findPath(data[i].children);

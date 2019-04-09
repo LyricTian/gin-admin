@@ -12,22 +12,28 @@ build-server:
 	@go build -ldflags "-w -s" -o $(SERVER_BIN) ./cmd/server
 
 build-web:
-	cd web && yarn && yarn run build
+	cd web && npm install && npm run build
 
 build: build-server build-web
 
 start: build-server build-web
 	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf -www ./web/dist
 
-start-server: 
+start-dev-server: 
 	@go build -o $(SERVER_BIN) ./cmd/server
-	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf
+	$(SERVER_BIN) -c ./config/config.toml -m ./config/model.conf -swagger ./src/web/swagger
 
-start-web:
-	cd web && yarn && yarn start
+start-dev-web:
+	cd web && npm install && npm start
+
+swagger:
+	swaggo -s ./src/web/swagger.go -p ./src -o ./src/web/swagger
 
 test:
 	@go test -cover -race ./...
+
+clean:
+	rm -rf data release $(SERVER_BIN) src/web/test/data
 
 pack: build-server build-web
 	rm -rf $(RELEASE_ROOT)
