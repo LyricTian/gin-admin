@@ -31,7 +31,7 @@
 ### 获取代码
 
 ```
-go get -v github.com/LyricTian/gin-admin/...
+go get -v github.com/LyricTian/gin-admin/cmd/ginadmin
 ```
 
 ### 运行
@@ -43,9 +43,7 @@ go get -v github.com/LyricTian/gin-admin/...
 > 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
 
 ```bash
-cd $GOPATH/src/github.com/LyricTian/gin-admin
-go build -o ./cmd/server/server ./cmd/server
-./cmd/server/server -c ./configs/ginadmin/config.toml -m ./configs/ginadmin/model.conf -swagger ./internal/app/ginadmin/swagger
+ginadmin -c ./configs/ginadmin/config.toml -m ./configs/ginadmin/model.conf -swagger ./internal/app/ginadmin/swagger
 ```
 
 #### 温馨提醒
