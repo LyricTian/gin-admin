@@ -16,7 +16,7 @@ import (
 
 // VERSION 版本号，
 // 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=3.0.0"
-var VERSION = "dev-3.0.0"
+var VERSION = "3.0.0"
 
 var (
 	configFile string
