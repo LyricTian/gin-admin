@@ -55,7 +55,7 @@ go build -o ./cmd/server/server ./cmd/server
 
 ## 前端实现
 
-- [gin-admin-react](https://github.com/LyricTian/gin-admin-react)：基于Ant Design React
+- [gin-admin-react](https://github.com/LyricTian/gin-admin-react)：基于[Ant Design React](https://ant.design)的实现版本
 
 ## Swagger 文档的使用
 
@@ -125,7 +125,7 @@ swaggo -s ./swagger.go -p ../ -o ./swagger
 
 > 该项目是利用业余时间进行开发的，开发思路主要是来源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，我非常期待！下面是我的微信二维码：
 
-![](./screenshot_wechat.jpeg)
+![](./screenshot_wechat.jpeg =256x256)
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
