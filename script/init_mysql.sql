@@ -1,2 +1,0 @@
--- 创建数据库
-CREATE DATABASE `gadmin` DEFAULT CHARACTER SET = `utf8mb4`;
