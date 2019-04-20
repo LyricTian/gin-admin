@@ -12,11 +12,11 @@ Package ginadmin 生成swagger文档
 package ginadmin
 
 import (
-	// 控制器
-	_ "github.com/LyricTian/gin-admin/internal/app/ginadmin/ctl"
+	// API控制器
+	_ "github.com/LyricTian/gin-admin/internal/app/ginadmin/routers/api/ctl"
 )
 
-// @Version 3.0.0
+// @Version 3.1.0
 // @Title GinAdmin
 // @Description RBAC scaffolding based on GIN + GORM + CASBIN.
 // @Schemes http,https

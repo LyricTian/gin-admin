@@ -8,6 +8,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/config"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/middleware"
+	"github.com/LyricTian/gin-admin/internal/app/ginadmin/routers/api"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -38,7 +39,7 @@ func InitWeb(ctx context.Context, obj *Object) *gin.Engine {
 	}
 
 	// 注册/api路由
-	registerAPIRouter(app, obj)
+	api.RegisterRouter(app, obj.Bll, obj.Auth, obj.Enforcer)
 
 	// swagger文档
 	if dir := cfg.Swagger; dir != "" {
