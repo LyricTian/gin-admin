@@ -38,7 +38,7 @@ go get -v github.com/LyricTian/gin-admin/cmd/ginadmin
 
 > root 用户的用户名及密码在配置文件(`configs/ginadmin/config.toml`)中，默认为：root/abc-123
 
-#### 编译并运行服务
+#### 运行服务
 
 > 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
 
