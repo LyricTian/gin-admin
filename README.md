@@ -83,13 +83,15 @@ swaggo -s ./swagger.go -p ../ -o ./swagger
 │           ├── bll：业务逻辑层
 │           ├── config：配置参数（与配置文件一一映射）
 │           ├── context：统一上下文管理
-│           ├── ctl：控制器层
 │           ├── ginplus：gin的扩展函数库
 │           ├── middleware：gin中间件
 │           ├── model：存储层
 │           │   └── gorm
 │           │       ├── entity：与数据库映射的实体层
 │           │       └── model：gorm实现的存储层
+│           ├── routers：路由层
+│           │   └── api：/api路由模块
+│           │       └── ctl：/api路由模块对应的控制器层
 │           ├── schema：对象模型
 │           ├── swagger：swagger静态目录
 │           └── test：单元测试
@@ -105,8 +107,8 @@ swaggo -s ./swagger.go -p ../ -o ./swagger
 │   │   └── hook
 │   │       └── gorm
 │   └── util：工具类
-├── scripts：脚本
-├── vendor：依赖包
+├── scripts：执行脚本
+└── vendor：依赖包
 ```
 
 ## 感谢以下框架的开源支持

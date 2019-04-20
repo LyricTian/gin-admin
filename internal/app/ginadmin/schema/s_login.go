@@ -25,3 +25,10 @@ type UpdatePasswordParam struct {
 type LoginCaptcha struct {
 	CaptchaID string `json:"captcha_id" swaggo:"true,验证码ID"`
 }
+
+// LoginTokenInfo 登录令牌信息
+type LoginTokenInfo struct {
+	AccessToken string `json:"access_token" swaggo:"true,访问令牌"`
+	TokenType   string `json:"token_type" swaggo:"true,令牌类型"`
+	ExpiresAt   int64  `json:"expires_at" swaggo:"true,令牌到期时间"`
+}

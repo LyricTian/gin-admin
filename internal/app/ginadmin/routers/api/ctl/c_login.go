@@ -8,17 +8,15 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/config"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/ginplus"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/schema"
-	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 // NewLogin 创建登录管理控制器
-func NewLogin(b *bll.Common, a auth.Auther) *Login {
+func NewLogin(b *bll.Common) *Login {
 	return &Login{
 		LoginBll: b.Login,
-		Auth:     a,
 	}
 }
 
@@ -27,11 +25,10 @@ func NewLogin(b *bll.Common, a auth.Auther) *Login {
 // @Description 登录管理
 type Login struct {
 	LoginBll *bll.Login
-	Auth     auth.Auther
 }
 
 func (a *Login) getFuncName(name string) string {
-	return fmt.Sprintf("web.ctl.Login.%s", name)
+	return fmt.Sprintf("api.ctl.Login.%s", name)
 }
 
 // GetCaptchaID 获取验证码ID
@@ -39,11 +36,12 @@ func (a *Login) getFuncName(name string) string {
 // @Success 200 schema.LoginCaptcha
 // @Router GET /api/v1/login/captchaid
 func (a *Login) GetCaptchaID(c *gin.Context) {
-	captchaID := captcha.NewLen(config.GetGlobalConfig().Captcha.Length)
-	data := schema.LoginCaptcha{
-		CaptchaID: captchaID,
+	item, err := a.LoginBll.GetCaptchaID(ginplus.NewContext(c), config.GetGlobalConfig().Captcha.Length)
+	if err != nil {
+		ginplus.ResError(c, err)
+		return
 	}
-	ginplus.ResSuccess(c, data)
+	ginplus.ResSuccess(c, item)
 }
 
 // GetCaptcha 获取图形验证码
@@ -68,28 +66,17 @@ func (a *Login) GetCaptcha(c *gin.Context) {
 		}
 	}
 
-	w := c.Writer
-	captchaConfig := config.GetGlobalConfig().Captcha
-	err := captcha.WriteImage(w, captchaID, captchaConfig.Width, captchaConfig.Height)
+	cfg := config.GetGlobalConfig().Captcha
+	err := a.LoginBll.ResCaptcha(ginplus.NewContext(c), c.Writer, captchaID, cfg.Width, cfg.Height)
 	if err != nil {
-		if err == captcha.ErrNotFound {
-			ginplus.ResError(c, errors.NewBadRequestError("无效的请求参数"))
-			return
-		}
-		logger.StartSpan(ginplus.NewContext(c), "获取图形验证码", a.getFuncName("GetCaptcha")).Errorf(err.Error())
-		ginplus.ResError(c, errors.NewInternalServerError())
-		return
+		ginplus.ResError(c, err)
 	}
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
-	w.Header().Set("Content-Type", "image/png")
 }
 
 // Login 用户登录
 // @Summary 用户登录
 // @Param body body schema.LoginParam true
-// @Success 200 auth.TokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
+// @Success 200 schema.LoginTokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
 // @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/login
@@ -120,17 +107,16 @@ func (a *Login) Login(c *gin.Context) {
 		}
 	}
 
-	userID := user.RecordID
-	ginplus.SetUserID(c, userID)
-	span := logger.StartSpan(ginplus.NewContext(c), "用户登录", a.getFuncName("Login"))
-	tokenInfo, err := a.Auth.GenerateToken(userID)
+	// 将用户ID放入上下文
+	ginplus.SetUserID(c, user.RecordID)
+
+	tokenInfo, err := a.LoginBll.GenerateToken(ginplus.NewContext(c))
 	if err != nil {
-		span.Errorf(err.Error())
-		ginplus.ResError(c, errors.NewInternalServerError())
+		ginplus.ResError(c, err)
 		return
 	}
 
-	span.Infof("登入系统")
+	logger.StartSpan(ginplus.NewContext(c), "用户登录", a.getFuncName("Login")).Infof("登入系统")
 	ginplus.ResSuccess(c, tokenInfo)
 }
 
@@ -142,12 +128,9 @@ func (a *Login) Logout(c *gin.Context) {
 	// 检查用户是否处于登录状态，如果是则执行销毁
 	userID := ginplus.GetUserID(c)
 	if userID != "" {
-		span := logger.StartSpan(ginplus.NewContext(c), "用户登出", a.getFuncName("Logout"))
-		err := a.Auth.DestroyToken(ginplus.GetToken(c))
-		if err != nil {
-			span.Errorf(err.Error())
-		}
-		span.Infof("登出系统")
+		a.LoginBll.DestroyToken(ginplus.NewContext(c), ginplus.GetToken(c))
+
+		logger.StartSpan(ginplus.NewContext(c), "用户登出", a.getFuncName("Logout")).Infof("登出系统")
 	}
 	ginplus.ResOK(c)
 }
@@ -155,15 +138,14 @@ func (a *Login) Logout(c *gin.Context) {
 // RefreshToken 刷新令牌
 // @Summary 刷新令牌
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Success 200 auth.TokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
+// @Success 200 schema.LoginTokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
 // @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router POST /api/v1/refresh_token
 func (a *Login) RefreshToken(c *gin.Context) {
-	tokenInfo, err := a.Auth.GenerateToken(ginplus.GetUserID(c))
+	tokenInfo, err := a.LoginBll.GenerateToken(ginplus.NewContext(c))
 	if err != nil {
-		logger.StartSpan(ginplus.NewContext(c), "刷新令牌", a.getFuncName("RefreshToken")).Errorf(err.Error())
-		ginplus.ResError(c, errors.NewInternalServerError())
+		ginplus.ResError(c, err)
 		return
 	}
 	ginplus.ResSuccess(c, tokenInfo)
