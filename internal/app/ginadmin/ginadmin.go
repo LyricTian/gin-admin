@@ -5,7 +5,6 @@ import (
 
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/bll"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/config"
-	"github.com/LyricTian/gin-admin/internal/app/ginadmin/ctl"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/model"
 	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/LyricTian/gin-admin/pkg/logger"
@@ -19,7 +18,6 @@ type Object struct {
 	Auth     auth.Auther
 	Model    *model.Common
 	Bll      *bll.Common
-	Ctl      *ctl.Common
 }
 
 // Init 应用初始化
@@ -83,8 +81,7 @@ func InitObject(ctx context.Context) (*Object, func(), error) {
 		return nil, nil, err
 	}
 	obj.Model = m
-	obj.Bll = bll.NewCommon(obj.Model, obj.Enforcer)
-	obj.Ctl = ctl.NewCommon(obj.Bll, obj.Auth)
+	obj.Bll = bll.NewCommon(obj.Model, obj.Auth, obj.Enforcer)
 
 	return obj, func() {
 		if storeCall != nil {
