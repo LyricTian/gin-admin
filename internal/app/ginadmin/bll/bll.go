@@ -8,6 +8,7 @@ import (
 	icontext "github.com/LyricTian/gin-admin/internal/app/ginadmin/context"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/model"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/schema"
+	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/casbin/casbin"
 )
@@ -76,10 +77,10 @@ type Common struct {
 }
 
 // NewCommon 创建统一的业务逻辑处理
-func NewCommon(m *model.Common, e *casbin.Enforcer) *Common {
+func NewCommon(m *model.Common, a auth.Auther, e *casbin.Enforcer) *Common {
 	return &Common{
 		Demo:  NewDemo(m),
-		Login: NewLogin(m),
+		Login: NewLogin(m, a),
 		Menu:  NewMenu(m),
 		Role:  NewRole(m, e),
 		User:  NewUser(m, e),

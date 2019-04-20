@@ -2,10 +2,15 @@ package bll
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 
+	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/model"
 	"github.com/LyricTian/gin-admin/internal/app/ginadmin/schema"
+	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/LyricTian/gin-admin/pkg/util"
 )
 
@@ -19,11 +24,12 @@ var (
 )
 
 // NewLogin 创建登录管理实例
-func NewLogin(m *model.Common) *Login {
+func NewLogin(m *model.Common, a auth.Auther) *Login {
 	return &Login{
 		UserModel: m.User,
 		RoleModel: m.Role,
 		MenuModel: m.Menu,
+		Auth:      a,
 	}
 }
 
@@ -32,6 +38,63 @@ type Login struct {
 	UserModel model.IUser
 	RoleModel model.IRole
 	MenuModel model.IMenu
+	Auth      auth.Auther
+}
+
+func (a *Login) getFuncName(name string) string {
+	return fmt.Sprintf("ginadmin.bll.Login.%s", name)
+}
+
+// GetCaptchaID 获取图形验证码ID
+func (a *Login) GetCaptchaID(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
+	captchaID := captcha.NewLen(length)
+	item := &schema.LoginCaptcha{
+		CaptchaID: captchaID,
+	}
+	return item, nil
+}
+
+// ResCaptcha 生成图形验证码
+func (a *Login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, width, height int) error {
+	err := captcha.WriteImage(w, captchaID, width, height)
+	if err != nil {
+		if err == captcha.ErrNotFound {
+			return errors.NewBadRequestError("无效的请求参数")
+		}
+		logger.StartSpan(ctx, "生成图形验证码", a.getFuncName("ResCaptcha")).Errorf(err.Error())
+		return errors.NewInternalServerError("生成验证码发生错误")
+	}
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Content-Type", "image/png")
+	return nil
+}
+
+// GenerateToken 生成令牌
+func (a *Login) GenerateToken(ctx context.Context) (*schema.LoginTokenInfo, error) {
+	tokenInfo, err := a.Auth.GenerateToken(GetUserID(ctx))
+	if err != nil {
+		logger.StartSpan(ctx, "生成令牌", a.getFuncName("GenerateToken")).Errorf(err.Error())
+		return nil, errors.NewInternalServerError("生成令牌发生错误")
+	}
+
+	item := &schema.LoginTokenInfo{
+		AccessToken: tokenInfo.GetAccessToken(),
+		TokenType:   tokenInfo.GetTokenType(),
+		ExpiresAt:   tokenInfo.GetExpiresAt(),
+	}
+	return item, nil
+}
+
+// DestroyToken 销毁令牌
+func (a *Login) DestroyToken(ctx context.Context, tokenString string) error {
+	err := a.Auth.DestroyToken(tokenString)
+	if err != nil {
+		logger.StartSpan(ctx, "销毁令牌", a.getFuncName("DestroyToken")).Errorf(err.Error())
+		return errors.NewInternalServerError("销毁令牌发生错误")
+	}
+	return nil
 }
 
 // Verify 登录验证
