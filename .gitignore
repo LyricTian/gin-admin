@@ -12,8 +12,7 @@
 *.out
 
 *.DS_Store
-/cmd/server/server
+/cmd/ginadmin/ginadmin
 /release
 /data
-/src/web/test/data
-/src/model/gorm/model/data
+/internal/app/ginadmin/test/data
