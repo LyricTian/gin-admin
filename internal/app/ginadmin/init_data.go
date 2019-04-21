@@ -29,7 +29,7 @@ func loadCasbinPolicyData(ctx context.Context, obj *Object) error {
 		return err
 	}
 
-	return obj.Bll.Role.LoadAllPolicy(ctx)
+	return obj.Bll.User.LoadAllPolicy(ctx)
 }
 
 // initMenuData 初始化菜单数据
