@@ -16,7 +16,7 @@ import (
 	_ "github.com/LyricTian/gin-admin/internal/app/ginadmin/routers/api/ctl"
 )
 
-// @Version 3.1.0
+// @Version 3.1.1
 // @Title GinAdmin
 // @Description RBAC scaffolding based on GIN + GORM + CASBIN.
 // @Schemes http,https
