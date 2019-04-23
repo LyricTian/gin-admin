@@ -70,26 +70,37 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 		Data:       list.ToSchemaUsers(),
 	}
 
-	for i, item := range qr.Data {
-		err := a.fillSchemaUser(ctx, item, opts...)
-		if err != nil {
-			return nil, err
-		}
-		qr.Data[i] = item
+	err = a.fillSchemaUsers(ctx, qr.Data, opts...)
+	if err != nil {
+		return nil, err
 	}
 
 	return qr, nil
 }
 
-func (a *User) fillSchemaUser(ctx context.Context, item *schema.User, opts ...schema.UserQueryOptions) error {
+func (a *User) fillSchemaUsers(ctx context.Context, items []*schema.User, opts ...schema.UserQueryOptions) error {
 	opt := a.getQueryOption(opts...)
 
 	if opt.IncludeRoles {
-		list, err := a.queryRoles(ctx, item.RecordID)
-		if err != nil {
-			return err
+		userIDs := make([]string, len(items))
+		for i, item := range items {
+			userIDs[i] = item.RecordID
 		}
-		item.Roles = list.ToSchemaUserRoles()
+
+		var roleList entity.UserRoles
+		if opt.IncludeRoles {
+			items, err := a.queryRoles(ctx, userIDs...)
+			if err != nil {
+				return err
+			}
+			roleList = items
+		}
+
+		for i, item := range items {
+			if len(roleList) > 0 {
+				items[i].Roles = roleList.GetByUserID(item.RecordID)
+			}
+		}
 	}
 
 	return nil
@@ -110,7 +121,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 	}
 
 	sitem := item.ToSchemaUser()
-	err = a.fillSchemaUser(ctx, sitem, opts...)
+	err = a.fillSchemaUsers(ctx, []*schema.User{sitem}, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -273,15 +284,15 @@ func (a *User) UpdatePassword(ctx context.Context, recordID, password string) er
 	return nil
 }
 
-func (a *User) queryRoles(ctx context.Context, userID string) (entity.UserRoles, error) {
+func (a *User) queryRoles(ctx context.Context, userIDs ...string) (entity.UserRoles, error) {
 	span := logger.StartSpan(ctx, "查询用户角色数据", a.getFuncName("queryRoles"))
 	defer span.Finish()
 
 	var list entity.UserRoles
-	result := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", userID).Find(&list)
+	result := entity.GetUserRoleDB(ctx, a.db).Where("user_id IN(?)", userIDs).Find(&list)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
-		return nil, errors.New("查询角色ID列表发生错误")
+		return nil, errors.New("查询用户角色数据发生错误")
 	}
 	return list, nil
 }
