@@ -120,6 +120,17 @@ func (a UserRole) ToSchemaUserRole() *schema.UserRole {
 // UserRoles 用户角色关联列表
 type UserRoles []*UserRole
 
+// GetByUserID 根据用户ID获取用户角色对象列表
+func (a UserRoles) GetByUserID(userID string) []*schema.UserRole {
+	var list []*schema.UserRole
+	for _, item := range a {
+		if item.UserID == userID {
+			list = append(list, item.ToSchemaUserRole())
+		}
+	}
+	return list
+}
+
 // ToSchemaUserRoles 转换为用户角色对象列表
 func (a UserRoles) ToSchemaUserRoles() []*schema.UserRole {
 	list := make([]*schema.UserRole, len(a))

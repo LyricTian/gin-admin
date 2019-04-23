@@ -66,26 +66,39 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		Data:       list.ToSchemaRoles(),
 	}
 
-	for _, item := range qr.Data {
-		err := a.fillSchameRole(ctx, item, opts...)
-		if err != nil {
-			return nil, err
-		}
+	err = a.fillSchameRoles(ctx, qr.Data, opts...)
+	if err != nil {
+		return nil, err
 	}
 
 	return qr, nil
 }
 
 // 填充角色对象
-func (a *Role) fillSchameRole(ctx context.Context, item *schema.Role, opts ...schema.RoleQueryOptions) error {
+func (a *Role) fillSchameRoles(ctx context.Context, items []*schema.Role, opts ...schema.RoleQueryOptions) error {
 	opt := a.getQueryOption(opts...)
 
 	if opt.IncludeMenus {
-		list, err := a.queryMenus(ctx, item.RecordID)
-		if err != nil {
-			return err
+
+		roleIDs := make([]string, len(items))
+		for i, item := range items {
+			roleIDs[i] = item.RecordID
 		}
-		item.Menus = list.ToSchemaRoleMenus()
+
+		var menuList entity.RoleMenus
+		if opt.IncludeMenus {
+			items, err := a.queryMenus(ctx, roleIDs...)
+			if err != nil {
+				return err
+			}
+			menuList = items
+		}
+
+		for i, item := range items {
+			if len(menuList) > 0 {
+				items[i].Menus = menuList.GetByRoleID(item.RecordID)
+			}
+		}
 	}
 	return nil
 }
@@ -105,7 +118,7 @@ func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQuer
 	}
 
 	sitem := role.ToSchemaRole()
-	err = a.fillSchameRole(ctx, sitem, opts...)
+	err = a.fillSchameRoles(ctx, []*schema.Role{sitem}, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -236,12 +249,12 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	})
 }
 
-func (a *Role) queryMenus(ctx context.Context, roleID string) (entity.RoleMenus, error) {
+func (a *Role) queryMenus(ctx context.Context, roleIDs ...string) (entity.RoleMenus, error) {
 	span := logger.StartSpan(ctx, "查询角色菜单数据", a.getFuncName("queryMenus"))
 	defer span.Finish()
 
 	var list entity.RoleMenus
-	result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=?", roleID).Find(&list)
+	result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id IN(?)", roleIDs).Find(&list)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return nil, errors.New("查询角色菜单数据发生错误")

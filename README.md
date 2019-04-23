@@ -21,9 +21,6 @@
 - 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，日志钩子支持 gorm)
 - JWT 认证(基于黑名单的认证模式，存储支持：file/redis)
 - 支持 Swagger 文档
-- 支持跨域请求
-- 支持请求频次限制
-- 支持静态站点
 - 单元测试
 
 ## 下载并运行
