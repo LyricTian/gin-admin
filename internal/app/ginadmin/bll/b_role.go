@@ -84,7 +84,7 @@ func (a *Role) checkName(ctx context.Context, name string) error {
 func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.Role, error) {
 	err := a.checkName(ctx, item.Name)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	item.RecordID = util.MustUUID()

@@ -131,6 +131,17 @@ func (a RoleMenu) ToSchemaRoleMenu() *schema.RoleMenu {
 // RoleMenus 角色菜单关联实体列表
 type RoleMenus []*RoleMenu
 
+// GetByRoleID 根据角色ID获取角色菜单对象列表
+func (a RoleMenus) GetByRoleID(roleID string) []*schema.RoleMenu {
+	var list []*schema.RoleMenu
+	for _, item := range a {
+		if item.RoleID == roleID {
+			list = append(list, item.ToSchemaRoleMenu())
+		}
+	}
+	return list
+}
+
 // ToSchemaRoleMenus 转换为角色菜单对象列表
 func (a RoleMenus) ToSchemaRoleMenus() []*schema.RoleMenu {
 	list := make([]*schema.RoleMenu, len(a))

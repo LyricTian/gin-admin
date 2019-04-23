@@ -148,6 +148,17 @@ func (a MenuAction) ToSchemaMenuAction() *schema.MenuAction {
 // MenuActions 菜单动作关联实体列表
 type MenuActions []*MenuAction
 
+// GetByMenuID 根据菜单ID获取菜单动作列表
+func (a MenuActions) GetByMenuID(menuID string) []*schema.MenuAction {
+	var list []*schema.MenuAction
+	for _, item := range a {
+		if item.MenuID == menuID {
+			list = append(list, item.ToSchemaMenuAction())
+		}
+	}
+	return list
+}
+
 // ToSchemaMenuActions 转换为菜单动作列表
 func (a MenuActions) ToSchemaMenuActions() []*schema.MenuAction {
 	list := make([]*schema.MenuAction, len(a))
@@ -207,6 +218,17 @@ func (a MenuResource) ToSchemaMenuResource() *schema.MenuResource {
 
 // MenuResources 菜单资源关联实体列表
 type MenuResources []*MenuResource
+
+// GetByMenuID 根据菜单ID获取菜单资源列表
+func (a MenuResources) GetByMenuID(menuID string) []*schema.MenuResource {
+	var list []*schema.MenuResource
+	for _, item := range a {
+		if item.MenuID == menuID {
+			list = append(list, item.ToSchemaMenuResource())
+		}
+	}
+	return list
+}
 
 // ToSchemaMenuResources 转换为菜单资源列表
 func (a MenuResources) ToSchemaMenuResources() []*schema.MenuResource {

@@ -68,35 +68,53 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 		Data:       list.ToSchemaMenus(),
 	}
 
-	for _, item := range qr.Data {
-		err := a.fillSchemaMenu(ctx, item, opts...)
-		if err != nil {
-			return nil, err
-		}
+	err = a.fillSchemaMenus(ctx, qr.Data, opts...)
+	if err != nil {
+		return nil, err
 	}
 
 	return qr, nil
 }
 
 // 填充菜单对象数据
-func (a *Menu) fillSchemaMenu(ctx context.Context, item *schema.Menu, opts ...schema.MenuQueryOptions) error {
+func (a *Menu) fillSchemaMenus(ctx context.Context, items []*schema.Menu, opts ...schema.MenuQueryOptions) error {
 	opt := a.getQueryOption(opts...)
 
-	if opt.IncludeActions {
-		list, err := a.queryActions(ctx, item.RecordID)
-		if err != nil {
-			return err
+	if opt.IncludeActions || opt.IncludeResources {
+
+		menuIDs := make([]string, len(items))
+		for i, item := range items {
+			menuIDs[i] = item.RecordID
 		}
-		item.Actions = list.ToSchemaMenuActions()
+
+		var actionList entity.MenuActions
+		var resourceList entity.MenuResources
+		if opt.IncludeActions {
+			items, err := a.queryActions(ctx, menuIDs...)
+			if err != nil {
+				return err
+			}
+			actionList = items
+		}
+
+		if opt.IncludeResources {
+			items, err := a.queryResources(ctx, menuIDs...)
+			if err != nil {
+				return err
+			}
+			resourceList = items
+		}
+
+		for i, item := range items {
+			if len(actionList) > 0 {
+				items[i].Actions = actionList.GetByMenuID(item.RecordID)
+			}
+			if len(resourceList) > 0 {
+				items[i].Resources = resourceList.GetByMenuID(item.RecordID)
+			}
+		}
 	}
 
-	if opt.IncludeResources {
-		list, err := a.queryResources(ctx, item.RecordID)
-		if err != nil {
-			return err
-		}
-		item.Resources = list.ToSchemaMenuResources()
-	}
 	return nil
 }
 
@@ -115,7 +133,7 @@ func (a *Menu) Get(ctx context.Context, recordID string, opts ...schema.MenuQuer
 	}
 
 	sitem := item.ToSchemaMenu()
-	err = a.fillSchemaMenu(ctx, sitem, opts...)
+	err = a.fillSchemaMenus(ctx, []*schema.Menu{sitem}, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -331,12 +349,12 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 	})
 }
 
-func (a *Menu) queryActions(ctx context.Context, menuID string) (entity.MenuActions, error) {
+func (a *Menu) queryActions(ctx context.Context, menuIDs ...string) (entity.MenuActions, error) {
 	span := logger.StartSpan(ctx, "查询菜单动作数据", a.getFuncName("queryActions"))
 	defer span.Finish()
 
 	var list entity.MenuActions
-	result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", menuID).Find(&list)
+	result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id IN(?)", menuIDs).Find(&list)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return nil, errors.New("查询菜单动作数据发生错误")
@@ -345,12 +363,12 @@ func (a *Menu) queryActions(ctx context.Context, menuID string) (entity.MenuActi
 	return list, nil
 }
 
-func (a *Menu) queryResources(ctx context.Context, menuID string) (entity.MenuResources, error) {
+func (a *Menu) queryResources(ctx context.Context, menuIDs ...string) (entity.MenuResources, error) {
 	span := logger.StartSpan(ctx, "查询菜单资源数据", a.getFuncName("queryResources"))
 	defer span.Finish()
 
 	var list entity.MenuResources
-	result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id=?", menuID).Find(&list)
+	result := entity.GetMenuResourceDB(ctx, a.db).Where("menu_id IN(?)", menuIDs).Find(&list)
 	if err := result.Error; err != nil {
 		span.Errorf(err.Error())
 		return nil, errors.New("查询菜单资源数据发生错误")
