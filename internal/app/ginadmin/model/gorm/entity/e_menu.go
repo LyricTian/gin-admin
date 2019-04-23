@@ -33,7 +33,7 @@ func (a SchemaMenu) ToMenu() *Menu {
 		Sequence:   a.Sequence,
 		Icon:       a.Icon,
 		Router:     a.Router,
-		Hidden:     a.Hidden,
+		Hidden:     &a.Hidden,
 		ParentID:   a.ParentID,
 		ParentPath: a.ParentPath,
 		Creator:    a.Creator,
@@ -67,7 +67,7 @@ type Menu struct {
 	Sequence   int    `gorm:"column:sequence;index;"`             // 排序值
 	Icon       string `gorm:"column:icon;size:255;"`              // 菜单图标
 	Router     string `gorm:"column:router;size:255;"`            // 访问路由
-	Hidden     int    `gorm:"column:hidden;index;"`               // 隐藏菜单(0:不隐藏 1:隐藏)
+	Hidden     *int   `gorm:"column:hidden;index;"`               // 隐藏菜单(0:不隐藏 1:隐藏)
 	ParentID   string `gorm:"column:parent_id;size:36;index;"`    // 父级内码
 	ParentPath string `gorm:"column:parent_path;size:518;index;"` // 父级路径
 	Creator    string `gorm:"column:creator;size:36;"`            // 创建人
@@ -90,7 +90,7 @@ func (a Menu) ToSchemaMenu() *schema.Menu {
 		Sequence:   a.Sequence,
 		Icon:       a.Icon,
 		Router:     a.Router,
-		Hidden:     a.Hidden,
+		Hidden:     *a.Hidden,
 		ParentID:   a.ParentID,
 		ParentPath: a.ParentPath,
 		Creator:    a.Creator,
