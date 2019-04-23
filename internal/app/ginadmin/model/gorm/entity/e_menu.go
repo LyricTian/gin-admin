@@ -33,7 +33,7 @@ func (a SchemaMenu) ToMenu() *Menu {
 		Sequence:   a.Sequence,
 		Icon:       a.Icon,
 		Router:     a.Router,
-		Hidden:     a.Hidden,
+		Hidden:     &a.Hidden,
 		ParentID:   a.ParentID,
 		ParentPath: a.ParentPath,
 		Creator:    a.Creator,
@@ -67,7 +67,7 @@ type Menu struct {
 	Sequence   int    `gorm:"column:sequence;index;"`             // 排序值
 	Icon       string `gorm:"column:icon;size:255;"`              // 菜单图标
 	Router     string `gorm:"column:router;size:255;"`            // 访问路由
-	Hidden     int    `gorm:"column:hidden;index;"`               // 隐藏菜单(0:不隐藏 1:隐藏)
+	Hidden     *int   `gorm:"column:hidden;index;"`               // 隐藏菜单(0:不隐藏 1:隐藏)
 	ParentID   string `gorm:"column:parent_id;size:36;index;"`    // 父级内码
 	ParentPath string `gorm:"column:parent_path;size:518;index;"` // 父级路径
 	Creator    string `gorm:"column:creator;size:36;"`            // 创建人
@@ -90,7 +90,7 @@ func (a Menu) ToSchemaMenu() *schema.Menu {
 		Sequence:   a.Sequence,
 		Icon:       a.Icon,
 		Router:     a.Router,
-		Hidden:     a.Hidden,
+		Hidden:     *a.Hidden,
 		ParentID:   a.ParentID,
 		ParentPath: a.ParentPath,
 		Creator:    a.Creator,
@@ -147,6 +147,17 @@ func (a MenuAction) ToSchemaMenuAction() *schema.MenuAction {
 
 // MenuActions 菜单动作关联实体列表
 type MenuActions []*MenuAction
+
+// GetByMenuID 根据菜单ID获取菜单动作列表
+func (a MenuActions) GetByMenuID(menuID string) []*schema.MenuAction {
+	var list []*schema.MenuAction
+	for _, item := range a {
+		if item.MenuID == menuID {
+			list = append(list, item.ToSchemaMenuAction())
+		}
+	}
+	return list
+}
 
 // ToSchemaMenuActions 转换为菜单动作列表
 func (a MenuActions) ToSchemaMenuActions() []*schema.MenuAction {
@@ -207,6 +218,17 @@ func (a MenuResource) ToSchemaMenuResource() *schema.MenuResource {
 
 // MenuResources 菜单资源关联实体列表
 type MenuResources []*MenuResource
+
+// GetByMenuID 根据菜单ID获取菜单资源列表
+func (a MenuResources) GetByMenuID(menuID string) []*schema.MenuResource {
+	var list []*schema.MenuResource
+	for _, item := range a {
+		if item.MenuID == menuID {
+			list = append(list, item.ToSchemaMenuResource())
+		}
+	}
+	return list
+}
 
 // ToSchemaMenuResources 转换为菜单资源列表
 func (a MenuResources) ToSchemaMenuResources() []*schema.MenuResource {
