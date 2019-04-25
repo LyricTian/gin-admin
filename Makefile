@@ -16,7 +16,7 @@ start:
 	$(SERVER_BIN) -c ./configs/ginadmin/config.toml -m ./configs/ginadmin/model.conf -swagger ./internal/app/ginadmin/swagger
 
 swagger:
-	swaggo -s ./internal/app/ginadmin/swagger.go -p ./internal/app/ginadmin -o ./internal/app/ginadmin/swagger
+	swaggo -s ./internal/app/ginadmin/swagger.go -p . -o ./internal/app/ginadmin/swagger
 
 test:
 	@go test -cover -race ./...

@@ -6,8 +6,7 @@ Package ginadmin 生成swagger文档
 使用方式：
 
 	go get -u -v github.com/teambition/swaggo
-	cd internal/app/ginadmin
-	swaggo -s ./swagger.go -p ../../../ -o ./swagger
+	swaggo -s ./internal/app/ginadmin/swagger.go -p . -o ./internal/app/ginadmin/swagger
 */
 package ginadmin
 
