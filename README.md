@@ -60,8 +60,7 @@ ginadmin -c ./configs/ginadmin/config.toml -m ./configs/ginadmin/model.conf -swa
 
 ```
 go get -u -v github.com/teambition/swaggo
-cd internal/app/ginadmin
-swaggo -s ./swagger.go -p ../../../ -o ./swagger
+swaggo -s ./internal/app/ginadmin/swagger.go -p . -o ./internal/app/ginadmin/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
