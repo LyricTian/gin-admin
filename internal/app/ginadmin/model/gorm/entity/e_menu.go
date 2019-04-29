@@ -90,12 +90,14 @@ func (a Menu) ToSchemaMenu() *schema.Menu {
 		Sequence:   a.Sequence,
 		Icon:       a.Icon,
 		Router:     a.Router,
-		Hidden:     *a.Hidden,
 		ParentID:   a.ParentID,
 		ParentPath: a.ParentPath,
 		Creator:    a.Creator,
 		CreatedAt:  &a.CreatedAt,
 		UpdatedAt:  &a.UpdatedAt,
+	}
+	if a.Hidden != nil {
+		item.Hidden = *a.Hidden
 	}
 	return item
 }
