@@ -37,12 +37,7 @@ func (a SchemaRole) ToRole() *Role {
 func (a SchemaRole) ToRoleMenus() []*RoleMenu {
 	list := make([]*RoleMenu, len(a.Menus))
 	for i, item := range a.Menus {
-		list[i] = &RoleMenu{
-			RoleID:   a.RecordID,
-			MenuID:   item.MenuID,
-			Action:   strings.Join(item.Actions, ","),
-			Resource: strings.Join(item.Resources, ","),
-		}
+		list[i] = SchemaRoleMenu(*item).ToRoleMenu(a.RecordID)
 	}
 	return list
 }
@@ -97,21 +92,33 @@ type SchemaRoleMenu schema.RoleMenu
 
 // ToRoleMenu 转换为角色菜单实体
 func (a SchemaRoleMenu) ToRoleMenu(roleID string) *RoleMenu {
-	return &RoleMenu{
-		RoleID:   roleID,
-		MenuID:   a.MenuID,
-		Action:   strings.Join(a.Actions, ","),
-		Resource: strings.Join(a.Resources, ","),
+	item := &RoleMenu{
+		RoleID: roleID,
+		MenuID: a.MenuID,
 	}
+
+	var action string
+	if v := a.Actions; len(v) > 0 {
+		action = strings.Join(v, ",")
+	}
+	item.Action = &action
+
+	var resource string
+	if v := a.Resources; len(v) > 0 {
+		resource = strings.Join(v, ",")
+	}
+	item.Resource = &resource
+
+	return item
 }
 
 // RoleMenu 角色菜单关联实体
 type RoleMenu struct {
 	Model
-	RoleID   string `gorm:"column:role_id;size:36;index;"` // 角色内码
-	MenuID   string `gorm:"column:menu_id;size:36;index;"` // 菜单内码
-	Action   string `gorm:"column:action;size:2048;"`      // 动作权限(多个以英文逗号分隔)
-	Resource string `gorm:"column:resource;size:2048;"`    // 资源权限(多个以英文逗号分隔)
+	RoleID   string  `gorm:"column:role_id;size:36;index;"` // 角色内码
+	MenuID   string  `gorm:"column:menu_id;size:36;index;"` // 菜单内码
+	Action   *string `gorm:"column:action;size:2048;"`      // 动作权限(多个以英文逗号分隔)
+	Resource *string `gorm:"column:resource;size:2048;"`    // 资源权限(多个以英文逗号分隔)
 }
 
 // TableName 表名
@@ -121,11 +128,18 @@ func (a RoleMenu) TableName() string {
 
 // ToSchemaRoleMenu 转换为角色菜单对象
 func (a RoleMenu) ToSchemaRoleMenu() *schema.RoleMenu {
-	return &schema.RoleMenu{
-		MenuID:    a.MenuID,
-		Actions:   strings.Split(a.Action, ","),
-		Resources: strings.Split(a.Resource, ","),
+	item := &schema.RoleMenu{
+		MenuID: a.MenuID,
 	}
+
+	if v := a.Action; v != nil && *v != "" {
+		item.Actions = strings.Split(*v, ",")
+	}
+	if v := a.Resource; v != nil && *v != "" {
+		item.Resources = strings.Split(*v, ",")
+	}
+
+	return item
 }
 
 // RoleMenus 角色菜单关联实体列表

@@ -70,9 +70,20 @@ func TestRole(t *testing.T) {
 	// put /roles/:id
 	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
+
 	var putItem schema.Role
 	err = parseReader(w.Body, &putItem)
+	assert.Equal(t, len(putItem.Menus), 1)
+
 	putItem.Name = util.MustUUID()
+	putItem.Menus = []*schema.RoleMenu{
+		{
+			MenuID:    addNewMenuItem.RecordID,
+			Actions:   []string{},
+			Resources: []string{"query"},
+		},
+	}
+
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
 	var putNewItem schema.Role
@@ -80,6 +91,8 @@ func TestRole(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, putItem.Name, putNewItem.Name)
 	assert.Equal(t, len(putItem.Menus), len(putNewItem.Menus))
+	assert.Equal(t, 0, len(putNewItem.Menus[0].Actions))
+	assert.Equal(t, 1, len(putNewItem.Menus[0].Resources))
 
 	// delete /menus/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", "v1/menus", addNewMenuItem.RecordID))
