@@ -73,6 +73,10 @@ func (a *Menu) Get(ctx context.Context, recordID string) (*schema.Menu, error) {
 	return item, nil
 }
 
+func (a *Menu) getSep() string {
+	return "/"
+}
+
 // 获取父级路径
 func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, error) {
 	if parentID == "" {
@@ -88,7 +92,7 @@ func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, erro
 
 	var parentPath string
 	if v := pitem.ParentPath; v != "" {
-		parentPath = v + "/"
+		parentPath = v + a.getSep()
 	}
 	parentPath = parentPath + pitem.RecordID
 	return parentPath, nil
@@ -137,7 +141,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*
 
 			opath := oldItem.ParentPath
 			if opath != "" {
-				opath += "/"
+				opath += a.getSep()
 			}
 			opath += oldItem.RecordID
 
@@ -148,9 +152,15 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*
 				return err
 			}
 
+			npath := item.ParentPath
+			if npath != "" {
+				npath += a.getSep()
+			}
+			npath += item.RecordID
+
 			for _, menu := range result.Data {
-				npath := item.ParentPath + menu.ParentPath[len(opath):]
-				err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath)
+				npath2 := npath + menu.ParentPath[len(opath):]
+				err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath2)
 				if err != nil {
 					return err
 				}
