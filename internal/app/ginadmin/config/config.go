@@ -2,14 +2,12 @@ package config
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/BurntSushi/toml"
 )
 
 var (
 	global *Config
-	once   sync.Once
 )
 
 // LoadGlobalConfig 加载全局配置
