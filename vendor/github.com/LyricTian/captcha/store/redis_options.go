@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"crypto/tls"
 	"net"
 	"time"
@@ -18,7 +19,7 @@ type RedisOptions struct {
 
 	// Dialer creates new network connection and has priority over
 	// Network and Addr options.
-	Dialer func() (net.Conn, error)
+	Dialer func(ctx context.Context, network, addr string) (net.Conn, error)
 
 	// Optional password. Must match the password specified in the
 	// requirepass server configuration option.
