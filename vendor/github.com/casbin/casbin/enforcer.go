@@ -84,12 +84,12 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 	} else if len(params)-parsedParamLen == 1 {
 		switch p0 := params[0].(type) {
 		case string:
-			e.InitWithFile(p0, "")
+			e.InitWithAdapter(p0, nil)
 		default:
 			e.InitWithModelAndAdapter(p0.(model.Model), nil)
 		}
 	} else if len(params)-parsedParamLen == 0 {
-		e.InitWithFile("", "")
+		e.InitWithAdapter("", nil)
 	} else {
 		panic("Invalid parameters for enforcer.")
 	}
@@ -122,10 +122,13 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	e.initialize()
 
 	// Do not initialize the full policy when using a filtered adapter
-	fa, ok := e.adapter.(persist.FilteredAdapter)
-	if e.adapter != nil && (!ok || ok && !fa.IsFiltered()) {
+	_, filtered := e.adapter.(persist.FilteredAdapter)
+	if e.adapter != nil && !filtered {
 		// error intentionally ignored
-		e.LoadPolicy()
+		err := e.LoadPolicy()
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 

@@ -136,15 +136,46 @@ func FromUserIDContext(ctx context.Context) string {
 	return ""
 }
 
+type spanOptions struct {
+	Title    string
+	FuncName string
+}
+
+// SpanOption 定义跟踪单元的数据项
+type SpanOption func(*spanOptions)
+
+// SetSpanTitle 设置跟踪单元的标题
+func SetSpanTitle(title string) SpanOption {
+	return func(o *spanOptions) {
+		o.Title = title
+	}
+}
+
+// SetSpanFuncName 设置跟踪单元的函数名
+func SetSpanFuncName(funcName string) SpanOption {
+	return func(o *spanOptions) {
+		o.FuncName = funcName
+	}
+}
+
 // StartSpan 开始一个追踪单元
-func StartSpan(ctx context.Context, title, funcName string) *Entry {
+func StartSpan(ctx context.Context, opts ...SpanOption) *Entry {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	var o spanOptions
+	for _, opt := range opts {
+		opt(&o)
+	}
+
 	fields := map[string]interface{}{
 		StartedAtKey:    time.Now(),
 		UserIDKey:       FromUserIDContext(ctx),
 		TraceIDKey:      FromTraceIDContext(ctx),
 		SpanIDKey:       FromSpanIDContext(ctx),
-		SpanTitleKey:    title,
-		SpanFunctionKey: funcName,
+		SpanTitleKey:    o.Title,
+		SpanFunctionKey: o.FuncName,
 		VersionKey:      version,
 	}
 
@@ -152,10 +183,40 @@ func StartSpan(ctx context.Context, title, funcName string) *Entry {
 }
 
 // StartSpanWithCall 开始一个追踪单元（回调执行）
-func StartSpanWithCall(ctx context.Context, title, funcName string) func() *Entry {
+func StartSpanWithCall(ctx context.Context, opts ...SpanOption) func() *Entry {
 	return func() *Entry {
-		return StartSpan(ctx, title, funcName)
+		return StartSpan(ctx, opts...)
 	}
+}
+
+// Debugf 写入调试日志
+func Debugf(ctx context.Context, format string, args ...interface{}) {
+	StartSpan(ctx).Debugf(format, args...)
+}
+
+// Infof 写入消息日志
+func Infof(ctx context.Context, format string, args ...interface{}) {
+	StartSpan(ctx).Infof(format, args...)
+}
+
+// Printf 写入消息日志
+func Printf(ctx context.Context, format string, args ...interface{}) {
+	StartSpan(ctx).Printf(format, args...)
+}
+
+// Warnf 写入警告日志
+func Warnf(ctx context.Context, format string, args ...interface{}) {
+	StartSpan(ctx).Warnf(format, args...)
+}
+
+// Errorf 写入错误日志
+func Errorf(ctx context.Context, format string, args ...interface{}) {
+	StartSpan(ctx).Errorf(format, args...)
+}
+
+// Fatalf 写入重大错误日志
+func Fatalf(ctx context.Context, format string, args ...interface{}) {
+	StartSpan(ctx).Fatalf(format, args...)
 }
 
 func newEntry(entry *logrus.Entry) *Entry {

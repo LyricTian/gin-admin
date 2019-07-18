@@ -17,7 +17,8 @@
 
 - 遵循 RESTful API 设计规范
 - 基于 Casbin 的 RBAC 访问控制模型
-- 存储分离(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离，可以非常方便的更换存储方式)
+- 存储分离(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离)
+- 依赖注入(基于[dig](http://go.uber.org/dig))
 - 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，日志钩子支持 gorm)
 - JWT 认证(基于黑名单的认证模式，存储支持：file/redis)
 - 支持 Swagger 文档
@@ -28,19 +29,19 @@
 ### 获取代码
 
 ```
-go get -v github.com/LyricTian/gin-admin/cmd/ginadmin
+go get -v github.com/LyricTian/gin-admin/cmd/server
 ```
 
 ### 运行
 
-> root 用户的用户名及密码在配置文件(`configs/ginadmin/config.toml`)中，默认为：root/abc-123
+> root 用户的用户名及密码在配置文件(`configs/config.toml`)中，默认为：root/abc-123
 
 #### 运行服务
 
 > 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
 
 ```bash
-ginadmin -c ./configs/ginadmin/config.toml -m ./configs/ginadmin/model.conf -swagger ./internal/app/ginadmin/swagger
+ginadmin -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
 ```
 
 #### 温馨提醒
@@ -60,7 +61,7 @@ ginadmin -c ./configs/ginadmin/config.toml -m ./configs/ginadmin/model.conf -swa
 
 ```
 go get -u -v github.com/teambition/swaggo
-swaggo -s ./internal/app/ginadmin/swagger.go -p . -o ./internal/app/ginadmin/swagger
+swaggo -s ./internal/app/routers/api/swagger.go -p . -o ./internal/app/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -68,43 +69,35 @@ swaggo -s ./internal/app/ginadmin/swagger.go -p . -o ./internal/app/ginadmin/swa
 ## 项目结构概览
 
 ```
+.
 ├── cmd
-│   └── ginadmin：主服务
-├── configs
-│   └── ginadmin：配置文件目录
-├── docs：文档
+│   └── server：主服务
+├── configs：配置文件目录
+├── docs：文档目录
 ├── internal：内部应用
-│   └── app
-│       └── ginadmin：主应用目录
-│           ├── bll：业务逻辑层
-│           ├── config：配置参数（与配置文件一一映射）
-│           ├── context：统一上下文管理
-│           ├── ginplus：gin的扩展函数库
-│           ├── middleware：gin中间件
-│           ├── model：存储层
-│           │   └── gorm
-│           │       ├── entity：与数据库映射的实体层
-│           │       └── model：gorm实现的存储层
-│           ├── routers：路由层
-│           │   └── api：/api路由模块
-│           │       └── ctl：/api路由模块对应的控制器层
-│           ├── schema：对象模型
-│           ├── swagger：swagger静态目录
-│           └── test：单元测试
+│   └── app：主应用目录
+│       ├── bll：业务逻辑层接口
+│       │   └── impl：业务逻辑层的接口实现
+│       ├── config：配置参数（与配置文件一一映射）
+│       ├── context：统一上下文
+│       ├── errors：统一的错误定义
+│       ├── ginplus：gin的扩展函数库
+│       ├── middleware：gin中间件
+│       ├── model：存储层接口
+│       │   └── impl：存储层接口实现
+│       ├── routers：路由层
+│       │   └── api：/api路由模块
+│       │       └── ctl：/api路由模块对应的控制器层
+│       ├── schema：对象模型
+│       ├── swagger：swagger静态目录
+│       └── test：单元测试
 ├── pkg：公共模块
-│   ├── auth：认证模块
-│   │   └── jwtauth
-│   │       └── store
-│   │           ├── buntdb
-│   │           └── redis
-│   ├── errors：错误处理模块
-│   ├── gormplus：gorm扩展实现
-│   ├── logger：日志模块
-│   │   └── hook
-│   │       └── gorm
-│   └── util：工具类
-├── scripts：执行脚本
-└── vendor：依赖包
+│   ├── auth：认证模块
+│   │   └── jwtauth：JWT认证模块实现
+│   ├── gormplus：gorm扩展实现
+│   ├── logger：日志模块
+│   └── util：工具库
+└── scripts：执行脚本
 ```
 
 ## 感谢以下框架的开源支持
@@ -112,6 +105,7 @@ swaggo -s ./internal/app/ginadmin/swagger.go -p . -o ./internal/app/ginadmin/swa
 - [Gin] - [https://gin-gonic.com/](https://gin-gonic.com/)
 - [GORM] - [http://gorm.io/](http://gorm.io/)
 - [Casbin] - [https://casbin.org/](https://casbin.org/)
+- [Dig] - [http://go.uber.org/dig](http://go.uber.org/dig)
 
 ## MIT License
 
