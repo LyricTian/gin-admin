@@ -134,7 +134,7 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 //
 // GetRolesForUser("alice") can only get: ["role:admin"].
 // But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
-func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) []string {
+func (e *Enforcer) GetImplicitRolesForUser(name string) []string {
 	res := []string{}
 	roleSet := make(map[string]bool)
 	roleSet[name] = true
@@ -146,7 +146,7 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) []stri
 		name := q[0]
 		q = q[1:]
 
-		roles, err := e.rm.GetRoles(name, domain...)
+		roles, err := e.rm.GetRoles(name)
 		if err != nil {
 			panic(err)
 		}

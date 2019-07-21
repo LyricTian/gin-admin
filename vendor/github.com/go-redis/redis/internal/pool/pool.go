@@ -1,6 +1,7 @@
 package pool
 
 import (
+	"context"
 	"errors"
 	"net"
 	"sync"
@@ -36,7 +37,7 @@ type Pooler interface {
 	NewConn() (*Conn, error)
 	CloseConn(*Conn) error
 
-	Get() (*Conn, error)
+	Get(context.Context) (*Conn, error)
 	Put(*Conn)
 	Remove(*Conn)
 
@@ -48,7 +49,7 @@ type Pooler interface {
 }
 
 type Options struct {
-	Dialer  func() (net.Conn, error)
+	Dialer  func(c context.Context) (net.Conn, error)
 	OnClose func(*Conn) error
 
 	PoolSize           int
@@ -114,7 +115,7 @@ func (p *ConnPool) checkMinIdleConns() {
 }
 
 func (p *ConnPool) addIdleConn() {
-	cn, err := p.newConn(true)
+	cn, err := p.newConn(nil, true)
 	if err != nil {
 		return
 	}
@@ -126,11 +127,11 @@ func (p *ConnPool) addIdleConn() {
 }
 
 func (p *ConnPool) NewConn() (*Conn, error) {
-	return p._NewConn(false)
+	return p._NewConn(nil, false)
 }
 
-func (p *ConnPool) _NewConn(pooled bool) (*Conn, error) {
-	cn, err := p.newConn(pooled)
+func (p *ConnPool) _NewConn(ctx context.Context, pooled bool) (*Conn, error) {
+	cn, err := p.newConn(ctx, pooled)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ func (p *ConnPool) _NewConn(pooled bool) (*Conn, error) {
 	return cn, nil
 }
 
-func (p *ConnPool) newConn(pooled bool) (*Conn, error) {
+func (p *ConnPool) newConn(ctx context.Context, pooled bool) (*Conn, error) {
 	if p.closed() {
 		return nil, ErrClosed
 	}
@@ -157,7 +158,7 @@ func (p *ConnPool) newConn(pooled bool) (*Conn, error) {
 		return nil, p.getLastDialError()
 	}
 
-	netConn, err := p.opt.Dialer()
+	netConn, err := p.opt.Dialer(ctx)
 	if err != nil {
 		p.setLastDialError(err)
 		if atomic.AddUint32(&p.dialErrorsNum, 1) == uint32(p.opt.PoolSize) {
@@ -177,7 +178,7 @@ func (p *ConnPool) tryDial() {
 			return
 		}
 
-		conn, err := p.opt.Dialer()
+		conn, err := p.opt.Dialer(nil)
 		if err != nil {
 			p.setLastDialError(err)
 			time.Sleep(time.Second)
@@ -204,12 +205,12 @@ func (p *ConnPool) getLastDialError() error {
 }
 
 // Get returns existed connection from the pool or creates a new one.
-func (p *ConnPool) Get() (*Conn, error) {
+func (p *ConnPool) Get(ctx context.Context) (*Conn, error) {
 	if p.closed() {
 		return nil, ErrClosed
 	}
 
-	err := p.waitTurn()
+	err := p.waitTurn(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +235,7 @@ func (p *ConnPool) Get() (*Conn, error) {
 
 	atomic.AddUint32(&p.stats.Misses, 1)
 
-	newcn, err := p._NewConn(true)
+	newcn, err := p._NewConn(ctx, true)
 	if err != nil {
 		p.freeTurn()
 		return nil, err
@@ -247,8 +248,15 @@ func (p *ConnPool) getTurn() {
 	p.queue <- struct{}{}
 }
 
-func (p *ConnPool) waitTurn() error {
+func (p *ConnPool) waitTurn(ctx context.Context) error {
+	var done <-chan struct{}
+	if ctx != nil {
+		done = ctx.Done()
+	}
+
 	select {
+	case <-done:
+		return ctx.Err()
 	case p.queue <- struct{}{}:
 		return nil
 	default:
@@ -256,6 +264,12 @@ func (p *ConnPool) waitTurn() error {
 		timer.Reset(p.opt.PoolTimeout)
 
 		select {
+		case <-done:
+			if !timer.Stop() {
+				<-timer.C
+			}
+			timers.Put(timer)
+			return ctx.Err()
 		case p.queue <- struct{}{}:
 			if !timer.Stop() {
 				<-timer.C
@@ -468,7 +482,7 @@ func (p *ConnPool) isStaleConn(cn *Conn) bool {
 	if p.opt.IdleTimeout > 0 && now.Sub(cn.UsedAt()) >= p.opt.IdleTimeout {
 		return true
 	}
-	if p.opt.MaxConnAge > 0 && now.Sub(cn.InitedAt) >= p.opt.MaxConnAge {
+	if p.opt.MaxConnAge > 0 && now.Sub(cn.createdAt) >= p.opt.MaxConnAge {
 		return true
 	}
 

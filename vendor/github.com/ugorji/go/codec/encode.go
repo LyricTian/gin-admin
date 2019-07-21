@@ -12,7 +12,6 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -280,10 +279,18 @@ type bufioEncWriter struct {
 	buf []byte
 	w   io.Writer
 	n   int
+	sz  int // buf size
+
+	// Extensions can call Encode() within a current Encode() call.
+	// We need to know when the top level Encode() call returns,
+	// so we can decide whether to Release() or not.
+	calls uint16 // what depth in mustDecode are we in now.
+
+	_ [6]uint8 // padding
 
 	bytesBufPooler
 
-	_ [3]uint64 // padding
+	_ [1]uint64 // padding
 	// a int
 	// b   [4]byte
 	// err
@@ -292,16 +299,22 @@ type bufioEncWriter struct {
 func (z *bufioEncWriter) reset(w io.Writer, bufsize int) {
 	z.w = w
 	z.n = 0
+	z.calls = 0
 	if bufsize <= 0 {
 		bufsize = defEncByteBufSize
 	}
+	z.sz = bufsize
 	if cap(z.buf) >= bufsize {
 		z.buf = z.buf[:cap(z.buf)]
 	} else {
-		z.bytesBufPooler.end() // potentially return old one to pool
 		z.buf = z.bytesBufPooler.get(bufsize)
 		// z.buf = make([]byte, bufsize)
 	}
+}
+
+func (z *bufioEncWriter) release() {
+	z.buf = nil
+	z.bytesBufPooler.end()
 }
 
 //go:noinline - flush only called intermittently
@@ -731,30 +744,9 @@ func (e *Encoder) kStruct(f *codecFnInfo, rv reflect.Value) {
 	// The cost is that of locking sometimes, but sync.Pool is efficient
 	// enough to reduce thread contention.
 
-	var spool *sync.Pool
-	var poolv interface{}
-	var fkvs []sfiRv
 	// fmt.Printf(">>>>>>>>>>>>>> encode.kStruct: newlen: %d\n", newlen)
-	if newlen < 0 { // bounds-check-elimination
-		// cannot happen // here for bounds-check-elimination
-	} else if newlen <= 8 {
-		spool, poolv = pool.sfiRv8()
-		fkvs = poolv.(*[8]sfiRv)[:newlen]
-	} else if newlen <= 16 {
-		spool, poolv = pool.sfiRv16()
-		fkvs = poolv.(*[16]sfiRv)[:newlen]
-	} else if newlen <= 32 {
-		spool, poolv = pool.sfiRv32()
-		fkvs = poolv.(*[32]sfiRv)[:newlen]
-	} else if newlen <= 64 {
-		spool, poolv = pool.sfiRv64()
-		fkvs = poolv.(*[64]sfiRv)[:newlen]
-	} else if newlen <= 128 {
-		spool, poolv = pool.sfiRv128()
-		fkvs = poolv.(*[128]sfiRv)[:newlen]
-	} else {
-		fkvs = make([]sfiRv, newlen)
-	}
+	var spool sfiRvPooler
+	var fkvs = spool.get(newlen)
 
 	var kv sfiRv
 	recur := e.h.RecursiveEmptyCheck
@@ -773,7 +765,8 @@ func (e *Encoder) kStruct(f *codecFnInfo, rv reflect.Value) {
 			// if a reference or struct, set to nil (so you do not output too much)
 			if si.omitEmpty() && isEmptyValue(kv.r, e.h.TypeInfos, recur, recur) {
 				switch kv.r.Kind() {
-				case reflect.Struct, reflect.Interface, reflect.Ptr, reflect.Array, reflect.Map, reflect.Slice:
+				case reflect.Struct, reflect.Interface, reflect.Ptr,
+					reflect.Array, reflect.Map, reflect.Slice:
 					kv.r = reflect.Value{} //encode as nil
 				}
 			}
@@ -842,9 +835,7 @@ func (e *Encoder) kStruct(f *codecFnInfo, rv reflect.Value) {
 	// do not use defer. Instead, use explicit pool return at end of function.
 	// defer has a cost we are trying to avoid.
 	// If there is a panic and these slices are not returned, it is ok.
-	if spool != nil {
-		spool.Put(poolv)
-	}
+	spool.end()
 }
 
 func (e *Encoder) kMap(f *codecFnInfo, rv reflect.Value) {
@@ -1258,12 +1249,7 @@ type Encoder struct {
 
 	ci set
 
-	// Extensions can call Encode() within a current Encode() call.
-	// We need to know when the top level Encode() call returns,
-	// so we can decide whether to Release() or not.
-	calls uint16 // what depth in mustEncode are we in now.
-
-	b [(5 * 8) - 2]byte // for encoding chan or (non-addressable) [N]byte
+	b [(5 * 8)]byte // for encoding chan or (non-addressable) [N]byte
 
 	// ---- writable fields during execution --- *try* to keep in sep cache line
 
@@ -1319,7 +1305,6 @@ func (e *Encoder) resetCommon() {
 	_, e.js = e.hh.(*JsonHandle)
 	e.e.reset()
 	e.err = nil
-	e.calls = 0
 }
 
 // Reset resets the Encoder with a new output stream.
@@ -1494,13 +1479,26 @@ func (e *Encoder) MustEncode(v interface{}) {
 }
 
 func (e *Encoder) mustEncode(v interface{}) {
-	e.calls++
+	if e.wf == nil {
+		e.encode(v)
+		e.e.atEndOfEncode()
+		e.w.end()
+		return
+	}
+
+	if e.wf.buf == nil {
+		e.wf.buf = e.wf.bytesBufPooler.get(e.wf.sz)
+	}
+	e.wf.calls++
+
 	e.encode(v)
 	e.e.atEndOfEncode()
 	e.w.end()
-	e.calls--
-	if !e.h.ExplicitRelease && e.calls == 0 {
-		e.Release()
+
+	e.wf.calls--
+
+	if !e.h.ExplicitRelease && e.wf.calls == 0 {
+		e.wf.release()
 	}
 }
 
@@ -1525,12 +1523,8 @@ func (e *Encoder) finalize() {
 // It is important to call Release() when done with an Encoder, so those resources
 // are released instantly for use by subsequently created Encoders.
 func (e *Encoder) Release() {
-	if useFinalizers && removeFinalizerOnRelease {
-		runtime.SetFinalizer(e, nil)
-	}
 	if e.wf != nil {
-		e.wf.buf = nil
-		e.wf.bytesBufPooler.end()
+		e.wf.release()
 	}
 }
 

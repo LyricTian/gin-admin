@@ -1,19 +1,35 @@
 package redis
 
 import (
+	"context"
 	"sync"
 
 	"github.com/go-redis/redis/internal/pool"
 )
 
-type pipelineExecer func([]Cmder) error
+type pipelineExecer func(context.Context, []Cmder) error
 
+// Pipeliner is an mechanism to realise Redis Pipeline technique.
+//
+// Pipelining is a technique to extremely speed up processing by packing
+// operations to batches, send them at once to Redis and read a replies in a
+// singe step.
+// See https://redis.io/topics/pipelining
+//
+// Pay attention, that Pipeline is not a transaction, so you can get unexpected
+// results in case of big pipelines and small read/write timeouts.
+// Redis client has retransmission logic in case of timeouts, pipeline
+// can be retransmitted and commands can be executed more then once.
+// To avoid this: it is good idea to use reasonable bigger read/write timeouts
+// depends of your batch size and/or use TxPipeline.
 type Pipeliner interface {
 	StatefulCmdable
+	Do(args ...interface{}) *Cmd
 	Process(cmd Cmder) error
 	Close() error
 	Discard() error
 	Exec() ([]Cmder, error)
+	ExecContext(ctx context.Context) ([]Cmder, error)
 }
 
 var _ Pipeliner = (*Pipeline)(nil)
@@ -22,6 +38,7 @@ var _ Pipeliner = (*Pipeline)(nil)
 // http://redis.io/topics/pipelining. It's safe for concurrent use
 // by multiple goroutines.
 type Pipeline struct {
+	cmdable
 	statefulCmdable
 
 	exec pipelineExecer
@@ -29,6 +46,17 @@ type Pipeline struct {
 	mu     sync.Mutex
 	cmds   []Cmder
 	closed bool
+}
+
+func (c *Pipeline) init() {
+	c.cmdable = c.Process
+	c.statefulCmdable = c.Process
+}
+
+func (c *Pipeline) Do(args ...interface{}) *Cmd {
+	cmd := NewCmd(args...)
+	_ = c.Process(cmd)
+	return cmd
 }
 
 // Process queues the cmd for later execution.
@@ -70,6 +98,10 @@ func (c *Pipeline) discard() error {
 // Exec always returns list of commands and error of the first failed
 // command if any.
 func (c *Pipeline) Exec() ([]Cmder, error) {
+	return c.ExecContext(nil)
+}
+
+func (c *Pipeline) ExecContext(ctx context.Context) ([]Cmder, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -84,10 +116,10 @@ func (c *Pipeline) Exec() ([]Cmder, error) {
 	cmds := c.cmds
 	c.cmds = nil
 
-	return cmds, c.exec(cmds)
+	return cmds, c.exec(ctx, cmds)
 }
 
-func (c *Pipeline) pipelined(fn func(Pipeliner) error) ([]Cmder, error) {
+func (c *Pipeline) Pipelined(fn func(Pipeliner) error) ([]Cmder, error) {
 	if err := fn(c); err != nil {
 		return nil, err
 	}
@@ -96,16 +128,12 @@ func (c *Pipeline) pipelined(fn func(Pipeliner) error) ([]Cmder, error) {
 	return cmds, err
 }
 
-func (c *Pipeline) Pipelined(fn func(Pipeliner) error) ([]Cmder, error) {
-	return c.pipelined(fn)
-}
-
 func (c *Pipeline) Pipeline() Pipeliner {
 	return c
 }
 
 func (c *Pipeline) TxPipelined(fn func(Pipeliner) error) ([]Cmder, error) {
-	return c.pipelined(fn)
+	return c.Pipelined(fn)
 }
 
 func (c *Pipeline) TxPipeline() Pipeliner {

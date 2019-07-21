@@ -14,7 +14,7 @@
 
 package effect
 
-import "errors"
+import "github.com/pkg/errors"
 
 // DefaultEffector is default effector for Casbin.
 type DefaultEffector struct {
