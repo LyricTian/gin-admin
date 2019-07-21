@@ -31,7 +31,6 @@ const (
 	MIMEPlain             = binding.MIMEPlain
 	MIMEPOSTForm          = binding.MIMEPOSTForm
 	MIMEMultipartPOSTForm = binding.MIMEMultipartPOSTForm
-	MIMEYAML              = binding.MIMEYAML
 	BodyBytesKey          = "_gin-gonic/gin/bodybyteskey"
 )
 
@@ -105,9 +104,8 @@ func (c *Context) Handler() HandlerFunc {
 // See example in GitHub.
 func (c *Context) Next() {
 	c.index++
-	for c.index < int8(len(c.handlers)) {
+	for s := int8(len(c.handlers)); c.index < s; c.index++ {
 		c.handlers[c.index](c)
-		c.index++
 	}
 }
 
@@ -416,11 +414,8 @@ func (c *Context) PostFormArray(key string) []string {
 // a boolean value whether at least one value exists for the given key.
 func (c *Context) GetPostFormArray(key string) ([]string, bool) {
 	req := c.Request
-	if err := req.ParseMultipartForm(c.engine.MaxMultipartMemory); err != nil {
-		if err != http.ErrNotMultipart {
-			debugPrint("error on parse multipart form array: %v", err)
-		}
-	}
+	req.ParseForm()
+	req.ParseMultipartForm(c.engine.MaxMultipartMemory)
 	if values := req.PostForm[key]; len(values) > 0 {
 		return values, true
 	}
@@ -442,11 +437,8 @@ func (c *Context) PostFormMap(key string) map[string]string {
 // whether at least one value exists for the given key.
 func (c *Context) GetPostFormMap(key string) (map[string]string, bool) {
 	req := c.Request
-	if err := req.ParseMultipartForm(c.engine.MaxMultipartMemory); err != nil {
-		if err != http.ErrNotMultipart {
-			debugPrint("error on parse multipart form map: %v", err)
-		}
-	}
+	req.ParseForm()
+	req.ParseMultipartForm(c.engine.MaxMultipartMemory)
 	dicts, exist := c.get(req.PostForm, key)
 
 	if !exist && req.MultipartForm != nil && req.MultipartForm.File != nil {
@@ -473,11 +465,6 @@ func (c *Context) get(m map[string][]string, key string) (map[string]string, boo
 
 // FormFile returns the first file for the provided form key.
 func (c *Context) FormFile(name string) (*multipart.FileHeader, error) {
-	if c.Request.MultipartForm == nil {
-		if err := c.Request.ParseMultipartForm(c.engine.MaxMultipartMemory); err != nil {
-			return nil, err
-		}
-	}
 	_, fh, err := c.Request.FormFile(name)
 	return fh, err
 }
@@ -502,8 +489,8 @@ func (c *Context) SaveUploadedFile(file *multipart.FileHeader, dst string) error
 	}
 	defer out.Close()
 
-	_, err = io.Copy(out, src)
-	return err
+	io.Copy(out, src)
+	return nil
 }
 
 // Bind checks the Content-Type to select a binding engine automatically,
@@ -524,40 +511,20 @@ func (c *Context) BindJSON(obj interface{}) error {
 	return c.MustBindWith(obj, binding.JSON)
 }
 
-// BindXML is a shortcut for c.MustBindWith(obj, binding.BindXML).
-func (c *Context) BindXML(obj interface{}) error {
-	return c.MustBindWith(obj, binding.XML)
-}
-
 // BindQuery is a shortcut for c.MustBindWith(obj, binding.Query).
 func (c *Context) BindQuery(obj interface{}) error {
 	return c.MustBindWith(obj, binding.Query)
 }
 
-// BindYAML is a shortcut for c.MustBindWith(obj, binding.YAML).
-func (c *Context) BindYAML(obj interface{}) error {
-	return c.MustBindWith(obj, binding.YAML)
-}
-
-// BindUri binds the passed struct pointer using binding.Uri.
-// It will abort the request with HTTP 400 if any error occurs.
-func (c *Context) BindUri(obj interface{}) error {
-	if err := c.ShouldBindUri(obj); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err).SetType(ErrorTypeBind) // nolint: errcheck
-		return err
-	}
-	return nil
-}
-
 // MustBindWith binds the passed struct pointer using the specified binding engine.
-// It will abort the request with HTTP 400 if any error occurs.
+// It will abort the request with HTTP 400 if any error ocurrs.
 // See the binding package.
-func (c *Context) MustBindWith(obj interface{}, b binding.Binding) error {
-	if err := c.ShouldBindWith(obj, b); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err).SetType(ErrorTypeBind) // nolint: errcheck
-		return err
+func (c *Context) MustBindWith(obj interface{}, b binding.Binding) (err error) {
+	if err = c.ShouldBindWith(obj, b); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err).SetType(ErrorTypeBind)
 	}
-	return nil
+
+	return
 }
 
 // ShouldBind checks the Content-Type to select a binding engine automatically,
@@ -578,28 +545,9 @@ func (c *Context) ShouldBindJSON(obj interface{}) error {
 	return c.ShouldBindWith(obj, binding.JSON)
 }
 
-// ShouldBindXML is a shortcut for c.ShouldBindWith(obj, binding.XML).
-func (c *Context) ShouldBindXML(obj interface{}) error {
-	return c.ShouldBindWith(obj, binding.XML)
-}
-
 // ShouldBindQuery is a shortcut for c.ShouldBindWith(obj, binding.Query).
 func (c *Context) ShouldBindQuery(obj interface{}) error {
 	return c.ShouldBindWith(obj, binding.Query)
-}
-
-// ShouldBindYAML is a shortcut for c.ShouldBindWith(obj, binding.YAML).
-func (c *Context) ShouldBindYAML(obj interface{}) error {
-	return c.ShouldBindWith(obj, binding.YAML)
-}
-
-// ShouldBindUri binds the passed struct pointer using the specified binding engine.
-func (c *Context) ShouldBindUri(obj interface{}) error {
-	m := make(map[string][]string)
-	for _, v := range c.Params {
-		m[v.Key] = []string{v.Value}
-	}
-	return binding.Uri.BindUri(m, obj)
 }
 
 // ShouldBindWith binds the passed struct pointer using the specified binding engine.
@@ -613,7 +561,9 @@ func (c *Context) ShouldBindWith(obj interface{}, b binding.Binding) error {
 //
 // NOTE: This method reads the body before binding. So you should use
 // ShouldBindWith for better performance if you need to call only once.
-func (c *Context) ShouldBindBodyWith(obj interface{}, bb binding.BindingBody) (err error) {
+func (c *Context) ShouldBindBodyWith(
+	obj interface{}, bb binding.BindingBody,
+) (err error) {
 	var body []byte
 	if cb, ok := c.Get(BodyBytesKey); ok {
 		if cbb, ok := cb.([]byte); ok {
@@ -705,9 +655,9 @@ func (c *Context) Status(code int) {
 func (c *Context) Header(key, value string) {
 	if value == "" {
 		c.Writer.Header().Del(key)
-		return
+	} else {
+		c.Writer.Header().Set(key, value)
 	}
-	c.Writer.Header().Set(key, value)
 }
 
 // GetHeader returns value from request headers.
@@ -751,7 +701,6 @@ func (c *Context) Cookie(name string) (string, error) {
 	return val, nil
 }
 
-// Render writes the response headers and calls render.Render to render data.
 func (c *Context) Render(code int, r render.Render) {
 	c.Status(code)
 
@@ -796,9 +745,9 @@ func (c *Context) JSONP(code int, obj interface{}) {
 	callback := c.DefaultQuery("callback", "")
 	if callback == "" {
 		c.Render(code, render.JSON{Data: obj})
-		return
+	} else {
+		c.Render(code, render.JsonpJSON{Callback: callback, Data: obj})
 	}
-	c.Render(code, render.JsonpJSON{Callback: callback, Data: obj})
 }
 
 // JSON serializes the given struct as JSON into the response body.
@@ -822,11 +771,6 @@ func (c *Context) XML(code int, obj interface{}) {
 // YAML serializes the given struct as YAML into the response body.
 func (c *Context) YAML(code int, obj interface{}) {
 	c.Render(code, render.YAML{Data: obj})
-}
-
-// ProtoBuf serializes the given struct as ProtoBuf into the response body.
-func (c *Context) ProtoBuf(code int, obj interface{}) {
-	c.Render(code, render.ProtoBuf{Data: obj})
 }
 
 // String writes the given string into the response body.
@@ -874,7 +818,6 @@ func (c *Context) SSEvent(name string, message interface{}) {
 	})
 }
 
-// Stream sends a streaming response.
 func (c *Context) Stream(step func(w io.Writer) bool) {
 	w := c.Writer
 	clientGone := w.CloseNotify()
@@ -896,7 +839,6 @@ func (c *Context) Stream(step func(w io.Writer) bool) {
 /******** CONTENT NEGOTIATION *******/
 /************************************/
 
-// Negotiate contains all negotiations data.
 type Negotiate struct {
 	Offered  []string
 	HTMLName string
@@ -906,7 +848,6 @@ type Negotiate struct {
 	Data     interface{}
 }
 
-// Negotiate calls different Render according acceptable Accept format.
 func (c *Context) Negotiate(code int, config Negotiate) {
 	switch c.NegotiateFormat(config.Offered...) {
 	case binding.MIMEJSON:
@@ -922,11 +863,10 @@ func (c *Context) Negotiate(code int, config Negotiate) {
 		c.XML(code, data)
 
 	default:
-		c.AbortWithError(http.StatusNotAcceptable, errors.New("the accepted formats are not offered by the server")) // nolint: errcheck
+		c.AbortWithError(http.StatusNotAcceptable, errors.New("the accepted formats are not offered by the server"))
 	}
 }
 
-// NegotiateFormat returns an acceptable Accept format.
 func (c *Context) NegotiateFormat(offered ...string) string {
 	assert1(len(offered) > 0, "you must provide at least one offer")
 
@@ -946,7 +886,6 @@ func (c *Context) NegotiateFormat(offered ...string) string {
 	return ""
 }
 
-// SetAccepted sets Accept header data.
 func (c *Context) SetAccepted(formats ...string) {
 	c.Accepted = formats
 }
