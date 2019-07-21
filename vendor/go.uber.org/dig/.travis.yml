@@ -1,0 +1,18 @@
+language: go
+sudo: false
+go_import_path: go.uber.org/dig
+
+matrix:
+  include:
+    - go: "1.11"
+    - go: "1.12"
+      env: LINT=1
+
+cache:
+  directories:
+    - vendor
+install:
+  - make dependencies
+script:
+  - test -z "$LINT" && echo "Skipping lint" || make lint
+  - make ci
