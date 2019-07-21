@@ -41,8 +41,12 @@ go get -v github.com/LyricTian/gin-admin/cmd/server
 > 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
 
 ```bash
-ginadmin -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
+cd github.com/LyricTian/gin-admin/cmd/server
+go build -o server
+./server -c ../../configs/config.toml -m ../../configs/model.conf -swagger ../../internal/app/swagger
 ```
+
+> 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
 
 #### 温馨提醒
 

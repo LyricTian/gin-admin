@@ -22,7 +22,7 @@ test:
 	@go test -cover -race ./...
 
 clean:
-	rm -rf data release $(SERVER_BIN) ./internal/app/test/data
+	rm -rf data release $(SERVER_BIN) ./internal/app/test/data ./cmd/server/data
 
 pack: build
 	rm -rf $(RELEASE_ROOT)
