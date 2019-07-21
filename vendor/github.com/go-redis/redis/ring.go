@@ -273,9 +273,13 @@ func (c *ringShards) Heartbeat(frequency time.Duration) {
 
 // rebalance removes dead shards from the Ring.
 func (c *ringShards) rebalance() {
+	c.mu.RLock()
+	shards := c.shards
+	c.mu.RUnlock()
+
 	hash := newConsistentHash(c.opt)
 	var shardsNum int
-	for name, shard := range c.shards {
+	for name, shard := range shards {
 		if shard.IsUp() {
 			hash.Add(name)
 			shardsNum++
@@ -319,12 +323,20 @@ func (c *ringShards) Close() error {
 
 //------------------------------------------------------------------------------
 
-// Ring is a Redis client that uses constistent hashing to distribute
+type ring struct {
+	cmdable
+	hooks
+	opt           *RingOptions
+	shards        *ringShards
+	cmdsInfoCache *cmdsInfoCache
+}
+
+// Ring is a Redis client that uses consistent hashing to distribute
 // keys across multiple Redis servers (shards). It's safe for
 // concurrent use by multiple goroutines.
 //
 // Ring monitors the state of each shard and removes dead shards from
-// the ring. When shard comes online it is added back to the ring. This
+// the ring. When a shard comes online it is added back to the ring. This
 // gives you maximum availability and partition tolerance, but no
 // consistency between different shards or even clients. Each client
 // uses shards that are available to the client and does not do any
@@ -334,30 +346,22 @@ func (c *ringShards) Close() error {
 // and can tolerate losing data when one of the servers dies.
 // Otherwise you should use Redis Cluster.
 type Ring struct {
-	cmdable
-
+	*ring
 	ctx context.Context
-
-	opt           *RingOptions
-	shards        *ringShards
-	cmdsInfoCache *cmdsInfoCache
-
-	process         func(Cmder) error
-	processPipeline func([]Cmder) error
 }
 
 func NewRing(opt *RingOptions) *Ring {
 	opt.init()
 
-	ring := &Ring{
-		opt:    opt,
-		shards: newRingShards(opt),
+	ring := Ring{
+		ring: &ring{
+			opt:    opt,
+			shards: newRingShards(opt),
+		},
 	}
-	ring.cmdsInfoCache = newCmdsInfoCache(ring.cmdsInfo)
+	ring.init()
 
-	ring.process = ring.defaultProcess
-	ring.processPipeline = ring.defaultProcessPipeline
-	ring.cmdable.setProcessor(ring.Process)
+	ring.cmdsInfoCache = newCmdsInfoCache(ring.cmdsInfo)
 
 	for name, addr := range opt.Addrs {
 		clopt := opt.clientOptions()
@@ -367,7 +371,11 @@ func NewRing(opt *RingOptions) *Ring {
 
 	go ring.shards.Heartbeat(opt.HeartbeatFrequency)
 
-	return ring
+	return &ring
+}
+
+func (c *Ring) init() {
+	c.cmdable = c.Process
 }
 
 func (c *Ring) Context() context.Context {
@@ -381,14 +389,28 @@ func (c *Ring) WithContext(ctx context.Context) *Ring {
 	if ctx == nil {
 		panic("nil context")
 	}
-	c2 := c.copy()
-	c2.ctx = ctx
-	return c2
+	clone := *c
+	clone.ctx = ctx
+	return &clone
 }
 
-func (c *Ring) copy() *Ring {
-	cp := *c
-	return &cp
+// Do creates a Cmd from the args and processes the cmd.
+func (c *Ring) Do(args ...interface{}) *Cmd {
+	return c.DoContext(c.ctx, args...)
+}
+
+func (c *Ring) DoContext(ctx context.Context, args ...interface{}) *Cmd {
+	cmd := NewCmd(args...)
+	c.ProcessContext(ctx, cmd)
+	return cmd
+}
+
+func (c *Ring) Process(cmd Cmder) error {
+	return c.ProcessContext(c.ctx, cmd)
+}
+
+func (c *Ring) ProcessContext(ctx context.Context, cmd Cmder) error {
+	return c.hooks.process(ctx, cmd, c.process)
 }
 
 // Options returns read-only Options that were used to create the client.
@@ -518,24 +540,7 @@ func (c *Ring) cmdShard(cmd Cmder) (*ringShard, error) {
 	return c.shards.GetByKey(firstKey)
 }
 
-// Do creates a Cmd from the args and processes the cmd.
-func (c *Ring) Do(args ...interface{}) *Cmd {
-	cmd := NewCmd(args...)
-	c.Process(cmd)
-	return cmd
-}
-
-func (c *Ring) WrapProcess(
-	fn func(oldProcess func(cmd Cmder) error) func(cmd Cmder) error,
-) {
-	c.process = fn(c.process)
-}
-
-func (c *Ring) Process(cmd Cmder) error {
-	return c.process(cmd)
-}
-
-func (c *Ring) defaultProcess(cmd Cmder) error {
+func (c *Ring) process(ctx context.Context, cmd Cmder) error {
 	for attempt := 0; attempt <= c.opt.MaxRetries; attempt++ {
 		if attempt > 0 {
 			time.Sleep(c.retryBackoff(attempt))
@@ -547,7 +552,7 @@ func (c *Ring) defaultProcess(cmd Cmder) error {
 			return err
 		}
 
-		err = shard.Client.Process(cmd)
+		err = shard.Client.ProcessContext(ctx, cmd)
 		if err == nil {
 			return nil
 		}
@@ -558,25 +563,23 @@ func (c *Ring) defaultProcess(cmd Cmder) error {
 	return cmd.Err()
 }
 
-func (c *Ring) Pipeline() Pipeliner {
-	pipe := Pipeline{
-		exec: c.processPipeline,
-	}
-	pipe.cmdable.setProcessor(pipe.Process)
-	return &pipe
-}
-
 func (c *Ring) Pipelined(fn func(Pipeliner) error) ([]Cmder, error) {
 	return c.Pipeline().Pipelined(fn)
 }
 
-func (c *Ring) WrapProcessPipeline(
-	fn func(oldProcess func([]Cmder) error) func([]Cmder) error,
-) {
-	c.processPipeline = fn(c.processPipeline)
+func (c *Ring) Pipeline() Pipeliner {
+	pipe := Pipeline{
+		exec: c.processPipeline,
+	}
+	pipe.init()
+	return &pipe
 }
 
-func (c *Ring) defaultProcessPipeline(cmds []Cmder) error {
+func (c *Ring) processPipeline(ctx context.Context, cmds []Cmder) error {
+	return c.hooks.processPipeline(ctx, cmds, c._processPipeline)
+}
+
+func (c *Ring) _processPipeline(ctx context.Context, cmds []Cmder) error {
 	cmdsMap := make(map[string][]Cmder)
 	for _, cmd := range cmds {
 		cmdInfo := c.cmdInfo(cmd.Name())
@@ -607,13 +610,13 @@ func (c *Ring) defaultProcessPipeline(cmds []Cmder) error {
 					return
 				}
 
-				cn, err := shard.Client.getConn()
+				cn, err := shard.Client.getConn(ctx)
 				if err != nil {
 					setCmdsErr(cmds, err)
 					return
 				}
 
-				canRetry, err := shard.Client.pipelineProcessCmds(cn, cmds)
+				canRetry, err := shard.Client.pipelineProcessCmds(ctx, cn, cmds)
 				shard.Client.releaseConnStrict(cn, err)
 
 				if canRetry && internal.IsRetryableError(err, true) {
@@ -651,6 +654,39 @@ func (c *Ring) TxPipelined(fn func(Pipeliner) error) ([]Cmder, error) {
 // and shared between many goroutines.
 func (c *Ring) Close() error {
 	return c.shards.Close()
+}
+
+func (c *Ring) Watch(fn func(*Tx) error, keys ...string) error {
+	if len(keys) == 0 {
+		return fmt.Errorf("redis: Watch requires at least one key")
+	}
+
+	var shards []*ringShard
+	for _, key := range keys {
+		if key != "" {
+			shard, err := c.shards.GetByKey(hashtag.Key(key))
+			if err != nil {
+				return err
+			}
+
+			shards = append(shards, shard)
+		}
+	}
+
+	if len(shards) == 0 {
+		return fmt.Errorf("redis: Watch requires at least one shard")
+	}
+
+	if len(shards) > 1 {
+		for _, shard := range shards[1:] {
+			if shard.Client != shards[0].Client {
+				err := fmt.Errorf("redis: Watch requires all keys to be in the same shard")
+				return err
+			}
+		}
+	}
+
+	return shards[0].Client.Watch(fn, keys...)
 }
 
 func newConsistentHash(opt *RingOptions) *consistenthash.Map {

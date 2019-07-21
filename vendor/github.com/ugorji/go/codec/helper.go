@@ -127,7 +127,7 @@ const (
 
 	// arrayCacheLen is the length of the cache used in encoder or decoder for
 	// allowing zero-alloc initialization.
-	arrayCacheLen = 8
+	// arrayCacheLen = 8
 
 	// size of the cacheline: defaulting to value for archs: amd64, arm64, 386
 	// should use "runtime/internal/sys".CacheLineSize, but that is not exposed.
@@ -149,8 +149,7 @@ const (
 	// explicitly call SetFinalizer themselves e.g.
 	//    runtime.SetFinalizer(e, (*Encoder).Release)
 	//    runtime.SetFinalizer(d, (*Decoder).Release)
-	useFinalizers            = false
-	removeFinalizerOnRelease = false
+	useFinalizers = false
 )
 
 var oneByteArr [1]byte
@@ -1598,7 +1597,7 @@ func (x *TypeInfos) get(rtid uintptr, rt reflect.Type) (pti *typeInfo) {
 		} else {
 			ti.keyType = valueTypeString
 		}
-		pp, pi := pool.tiLoad()
+		pp, pi := &pool.tiload, pool.tiload.Get() // pool.tiLoad()
 		pv := pi.(*typeInfoLoadArray)
 		pv.etypes[0] = ti.rtid
 		// vv := typeInfoLoad{pv.fNames[:0], pv.encNames[:0], pv.etypes[:1], pv.sfis[:0]}
@@ -2372,21 +2371,21 @@ func (x *bitset256) set(pos byte) {
 type pooler struct {
 	// function-scoped pooled resources
 	tiload                                      sync.Pool // for type info loading
-	strRv8, strRv16, strRv32, strRv64, strRv128 sync.Pool // for stringRV
+	sfiRv8, sfiRv16, sfiRv32, sfiRv64, sfiRv128 sync.Pool // for struct encoding
 
 	// lifetime-scoped pooled resources
 	// dn                                 sync.Pool // for decNaked
-	buf1k, buf2k, buf4k, buf8k, buf16k sync.Pool // for [N]byte
+	buf1k, buf2k, buf4k, buf8k, buf16k, buf32k, buf64k sync.Pool // for [N]byte
 }
 
 func (p *pooler) init() {
 	p.tiload.New = func() interface{} { return new(typeInfoLoadArray) }
 
-	p.strRv8.New = func() interface{} { return new([8]sfiRv) }
-	p.strRv16.New = func() interface{} { return new([16]sfiRv) }
-	p.strRv32.New = func() interface{} { return new([32]sfiRv) }
-	p.strRv64.New = func() interface{} { return new([64]sfiRv) }
-	p.strRv128.New = func() interface{} { return new([128]sfiRv) }
+	p.sfiRv8.New = func() interface{} { return new([8]sfiRv) }
+	p.sfiRv16.New = func() interface{} { return new([16]sfiRv) }
+	p.sfiRv32.New = func() interface{} { return new([32]sfiRv) }
+	p.sfiRv64.New = func() interface{} { return new([64]sfiRv) }
+	p.sfiRv128.New = func() interface{} { return new([128]sfiRv) }
 
 	// p.dn.New = func() interface{} { x := new(decNaked); x.init(); return x }
 
@@ -2395,43 +2394,52 @@ func (p *pooler) init() {
 	p.buf4k.New = func() interface{} { return new([4 * 1024]byte) }
 	p.buf8k.New = func() interface{} { return new([8 * 1024]byte) }
 	p.buf16k.New = func() interface{} { return new([16 * 1024]byte) }
+	p.buf32k.New = func() interface{} { return new([32 * 1024]byte) }
+	p.buf64k.New = func() interface{} { return new([64 * 1024]byte) }
 
 }
 
-func (p *pooler) sfiRv8() (sp *sync.Pool, v interface{}) {
-	return &p.strRv8, p.strRv8.Get()
-}
-func (p *pooler) sfiRv16() (sp *sync.Pool, v interface{}) {
-	return &p.strRv16, p.strRv16.Get()
-}
-func (p *pooler) sfiRv32() (sp *sync.Pool, v interface{}) {
-	return &p.strRv32, p.strRv32.Get()
-}
-func (p *pooler) sfiRv64() (sp *sync.Pool, v interface{}) {
-	return &p.strRv64, p.strRv64.Get()
-}
-func (p *pooler) sfiRv128() (sp *sync.Pool, v interface{}) {
-	return &p.strRv128, p.strRv128.Get()
-}
+// func (p *pooler) sfiRv8() (sp *sync.Pool, v interface{}) {
+// 	return &p.strRv8, p.strRv8.Get()
+// }
+// func (p *pooler) sfiRv16() (sp *sync.Pool, v interface{}) {
+// 	return &p.strRv16, p.strRv16.Get()
+// }
+// func (p *pooler) sfiRv32() (sp *sync.Pool, v interface{}) {
+// 	return &p.strRv32, p.strRv32.Get()
+// }
+// func (p *pooler) sfiRv64() (sp *sync.Pool, v interface{}) {
+// 	return &p.strRv64, p.strRv64.Get()
+// }
+// func (p *pooler) sfiRv128() (sp *sync.Pool, v interface{}) {
+// 	return &p.strRv128, p.strRv128.Get()
+// }
 
-func (p *pooler) bytes1k() (sp *sync.Pool, v interface{}) {
-	return &p.buf1k, p.buf1k.Get()
-}
-func (p *pooler) bytes2k() (sp *sync.Pool, v interface{}) {
-	return &p.buf2k, p.buf2k.Get()
-}
-func (p *pooler) bytes4k() (sp *sync.Pool, v interface{}) {
-	return &p.buf4k, p.buf4k.Get()
-}
-func (p *pooler) bytes8k() (sp *sync.Pool, v interface{}) {
-	return &p.buf8k, p.buf8k.Get()
-}
-func (p *pooler) bytes16k() (sp *sync.Pool, v interface{}) {
-	return &p.buf16k, p.buf16k.Get()
-}
-func (p *pooler) tiLoad() (sp *sync.Pool, v interface{}) {
-	return &p.tiload, p.tiload.Get()
-}
+// func (p *pooler) bytes1k() (sp *sync.Pool, v interface{}) {
+// 	return &p.buf1k, p.buf1k.Get()
+// }
+// func (p *pooler) bytes2k() (sp *sync.Pool, v interface{}) {
+// 	return &p.buf2k, p.buf2k.Get()
+// }
+// func (p *pooler) bytes4k() (sp *sync.Pool, v interface{}) {
+// 	return &p.buf4k, p.buf4k.Get()
+// }
+// func (p *pooler) bytes8k() (sp *sync.Pool, v interface{}) {
+// 	return &p.buf8k, p.buf8k.Get()
+// }
+// func (p *pooler) bytes16k() (sp *sync.Pool, v interface{}) {
+// 	return &p.buf16k, p.buf16k.Get()
+// }
+// func (p *pooler) bytes32k() (sp *sync.Pool, v interface{}) {
+// 	return &p.buf32k, p.buf32k.Get()
+// }
+// func (p *pooler) bytes64k() (sp *sync.Pool, v interface{}) {
+// 	return &p.buf64k, p.buf64k.Get()
+// }
+
+// func (p *pooler) tiLoad() (sp *sync.Pool, v interface{}) {
+// 	return &p.tiload, p.tiload.Get()
+// }
 
 // func (p *pooler) decNaked() (sp *sync.Pool, v interface{}) {
 // 	return &p.dn, p.dn.Get()
@@ -2534,21 +2542,105 @@ func (z *bytesBufPooler) end() {
 }
 
 func (z *bytesBufPooler) get(bufsize int) (buf []byte) {
+	// ensure an end is called first (if necessary)
+	if z.pool != nil {
+		z.pool.Put(z.poolbuf)
+		z.pool, z.poolbuf = nil, nil
+	}
+
+	// // Try to use binary search.
+	// // This is not optimal, as most folks select 1k or 2k buffers
+	// // so a linear search is better (sequence of if/else blocks)
+	// if bufsize < 1 {
+	// 	bufsize = 0
+	// } else {
+	// 	bufsize--
+	// 	bufsize /= 1024
+	// }
+	// switch bufsize {
+	// case 0:
+	// 	z.pool, z.poolbuf = pool.bytes1k()
+	// 	buf = z.poolbuf.(*[1 * 1024]byte)[:]
+	// case 1:
+	// 	z.pool, z.poolbuf = pool.bytes2k()
+	// 	buf = z.poolbuf.(*[2 * 1024]byte)[:]
+	// case 2, 3:
+	// 	z.pool, z.poolbuf = pool.bytes4k()
+	// 	buf = z.poolbuf.(*[4 * 1024]byte)[:]
+	// case 4, 5, 6, 7:
+	// 	z.pool, z.poolbuf = pool.bytes8k()
+	// 	buf = z.poolbuf.(*[8 * 1024]byte)[:]
+	// case 8, 9, 10, 11, 12, 13, 14, 15:
+	// 	z.pool, z.poolbuf = pool.bytes16k()
+	// 	buf = z.poolbuf.(*[16 * 1024]byte)[:]
+	// case 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31:
+	// 	z.pool, z.poolbuf = pool.bytes32k()
+	// 	buf = z.poolbuf.(*[32 * 1024]byte)[:]
+	// default:
+	// 	z.pool, z.poolbuf = pool.bytes64k()
+	// 	buf = z.poolbuf.(*[64 * 1024]byte)[:]
+	// }
+	// return
+
 	if bufsize <= 1*1024 {
-		z.pool, z.poolbuf = pool.bytes1k()
+		z.pool, z.poolbuf = &pool.buf1k, pool.buf1k.Get() // pool.bytes1k()
 		buf = z.poolbuf.(*[1 * 1024]byte)[:]
 	} else if bufsize <= 2*1024 {
-		z.pool, z.poolbuf = pool.bytes2k()
+		z.pool, z.poolbuf = &pool.buf2k, pool.buf2k.Get() // pool.bytes2k()
 		buf = z.poolbuf.(*[2 * 1024]byte)[:]
 	} else if bufsize <= 4*1024 {
-		z.pool, z.poolbuf = pool.bytes4k()
+		z.pool, z.poolbuf = &pool.buf4k, pool.buf4k.Get() // pool.bytes4k()
 		buf = z.poolbuf.(*[4 * 1024]byte)[:]
 	} else if bufsize <= 8*1024 {
-		z.pool, z.poolbuf = pool.bytes8k()
+		z.pool, z.poolbuf = &pool.buf8k, pool.buf8k.Get() // pool.bytes8k()
 		buf = z.poolbuf.(*[8 * 1024]byte)[:]
-	} else {
-		z.pool, z.poolbuf = pool.bytes16k()
+	} else if bufsize <= 16*1024 {
+		z.pool, z.poolbuf = &pool.buf16k, pool.buf16k.Get() // pool.bytes16k()
 		buf = z.poolbuf.(*[16 * 1024]byte)[:]
+	} else if bufsize <= 32*1024 {
+		z.pool, z.poolbuf = &pool.buf32k, pool.buf32k.Get() // pool.bytes32k()
+		buf = z.poolbuf.(*[32 * 1024]byte)[:]
+	} else {
+		z.pool, z.poolbuf = &pool.buf64k, pool.buf64k.Get() // pool.bytes64k()
+		buf = z.poolbuf.(*[64 * 1024]byte)[:]
+	}
+	return
+}
+
+// ----------------
+
+type sfiRvPooler struct {
+	pool  *sync.Pool
+	poolv interface{}
+}
+
+func (z *sfiRvPooler) end() {
+	if z.pool != nil {
+		z.pool.Put(z.poolv)
+		z.pool, z.poolv = nil, nil
+	}
+}
+
+func (z *sfiRvPooler) get(newlen int) (fkvs []sfiRv) {
+	if newlen < 0 { // bounds-check-elimination
+		// cannot happen // here for bounds-check-elimination
+	} else if newlen <= 8 {
+		z.pool, z.poolv = &pool.sfiRv8, pool.sfiRv8.Get() // pool.sfiRv8()
+		fkvs = z.poolv.(*[8]sfiRv)[:newlen]
+	} else if newlen <= 16 {
+		z.pool, z.poolv = &pool.sfiRv16, pool.sfiRv16.Get() // pool.sfiRv16()
+		fkvs = z.poolv.(*[16]sfiRv)[:newlen]
+	} else if newlen <= 32 {
+		z.pool, z.poolv = &pool.sfiRv32, pool.sfiRv32.Get() // pool.sfiRv32()
+		fkvs = z.poolv.(*[32]sfiRv)[:newlen]
+	} else if newlen <= 64 {
+		z.pool, z.poolv = &pool.sfiRv64, pool.sfiRv64.Get() // pool.sfiRv64()
+		fkvs = z.poolv.(*[64]sfiRv)[:newlen]
+	} else if newlen <= 128 {
+		z.pool, z.poolv = &pool.sfiRv128, pool.sfiRv128.Get() // pool.sfiRv128()
+		fkvs = z.poolv.(*[128]sfiRv)[:newlen]
+	} else {
+		fkvs = make([]sfiRv, newlen)
 	}
 	return
 }
