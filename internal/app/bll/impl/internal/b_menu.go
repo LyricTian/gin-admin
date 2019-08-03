@@ -44,6 +44,13 @@ func (a *Menu) getSep() string {
 	return "/"
 }
 
+func (a *Menu) joinParentPath(ppath, code string) string {
+	if ppath != "" {
+		ppath += a.getSep()
+	}
+	return ppath + code
+}
+
 // 获取父级路径
 func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, error) {
 	if parentID == "" {
@@ -54,15 +61,10 @@ func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, erro
 	if err != nil {
 		return "", err
 	} else if pitem == nil {
-		return "", errors.ErrMenuInvalidParent
+		return "", errors.ErrInvalidParent
 	}
 
-	var parentPath string
-	if v := pitem.ParentPath; v != "" {
-		parentPath = v + a.getSep()
-	}
-	parentPath += pitem.RecordID
-	return parentPath, nil
+	return a.joinParentPath(pitem.ParentPath, pitem.RecordID), nil
 }
 
 func (a *Menu) getUpdate(ctx context.Context, recordID string) (*schema.Menu, error) {
@@ -92,7 +94,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, erro
 // Update 更新数据
 func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*schema.Menu, error) {
 	if recordID == item.ParentID {
-		return nil, errors.ErrMenuNotAllowSelf
+		return nil, errors.ErrInvalidParent
 	}
 
 	oldItem, err := a.MenuModel.Get(ctx, recordID)
@@ -112,12 +114,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*
 			}
 			item.ParentPath = parentPath
 
-			opath := oldItem.ParentPath
-			if opath != "" {
-				opath += a.getSep()
-			}
-			opath += oldItem.RecordID
-
+			opath := a.joinParentPath(oldItem.ParentPath, oldItem.RecordID)
 			result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 				PrefixParentPath: opath,
 			})
@@ -125,12 +122,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*
 				return err
 			}
 
-			npath := item.ParentPath
-			if npath != "" {
-				npath += a.getSep()
-			}
-			npath += item.RecordID
-
+			npath := a.joinParentPath(item.ParentPath, item.RecordID)
 			for _, menu := range result.Data {
 				npath2 := npath + menu.ParentPath[len(opath):]
 				err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath2)
@@ -150,13 +142,20 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*
 
 // Delete 删除数据
 func (a *Menu) Delete(ctx context.Context, recordID string) error {
+	oldItem, err := a.MenuModel.Get(ctx, recordID)
+	if err != nil {
+		return err
+	} else if oldItem == nil {
+		return errors.ErrNotFound
+	}
+
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		ParentID: &recordID,
 	}, schema.MenuQueryOptions{PageParam: &schema.PaginationParam{PageSize: -1}})
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrMenuNotAllowDelete
+		return errors.ErrNotAllowDeleteWithChild
 	}
 
 	return a.MenuModel.Delete(ctx, recordID)

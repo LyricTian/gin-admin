@@ -250,7 +250,6 @@ func (e *Entry) WithFields(fields map[string]interface{}) *Entry {
 	e.checkAndDelete(fields,
 		StartedAtKey,
 		TraceIDKey,
-		UserIDKey,
 		SpanIDKey,
 		SpanTitleKey,
 		SpanFunctionKey,

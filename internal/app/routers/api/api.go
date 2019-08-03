@@ -30,20 +30,16 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 		g.Use(middleware.UserAuthMiddleware(
 			a,
 			middleware.AllowMethodAndPathPrefixSkipper(
-				middleware.JoinRouter("GET", "/api/v1/login"),
-				middleware.JoinRouter("POST", "/api/v1/login"),
+				middleware.JoinRouter("GET", "/api/v1/pub/login"),
+				middleware.JoinRouter("POST", "/api/v1/pub/login"),
 			),
 		))
 
 		// casbin权限校验中间件
 		g.Use(middleware.CasbinMiddleware(e,
 			middleware.AllowMethodAndPathPrefixSkipper(
-				middleware.JoinRouter("GET", "/api/v1/login"),
-				middleware.JoinRouter("POST", "/api/v1/login"),
-				middleware.JoinRouter("POST", "/api/v1/refresh_token"),
-				middleware.JoinRouter("PUT", "/api/v1/current/password"),
-				middleware.JoinRouter("GET", "/api/v1/current/user"),
-				middleware.JoinRouter("GET", "/api/v1/current/menutree"),
+				middleware.JoinRouter("GET", "/api/v1/pub"),
+				middleware.JoinRouter("POST", "/api/v1/pub"),
 			),
 		))
 
@@ -52,19 +48,22 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 
 		v1 := g.Group("/v1")
 		{
-			// 注册/api/v1/login
-			v1.GET("/login/captchaid", login.GetCaptcha)
-			v1.GET("/login/captcha", login.ResCaptcha)
-			v1.POST("/login", login.Login)
-			v1.POST("/login/exit", login.Logout)
+			pub := v1.Group("/pub")
+			{
+				// 注册/api/v1/pub/login
+				pub.GET("/login/captchaid", login.GetCaptcha)
+				pub.GET("/login/captcha", login.ResCaptcha)
+				pub.POST("/login", login.Login)
+				pub.POST("/login/exit", login.Logout)
 
-			// 注册/api/v1/refresh_token
-			v1.POST("/refresh_token", login.RefreshToken)
+				// 注册/api/v1/pub/refresh_token
+				pub.POST("/refresh_token", login.RefreshToken)
 
-			// 注册/api/v1/current
-			v1.PUT("/current/password", login.UpdatePassword)
-			v1.GET("/current/user", login.GetUserInfo)
-			v1.GET("/current/menutree", login.QueryUserMenuTree)
+				// 注册/api/v1/pub/current
+				pub.PUT("/current/password", login.UpdatePassword)
+				pub.GET("/current/user", login.GetUserInfo)
+				pub.GET("/current/menutree", login.QueryUserMenuTree)
+			}
 
 			// 注册/api/v1/demos
 			v1.GET("/demos", demo.Query)

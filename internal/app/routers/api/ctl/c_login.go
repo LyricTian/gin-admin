@@ -28,7 +28,7 @@ type Login struct {
 // GetCaptcha 获取验证码信息
 // @Summary 获取验证码信息
 // @Success 200 schema.LoginCaptcha
-// @Router GET /api/v1/login/captchaid
+// @Router GET /api/v1/pub/login/captchaid
 func (a *Login) GetCaptcha(c *gin.Context) {
 	item, err := a.LoginBll.GetCaptcha(ginplus.NewContext(c), config.GetGlobalConfig().Captcha.Length)
 	if err != nil {
@@ -45,7 +45,7 @@ func (a *Login) GetCaptcha(c *gin.Context) {
 // @Success 200 file "图形验证码"
 // @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router GET /api/v1/login/captcha
+// @Router GET /api/v1/pub/login/captcha
 func (a *Login) ResCaptcha(c *gin.Context) {
 	captchaID := c.Query("id")
 	if captchaID == "" {
@@ -73,7 +73,7 @@ func (a *Login) ResCaptcha(c *gin.Context) {
 // @Success 200 schema.LoginTokenInfo
 // @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router POST /api/v1/login
+// @Router POST /api/v1/pub/login
 func (a *Login) Login(c *gin.Context) {
 	var item schema.LoginParam
 	if err := ginplus.ParseJSON(c, &item); err != nil {
@@ -109,7 +109,7 @@ func (a *Login) Login(c *gin.Context) {
 // Logout 用户登出
 // @Summary 用户登出
 // @Success 200 schema.HTTPStatus "{status:OK}"
-// @Router POST /api/v1/login/exit
+// @Router POST /api/v1/pub/login/exit
 func (a *Login) Logout(c *gin.Context) {
 	// 检查用户是否处于登录状态，如果是则执行销毁
 	userID := ginplus.GetUserID(c)
@@ -130,7 +130,7 @@ func (a *Login) Logout(c *gin.Context) {
 // @Success 200 schema.LoginTokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
 // @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router POST /api/v1/refresh_token
+// @Router POST /api/v1/pub/refresh_token
 func (a *Login) RefreshToken(c *gin.Context) {
 	tokenInfo, err := a.LoginBll.GenerateToken(ginplus.NewContext(c), ginplus.GetUserID(c))
 	if err != nil {
@@ -146,7 +146,7 @@ func (a *Login) RefreshToken(c *gin.Context) {
 // @Success 200 schema.UserLoginInfo
 // @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router GET /api/v1/current/user
+// @Router GET /api/v1/pub/current/user
 func (a *Login) GetUserInfo(c *gin.Context) {
 	info, err := a.LoginBll.GetLoginInfo(ginplus.NewContext(c), ginplus.GetUserID(c))
 	if err != nil {
@@ -162,7 +162,7 @@ func (a *Login) GetUserInfo(c *gin.Context) {
 // @Success 200 schema.Menu "查询结果：{list:菜单树}"
 // @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router GET /api/v1/current/menutree
+// @Router GET /api/v1/pub/current/menutree
 func (a *Login) QueryUserMenuTree(c *gin.Context) {
 	menus, err := a.LoginBll.QueryUserMenuTree(ginplus.NewContext(c), ginplus.GetUserID(c))
 	if err != nil {
@@ -180,7 +180,7 @@ func (a *Login) QueryUserMenuTree(c *gin.Context) {
 // @Failure 400 schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 401 schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router PUT /api/v1/current/password
+// @Router PUT /api/v1/pub/current/password
 func (a *Login) UpdatePassword(c *gin.Context) {
 	var item schema.UpdatePasswordParam
 	if err := ginplus.ParseJSON(c, &item); err != nil {

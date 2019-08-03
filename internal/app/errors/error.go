@@ -21,6 +21,8 @@ var (
 	ErrInvalidRequestParameter = New("无效的请求参数")
 	ErrTooManyRequests         = New("请求过于频繁")
 	ErrUnknownQuery            = New("未知的查询类型")
+	ErrInvalidParent           = New("无效的父级节点")
+	ErrNotAllowDeleteWithChild = New("含有子级，不能删除")
 
 	// 权限错误
 	ErrNoPerm         = New("无访问权限")
@@ -42,11 +44,6 @@ var (
 	ErrLoginInvalidOldPwd     = New("旧密码不正确")
 	ErrLoginInvalidVerifyCode = New("无效的验证码")
 
-	// menu
-	ErrMenuInvalidParent  = New("无效的父级节点")
-	ErrMenuNotAllowSelf   = New("不允许使用节点自身作为父级节点")
-	ErrMenuNotAllowDelete = New("含有子级菜单，不能删除")
-
 	// role
 	ErrRoleNameExists     = New("角色名称已经存在")
 	ErrRoleNotAllowDelete = New("该角色已被赋予用户，不能删除")
@@ -60,6 +57,8 @@ func init() {
 	newErrorCode(ErrMethodNotAllow, 405, ErrMethodNotAllow.Error(), 405)
 	newErrorCode(ErrTooManyRequests, 429, ErrTooManyRequests.Error(), 429)
 	newBadRequestError(ErrUnknownQuery)
+	newBadRequestError(ErrInvalidParent)
+	newBadRequestError(ErrNotAllowDeleteWithChild)
 
 	// 权限错误
 	newErrorCode(ErrNoPerm, 9999, ErrNoPerm.Error(), 401)
@@ -79,11 +78,6 @@ func init() {
 	// login
 	newBadRequestError(ErrLoginNotAllowModifyPwd)
 	newBadRequestError(ErrLoginInvalidOldPwd)
-
-	// menu
-	newBadRequestError(ErrMenuInvalidParent)
-	newBadRequestError(ErrMenuNotAllowSelf)
-	newBadRequestError(ErrMenuNotAllowDelete)
 
 	// role
 	newBadRequestError(ErrRoleNameExists)
