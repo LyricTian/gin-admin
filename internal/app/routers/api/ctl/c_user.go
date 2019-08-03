@@ -109,6 +109,7 @@ func (a *User) Create(c *gin.Context) {
 		return
 	}
 
+	item.Creator = ginplus.GetUserID(c)
 	nitem, err := a.UserBll.Create(ginplus.NewContext(c), item)
 	if err != nil {
 		ginplus.ResError(c, err)
