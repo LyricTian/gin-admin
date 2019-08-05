@@ -18,8 +18,8 @@ func WWWMiddleware(root string, skipper ...SkipperFunc) gin.HandlerFunc {
 
 		p := c.Request.URL.Path
 		fpath := filepath.Join(root, filepath.FromSlash(p))
-		_, verr := os.Stat(fpath)
-		if verr != nil && os.IsNotExist(verr) {
+		_, err := os.Stat(fpath)
+		if err != nil && os.IsNotExist(err) {
 			fpath = filepath.Join(root, "index.html")
 		}
 
