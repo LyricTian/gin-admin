@@ -22,7 +22,8 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 		login *ctl.Login,
 		menu *ctl.Menu,
 		role *ctl.Role,
-		user *ctl.User) error {
+		user *ctl.User,
+	) error {
 
 		g := app.Group("/api")
 
