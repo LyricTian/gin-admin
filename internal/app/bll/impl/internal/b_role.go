@@ -57,7 +57,7 @@ func (a *Role) checkName(ctx context.Context, name string) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrRoleNameExists
+		return errors.ErrResourceExists
 	}
 	return nil
 }
@@ -133,7 +133,7 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	if err != nil {
 		return err
 	} else if userResult.PageResult.Total > 0 {
-		return errors.ErrRoleNotAllowDelete
+		return errors.ErrResourceNotAllowDelete
 	}
 
 	err = a.RoleModel.Delete(ctx, recordID)

@@ -23,6 +23,8 @@ var (
 	ErrUnknownQuery            = New("未知的查询类型")
 	ErrInvalidParent           = New("无效的父级节点")
 	ErrNotAllowDeleteWithChild = New("含有子级，不能删除")
+	ErrResourceExists          = New("资源已经存在")
+	ErrResourceNotAllowDelete  = New("资源不允许删除")
 
 	// 权限错误
 	ErrNoPerm         = New("无访问权限")
@@ -34,19 +36,11 @@ var (
 	ErrInvalidUser     = New("无效的用户")
 	ErrUserDisable     = New("用户被禁用")
 	ErrUserNotEmptyPwd = New("密码不允许为空")
-	ErrUserNameExists  = New("用户名已经存在")
-
-	// demo
-	ErrDemoCodeExists = New("编号已经存在")
 
 	// login
 	ErrLoginNotAllowModifyPwd = New("不允许修改密码")
 	ErrLoginInvalidOldPwd     = New("旧密码不正确")
 	ErrLoginInvalidVerifyCode = New("无效的验证码")
-
-	// role
-	ErrRoleNameExists     = New("角色名称已经存在")
-	ErrRoleNotAllowDelete = New("该角色已被赋予用户，不能删除")
 )
 
 func init() {
@@ -59,6 +53,8 @@ func init() {
 	newBadRequestError(ErrUnknownQuery)
 	newBadRequestError(ErrInvalidParent)
 	newBadRequestError(ErrNotAllowDeleteWithChild)
+	newBadRequestError(ErrResourceExists)
+	newBadRequestError(ErrResourceNotAllowDelete)
 
 	// 权限错误
 	newErrorCode(ErrNoPerm, 9999, ErrNoPerm.Error(), 401)
@@ -70,16 +66,9 @@ func init() {
 	newBadRequestError(ErrInvalidUser)
 	newBadRequestError(ErrUserDisable)
 	newBadRequestError(ErrUserNotEmptyPwd)
-	newBadRequestError(ErrUserNameExists)
-
-	// demo
-	newBadRequestError(ErrDemoCodeExists)
 
 	// login
 	newBadRequestError(ErrLoginNotAllowModifyPwd)
 	newBadRequestError(ErrLoginInvalidOldPwd)
-
-	// role
-	newBadRequestError(ErrRoleNameExists)
-	newBadRequestError(ErrRoleNotAllowDelete)
+	newBadRequestError(ErrLoginInvalidVerifyCode)
 }
