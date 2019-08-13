@@ -72,7 +72,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 
 func (a *User) checkUserName(ctx context.Context, userName string) error {
 	if userName == GetRootUser().UserName {
-		return errors.ErrUserNameExists
+		return errors.ErrResourceExists
 	}
 
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
@@ -83,7 +83,7 @@ func (a *User) checkUserName(ctx context.Context, userName string) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrUserNameExists
+		return errors.ErrResourceExists
 	}
 	return nil
 }

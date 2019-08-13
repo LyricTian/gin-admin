@@ -47,7 +47,7 @@ func (a *Demo) checkCode(ctx context.Context, code string) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrDemoCodeExists
+		return errors.ErrResourceExists
 	}
 	return nil
 }
