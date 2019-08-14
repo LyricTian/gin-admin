@@ -45,7 +45,7 @@ func loadCasbinPolicyData(ctx context.Context, container *dig.Container) error {
 		// 加载用户策略
 		userResult, err := user.Query(ctx, schema.UserQueryParam{
 			Status: 1,
-		})
+		}, schema.UserQueryOptions{IncludeRoles: true})
 		if err != nil {
 			return err
 		}
