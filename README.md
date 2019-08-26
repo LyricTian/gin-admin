@@ -8,8 +8,8 @@
 
 </div>
 
-- [在线演示地址](https://demo.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
-- [Swagger 文档地址](https://demo.tiannianshou.com/swagger/)
+- [在线演示地址](http://demo.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
+- [Swagger 文档地址](http://demo.tiannianshou.com/swagger/)
 
 ![](./screenshot_swagger.png)
 
