@@ -24,6 +24,17 @@
 - 支持 Swagger 文档
 - 单元测试
 
+## 使用`gin-admin-cli`工具快速开始
+
+```
+$ go get -u github.com/LyricTian/gin-admin-cli
+$ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
+$ cd ~/go/src/gin-admin
+$ make start
+```
+
+> 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
+
 ## 下载并运行
 
 ### 获取代码
