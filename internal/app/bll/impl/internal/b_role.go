@@ -11,15 +11,17 @@ import (
 )
 
 // NewRole 创建角色管理实例
-func NewRole(e *casbin.Enforcer,
-	role model.IRole,
-	menu model.IMenu,
-	user model.IUser) *Role {
+func NewRole(
+	e *casbin.Enforcer,
+	mRole model.IRole,
+	mMenu model.IMenu,
+	mUser model.IUser,
+) *Role {
 	return &Role{
 		Enforcer:  e,
-		RoleModel: role,
-		MenuModel: menu,
-		UserModel: user,
+		RoleModel: mRole,
+		MenuModel: mMenu,
+		UserModel: mUser,
 	}
 }
 

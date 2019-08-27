@@ -10,11 +10,13 @@ import (
 )
 
 // NewMenu 创建菜单管理实例
-func NewMenu(trans model.ITrans,
-	menu model.IMenu) *Menu {
+func NewMenu(
+	trans model.ITrans,
+	mMenu model.IMenu,
+) *Menu {
 	return &Menu{
 		TransModel: trans,
-		MenuModel:  menu,
+		MenuModel:  mMenu,
 	}
 }
 

@@ -11,13 +11,15 @@ import (
 )
 
 // NewUser 创建菜单管理实例
-func NewUser(e *casbin.Enforcer,
-	user model.IUser,
-	role model.IRole) *User {
+func NewUser(
+	e *casbin.Enforcer,
+	mUser model.IUser,
+	mRole model.IRole,
+) *User {
 	return &User{
 		Enforcer:  e,
-		UserModel: user,
-		RoleModel: role,
+		UserModel: mUser,
+		RoleModel: mRole,
 	}
 }
 

@@ -13,15 +13,17 @@ import (
 )
 
 // NewLogin 创建登录管理实例
-func NewLogin(a auth.Auther,
-	user model.IUser,
-	role model.IRole,
-	menu model.IMenu) *Login {
+func NewLogin(
+	a auth.Auther,
+	mUser model.IUser,
+	mRole model.IRole,
+	mMenu model.IMenu,
+) *Login {
 	return &Login{
 		Auth:      a,
-		UserModel: user,
-		RoleModel: role,
-		MenuModel: menu,
+		UserModel: mUser,
+		RoleModel: mRole,
+		MenuModel: mMenu,
 	}
 }
 

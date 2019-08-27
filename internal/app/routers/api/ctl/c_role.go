@@ -9,9 +9,9 @@ import (
 )
 
 // NewRole 创建角色管理控制器
-func NewRole(role bll.IRole) *Role {
+func NewRole(bRole bll.IRole) *Role {
 	return &Role{
-		RoleBll: role,
+		RoleBll: bRole,
 	}
 }
 

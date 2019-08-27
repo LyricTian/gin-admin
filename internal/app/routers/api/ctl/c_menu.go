@@ -10,9 +10,9 @@ import (
 )
 
 // NewMenu 创建菜单管理控制器
-func NewMenu(menu bll.IMenu) *Menu {
+func NewMenu(bMenu bll.IMenu) *Menu {
 	return &Menu{
-		MenuBll: menu,
+		MenuBll: bMenu,
 	}
 }
 
