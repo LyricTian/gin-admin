@@ -16,13 +16,14 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 		return err
 	}
 
-	return container.Invoke(func(a auth.Auther,
+	return container.Invoke(func(
+		a auth.Auther,
 		e *casbin.Enforcer,
-		demo *ctl.Demo,
-		login *ctl.Login,
-		menu *ctl.Menu,
-		role *ctl.Role,
-		user *ctl.User,
+		cDemo *ctl.Demo,
+		cLogin *ctl.Login,
+		cMenu *ctl.Menu,
+		cRole *ctl.Role,
+		cUser *ctl.User,
 	) error {
 
 		g := app.Group("/api")
@@ -52,51 +53,51 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 			pub := v1.Group("/pub")
 			{
 				// 注册/api/v1/pub/login
-				pub.GET("/login/captchaid", login.GetCaptcha)
-				pub.GET("/login/captcha", login.ResCaptcha)
-				pub.POST("/login", login.Login)
-				pub.POST("/login/exit", login.Logout)
+				pub.GET("/login/captchaid", cLogin.GetCaptcha)
+				pub.GET("/login/captcha", cLogin.ResCaptcha)
+				pub.POST("/login", cLogin.Login)
+				pub.POST("/login/exit", cLogin.Logout)
 
 				// 注册/api/v1/pub/refresh_token
-				pub.POST("/refresh_token", login.RefreshToken)
+				pub.POST("/refresh_token", cLogin.RefreshToken)
 
 				// 注册/api/v1/pub/current
-				pub.PUT("/current/password", login.UpdatePassword)
-				pub.GET("/current/user", login.GetUserInfo)
-				pub.GET("/current/menutree", login.QueryUserMenuTree)
+				pub.PUT("/current/password", cLogin.UpdatePassword)
+				pub.GET("/current/user", cLogin.GetUserInfo)
+				pub.GET("/current/menutree", cLogin.QueryUserMenuTree)
 			}
 
 			// 注册/api/v1/demos
-			v1.GET("/demos", demo.Query)
-			v1.GET("/demos/:id", demo.Get)
-			v1.POST("/demos", demo.Create)
-			v1.PUT("/demos/:id", demo.Update)
-			v1.DELETE("/demos/:id", demo.Delete)
-			v1.PATCH("/demos/:id/enable", demo.Enable)
-			v1.PATCH("/demos/:id/disable", demo.Disable)
+			v1.GET("/demos", cDemo.Query)
+			v1.GET("/demos/:id", cDemo.Get)
+			v1.POST("/demos", cDemo.Create)
+			v1.PUT("/demos/:id", cDemo.Update)
+			v1.DELETE("/demos/:id", cDemo.Delete)
+			v1.PATCH("/demos/:id/enable", cDemo.Enable)
+			v1.PATCH("/demos/:id/disable", cDemo.Disable)
 
 			// 注册/api/v1/menus
-			v1.GET("/menus", menu.Query)
-			v1.GET("/menus/:id", menu.Get)
-			v1.POST("/menus", menu.Create)
-			v1.PUT("/menus/:id", menu.Update)
-			v1.DELETE("/menus/:id", menu.Delete)
+			v1.GET("/menus", cMenu.Query)
+			v1.GET("/menus/:id", cMenu.Get)
+			v1.POST("/menus", cMenu.Create)
+			v1.PUT("/menus/:id", cMenu.Update)
+			v1.DELETE("/menus/:id", cMenu.Delete)
 
 			// 注册/api/v1/roles
-			v1.GET("/roles", role.Query)
-			v1.GET("/roles/:id", role.Get)
-			v1.POST("/roles", role.Create)
-			v1.PUT("/roles/:id", role.Update)
-			v1.DELETE("/roles/:id", role.Delete)
+			v1.GET("/roles", cRole.Query)
+			v1.GET("/roles/:id", cRole.Get)
+			v1.POST("/roles", cRole.Create)
+			v1.PUT("/roles/:id", cRole.Update)
+			v1.DELETE("/roles/:id", cRole.Delete)
 
 			// 注册/api/v1/users
-			v1.GET("/users", user.Query)
-			v1.GET("/users/:id", user.Get)
-			v1.POST("/users", user.Create)
-			v1.PUT("/users/:id", user.Update)
-			v1.DELETE("/users/:id", user.Delete)
-			v1.PATCH("/users/:id/enable", user.Enable)
-			v1.PATCH("/users/:id/disable", user.Disable)
+			v1.GET("/users", cUser.Query)
+			v1.GET("/users/:id", cUser.Get)
+			v1.POST("/users", cUser.Create)
+			v1.PUT("/users/:id", cUser.Update)
+			v1.DELETE("/users/:id", cUser.Delete)
+			v1.PATCH("/users/:id/enable", cUser.Enable)
+			v1.PATCH("/users/:id/disable", cUser.Disable)
 		}
 
 		return nil

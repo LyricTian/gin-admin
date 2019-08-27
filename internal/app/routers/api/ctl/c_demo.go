@@ -10,9 +10,9 @@ import (
 )
 
 // NewDemo 创建demo控制器
-func NewDemo(demo bll.IDemo) *Demo {
+func NewDemo(bDemo bll.IDemo) *Demo {
 	return &Demo{
-		DemoBll: demo,
+		DemoBll: bDemo,
 	}
 }
 

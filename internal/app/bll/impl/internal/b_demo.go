@@ -10,9 +10,9 @@ import (
 )
 
 // NewDemo 创建demo
-func NewDemo(demo model.IDemo) *Demo {
+func NewDemo(mDemo model.IDemo) *Demo {
 	return &Demo{
-		DemoModel: demo,
+		DemoModel: mDemo,
 	}
 }
 

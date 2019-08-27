@@ -12,9 +12,9 @@ import (
 )
 
 // NewUser 创建用户管理控制器
-func NewUser(user bll.IUser) *User {
+func NewUser(bUser bll.IUser) *User {
 	return &User{
-		UserBll: user,
+		UserBll: bUser,
 	}
 }
 

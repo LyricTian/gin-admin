@@ -12,9 +12,9 @@ import (
 )
 
 // NewLogin 创建登录管理控制器
-func NewLogin(login bll.ILogin) *Login {
+func NewLogin(bLogin bll.ILogin) *Login {
 	return &Login{
-		LoginBll: login,
+		LoginBll: bLogin,
 	}
 }
 
