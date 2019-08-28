@@ -24,9 +24,11 @@
 - 支持 Swagger 文档
 - 单元测试
 
-## 使用`gin-admin-cli`工具快速开始
+## 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具快速开始
 
-```
+### 快速创建并运行项目
+
+```bash
 $ go get -u github.com/LyricTian/gin-admin-cli
 $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
 $ cd ~/go/src/gin-admin
@@ -35,11 +37,17 @@ $ make start
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
 
+### 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
+
+```bash
+gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
+```
+
 ## 下载并运行
 
 ### 获取代码
 
-```
+```bash
 go get -v github.com/LyricTian/gin-admin/cmd/server
 ```
 
