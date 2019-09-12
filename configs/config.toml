@@ -184,6 +184,9 @@ password = "123456"
 # 数据库
 db_name = "ginadmin"
 
+sslmode = "disable"
+
+
 # sqlite数据库配置
 [sqlite3]
 # 数据库路径
