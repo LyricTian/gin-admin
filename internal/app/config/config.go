@@ -182,12 +182,13 @@ type Postgres struct {
 	User     string `toml:"user"`
 	Password string `toml:"password"`
 	DBName   string `toml:"db_name"`
+	SSLMode   string `toml:"sslmode"`
 }
 
 // DSN 数据库连接串
 func (a Postgres) DSN() string {
-	return fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s",
-		a.Host, a.Port, a.User, a.DBName, a.Password)
+	return fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s",
+		a.Host, a.Port, a.User, a.DBName, a.Password, a.SSLMode)
 }
 
 // Sqlite3 sqlite3配置参数
