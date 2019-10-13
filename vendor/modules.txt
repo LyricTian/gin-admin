@@ -9,7 +9,9 @@ github.com/LyricTian/captcha/store
 github.com/LyricTian/queue
 # github.com/casbin/casbin v1.9.1
 github.com/casbin/casbin
+github.com/casbin/casbin/config
 github.com/casbin/casbin/effect
+github.com/casbin/casbin/errors
 github.com/casbin/casbin/log
 github.com/casbin/casbin/model
 github.com/casbin/casbin/persist
@@ -17,8 +19,6 @@ github.com/casbin/casbin/persist/file-adapter
 github.com/casbin/casbin/rbac
 github.com/casbin/casbin/rbac/default-role-manager
 github.com/casbin/casbin/util
-github.com/casbin/casbin/config
-github.com/casbin/casbin/errors
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/dgrijalva/jwt-go v0.0.0-20180719211823-0b96aaa70776
@@ -106,7 +106,7 @@ github.com/ugorji/go/codec
 go.uber.org/dig
 go.uber.org/dig/internal/digreflect
 go.uber.org/dig/internal/dot
-# golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+# golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/sys v0.0.0-20190312061237-fead79001313
 golang.org/x/sys/unix

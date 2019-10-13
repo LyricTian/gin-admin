@@ -155,6 +155,8 @@ max_open_conns = 150
 max_idle_conns = 50
 # 数据库表名前缀
 table_prefix = "g_"
+# 是否启用自动映射数据库表结构
+enable_auto_migrate = true
 
 # mysql数据库配置
 [mysql]
@@ -183,9 +185,8 @@ user = "root"
 password = "123456"
 # 数据库
 db_name = "ginadmin"
-
-sslmode = "disable"
-
+# SSL模式
+ssl_mode = "disable"
 
 # sqlite数据库配置
 [sqlite3]

@@ -8,11 +8,11 @@ import (
 	"github.com/tidwall/buntdb"
 )
 
-// NewStore 创建基于buntdb的存储
-func NewStore(p string) (*Store, error) {
-	os.MkdirAll(filepath.Dir(p), 0777)
+// NewStore 创建基于buntdb的文件存储
+func NewStore(path string) (*Store, error) {
+	os.MkdirAll(filepath.Dir(path), 0777)
 
-	db, err := buntdb.Open(p)
+	db, err := buntdb.Open(path)
 	if err != nil {
 		return nil, err
 	}
