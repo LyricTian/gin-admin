@@ -6,16 +6,16 @@ import (
 
 // User 用户对象
 type User struct {
-	RecordID  string    `json:"record_id" swaggo:"false,记录ID"`
-	UserName  string    `json:"user_name" binding:"required" swaggo:"true,用户名"`
-	RealName  string    `json:"real_name" binding:"required" swaggo:"true,真实姓名"`
-	Password  string    `json:"password" swaggo:"false,密码"`
-	Phone     string    `json:"phone" swaggo:"false,手机号"`
-	Email     string    `json:"email" swaggo:"false,邮箱"`
-	Status    int       `json:"status" binding:"required,max=2,min=1" swaggo:"true,用户状态(1:启用 2:停用)"`
-	Creator   string    `json:"creator" swaggo:"false,创建者"`
-	CreatedAt time.Time `json:"created_at" swaggo:"false,创建时间"`
-	Roles     UserRoles `json:"roles" binding:"required,gt=0" swaggo:"true,角色授权"`
+	RecordID  string    `json:"record_id"`                             // 记录ID
+	UserName  string    `json:"user_name" binding:"required"`          // 用户名
+	RealName  string    `json:"real_name" binding:"required"`          // 真实姓名
+	Password  string    `json:"password"`                              // 密码
+	Phone     string    `json:"phone"`                                 // 手机号
+	Email     string    `json:"email"`                                 // 邮箱
+	Status    int       `json:"status" binding:"required,max=2,min=1"` // 用户状态(1:启用 2:停用)
+	Creator   string    `json:"creator"`                               // 创建者
+	CreatedAt time.Time `json:"created_at"`                            // 创建时间
+	Roles     UserRoles `json:"roles" binding:"required,gt=0"`         // 角色授权
 }
 
 // CleanSecure 清理安全数据
@@ -104,14 +104,14 @@ func (a UserRoles) ToRoleIDs() []string {
 
 // UserShow 用户显示项
 type UserShow struct {
-	RecordID  string    `json:"record_id" swaggo:"false,记录ID"`
-	UserName  string    `json:"user_name" swaggo:"true,用户名"`
-	RealName  string    `json:"real_name" swaggo:"true,真实姓名"`
-	Phone     string    `json:"phone" swaggo:"false,手机号"`
-	Email     string    `json:"email" swaggo:"false,邮箱"`
-	Status    int       `json:"status" swaggo:"true,用户状态(1:启用 2:停用)"`
-	CreatedAt time.Time `json:"created_at" swaggo:"false,创建时间"`
-	Roles     []*Role   `json:"roles" swaggo:"true,授权角色列表"`
+	RecordID  string    `json:"record_id"`  // 记录ID
+	UserName  string    `json:"user_name"`  // 用户名
+	RealName  string    `json:"real_name"`  // 真实姓名
+	Phone     string    `json:"phone"`      // 手机号
+	Email     string    `json:"email"`      // 邮箱
+	Status    int       `json:"status"`     // 用户状态(1:启用 2:停用)
+	CreatedAt time.Time `json:"created_at"` // 创建时间
+	Roles     []*Role   `json:"roles"`      // 授权角色列表
 }
 
 // UserShows 用户显示项列表

@@ -4,20 +4,20 @@ import "time"
 
 // Role 角色对象
 type Role struct {
-	RecordID  string    `json:"record_id" swaggo:"false,记录ID"`
-	Name      string    `json:"name" binding:"required" swaggo:"true,角色名称"`
-	Sequence  int       `json:"sequence" swaggo:"false,排序值"`
-	Memo      string    `json:"memo" swaggo:"false,备注"`
-	Creator   string    `json:"creator" swaggo:"false,创建者"`
-	CreatedAt time.Time `json:"created_at" swaggo:"false,创建时间"`
-	Menus     RoleMenus `json:"menus" binding:"required,gt=0" swaggo:"false,菜单权限"`
+	RecordID  string    `json:"record_id"`                     // 记录ID
+	Name      string    `json:"name" binding:"required"`       // 角色名称
+	Sequence  int       `json:"sequence"`                      // 排序值
+	Memo      string    `json:"memo"`                          // 备注
+	Creator   string    `json:"creator"`                       // 创建者
+	CreatedAt time.Time `json:"created_at"`                    // 创建时间
+	Menus     RoleMenus `json:"menus" binding:"required,gt=0"` // 菜单权限
 }
 
 // RoleMenu 角色菜单对象
 type RoleMenu struct {
-	MenuID    string   `json:"menu_id" swaggo:"false,菜单ID"`
-	Actions   []string `json:"actions" swaggo:"false,动作权限列表"`
-	Resources []string `json:"resources" swaggo:"false,资源权限列表"`
+	MenuID    string   `json:"menu_id"`   // 菜单ID
+	Actions   []string `json:"actions"`   // 动作权限列表
+	Resources []string `json:"resources"` // 资源权限列表
 }
 
 // RoleQueryParam 查询条件
