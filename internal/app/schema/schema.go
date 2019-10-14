@@ -2,18 +2,18 @@ package schema
 
 // HTTPError HTTP响应错误
 type HTTPError struct {
-	Error HTTPErrorItem `json:"error" swaggo:"true,错误项"`
+	Error HTTPErrorItem `json:"error"` // 错误项
 }
 
 // HTTPErrorItem HTTP响应错误项
 type HTTPErrorItem struct {
-	Code    int    `json:"code" swaggo:"true,错误码"`
-	Message string `json:"message" swaggo:"true,错误信息"`
+	Code    int    `json:"code"`    // 错误码
+	Message string `json:"message"` // 错误信息
 }
 
 // HTTPStatus HTTP响应状态
 type HTTPStatus struct {
-	Status string `json:"status" swaggo:"true,状态(OK)"`
+	Status string `json:"status"` // 状态(OK)
 }
 
 // HTTPList HTTP响应列表数据

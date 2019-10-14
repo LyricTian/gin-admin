@@ -31,8 +31,9 @@
 ```bash
 $ go get -u github.com/LyricTian/gin-admin-cli
 $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
-$ cd ~/go/src/gin-admin
-$ make start
+$ cd ~/go/src/gin-admin/cmd/server
+$ go build -o server
+$ ./server -c ../../configs/config.toml -m ../../configs/model.conf -swagger ../../internal/app/swagger
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -40,15 +41,15 @@ $ make start
 ### 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
 
 ```bash
-gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
+$ gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
 ```
 
-## 下载并运行
+## 手动下载并运行
 
 ### 获取代码
 
 ```bash
-go get -v github.com/LyricTian/gin-admin/cmd/server
+$ go get -v github.com/LyricTian/gin-admin/cmd/server
 ```
 
 ### 运行
@@ -60,9 +61,9 @@ go get -v github.com/LyricTian/gin-admin/cmd/server
 > 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
 
 ```bash
-cd github.com/LyricTian/gin-admin/cmd/server
-go build -o server
-./server -c ../../configs/config.toml -m ../../configs/model.conf -swagger ../../internal/app/swagger
+$ cd github.com/LyricTian/gin-admin/cmd/server
+$ go build -o server
+$ ./server -c ../../configs/config.toml -m ../../configs/model.conf -swagger ../../internal/app/swagger
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -78,13 +79,13 @@ go build -o server
 
 ## Swagger 文档的使用
 
-> 文档规则请参考：[https://github.com/teambition/swaggo/wiki/Declarative-Comments-Format](https://github.com/teambition/swaggo/wiki/Declarative-Comments-Format)
+> 文档规则请参考：[https://github.com/swaggo/swag#declarative-comments-format](https://github.com/swaggo/swag#declarative-comments-format)
 
 ### 安装工具并生成文档
 
-```
-go get -u -v github.com/teambition/swaggo
-swaggo -s ./internal/app/routers/api/swagger.go -p . -o ./internal/app/swagger
+```bash
+$ go get -u -v github.com/swaggo/swag/cmd/swag
+$ swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)

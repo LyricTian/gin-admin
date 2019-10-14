@@ -16,7 +16,7 @@ start:
 	$(SERVER_BIN) -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
 
 swagger:
-	swaggo -s ./internal/app/routers/api/swagger.go -p . -o ./internal/app/swagger
+	swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
 
 test:
 	@go test -cover -race ./...
