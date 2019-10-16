@@ -35,8 +35,8 @@ func UserAuthMiddleware(a auth.Auther, skipper ...SkipperFunc) gin.HandlerFunc {
 		}
 
 		if userID == "" {
-			if config.GetGlobalConfig().RunMode == "debug" {
-				c.Set(ginplus.UserIDKey, config.GetGlobalConfig().Root.UserName)
+			if config.Global().IsDebugMode() {
+				c.Set(ginplus.UserIDKey, config.Global().Root.UserName)
 				c.Next()
 				return
 			}

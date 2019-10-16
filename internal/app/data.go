@@ -17,7 +17,7 @@ func InitData(ctx context.Context, container *dig.Container) error {
 		return err
 	}
 
-	if config.GetGlobalConfig().AllowInitMenu {
+	if config.Global().AllowInitMenu {
 		return initMenuData(ctx, container)
 	}
 

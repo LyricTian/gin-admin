@@ -29,7 +29,7 @@ type Login struct {
 // @Success 200 {object} schema.LoginCaptcha
 // @Router /api/v1/pub/login/captchaid [get]
 func (a *Login) GetCaptcha(c *gin.Context) {
-	item, err := a.LoginBll.GetCaptcha(ginplus.NewContext(c), config.GetGlobalConfig().Captcha.Length)
+	item, err := a.LoginBll.GetCaptcha(ginplus.NewContext(c), config.Global().Captcha.Length)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -61,7 +61,7 @@ func (a *Login) ResCaptcha(c *gin.Context) {
 		}
 	}
 
-	cfg := config.GetGlobalConfig().Captcha
+	cfg := config.Global().Captcha
 	err := a.LoginBll.ResCaptcha(ginplus.NewContext(c), c.Writer, captchaID, cfg.Width, cfg.Height)
 	if err != nil {
 		ginplus.ResError(c, err)

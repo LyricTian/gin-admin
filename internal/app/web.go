@@ -16,7 +16,7 @@ import (
 
 // InitWeb 初始化web引擎
 func InitWeb(container *dig.Container) *gin.Engine {
-	cfg := config.GetGlobalConfig()
+	cfg := config.Global()
 	gin.SetMode(cfg.RunMode)
 
 	app := gin.New()
@@ -58,7 +58,7 @@ func InitWeb(container *dig.Container) *gin.Engine {
 
 // InitHTTPServer 初始化http服务
 func InitHTTPServer(ctx context.Context, container *dig.Container) func() {
-	cfg := config.GetGlobalConfig().HTTP
+	cfg := config.Global().HTTP
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
 		Addr:         addr,
