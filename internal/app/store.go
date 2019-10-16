@@ -14,7 +14,7 @@ import (
 // InitStore 初始化存储
 func InitStore(container *dig.Container) (func(), error) {
 	var storeCall func()
-	cfg := config.GetGlobalConfig()
+	cfg := config.Global()
 
 	switch cfg.Store {
 	case "gorm":
@@ -51,7 +51,7 @@ func InitStore(container *dig.Container) (func(), error) {
 
 // initGorm 实例化gorm存储
 func initGorm() (*gormplus.DB, error) {
-	cfg := config.GetGlobalConfig()
+	cfg := config.Global()
 
 	var dsn string
 	switch cfg.Gorm.DBType {

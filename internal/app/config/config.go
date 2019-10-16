@@ -10,9 +10,9 @@ var (
 	global *Config
 )
 
-// LoadGlobalConfig 加载全局配置
-func LoadGlobalConfig(fpath string) error {
-	c, err := ParseConfig(fpath)
+// LoadGlobal 加载全局配置
+func LoadGlobal(fpath string) error {
+	c, err := Parse(fpath)
 	if err != nil {
 		return err
 	}
@@ -20,16 +20,16 @@ func LoadGlobalConfig(fpath string) error {
 	return nil
 }
 
-// GetGlobalConfig 获取全局配置
-func GetGlobalConfig() *Config {
+// Global 获取全局配置
+func Global() *Config {
 	if global == nil {
 		return &Config{}
 	}
 	return global
 }
 
-// ParseConfig 解析配置文件
-func ParseConfig(fpath string) (*Config, error) {
+// Parse 解析配置文件
+func Parse(fpath string) (*Config, error) {
 	var c Config
 	_, err := toml.DecodeFile(fpath, &c)
 	if err != nil {
@@ -61,6 +61,11 @@ type Config struct {
 	MySQL           MySQL       `toml:"mysql"`
 	Postgres        Postgres    `toml:"postgres"`
 	Sqlite3         Sqlite3     `toml:"sqlite3"`
+}
+
+// IsDebugMode 是否是debug模式
+func (c *Config) IsDebugMode() bool {
+	return c.RunMode == "debug"
 }
 
 // Log 日志配置参数
