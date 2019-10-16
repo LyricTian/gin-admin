@@ -82,6 +82,11 @@ func (d *DB) FindPage(db *gorm.DB, pageIndex, pageSize int, out interface{}) (in
 	return count, nil
 }
 
+// ForUpdate 事务锁
+func (d *DB) ForUpdate() *DB {
+	return Wrap(d.Set("gorm:query_option", "FOR UPDATE"))
+}
+
 // FindOne 查询单条数据
 func (d *DB) FindOne(db *gorm.DB, out interface{}) (bool, error) {
 	result := db.First(out)

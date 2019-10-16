@@ -15,7 +15,9 @@ func SetTablePrefix(prefix string) {
 
 // AutoMigrate 自动映射数据表
 func AutoMigrate(db *gormplus.DB) error {
-	return db.AutoMigrate(
+	return db.
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		AutoMigrate(
 		new(entity.Demo),
 		new(entity.User),
 		new(entity.UserRole),
