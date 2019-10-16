@@ -31,7 +31,7 @@ func NewLock(ctx context.Context, lock bool) context.Context {
 // IsForUpdate 从上下文中判断是否 FOR UPDATE
 func IsForUpdate(ctx context.Context) bool {
 	v := ctx.Value(lockCtx{})
-	return v.(bool) == true
+	return v != nil && v.(bool) == true
 }
 
 // NewUserID 创建用户ID的上下文
