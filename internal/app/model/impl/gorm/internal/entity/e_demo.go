@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // GetDemoDB 获取demo存储
-func GetDemoDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetDemoDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, Demo{})
 }
 

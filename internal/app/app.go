@@ -94,6 +94,8 @@ func Init(ctx context.Context, opts ...Option) func() {
 	if err != nil {
 		logger.Errorf(ctx, err.Error())
 	}
+
+	// 初始化图形验证码
 	InitCaptcha()
 
 	// 创建依赖注入容器

@@ -4,16 +4,16 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // GetUserDB 获取用户存储
-func GetUserDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, User{})
 }
 
 // GetUserRoleDB 获取用户角色关联存储
-func GetUserRoleDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, UserRole{})
 }
 
