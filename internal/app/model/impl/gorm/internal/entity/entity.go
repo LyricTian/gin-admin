@@ -45,7 +45,12 @@ func getDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
 	if ok {
 		db, ok := trans.(*gormplus.DB)
 		if ok {
-			return db.ForUpdate()
+			lock := icontext.IsForUpdate(ctx)
+			if lock {
+				return db.ForUpdate()
+			} else {
+				return db
+			}
 		}
 	}
 	return defDB

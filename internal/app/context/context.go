@@ -6,6 +6,7 @@ import (
 
 // 定义全局上下文中的键
 type (
+	lockCtx    struct{}
 	transCtx   struct{}
 	userIDCtx  struct{}
 	traceIDCtx struct{}
@@ -20,6 +21,17 @@ func NewTrans(ctx context.Context, trans interface{}) context.Context {
 func FromTrans(ctx context.Context) (interface{}, bool) {
 	v := ctx.Value(transCtx{})
 	return v, v != nil
+}
+
+// NewLock 是否加锁
+func NewLock(ctx context.Context, lock bool) context.Context {
+	return context.WithValue(ctx, lockCtx{}, lock)
+}
+
+// IsForUpdate 从上下文中判断是否 FOR UPDATE
+func IsForUpdate(ctx context.Context) bool {
+	v := ctx.Value(lockCtx{})
+	return v.(bool) == true
 }
 
 // NewUserID 创建用户ID的上下文
