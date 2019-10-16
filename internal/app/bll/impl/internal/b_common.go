@@ -47,6 +47,7 @@ func ExecTrans(ctx context.Context, transModel model.ITrans, fn TransFunc) error
 	return transModel.Commit(ctx, trans)
 }
 
+// Lock 是否开启锁
 func Lock(ctx context.Context, lock bool) context.Context  {
 	return icontext.NewLock(ctx, lock)
 }
