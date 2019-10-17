@@ -20,8 +20,7 @@ func AutoMigrate(db *gormplus.DB) error {
 	if DBType == "mysql" {
 		db = gormplus.Wrap(db.Set("gorm:table_options", "ENGINE=InnoDB"))
 	}
-	return db.
-		AutoMigrate(
+	return db.AutoMigrate(
 		new(entity.Demo),
 		new(entity.User),
 		new(entity.UserRole),
