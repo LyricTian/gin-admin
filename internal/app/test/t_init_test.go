@@ -24,12 +24,12 @@ var engine *gin.Engine
 
 func init() {
 	// 初始化配置文件
-	err := config.LoadGlobalConfig(configFile)
+	err := config.LoadGlobal(configFile)
 	if err != nil {
 		panic(err)
 	}
 
-	cfg := config.GetGlobalConfig()
+	cfg := config.Global()
 	cfg.RunMode = "debug"
 	cfg.CasbinModelConf = "../../../configs/model.conf"
 	cfg.Gorm.DBType = "sqlite3"

@@ -6,17 +6,17 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // NewMenu 创建菜单存储实例
-func NewMenu(db *gormplus.DB) *Menu {
+func NewMenu(db *gorm.DB) *Menu {
 	return &Menu{db}
 }
 
 // Menu 菜单存储
 type Menu struct {
-	db *gormplus.DB
+	db *gorm.DB
 }
 
 func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
@@ -29,7 +29,7 @@ func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryO
 
 // Query 查询数据
 func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
-	db := entity.GetMenuDB(ctx, a.db).DB
+	db := entity.GetMenuDB(ctx, a.db)
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
 	}
@@ -49,7 +49,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 
 	opt := a.getQueryOption(opts...)
 	var list entity.Menus
-	pr, err := WrapPageQuery(db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -111,7 +111,7 @@ func (a *Menu) fillSchemaMenus(ctx context.Context, items []*schema.Menu, opts .
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
 	var item entity.Menu
-	ok, err := a.db.FindOne(entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID), &item)
+	ok, err := FindOne(ctx, entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {

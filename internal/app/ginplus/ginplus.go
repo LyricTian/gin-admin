@@ -25,7 +25,7 @@ const (
 	ResBodyKey = prefix + "/res_body"
 )
 
-// NewContext 封装上线文入口
+// NewContext 封装上下文入口
 func NewContext(c *gin.Context) context.Context {
 	parent := context.Background()
 

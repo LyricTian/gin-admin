@@ -22,7 +22,10 @@ func LoggerMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
 
 		p := c.Request.URL.Path
 		method := c.Request.Method
-		span := logger.StartSpan(ginplus.NewContext(c), logger.SetSpanTitle("访问日志"), logger.SetSpanFuncName(JoinRouter(method, p)))
+		span := logger.StartSpan(ginplus.NewContext(c),
+			logger.SetSpanTitle("访问日志"),
+			logger.SetSpanFuncName(JoinRouter(method, p)))
+
 		start := time.Now()
 
 		fields := make(map[string]interface{})
@@ -52,11 +55,13 @@ func LoggerMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
 		timeConsuming := time.Since(start).Nanoseconds() / 1e6
 		fields["res_status"] = c.Writer.Status()
 		fields["res_length"] = c.Writer.Size()
+
 		if v, ok := c.Get(ginplus.ResBodyKey); ok {
 			if b, ok := v.([]byte); ok {
 				fields["res_body"] = string(b)
 			}
 		}
+
 		fields[logger.UserIDKey] = ginplus.GetUserID(c)
 		span.WithFields(fields).Infof("[http] %s-%s-%s-%d(%dms)",
 			p, c.Request.Method, c.ClientIP(), c.Writer.Status(), timeConsuming)

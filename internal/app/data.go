@@ -17,7 +17,7 @@ func InitData(ctx context.Context, container *dig.Container) error {
 		return err
 	}
 
-	if config.GetGlobalConfig().AllowInitMenu {
+	if config.Global().AllowInitMenu {
 		return initMenuData(ctx, container)
 	}
 
@@ -122,6 +122,64 @@ const menuData = `
     "icon": "dashboard",
     "router": "/dashboard",
     "sequence": 1900000
+  },
+  {
+    "name": "DEMO",
+    "icon": "tag",
+    "router": "/example/demo",
+    "sequence": 1800000,
+    "actions": [
+      { "code": "add", "name": "新增" },
+      { "code": "edit", "name": "编辑" },
+      { "code": "del", "name": "删除" },
+      { "code": "query", "name": "查询" },
+      { "code": "disable", "name": "禁用" },
+      { "code": "enable", "name": "启用" }
+    ],
+    "resources": [
+      {
+        "code": "query",
+        "name": "查询DEMO数据",
+        "method": "GET",
+        "path": "/api/v1/demos"
+      },
+      {
+        "code": "get",
+        "name": "精确查询DEMO数据",
+        "method": "GET",
+        "path": "/api/v1/demos/:id"
+      },
+      {
+        "code": "create",
+        "name": "创建DEMO数据",
+        "method": "POST",
+        "path": "/api/v1/demos"
+      },
+      {
+        "code": "update",
+        "name": "更新DEMO数据",
+        "method": "PUT",
+        "path": "/api/v1/demos/:id"
+      },
+      {
+        "code": "delete",
+        "name": "删除DEMO数据",
+        "method": "DELETE",
+        "path": "/api/v1/demos/:id"
+      },
+      {
+        "code": "disable",
+        "name": "禁用DEMO数据",
+        "method": "PATCH",
+        "path": "/api/v1/demos/:id/disable"
+      },
+      {
+        "code": "enable",
+        "name": "启用DEMO数据",
+        "method": "PATCH",
+        "path": "/api/v1/demos/:id/enable"
+      }
+    ]
   },
   {
     "name": "系统管理",
@@ -231,7 +289,9 @@ const menuData = `
           { "code": "add", "name": "新增" },
           { "code": "edit", "name": "编辑" },
           { "code": "del", "name": "删除" },
-          { "code": "query", "name": "查询" }
+          { "code": "query", "name": "查询" },
+          { "code": "disable", "name": "禁用" },
+          { "code": "enable", "name": "启用" }
         ],
         "resources": [
           {
