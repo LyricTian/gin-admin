@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
 	imodel "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/model"
@@ -15,8 +16,11 @@ func SetTablePrefix(prefix string) {
 
 // AutoMigrate 自动映射数据表
 func AutoMigrate(db *gormplus.DB) error {
+	DBType := config.GetGlobalConfig().Gorm.DBType
+	if DBType == "sqlite3" {
+		db = gormplus.Wrap(db.Set("gorm:table_options", "ENGINE=InnoDB"))
+	}
 	return db.
-		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
 		new(entity.Demo),
 		new(entity.User),

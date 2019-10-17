@@ -49,5 +49,9 @@ func ExecTrans(ctx context.Context, transModel model.ITrans, fn TransFunc) error
 
 // Lock 是否开启锁
 func Lock(ctx context.Context, lock bool) context.Context  {
+	DBType := config.GetGlobalConfig().Gorm.DBType
+	if DBType == "sqlite3" {
+		return ctx
+	}
 	return icontext.NewLock(ctx, lock)
 }
