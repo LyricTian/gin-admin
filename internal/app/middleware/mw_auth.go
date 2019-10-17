@@ -9,8 +9,13 @@ import (
 )
 
 // UserAuthMiddleware 用户授权中间件
-func UserAuthMiddleware(a auth.Auther, skipper ...SkipperFunc) gin.HandlerFunc {
+func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if Skip(c, skippers...) {
+			c.Next()
+			return
+		}
+
 		var userID string
 		if t := ginplus.GetToken(c); t != "" {
 			id, err := a.ParseUserID(t)
@@ -27,14 +32,7 @@ func UserAuthMiddleware(a auth.Auther, skipper ...SkipperFunc) gin.HandlerFunc {
 
 		if userID != "" {
 			c.Set(ginplus.UserIDKey, userID)
-		}
-
-		if len(skipper) > 0 && skipper[0](c) {
-			c.Next()
-			return
-		}
-
-		if userID == "" {
+		} else {
 			if config.Global().IsDebugMode() {
 				c.Set(ginplus.UserIDKey, config.Global().Root.UserName)
 				c.Next()

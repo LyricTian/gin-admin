@@ -78,3 +78,13 @@ func JoinRouter(method, path string) string {
 	}
 	return fmt.Sprintf("%s%s", strings.ToUpper(method), path)
 }
+
+// Skip 跳过
+func Skip(c *gin.Context, skippers ...SkipperFunc) bool {
+	for _, skipper := range skippers {
+		if skipper(c) {
+			return true
+		}
+	}
+	return false
+}

@@ -13,9 +13,9 @@ import (
 )
 
 // LoggerMiddleware 日志中间件
-func LoggerMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
+func LoggerMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if len(skipper) > 0 && skipper[0](c) {
+		if Skip(c, skippers...) {
 			c.Next()
 			return
 		}
