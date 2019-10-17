@@ -31,9 +31,8 @@
 ```bash
 $ go get -u github.com/LyricTian/gin-admin-cli
 $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
-$ cd ~/go/src/gin-admin/cmd/server
-$ go build -o server
-$ ./server -c ../../configs/config.toml -m ../../configs/model.conf -swagger ../../internal/app/swagger
+$ cd ~/go/src/gin-admin
+$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -61,9 +60,8 @@ $ go get -v github.com/LyricTian/gin-admin/cmd/server
 > 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
 
 ```bash
-$ cd github.com/LyricTian/gin-admin/cmd/server
-$ go build -o server
-$ ./server -c ../../configs/config.toml -m ../../configs/model.conf -swagger ../../internal/app/swagger
+$ cd github.com/LyricTian/gin-admin
+$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -95,8 +93,8 @@ $ swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
 ```
 .
 ├── cmd
-│   └── server：主服务
-├── configs：配置文件目录
+│   └── server：主服务（程序入口）
+├── configs：配置文件目录(包含运行配置参数及casbin模型配置)
 ├── docs：文档目录
 ├── internal：内部应用
 │   └── app：主应用目录

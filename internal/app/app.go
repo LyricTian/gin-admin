@@ -70,10 +70,10 @@ func Init(ctx context.Context, opts ...Option) func() {
 	for _, opt := range opts {
 		opt(&o)
 	}
-	err := config.LoadGlobalConfig(o.ConfigFile)
+	err := config.LoadGlobal(o.ConfigFile)
 	handleError(err)
 
-	cfg := config.GetGlobalConfig()
+	cfg := config.Global()
 
 	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", cfg.RunMode, o.Version, os.Getpid())
 
@@ -94,6 +94,8 @@ func Init(ctx context.Context, opts ...Option) func() {
 	if err != nil {
 		logger.Errorf(ctx, err.Error())
 	}
+
+	// 初始化图形验证码
 	InitCaptcha()
 
 	// 创建依赖注入容器
@@ -120,7 +122,7 @@ func Init(ctx context.Context, opts ...Option) func() {
 
 // NewEnforcer 创建casbin校验
 func NewEnforcer() *casbin.Enforcer {
-	cfg := config.GetGlobalConfig()
+	cfg := config.Global()
 	return casbin.NewEnforcer(cfg.CasbinModelConf, false)
 }
 
