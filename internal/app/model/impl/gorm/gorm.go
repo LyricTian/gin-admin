@@ -3,6 +3,7 @@ package gorm
 import (
 	"time"
 
+	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
 	imodel "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/model"
@@ -54,6 +55,10 @@ func SetTablePrefix(prefix string) {
 
 // AutoMigrate 自动映射数据表
 func AutoMigrate(db *gorm.DB) error {
+	if dbType := config.Global().Gorm.DBType; dbType == "mysql" {
+		db = db.Set("gorm:table_options", "ENGINE=InnoDB")
+	}
+
 	return db.AutoMigrate(
 		new(entity.Demo),
 		new(entity.User),
