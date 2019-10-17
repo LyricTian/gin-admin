@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/LyricTian/gin-admin/internal/app/config"
 	icontext "github.com/LyricTian/gin-admin/internal/app/context"
 	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/jinzhu/gorm"
@@ -45,6 +46,12 @@ func getDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	if ok {
 		db, ok := trans.(*gorm.DB)
 		if ok {
+			if icontext.FromTransLock(ctx) {
+				if dbType := config.Global().Gorm.DBType; dbType == "mysql" ||
+					dbType == "postgres" {
+					db = db.Set("gorm:query_option", "FOR UPDATE")
+				}
+			}
 			return db
 		}
 	}
