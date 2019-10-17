@@ -14,7 +14,7 @@ import (
 )
 
 // RateLimiterMiddleware 请求频率限制中间件
-func RateLimiterMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
+func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	cfg := config.Global().RateLimiter
 	if !cfg.Enable {
 		return func(c *gin.Context) {
@@ -35,7 +35,7 @@ func RateLimiterMiddleware(skipper ...SkipperFunc) gin.HandlerFunc {
 	limiter.Fallback = rate.NewLimiter(rate.Inf, 0)
 
 	return func(c *gin.Context) {
-		if (len(skipper) > 0 && skipper[0](c)) || limiter == nil {
+		if limiter == nil || Skip(c, skippers...) {
 			c.Next()
 			return
 		}
