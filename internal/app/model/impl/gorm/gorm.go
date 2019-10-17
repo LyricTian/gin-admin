@@ -17,7 +17,7 @@ func SetTablePrefix(prefix string) {
 // AutoMigrate 自动映射数据表
 func AutoMigrate(db *gormplus.DB) error {
 	DBType := config.GetGlobalConfig().Gorm.DBType
-	if DBType == "sqlite3" {
+	if DBType == "mysql" {
 		db = gormplus.Wrap(db.Set("gorm:table_options", "ENGINE=InnoDB"))
 	}
 	return db.
