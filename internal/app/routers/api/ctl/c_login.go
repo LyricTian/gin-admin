@@ -50,13 +50,13 @@ func (a *Login) GetCaptcha(c *gin.Context) {
 func (a *Login) ResCaptcha(c *gin.Context) {
 	captchaID := c.Query("id")
 	if captchaID == "" {
-		ginplus.ResError(c, errors.ErrInvalidRequestParameter)
+		ginplus.ResError(c, errors.New400Response("请提供验证码ID"))
 		return
 	}
 
 	if c.Query("reload") != "" {
 		if !captcha.Reload(captchaID) {
-			ginplus.ResError(c, errors.ErrInvalidRequestParameter)
+			ginplus.ResError(c, errors.New400Response("未找到验证码ID"))
 			return
 		}
 	}
@@ -84,7 +84,7 @@ func (a *Login) Login(c *gin.Context) {
 	}
 
 	if !captcha.VerifyString(item.CaptchaID, item.CaptchaCode) {
-		ginplus.ResError(c, errors.ErrLoginInvalidVerifyCode)
+		ginplus.ResError(c, errors.New400Response("无效的验证码"))
 		return
 	}
 
@@ -131,10 +131,10 @@ func (a *Login) Logout(c *gin.Context) {
 // @Tags 登录管理
 // @Summary 刷新令牌
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Success 200 {object} schema.LoginTokenInfo "{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}"
+// @Success 200 {object} schema.LoginTokenInfo
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router /api/v1/pub/refresh_token [post]
+// @Router /api/v1/pub/refresh-token [post]
 func (a *Login) RefreshToken(c *gin.Context) {
 	tokenInfo, err := a.LoginBll.GenerateToken(ginplus.NewContext(c), ginplus.GetUserID(c))
 	if err != nil {

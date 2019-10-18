@@ -16,13 +16,13 @@ import (
 
 // 定义上下文中的键
 const (
-	prefix = "ginadmin"
+	prefix = "gin-admin"
 	// UserIDKey 存储上下文中的键(用户ID)
-	UserIDKey = prefix + "/user_id"
+	UserIDKey = prefix + "/user-id"
 	// TraceIDKey 存储上下文中的键(跟踪ID)
-	TraceIDKey = prefix + "/trace_id"
+	TraceIDKey = prefix + "/trace-id"
 	// ResBodyKey 存储上下文中的键(响应Body数据)
-	ResBodyKey = prefix + "/res_body"
+	ResBodyKey = prefix + "/res-body"
 )
 
 // NewContext 封装上下文入口
@@ -104,8 +104,7 @@ func SetUserID(c *gin.Context, userID string) {
 // ParseJSON 解析请求JSON
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
-		logger.Warnf(NewContext(c), err.Error())
-		return errors.ErrInvalidRequestParameter
+		return errors.Wrap400Response(err, "解析请求参数发生错误")
 	}
 	return nil
 }
@@ -133,7 +132,7 @@ func ResList(c *gin.Context, v interface{}) {
 
 // ResOK 响应OK
 func ResOK(c *gin.Context) {
-	ResSuccess(c, schema.HTTPStatus{Status: "OK"})
+	ResSuccess(c, schema.HTTPStatus{Status: schema.OKStatusText.String()})
 }
 
 // ResSuccess 响应成功
@@ -154,27 +153,34 @@ func ResJSON(c *gin.Context, status int, v interface{}) {
 
 // ResError 响应错误
 func ResError(c *gin.Context, err error, status ...int) {
-	statusCode := 500
-	errItem := schema.HTTPErrorItem{
-		Code:    500,
-		Message: "服务器发生错误",
-	}
-
-	if errCode, ok := errors.FromErrorCode(err); ok {
-		errItem.Code = errCode.Code
-		errItem.Message = errCode.Message
-		statusCode = errCode.HTTPStatusCode
+	var res *errors.ResponseError
+	if err != nil {
+		if e, ok := err.(*errors.ResponseError); ok {
+			res = e
+		} else {
+			res = errors.Wrap500Response(err).(*errors.ResponseError)
+		}
+	} else {
+		res = errors.ErrInternalServer.(*errors.ResponseError)
 	}
 
 	if len(status) > 0 {
-		statusCode = status[0]
+		res.StatusCode = status[0]
 	}
 
-	if statusCode == 500 && err != nil {
-		span := logger.StartSpan(NewContext(c))
-		span = span.WithField("stack", fmt.Sprintf("%+v", err))
-		span.Errorf(err.Error())
+	if err := res.ERR; err != nil {
+		if status := res.StatusCode; status >= 400 && status < 500 {
+			logger.StartSpan(NewContext(c)).Warnf(err.Error())
+		} else if status >= 500 {
+			span := logger.StartSpan(NewContext(c))
+			span = span.WithField("stack", fmt.Sprintf("%+v", err))
+			span.Errorf(err.Error())
+		}
 	}
 
-	ResJSON(c, statusCode, schema.HTTPError{Error: errItem})
+	eitem := schema.HTTPErrorItem{
+		Code:    res.Code,
+		Message: res.Message,
+	}
+	ResJSON(c, res.StatusCode, schema.HTTPError{Error: eitem})
 }

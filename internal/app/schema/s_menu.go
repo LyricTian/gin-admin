@@ -39,6 +39,7 @@ type MenuResource struct {
 type MenuQueryParam struct {
 	RecordIDs        []string // 记录ID列表
 	LikeName         string   // 菜单名称(模糊查询)
+	Name             string   // 菜单名称
 	ParentID         *string  // 父级内码
 	PrefixParentPath string   // 父级路径(前缀模糊查询)
 	Hidden           *int     // 隐藏菜单

@@ -16,17 +16,15 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 			id, err := a.ParseUserID(t)
 			if err != nil {
 				if err == auth.ErrInvalidToken {
-					ginplus.ResError(c, errors.ErrNoPerm)
+					ginplus.ResError(c, errors.ErrInvalidToken)
 					return
 				}
 				ginplus.ResError(c, errors.WithStack(err))
 				return
+			} else if id != "" {
+				userID = id
+				c.Set(ginplus.UserIDKey, id)
 			}
-			userID = id
-		}
-
-		if userID != "" {
-			c.Set(ginplus.UserIDKey, userID)
 		}
 
 		if SkipHandler(c, skippers...) {
@@ -35,12 +33,13 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 		}
 
 		if userID == "" {
-			if config.Global().IsDebugMode() {
-				c.Set(ginplus.UserIDKey, config.Global().Root.UserName)
+			cfg := config.Global()
+			if cfg.IsDebugMode() {
+				c.Set(ginplus.UserIDKey, cfg.Root.UserName)
 				c.Next()
 				return
 			}
-			ginplus.ResError(c, errors.ErrNoPerm)
+			ginplus.ResError(c, errors.ErrInvalidToken)
 		}
 	}
 }

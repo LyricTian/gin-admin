@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"runtime"
 
+	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -25,8 +25,8 @@ func RecoveryMiddleware() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				stack := stack(3)
-				logger.StartSpan(ginplus.NewContext(c)).WithField("stack", string(stack)).Errorf("[recover]: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "message": "服务器发生错误"})
+				logger.StartSpan(ginplus.NewContext(c)).WithField("stack", string(stack)).Errorf("[panic]: %v", err)
+				ginplus.ResError(c, errors.ErrInternalServer)
 			}
 		}()
 		c.Next()

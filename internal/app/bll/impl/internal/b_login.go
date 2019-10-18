@@ -227,14 +227,14 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) ([]*schema
 // UpdatePassword 更新当前用户登录密码
 func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {
 	if CheckIsRootUser(ctx, userID) {
-		return errors.ErrLoginNotAllowModifyPwd
+		return errors.New400Response("root用户不允许更新密码")
 	}
 
 	user, err := a.getAndCheckUser(ctx, userID)
 	if err != nil {
 		return err
 	} else if util.SHA1HashString(params.OldPassword) != user.Password {
-		return errors.ErrLoginInvalidOldPwd
+		return errors.New400Response("旧密码不正确")
 	}
 
 	params.NewPassword = util.SHA1HashString(params.NewPassword)

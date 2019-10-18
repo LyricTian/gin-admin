@@ -1,5 +1,17 @@
 package schema
 
+// HTTPStatusText 定义HTTP状态文本
+type HTTPStatusText string
+
+func (t HTTPStatusText) String() string {
+	return string(t)
+}
+
+// 定义HTTP状态文本常量
+const (
+	OKStatusText HTTPStatusText = "OK"
+)
+
 // HTTPError HTTP响应错误
 type HTTPError struct {
 	Error HTTPErrorItem `json:"error"` // 错误项

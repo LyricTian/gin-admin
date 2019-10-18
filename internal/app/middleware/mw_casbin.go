@@ -23,7 +23,7 @@ func CasbinMiddleware(enforcer *casbin.Enforcer, skippers ...SkipperFunc) gin.Ha
 			ginplus.ResError(c, errors.WithStack(err))
 			return
 		} else if !b {
-			ginplus.ResError(c, errors.ErrNoResourcePerm)
+			ginplus.ResError(c, errors.ErrNoPerm)
 			return
 		}
 		c.Next()
