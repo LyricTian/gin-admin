@@ -9,7 +9,7 @@ import (
 )
 
 // UserAuthMiddleware 用户授权中间件
-func UserAuthMiddleware(a auth.Auther, skipper ...SkipperFunc) gin.HandlerFunc {
+func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var userID string
 		if t := ginplus.GetToken(c); t != "" {
@@ -29,7 +29,7 @@ func UserAuthMiddleware(a auth.Auther, skipper ...SkipperFunc) gin.HandlerFunc {
 			c.Set(ginplus.UserIDKey, userID)
 		}
 
-		if len(skipper) > 0 && skipper[0](c) {
+		if Skip(c, skippers...) {
 			c.Next()
 			return
 		}
