@@ -35,11 +35,10 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 				middleware.JoinRouter("GET", "/api/v1/pub/login"),
 				middleware.JoinRouter("POST", "/api/v1/pub/login"),
 			),
-			/*
-			middleware.AllowPathPrefixSkipper(
-				"/api/v1/pub/login",
-			),
-			*/
+			// 也可以使用路径前缀跳过验证路由(将忽略请求方式)
+			// middleware.AllowPathPrefixSkipper(
+			// 	"/api/v1/pub/login",
+			// ),
 		))
 
 		// casbin权限校验中间件
@@ -63,8 +62,8 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 				pub.POST("/login", cLogin.Login)
 				pub.POST("/login/exit", cLogin.Logout)
 
-				// 注册/api/v1/pub/refresh_token
-				pub.POST("/refresh_token", cLogin.RefreshToken)
+				// 注册/api/v1/pub/refresh-token
+				pub.POST("/refresh-token", cLogin.RefreshToken)
 
 				// 注册/api/v1/pub/current
 				pub.PUT("/current/password", cLogin.UpdatePassword)
