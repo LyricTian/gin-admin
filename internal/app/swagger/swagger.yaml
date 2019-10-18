@@ -82,7 +82,7 @@ definitions:
         description: 访问令牌
         type: string
       expires_at:
-        description: 令牌到期时间
+        description: 令牌到期时间戳
         type: integer
       token_type:
         description: 令牌类型
@@ -1002,7 +1002,7 @@ paths:
       summary: 用户登出
       tags:
       - 登录管理
-  /api/v1/pub/refresh_token:
+  /api/v1/pub/refresh-token:
     post:
       parameters:
       - description: Bearer 用户令牌
@@ -1011,7 +1011,7 @@ paths:
         type: string
       responses:
         "200":
-          description: '{access_token:访问令牌,token_type:令牌类型,expires_in:过期时长(单位秒)}'
+          description: OK
           schema:
             $ref: '#/definitions/schema.LoginTokenInfo'
         "401":

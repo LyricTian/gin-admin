@@ -82,6 +82,7 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 
 			// 注册/api/v1/menus
 			v1.GET("/menus", cMenu.Query)
+			v1.GET("/menus.tree", cMenu.QueryTree)
 			v1.GET("/menus/:id", cMenu.Get)
 			v1.POST("/menus", cMenu.Create)
 			v1.PUT("/menus/:id", cMenu.Update)
@@ -89,6 +90,7 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 
 			// 注册/api/v1/roles
 			v1.GET("/roles", cRole.Query)
+			v1.GET("/roles.select", cRole.QuerySelect)
 			v1.GET("/roles/:id", cRole.Get)
 			v1.POST("/roles", cRole.Create)
 			v1.PUT("/roles/:id", cRole.Update)
