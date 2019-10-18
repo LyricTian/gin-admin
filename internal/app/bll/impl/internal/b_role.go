@@ -59,7 +59,7 @@ func (a *Role) checkName(ctx context.Context, name string) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrResourceExists
+		return errors.New400Response("角色名称已经存在")
 	}
 	return nil
 }
@@ -135,7 +135,7 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	if err != nil {
 		return err
 	} else if userResult.PageResult.Total > 0 {
-		return errors.ErrResourceNotAllowDelete
+		return errors.New400Response("该角色已被赋予用户，不允许删除")
 	}
 
 	err = a.RoleModel.Delete(ctx, recordID)
