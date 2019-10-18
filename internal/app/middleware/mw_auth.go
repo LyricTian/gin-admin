@@ -29,7 +29,7 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 			c.Set(ginplus.UserIDKey, userID)
 		}
 
-		if Skip(c, skippers...) {
+		if SkipHandler(c, skippers...) {
 			c.Next()
 			return
 		}

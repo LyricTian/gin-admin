@@ -9,7 +9,7 @@ import (
 // TraceMiddleware 跟踪ID中间件
 func TraceMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if Skip(c, skippers...) {
+		if SkipHandler(c, skippers...) {
 			c.Next()
 			return
 		}
