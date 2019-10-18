@@ -17,3 +17,7 @@
 /release
 /data
 /internal/app/test/data
+
+# IDE configs
+.idea
+.vscode
