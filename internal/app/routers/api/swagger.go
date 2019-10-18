@@ -6,8 +6,7 @@ Package api 生成swagger文档
 使用方式：
 
 	go get -u github.com/swaggo/swag/cmd/swag
-	swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
-*/
+	swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger*/
 package api
 
 import (
