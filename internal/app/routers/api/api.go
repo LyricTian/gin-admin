@@ -35,6 +35,11 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 				middleware.JoinRouter("GET", "/api/v1/pub/login"),
 				middleware.JoinRouter("POST", "/api/v1/pub/login"),
 			),
+			/*
+			middleware.AllowPathPrefixSkipper(
+				"/api/v1/pub/login",
+			),
+			*/
 		))
 
 		// casbin权限校验中间件
