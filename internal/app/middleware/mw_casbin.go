@@ -12,7 +12,7 @@ import (
 func CasbinMiddleware(enforcer *casbin.Enforcer, skippers ...SkipperFunc) gin.HandlerFunc {
 	cfg := config.Global()
 	return func(c *gin.Context) {
-		if !cfg.EnableCasbin || Skip(c, skippers...) {
+		if !cfg.EnableCasbin || SkipHandler(c, skippers...) {
 			c.Next()
 			return
 		}
