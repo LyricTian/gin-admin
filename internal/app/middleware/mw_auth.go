@@ -11,7 +11,6 @@ import (
 // UserAuthMiddleware 用户授权中间件
 func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var userID string
 		if t := ginplus.GetToken(c); t != "" {
 			id, err := a.ParseUserID(t)
 			if err != nil {
@@ -19,11 +18,12 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 					ginplus.ResError(c, errors.ErrInvalidToken)
 					return
 				}
-				ginplus.ResError(c, errors.WithStack(err))
+				ginplus.ResError(c, errors.WrapResponse(err, 401, "令牌解析失败", 401))
 				return
 			} else if id != "" {
-				userID = id
 				c.Set(ginplus.UserIDKey, id)
+				c.Next()
+				return
 			}
 		}
 
@@ -32,14 +32,12 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 			return
 		}
 
-		if userID == "" {
-			cfg := config.Global()
-			if cfg.IsDebugMode() {
-				c.Set(ginplus.UserIDKey, cfg.Root.UserName)
-				c.Next()
-				return
-			}
-			ginplus.ResError(c, errors.ErrInvalidToken)
+		cfg := config.Global()
+		if cfg.IsDebugMode() {
+			c.Set(ginplus.UserIDKey, cfg.Root.UserName)
+			c.Next()
+			return
 		}
+		ginplus.ResError(c, errors.ErrInvalidToken)
 	}
 }

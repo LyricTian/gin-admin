@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -9,10 +10,10 @@ import (
 
 // Config redis配置参数
 type Config struct {
-	Addr      string
-	DB        int
-	Password  string
-	KeyPrefix string
+	Addr      string // 地址(IP:Port)
+	DB        int    // 数据库
+	Password  string // 密码
+	KeyPrefix string // 存储key的前缀
 }
 
 // NewStore 创建基于redis存储实例
@@ -25,6 +26,22 @@ func NewStore(cfg *Config) *Store {
 	return &Store{
 		cli:    cli,
 		prefix: cfg.KeyPrefix,
+	}
+}
+
+// NewStoreWithClient 使用redis客户端创建存储实例
+func NewStoreWithClient(cli *redis.Client, keyPrefix string) *Store {
+	return &Store{
+		cli:    cli,
+		prefix: keyPrefix,
+	}
+}
+
+// NewStoreWithClusterClient 使用redis集群客户端创建存储实例
+func NewStoreWithClusterClient(cli *redis.ClusterClient, keyPrefix string) *Store {
+	return &Store{
+		cli:    cli,
+		prefix: keyPrefix,
 	}
 }
 
@@ -44,19 +61,28 @@ type Store struct {
 	prefix string
 }
 
-func (a *Store) wrapperKey(key string) string {
-	return fmt.Sprintf("%s%s", a.prefix, key)
+func (s *Store) wrapperKey(key string) string {
+	return fmt.Sprintf("%s%s", s.prefix, key)
 }
 
 // Set ...
-func (a *Store) Set(tokenString string, expiration time.Duration) error {
-	cmd := a.cli.Set(a.wrapperKey(tokenString), "1", expiration)
+func (s *Store) Set(ctx context.Context, tokenString string, expiration time.Duration) error {
+	cmd := s.cli.Set(s.wrapperKey(tokenString), "1", expiration)
 	return cmd.Err()
 }
 
+// Delete ...
+func (s *Store) Delete(ctx context.Context, tokenString string) error {
+	cmd := s.cli.Del(tokenString)
+	if err := cmd.Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // Check ...
-func (a *Store) Check(tokenString string) (bool, error) {
-	cmd := a.cli.Exists(a.wrapperKey(tokenString))
+func (s *Store) Check(ctx context.Context, tokenString string) (bool, error) {
+	cmd := s.cli.Exists(s.wrapperKey(tokenString))
 	if err := cmd.Err(); err != nil {
 		return false, err
 	}
@@ -64,6 +90,6 @@ func (a *Store) Check(tokenString string) (bool, error) {
 }
 
 // Close ...
-func (a *Store) Close() error {
-	return a.cli.Close()
+func (s *Store) Close() error {
+	return s.cli.Close()
 }
