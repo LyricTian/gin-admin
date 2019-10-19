@@ -15,6 +15,14 @@ func (r *ResponseError) Error() string {
 	return r.Message
 }
 
+// UnWrapResponse 解包响应错误
+func UnWrapResponse(err error) *ResponseError {
+	if v, ok := err.(*ResponseError); ok {
+		return v
+	}
+	return nil
+}
+
 // WrapResponse 包装响应错误
 func WrapResponse(err error, code int, msg string, status ...int) error {
 	res := &ResponseError{

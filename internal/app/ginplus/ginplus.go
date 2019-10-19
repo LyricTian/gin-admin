@@ -158,10 +158,10 @@ func ResError(c *gin.Context, err error, status ...int) {
 		if e, ok := err.(*errors.ResponseError); ok {
 			res = e
 		} else {
-			res = errors.Wrap500Response(err).(*errors.ResponseError)
+			res = errors.UnWrapResponse(errors.Wrap500Response(err))
 		}
 	} else {
-		res = errors.ErrInternalServer.(*errors.ResponseError)
+		res = errors.UnWrapResponse(errors.ErrInternalServer)
 	}
 
 	if len(status) > 0 {

@@ -89,7 +89,7 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 
 // GenerateToken 生成令牌
 func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
-	tokenInfo, err := a.Auth.GenerateToken(userID)
+	tokenInfo, err := a.Auth.GenerateToken(ctx, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -104,7 +104,7 @@ func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.Login
 
 // DestroyToken 销毁令牌
 func (a *Login) DestroyToken(ctx context.Context, tokenString string) error {
-	err := a.Auth.DestroyToken(tokenString)
+	err := a.Auth.DestroyToken(ctx, tokenString)
 	if err != nil {
 		return errors.WithStack(err)
 	}
