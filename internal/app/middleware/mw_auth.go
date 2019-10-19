@@ -12,13 +12,15 @@ import (
 func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if t := ginplus.GetToken(c); t != "" {
-			id, err := a.ParseUserID(t)
+			id, err := a.ParseUserID(ginplus.NewContext(c), t)
 			if err != nil {
 				if err == auth.ErrInvalidToken {
 					ginplus.ResError(c, errors.ErrInvalidToken)
 					return
 				}
-				ginplus.ResError(c, errors.WrapResponse(err, 401, "令牌解析失败", 401))
+
+				e := errors.UnWrapResponse(errors.ErrInvalidToken)
+				ginplus.ResError(c, errors.WrapResponse(err, e.Code, e.Message, e.StatusCode))
 				return
 			} else if id != "" {
 				c.Set(ginplus.UserIDKey, id)
