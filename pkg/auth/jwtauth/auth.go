@@ -1,6 +1,7 @@
 package jwtauth
 
 import (
+	"context"
 	"time"
 
 	"github.com/LyricTian/gin-admin/pkg/auth"
@@ -13,7 +14,7 @@ var defaultOptions = options{
 	tokenType:     "Bearer",
 	expired:       7200,
 	signingMethod: jwt.SigningMethodHS512,
-	signingKey:    defaultKey,
+	signingKey:    []byte(defaultKey),
 	keyfunc: func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, auth.ErrInvalidToken
@@ -69,7 +70,8 @@ func New(store Storer, opts ...Option) *JWTAuth {
 	}
 
 	return &JWTAuth{
-		opts: &o,
+		opts:  &o,
+		store: store,
 	}
 }
 
@@ -80,7 +82,7 @@ type JWTAuth struct {
 }
 
 // GenerateToken 生成令牌
-func (a *JWTAuth) GenerateToken(userID string) (auth.TokenInfo, error) {
+func (a *JWTAuth) GenerateToken(ctx context.Context, userID string) (auth.TokenInfo, error) {
 	now := time.Now()
 	expiresAt := now.Add(time.Duration(a.opts.expired) * time.Second).Unix()
 
@@ -106,8 +108,10 @@ func (a *JWTAuth) GenerateToken(userID string) (auth.TokenInfo, error) {
 
 // 解析令牌
 func (a *JWTAuth) parseToken(tokenString string) (*jwt.StandardClaims, error) {
-	token, _ := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, a.opts.keyfunc)
-	if !token.Valid {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, a.opts.keyfunc)
+	if err != nil {
+		return nil, err
+	} else if !token.Valid {
 		return nil, auth.ErrInvalidToken
 	}
 
@@ -122,7 +126,7 @@ func (a *JWTAuth) callStore(fn func(Storer) error) error {
 }
 
 // DestroyToken 销毁令牌
-func (a *JWTAuth) DestroyToken(tokenString string) error {
+func (a *JWTAuth) DestroyToken(ctx context.Context, tokenString string) error {
 	claims, err := a.parseToken(tokenString)
 	if err != nil {
 		return err
@@ -131,19 +135,19 @@ func (a *JWTAuth) DestroyToken(tokenString string) error {
 	// 如果设定了存储，则将未过期的令牌放入
 	return a.callStore(func(store Storer) error {
 		expired := time.Unix(claims.ExpiresAt, 0).Sub(time.Now())
-		return store.Set(tokenString, expired)
+		return store.Set(ctx, tokenString, expired)
 	})
 }
 
 // ParseUserID 解析用户ID
-func (a *JWTAuth) ParseUserID(tokenString string) (string, error) {
+func (a *JWTAuth) ParseUserID(ctx context.Context, tokenString string) (string, error) {
 	claims, err := a.parseToken(tokenString)
 	if err != nil {
 		return "", err
 	}
 
 	err = a.callStore(func(store Storer) error {
-		exists, err := store.Check(tokenString)
+		exists, err := store.Check(ctx, tokenString)
 		if err != nil {
 			return err
 		} else if exists {
