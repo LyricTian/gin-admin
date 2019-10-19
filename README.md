@@ -16,15 +16,18 @@
 ## 特性
 
 - 遵循 RESTful API 设计规范
+- 基于 GIN WEB 框架，提供了丰富的中间件支持（用户认证、跨域、访问日志、请求频率限制、追踪 ID 等）
 - 基于 Casbin 的 RBAC 访问控制模型
-- 存储分离(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离)
+- 基于 GORM 的数据库存储(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离)
 - 依赖注入(基于[dig](http://go.uber.org/dig))
 - 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，日志钩子支持 gorm)
 - JWT 认证(基于黑名单的认证模式，存储支持：file/redis)
-- 支持 Swagger 文档
-- 单元测试
+- 支持 Swagger 文档(基于[swaggo](https://github.com/swaggo/swag))
+- 单元测试(基于`net/http/httptest`包，覆盖所有接口层的测试)
 
-## 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具快速开始
+## 快速开始
+
+> 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具
 
 ### 快速创建并运行项目
 
@@ -52,8 +55,6 @@ $ go get -v github.com/LyricTian/gin-admin/cmd/server
 ```
 
 ### 运行
-
-> root 用户的用户名及密码在配置文件(`configs/config.toml`)中，默认为：root/abc-123
 
 #### 运行服务
 
@@ -107,16 +108,17 @@ $ swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
 │       ├── middleware：gin中间件
 │       ├── model：存储层接口
 │       │   └── impl：存储层接口实现
+│       │       └── entity：映射数据库的实体
+│       │       └── model：存储层接口实现
 │       ├── routers：路由层
 │       │   └── api：/api路由模块
 │       │       └── ctl：/api路由模块对应的控制器层
 │       ├── schema：对象模型
 │       ├── swagger：swagger静态目录
-│       └── test：单元测试
+│       └── test：接口层单元测试
 ├── pkg：公共模块
 │   ├── auth：认证模块
 │   │   └── jwtauth：JWT认证模块实现
-│   ├── gormplus：gorm扩展实现
 │   ├── logger：日志模块
 │   └── util：工具库
 └── scripts：执行脚本
