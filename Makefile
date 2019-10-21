@@ -15,7 +15,7 @@ start:
 	go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
 
 swagger:
-	swag init -g ./swagger.go -o ./internal/app/swagger -d ./internal/app/routers/api
+	swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
 
 test:
 	@go test -cover -race ./...
