@@ -1645,31 +1645,24 @@
             ],
             "properties": {
                 "code": {
-                    "description": "编号",
                     "type": "string"
                 },
                 "created_at": {
-                    "description": "创建时间",
                     "type": "string"
                 },
                 "creator": {
-                    "description": "创建者",
                     "type": "string"
                 },
                 "memo": {
-                    "description": "备注",
                     "type": "string"
                 },
                 "name": {
-                    "description": "名称",
                     "type": "string"
                 },
                 "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "status": {
-                    "description": "状态(1:启用 2:停用)",
                     "type": "integer"
                 }
             }
@@ -1678,22 +1671,7 @@
             "type": "object",
             "properties": {
                 "error": {
-                    "description": "错误项",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.HTTPErrorItem"
-                }
-            }
-        },
-        "schema.HTTPErrorItem": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "错误码",
-                    "type": "integer"
-                },
-                "message": {
-                    "description": "错误信息",
-                    "type": "string"
+                    "type": "HTTPErrorItem"
                 }
             }
         },
@@ -1701,7 +1679,6 @@
             "type": "object",
             "properties": {
                 "status": {
-                    "description": "状态(OK)",
                     "type": "string"
                 }
             }
@@ -1710,7 +1687,6 @@
             "type": "object",
             "properties": {
                 "captcha_id": {
-                    "description": "验证码ID",
                     "type": "string"
                 }
             }
@@ -1725,19 +1701,15 @@
             ],
             "properties": {
                 "captcha_code": {
-                    "description": "验证码",
                     "type": "string"
                 },
                 "captcha_id": {
-                    "description": "验证码ID",
                     "type": "string"
                 },
                 "password": {
-                    "description": "密码(md5加密)",
                     "type": "string"
                 },
                 "user_name": {
-                    "description": "用户名",
                     "type": "string"
                 }
             }
@@ -1746,15 +1718,12 @@
             "type": "object",
             "properties": {
                 "access_token": {
-                    "description": "访问令牌",
                     "type": "string"
                 },
                 "expires_at": {
-                    "description": "令牌到期时间戳",
                     "type": "integer"
                 },
                 "token_type": {
-                    "description": "令牌类型",
                     "type": "string"
                 }
             }
@@ -1766,128 +1735,40 @@
             ],
             "properties": {
                 "actions": {
-                    "description": "动作列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActions"
+                    "type": "MenuActions"
                 },
                 "created_at": {
-                    "description": "创建时间",
                     "type": "string"
                 },
                 "creator": {
-                    "description": "创建者",
                     "type": "string"
                 },
                 "hidden": {
-                    "description": "隐藏菜单(0:不隐藏 1:隐藏)",
                     "type": "integer"
                 },
                 "icon": {
-                    "description": "菜单图标",
                     "type": "string"
                 },
                 "name": {
-                    "description": "菜单名称",
                     "type": "string"
                 },
                 "parent_id": {
-                    "description": "父级ID",
                     "type": "string"
                 },
                 "parent_path": {
-                    "description": "父级路径",
                     "type": "string"
                 },
                 "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "resources": {
-                    "description": "资源列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuResources"
+                    "type": "MenuResources"
                 },
                 "router": {
-                    "description": "访问路由",
                     "type": "string"
                 },
                 "sequence": {
-                    "description": "排序值",
                     "type": "integer"
-                }
-            }
-        },
-        "schema.MenuAction": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "动作编号",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "动作名称",
-                    "type": "string"
-                }
-            }
-        },
-        "schema.MenuActions": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "description": "动作编号",
-                        "type": "string"
-                    },
-                    "name": {
-                        "description": "动作名称",
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "schema.MenuResource": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "资源编号",
-                    "type": "string"
-                },
-                "method": {
-                    "description": "请求方式",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "资源名称",
-                    "type": "string"
-                },
-                "path": {
-                    "description": "请求路径",
-                    "type": "string"
-                }
-            }
-        },
-        "schema.MenuResources": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "description": "资源编号",
-                        "type": "string"
-                    },
-                    "method": {
-                        "description": "请求方式",
-                        "type": "string"
-                    },
-                    "name": {
-                        "description": "资源名称",
-                        "type": "string"
-                    },
-                    "path": {
-                        "description": "请求路径",
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -1898,52 +1779,39 @@
             ],
             "properties": {
                 "actions": {
-                    "description": "动作列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActions"
+                    "type": "MenuActions"
                 },
                 "children": {
-                    "description": "子级树",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schema.MenuTree"
                     }
                 },
                 "hidden": {
-                    "description": "隐藏菜单(0:不隐藏 1:隐藏)",
                     "type": "integer"
                 },
                 "icon": {
-                    "description": "菜单图标",
                     "type": "string"
                 },
                 "name": {
-                    "description": "菜单名称",
                     "type": "string"
                 },
                 "parent_id": {
-                    "description": "父级ID",
                     "type": "string"
                 },
                 "parent_path": {
-                    "description": "父级路径",
                     "type": "string"
                 },
                 "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "resources": {
-                    "description": "资源列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuResources"
+                    "type": "MenuResources"
                 },
                 "router": {
-                    "description": "访问路由",
                     "type": "string"
                 },
                 "sequence": {
-                    "description": "排序值",
                     "type": "integer"
                 }
             }
@@ -1951,86 +1819,30 @@
         "schema.Role": {
             "type": "object",
             "required": [
+                "menus",
                 "name"
             ],
             "properties": {
                 "created_at": {
-                    "description": "创建时间",
                     "type": "string"
                 },
                 "creator": {
-                    "description": "创建者",
                     "type": "string"
                 },
                 "memo": {
-                    "description": "备注",
                     "type": "string"
                 },
                 "menus": {
-                    "description": "菜单权限",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.RoleMenus"
+                    "type": "RoleMenus"
                 },
                 "name": {
-                    "description": "角色名称",
                     "type": "string"
                 },
                 "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "sequence": {
-                    "description": "排序值",
                     "type": "integer"
-                }
-            }
-        },
-        "schema.RoleMenu": {
-            "type": "object",
-            "properties": {
-                "actions": {
-                    "description": "动作权限列表",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "menu_id": {
-                    "description": "菜单ID",
-                    "type": "string"
-                },
-                "resources": {
-                    "description": "资源权限列表",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "schema.RoleMenus": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "actions": {
-                        "description": "动作权限列表",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "menu_id": {
-                        "description": "菜单ID",
-                        "type": "string"
-                    },
-                    "resources": {
-                        "description": "资源权限列表",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
                 }
             }
         },
@@ -2042,11 +1854,9 @@
             ],
             "properties": {
                 "new_password": {
-                    "description": "新密码(md5加密)",
                     "type": "string"
                 },
                 "old_password": {
-                    "description": "旧密码(md5加密)",
                     "type": "string"
                 }
             }
@@ -2055,49 +1865,39 @@
             "type": "object",
             "required": [
                 "real_name",
+                "roles",
                 "status",
                 "user_name"
             ],
             "properties": {
                 "created_at": {
-                    "description": "创建时间",
                     "type": "string"
                 },
                 "creator": {
-                    "description": "创建者",
                     "type": "string"
                 },
                 "email": {
-                    "description": "邮箱",
                     "type": "string"
                 },
                 "password": {
-                    "description": "密码",
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号",
                     "type": "string"
                 },
                 "real_name": {
-                    "description": "真实姓名",
                     "type": "string"
                 },
                 "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "roles": {
-                    "description": "角色授权",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.UserRoles"
+                    "type": "UserRoles"
                 },
                 "status": {
-                    "description": "用户状态(1:启用 2:停用)",
                     "type": "integer"
                 },
                 "user_name": {
-                    "description": "用户名",
                     "type": "string"
                 }
             }
@@ -2106,38 +1906,16 @@
             "type": "object",
             "properties": {
                 "real_name": {
-                    "description": "真实姓名",
                     "type": "string"
                 },
                 "role_names": {
-                    "description": "角色名列表",
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
                 "user_name": {
-                    "description": "用户名",
                     "type": "string"
-                }
-            }
-        },
-        "schema.UserRole": {
-            "type": "object",
-            "properties": {
-                "role_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "schema.UserRoles": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "role_id": {
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -2145,38 +1923,30 @@
             "type": "object",
             "properties": {
                 "created_at": {
-                    "description": "创建时间",
                     "type": "string"
                 },
                 "email": {
-                    "description": "邮箱",
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号",
                     "type": "string"
                 },
                 "real_name": {
-                    "description": "真实姓名",
                     "type": "string"
                 },
                 "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "roles": {
-                    "description": "授权角色列表",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schema.Role"
                     }
                 },
                 "status": {
-                    "description": "用户状态(1:启用 2:停用)",
                     "type": "integer"
                 },
                 "user_name": {
-                    "description": "用户名",
                     "type": "string"
                 }
             }

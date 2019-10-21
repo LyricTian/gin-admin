@@ -6,13 +6,8 @@ Package api 生成swagger文档
 使用方式：
 
 	go get -u github.com/swaggo/swag/cmd/swag
-	swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger*/
+	swag init -g ./swagger.go -o ./internal/app/swagger -d ./internal/app/routers/api*/
 package api
-
-import (
-	// API控制器
-	_ "github.com/LyricTian/gin-admin/internal/app/routers/api/ctl"
-)
 
 // @title GinAdmin
 // @version 5.0.0
