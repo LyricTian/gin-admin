@@ -8,8 +8,11 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// TransFunc 定义事务执行函数
+type TransFunc func(context.Context) error
+
 // ExecTrans 执行事务
-func ExecTrans(ctx context.Context, db *gorm.DB, fn func(context.Context) error) error {
+func ExecTrans(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 	if _, ok := icontext.FromTrans(ctx); ok {
 		return fn(ctx)
 	}
@@ -27,6 +30,14 @@ func ExecTrans(ctx context.Context, db *gorm.DB, fn func(context.Context) error)
 		return err
 	}
 	return transModel.Commit(ctx, trans)
+}
+
+// ExecTransWithLock 执行事务（加锁）
+func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {
+	if !icontext.FromTransLock(ctx) {
+		ctx = icontext.NewTransLock(ctx)
+	}
+	return ExecTrans(ctx, db, fn)
 }
 
 // WrapPageQuery 包装带有分页的查询
