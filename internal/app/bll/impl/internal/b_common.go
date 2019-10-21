@@ -46,3 +46,11 @@ func ExecTrans(ctx context.Context, transModel model.ITrans, fn TransFunc) error
 	}
 	return transModel.Commit(ctx, trans)
 }
+
+// ExecTransWithLock 执行事务（加锁）
+func ExecTransWithLock(ctx context.Context, transModel model.ITrans, fn TransFunc) error {
+	if !icontext.FromTransLock(ctx) {
+		ctx = icontext.NewTransLock(ctx)
+	}
+	return ExecTrans(ctx, transModel, fn)
+}
