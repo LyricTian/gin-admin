@@ -9,9 +9,9 @@ import (
 )
 
 // WWWMiddleware 静态站点中间件
-func WWWMiddleware(root string, skipper ...SkipperFunc) gin.HandlerFunc {
+func WWWMiddleware(root string, skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if len(skipper) > 0 && skipper[0](c) {
+		if SkipHandler(c, skippers...) {
 			c.Next()
 			return
 		}

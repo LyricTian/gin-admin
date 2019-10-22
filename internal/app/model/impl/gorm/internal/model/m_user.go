@@ -6,17 +6,17 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // NewUser 创建用户存储实例
-func NewUser(db *gormplus.DB) *User {
+func NewUser(db *gorm.DB) *User {
 	return &User{db}
 }
 
 // User 用户存储
 type User struct {
-	db *gormplus.DB
+	db *gorm.DB
 }
 
 func (a *User) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryOptions {
@@ -29,7 +29,7 @@ func (a *User) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryO
 
 // Query 查询数据
 func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
-	db := entity.GetUserDB(ctx, a.db).DB
+	db := entity.GetUserDB(ctx, a.db)
 	if v := params.UserName; v != "" {
 		db = db.Where("user_name=?", v)
 	}
@@ -50,7 +50,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 
 	opt := a.getQueryOption(opts...)
 	var list entity.Users
-	pr, err := WrapPageQuery(db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -99,7 +99,7 @@ func (a *User) fillSchemaUsers(ctx context.Context, items []*schema.User, opts .
 // Get 查询指定数据
 func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	var item entity.User
-	ok, err := a.db.FindOne(entity.GetUserDB(ctx, a.db).Where("record_id=?", recordID), &item)
+	ok, err := FindOne(ctx, entity.GetUserDB(ctx, a.db).Where("record_id=?", recordID), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {

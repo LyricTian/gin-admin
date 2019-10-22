@@ -6,15 +6,15 @@ import (
 	"path/filepath"
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	igorm "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm"
+	"github.com/jinzhu/gorm"
 	"go.uber.org/dig"
 )
 
 // InitStore 初始化存储
 func InitStore(container *dig.Container) (func(), error) {
 	var storeCall func()
-	cfg := config.GetGlobalConfig()
+	cfg := config.Global()
 
 	switch cfg.Store {
 	case "gorm":
@@ -27,21 +27,21 @@ func InitStore(container *dig.Container) (func(), error) {
 			db.Close()
 		}
 
-		gorm.SetTablePrefix(cfg.Gorm.TablePrefix)
+		igorm.SetTablePrefix(cfg.Gorm.TablePrefix)
 
 		if cfg.Gorm.EnableAutoMigrate {
-			err = gorm.AutoMigrate(db)
+			err = igorm.AutoMigrate(db)
 			if err != nil {
 				return nil, err
 			}
 		}
 
 		// 注入DB
-		container.Provide(func() *gormplus.DB {
+		container.Provide(func() *gorm.DB {
 			return db
 		})
 
-		gorm.Inject(container)
+		igorm.Inject(container)
 	default:
 		return nil, errors.New("unknown store")
 	}
@@ -50,8 +50,8 @@ func InitStore(container *dig.Container) (func(), error) {
 }
 
 // initGorm 实例化gorm存储
-func initGorm() (*gormplus.DB, error) {
-	cfg := config.GetGlobalConfig()
+func initGorm() (*gorm.DB, error) {
+	cfg := config.Global()
 
 	var dsn string
 	switch cfg.Gorm.DBType {
@@ -66,7 +66,7 @@ func initGorm() (*gormplus.DB, error) {
 		return nil, errors.New("unknown db")
 	}
 
-	return gormplus.New(&gormplus.Config{
+	return igorm.NewDB(&igorm.Config{
 		Debug:        cfg.Gorm.Debug,
 		DBType:       cfg.Gorm.DBType,
 		DSN:          dsn,

@@ -78,3 +78,20 @@ func JoinRouter(method, path string) string {
 	}
 	return fmt.Sprintf("%s%s", strings.ToUpper(method), path)
 }
+
+// SkipHandler 统一处理跳过函数
+func SkipHandler(c *gin.Context, skippers ...SkipperFunc) bool {
+	for _, skipper := range skippers {
+		if skipper(c) {
+			return true
+		}
+	}
+	return false
+}
+
+// EmptyMiddleware 不执行业务处理的中间件
+func EmptyMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+	}
+}

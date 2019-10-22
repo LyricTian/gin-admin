@@ -1,6 +1,9 @@
 package auth
 
-import "errors"
+import (
+	"context"
+	"errors"
+)
 
 // 定义错误
 var (
@@ -22,13 +25,13 @@ type TokenInfo interface {
 // Auther 认证接口
 type Auther interface {
 	// 生成令牌
-	GenerateToken(userID string) (TokenInfo, error)
+	GenerateToken(ctx context.Context, userID string) (TokenInfo, error)
 
 	// 销毁令牌
-	DestroyToken(accessToken string) error
+	DestroyToken(ctx context.Context, accessToken string) error
 
 	// 解析用户ID
-	ParseUserID(accessToken string) (string, error)
+	ParseUserID(ctx context.Context, accessToken string) (string, error)
 
 	// 释放资源
 	Release() error

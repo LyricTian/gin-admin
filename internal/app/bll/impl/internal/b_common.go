@@ -12,7 +12,7 @@ import (
 
 // GetRootUser 获取root用户
 func GetRootUser() *schema.User {
-	user := config.GetGlobalConfig().Root
+	user := config.Global().Root
 	return &schema.User{
 		RecordID: user.UserName,
 		UserName: user.UserName,
@@ -45,4 +45,12 @@ func ExecTrans(ctx context.Context, transModel model.ITrans, fn TransFunc) error
 		return err
 	}
 	return transModel.Commit(ctx, trans)
+}
+
+// ExecTransWithLock 执行事务（加锁）
+func ExecTransWithLock(ctx context.Context, transModel model.ITrans, fn TransFunc) error {
+	if !icontext.FromTransLock(ctx) {
+		ctx = icontext.NewTransLock(ctx)
+	}
+	return ExecTrans(ctx, transModel, fn)
 }

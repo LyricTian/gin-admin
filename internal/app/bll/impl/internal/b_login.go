@@ -89,7 +89,7 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 
 // GenerateToken 生成令牌
 func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
-	tokenInfo, err := a.Auth.GenerateToken(userID)
+	tokenInfo, err := a.Auth.GenerateToken(ctx, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -104,7 +104,7 @@ func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.Login
 
 // DestroyToken 销毁令牌
 func (a *Login) DestroyToken(ctx context.Context, tokenString string) error {
-	err := a.Auth.DestroyToken(tokenString)
+	err := a.Auth.DestroyToken(ctx, tokenString)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -227,14 +227,14 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) ([]*schema
 // UpdatePassword 更新当前用户登录密码
 func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {
 	if CheckIsRootUser(ctx, userID) {
-		return errors.ErrLoginNotAllowModifyPwd
+		return errors.New400Response("root用户不允许更新密码")
 	}
 
 	user, err := a.getAndCheckUser(ctx, userID)
 	if err != nil {
 		return err
 	} else if util.SHA1HashString(params.OldPassword) != user.Password {
-		return errors.ErrLoginInvalidOldPwd
+		return errors.New400Response("旧密码不正确")
 	}
 
 	params.NewPassword = util.SHA1HashString(params.NewPassword)

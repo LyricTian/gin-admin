@@ -16,15 +16,18 @@
 ## 特性
 
 - 遵循 RESTful API 设计规范
+- 基于 GIN WEB 框架，提供了丰富的中间件支持（用户认证、跨域、访问日志、请求频率限制、追踪 ID 等）
 - 基于 Casbin 的 RBAC 访问控制模型
-- 存储分离(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离)
+- 基于 GORM 的数据库存储(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离)
 - 依赖注入(基于[dig](http://go.uber.org/dig))
 - 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，日志钩子支持 gorm)
 - JWT 认证(基于黑名单的认证模式，存储支持：file/redis)
-- 支持 Swagger 文档
-- 单元测试
+- 支持 Swagger 文档(基于[swaggo](https://github.com/swaggo/swag))
+- 单元测试(基于`net/http/httptest`包，覆盖所有接口层的测试)
 
-## 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具快速开始
+## 快速开始
+
+> 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具
 
 ### 快速创建并运行项目
 
@@ -32,7 +35,7 @@
 $ go get -u github.com/LyricTian/gin-admin-cli
 $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
 $ cd ~/go/src/gin-admin
-$ make start
+$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -40,29 +43,26 @@ $ make start
 ### 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
 
 ```bash
-gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
+$ gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
 ```
 
-## 下载并运行
+## 手动下载并运行
 
 ### 获取代码
 
 ```bash
-go get -v github.com/LyricTian/gin-admin/cmd/server
+$ go get -v github.com/LyricTian/gin-admin/cmd/server
 ```
 
 ### 运行
-
-> root 用户的用户名及密码在配置文件(`configs/config.toml`)中，默认为：root/abc-123
 
 #### 运行服务
 
 > 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
 
 ```bash
-cd github.com/LyricTian/gin-admin/cmd/server
-go build -o server
-./server -c ../../configs/config.toml -m ../../configs/model.conf -swagger ../../internal/app/swagger
+$ cd github.com/LyricTian/gin-admin
+$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -78,13 +78,13 @@ go build -o server
 
 ## Swagger 文档的使用
 
-> 文档规则请参考：[https://github.com/teambition/swaggo/wiki/Declarative-Comments-Format](https://github.com/teambition/swaggo/wiki/Declarative-Comments-Format)
+> 文档规则请参考：[https://github.com/swaggo/swag#declarative-comments-format](https://github.com/swaggo/swag#declarative-comments-format)
 
 ### 安装工具并生成文档
 
-```
-go get -u -v github.com/teambition/swaggo
-swaggo -s ./internal/app/routers/api/swagger.go -p . -o ./internal/app/swagger
+```bash
+$ go get -u -v github.com/swaggo/swag/cmd/swag
+$ swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -94,8 +94,8 @@ swaggo -s ./internal/app/routers/api/swagger.go -p . -o ./internal/app/swagger
 ```
 .
 ├── cmd
-│   └── server：主服务
-├── configs：配置文件目录
+│   └── server：主服务（程序入口）
+├── configs：配置文件目录(包含运行配置参数及casbin模型配置)
 ├── docs：文档目录
 ├── internal：内部应用
 │   └── app：主应用目录
@@ -108,16 +108,17 @@ swaggo -s ./internal/app/routers/api/swagger.go -p . -o ./internal/app/swagger
 │       ├── middleware：gin中间件
 │       ├── model：存储层接口
 │       │   └── impl：存储层接口实现
+│       │       └── entity：映射数据库的实体
+│       │       └── model：存储层接口实现
 │       ├── routers：路由层
 │       │   └── api：/api路由模块
 │       │       └── ctl：/api路由模块对应的控制器层
 │       ├── schema：对象模型
 │       ├── swagger：swagger静态目录
-│       └── test：单元测试
+│       └── test：接口层单元测试
 ├── pkg：公共模块
 │   ├── auth：认证模块
 │   │   └── jwtauth：JWT认证模块实现
-│   ├── gormplus：gorm扩展实现
 │   ├── logger：日志模块
 │   └── util：工具库
 └── scripts：执行脚本

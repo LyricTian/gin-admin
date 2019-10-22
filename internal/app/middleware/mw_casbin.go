@@ -9,10 +9,10 @@ import (
 )
 
 // CasbinMiddleware casbin中间件
-func CasbinMiddleware(enforcer *casbin.Enforcer, skipper ...SkipperFunc) gin.HandlerFunc {
-	cfg := config.GetGlobalConfig()
+func CasbinMiddleware(enforcer *casbin.Enforcer, skippers ...SkipperFunc) gin.HandlerFunc {
+	cfg := config.Global()
 	return func(c *gin.Context) {
-		if !cfg.EnableCasbin || len(skipper) > 0 && skipper[0](c) {
+		if !cfg.EnableCasbin || SkipHandler(c, skippers...) {
 			c.Next()
 			return
 		}
@@ -23,7 +23,7 @@ func CasbinMiddleware(enforcer *casbin.Enforcer, skipper ...SkipperFunc) gin.Han
 			ginplus.ResError(c, errors.WithStack(err))
 			return
 		} else if !b {
-			ginplus.ResError(c, errors.ErrNoResourcePerm)
+			ginplus.ResError(c, errors.ErrNoPerm)
 			return
 		}
 		c.Next()

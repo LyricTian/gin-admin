@@ -16,7 +16,7 @@ import (
 func InitLogger() (func(), error) {
 	logger.SetTraceIDFunc(util.MustUUID)
 
-	c := config.GetGlobalConfig().Log
+	c := config.Global().Log
 	logger.SetLevel(c.Level)
 	logger.SetFormatter(c.Format)
 
@@ -46,16 +46,16 @@ func InitLogger() (func(), error) {
 	if c.EnableHook {
 		switch c.Hook {
 		case "gorm":
-			hc := config.GetGlobalConfig().LogGormHook
+			hc := config.Global().LogGormHook
 
 			var dsn string
 			switch hc.DBType {
 			case "mysql":
-				dsn = config.GetGlobalConfig().MySQL.DSN()
+				dsn = config.Global().MySQL.DSN()
 			case "sqlite3":
-				dsn = config.GetGlobalConfig().Sqlite3.DSN()
+				dsn = config.Global().Sqlite3.DSN()
 			case "postgres":
-				dsn = config.GetGlobalConfig().Postgres.DSN()
+				dsn = config.Global().Postgres.DSN()
 			default:
 				return nil, errors.New("unknown db")
 			}

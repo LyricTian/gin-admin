@@ -76,8 +76,27 @@ func (a *Menu) getUpdate(ctx context.Context, recordID string) (*schema.Menu, er
 	})
 }
 
+func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		ParentID: &item.ParentID,
+		Name:     item.Name,
+	}, schema.MenuQueryOptions{
+		PageParam: &schema.PaginationParam{PageSize: -1},
+	})
+	if err != nil {
+		return err
+	} else if result.PageResult.Total > 0 {
+		return errors.New400Response("菜单名称已经存在")
+	}
+	return nil
+}
+
 // Create 创建数据
 func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, error) {
+	if err := a.checkName(ctx, item); err != nil {
+		return nil, err
+	}
+
 	parentPath, err := a.getParentPath(ctx, item.ParentID)
 	if err != nil {
 		return nil, err
@@ -104,6 +123,10 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) (*
 		return nil, err
 	} else if oldItem == nil {
 		return nil, errors.ErrNotFound
+	} else if oldItem.Name != item.Name {
+		if err := a.checkName(ctx, item); err != nil {
+			return nil, err
+		}
 	}
 	item.ParentPath = oldItem.ParentPath
 
