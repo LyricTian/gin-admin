@@ -47,7 +47,7 @@ func (a *Demo) checkCode(ctx context.Context, code string) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrResourceExists
+		return errors.New400Response("编号已经存在")
 	}
 	return nil
 }

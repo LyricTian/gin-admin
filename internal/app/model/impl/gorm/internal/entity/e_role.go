@@ -5,16 +5,16 @@ import (
 	"strings"
 
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // GetRoleDB 获取角色存储
-func GetRoleDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, Role{})
 }
 
 // GetRoleMenuDB 获取角色菜单关联存储
-func GetRoleMenuDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, RoleMenu{})
 }
 

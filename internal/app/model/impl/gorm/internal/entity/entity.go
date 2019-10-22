@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/LyricTian/gin-admin/internal/app/config"
 	icontext "github.com/LyricTian/gin-admin/internal/app/context"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
 	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/jinzhu/gorm"
 )
 
 // 表名前缀
@@ -40,17 +41,23 @@ func toString(v interface{}) string {
 	return util.JSONMarshalToString(v)
 }
 
-func getDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func getDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	trans, ok := icontext.FromTrans(ctx)
 	if ok {
-		db, ok := trans.(*gormplus.DB)
+		db, ok := trans.(*gorm.DB)
 		if ok {
+			if icontext.FromTransLock(ctx) {
+				if dbType := config.Global().Gorm.DBType; dbType == "mysql" ||
+					dbType == "postgres" {
+					db = db.Set("gorm:query_option", "FOR UPDATE")
+				}
+			}
 			return db
 		}
 	}
 	return defDB
 }
 
-func getDBWithModel(ctx context.Context, defDB *gormplus.DB, m interface{}) *gormplus.DB {
-	return gormplus.Wrap(getDB(ctx, defDB).Model(m))
+func getDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB {
+	return getDB(ctx, defDB).Model(m)
 }

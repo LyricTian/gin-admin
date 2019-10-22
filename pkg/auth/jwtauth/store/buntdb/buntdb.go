@@ -1,6 +1,7 @@
 package buntdb
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"time"
@@ -10,7 +11,9 @@ import (
 
 // NewStore 创建基于buntdb的文件存储
 func NewStore(path string) (*Store, error) {
-	os.MkdirAll(filepath.Dir(path), 0777)
+	if path != ":memory:" {
+		os.MkdirAll(filepath.Dir(path), 0777)
+	}
 
 	db, err := buntdb.Open(path)
 	if err != nil {
@@ -28,15 +31,30 @@ type Store struct {
 }
 
 // Set ...
-func (a *Store) Set(tokenString string, expiration time.Duration) error {
+func (a *Store) Set(ctx context.Context, tokenString string, expiration time.Duration) error {
 	return a.db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(tokenString, "1", &buntdb.SetOptions{Expires: true, TTL: expiration})
+		var opts *buntdb.SetOptions
+		if expiration > 0 {
+			opts = &buntdb.SetOptions{Expires: true, TTL: expiration}
+		}
+		_, _, err := tx.Set(tokenString, "1", opts)
 		return err
 	})
 }
 
+// Delete 删除键
+func (a *Store) Delete(ctx context.Context, tokenString string) error {
+	return a.db.Update(func(tx *buntdb.Tx) error {
+		_, err := tx.Delete(tokenString)
+		if err != nil && err != buntdb.ErrNotFound {
+			return err
+		}
+		return nil
+	})
+}
+
 // Check ...
-func (a *Store) Check(tokenString string) (bool, error) {
+func (a *Store) Check(ctx context.Context, tokenString string) (bool, error) {
 	var exists bool
 	err := a.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(tokenString)

@@ -11,7 +11,7 @@ import (
 
 // InitAuth 初始化用户认证
 func InitAuth() (auth.Auther, error) {
-	cfg := config.GetGlobalConfig().JWTAuth
+	cfg := config.Global().JWTAuth
 
 	var opts []jwtauth.Option
 	opts = append(opts, jwtauth.SetExpired(cfg.Expired))
@@ -41,7 +41,7 @@ func InitAuth() (auth.Auther, error) {
 		}
 		store = s
 	case "redis":
-		rcfg := config.GetGlobalConfig().Redis
+		rcfg := config.Global().Redis
 		store = redis.NewStore(&redis.Config{
 			Addr:      rcfg.Addr,
 			Password:  rcfg.Password,

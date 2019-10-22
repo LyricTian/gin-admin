@@ -74,7 +74,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 
 func (a *User) checkUserName(ctx context.Context, userName string) error {
 	if userName == GetRootUser().UserName {
-		return errors.ErrResourceExists
+		return errors.New400Response("用户名不合法")
 	}
 
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
@@ -85,7 +85,7 @@ func (a *User) checkUserName(ctx context.Context, userName string) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrResourceExists
+		return errors.New400Response("用户名已经存在")
 	}
 	return nil
 }
@@ -108,7 +108,7 @@ func (a *User) getUpdate(ctx context.Context, recordID string) (*schema.User, er
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item schema.User) (*schema.User, error) {
 	if item.Password == "" {
-		return nil, errors.ErrUserNotEmptyPwd
+		return nil, errors.New400Response("密码不允许为空")
 	}
 
 	err := a.checkUserName(ctx, item.UserName)

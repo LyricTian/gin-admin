@@ -6,17 +6,17 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // NewRole 创建角色存储实例
-func NewRole(db *gormplus.DB) *Role {
+func NewRole(db *gorm.DB) *Role {
 	return &Role{db}
 }
 
 // Role 角色存储
 type Role struct {
-	db *gormplus.DB
+	db *gorm.DB
 }
 
 func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
@@ -29,7 +29,7 @@ func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryO
 
 // Query 查询数据
 func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
-	db := entity.GetRoleDB(ctx, a.db).DB
+	db := entity.GetRoleDB(ctx, a.db)
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
 	}
@@ -47,7 +47,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 
 	opt := a.getQueryOption(opts...)
 	var list entity.Roles
-	pr, err := WrapPageQuery(db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -96,7 +96,7 @@ func (a *Role) fillSchameRoles(ctx context.Context, items []*schema.Role, opts .
 // Get 查询指定数据
 func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	var role entity.Role
-	ok, err := a.db.FindOne(entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID), &role)
+	ok, err := FindOne(ctx, entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID), &role)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {

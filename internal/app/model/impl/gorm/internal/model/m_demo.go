@@ -6,17 +6,17 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // NewDemo 创建demo存储实例
-func NewDemo(db *gormplus.DB) *Demo {
+func NewDemo(db *gorm.DB) *Demo {
 	return &Demo{db}
 }
 
 // Demo demo存储
 type Demo struct {
-	db *gormplus.DB
+	db *gorm.DB
 }
 
 func (a *Demo) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryOptions {
@@ -29,7 +29,7 @@ func (a *Demo) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryO
 
 // Query 查询数据
 func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (*schema.DemoQueryResult, error) {
-	db := entity.GetDemoDB(ctx, a.db).DB
+	db := entity.GetDemoDB(ctx, a.db)
 	if v := params.Code; v != "" {
 		db = db.Where("code=?", v)
 	}
@@ -46,7 +46,7 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 
 	opt := a.getQueryOption(opts...)
 	var list entity.Demos
-	pr, err := WrapPageQuery(db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -62,7 +62,7 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 func (a *Demo) Get(ctx context.Context, recordID string, opts ...schema.DemoQueryOptions) (*schema.Demo, error) {
 	db := entity.GetDemoDB(ctx, a.db).Where("record_id=?", recordID)
 	var item entity.Demo
-	ok, err := a.db.FindOne(db, &item)
+	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {

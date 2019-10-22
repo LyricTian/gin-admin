@@ -4,21 +4,21 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/gormplus"
+	"github.com/jinzhu/gorm"
 )
 
 // GetMenuDB 获取菜单存储
-func GetMenuDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, Menu{})
 }
 
 // GetMenuActionDB 获取菜单动作存储
-func GetMenuActionDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetMenuActionDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, MenuAction{})
 }
 
 // GetMenuResourceDB 获取菜单资源存储
-func GetMenuResourceDB(ctx context.Context, defDB *gormplus.DB) *gormplus.DB {
+func GetMenuResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, MenuResource{})
 }
 

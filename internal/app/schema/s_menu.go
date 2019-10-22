@@ -7,38 +7,39 @@ import (
 
 // Menu 菜单对象
 type Menu struct {
-	RecordID   string        `json:"record_id" swaggo:"false,记录ID"`
-	Name       string        `json:"name" binding:"required" swaggo:"true,菜单名称"`
-	Sequence   int           `json:"sequence" swaggo:"false,排序值"`
-	Icon       string        `json:"icon" swaggo:"false,菜单图标"`
-	Router     string        `json:"router" swaggo:"false,访问路由"`
-	Hidden     int           `json:"hidden" swaggo:"false,隐藏菜单(0:不隐藏 1:隐藏)"`
-	ParentID   string        `json:"parent_id" swaggo:"false,父级ID"`
-	ParentPath string        `json:"parent_path" swaggo:"false,父级路径"`
-	Creator    string        `json:"creator" swaggo:"false,创建者"`
-	CreatedAt  time.Time     `json:"created_at" swaggo:"false,创建时间"`
-	Actions    MenuActions   `json:"actions" swaggo:"false,动作列表"`
-	Resources  MenuResources `json:"resources" swaggo:"false,资源列表"`
+	RecordID   string        `json:"record_id"`               // 记录ID
+	Name       string        `json:"name" binding:"required"` // 菜单名称
+	Sequence   int           `json:"sequence"`                // 排序值
+	Icon       string        `json:"icon"`                    // 菜单图标
+	Router     string        `json:"router"`                  // 访问路由
+	Hidden     int           `json:"hidden"`                  // 隐藏菜单(0:不隐藏 1:隐藏)
+	ParentID   string        `json:"parent_id"`               // 父级ID
+	ParentPath string        `json:"parent_path"`             // 父级路径
+	Creator    string        `json:"creator"`                 // 创建者
+	CreatedAt  time.Time     `json:"created_at"`              // 创建时间
+	Actions    MenuActions   `json:"actions"`                 // 动作列表
+	Resources  MenuResources `json:"resources"`               // 资源列表
 }
 
 // MenuAction 菜单动作对象
 type MenuAction struct {
-	Code string `json:"code" swaggo:"true,动作编号"`
-	Name string `json:"name" swaggo:"true,动作名称"`
+	Code string `json:"code"` // 动作编号
+	Name string `json:"name"` // 动作名称
 }
 
 // MenuResource 菜单资源对象
 type MenuResource struct {
-	Code   string `json:"code" swaggo:"true,资源编号"`
-	Name   string `json:"name" swaggo:"true,资源名称"`
-	Method string `json:"method" swaggo:"true,请求方式"`
-	Path   string `json:"path" swaggo:"true,请求路径"`
+	Code   string `json:"code"`   // 资源编号
+	Name   string `json:"name"`   // 资源名称
+	Method string `json:"method"` // 请求方式
+	Path   string `json:"path"`   // 请求路径
 }
 
 // MenuQueryParam 查询条件
 type MenuQueryParam struct {
 	RecordIDs        []string // 记录ID列表
 	LikeName         string   // 菜单名称(模糊查询)
+	Name             string   // 菜单名称
 	ParentID         *string  // 父级内码
 	PrefixParentPath string   // 父级路径(前缀模糊查询)
 	Hidden           *int     // 隐藏菜单
@@ -158,17 +159,17 @@ type MenuActions []*MenuAction
 
 // MenuTree 菜单树
 type MenuTree struct {
-	RecordID   string        `json:"record_id" swaggo:"false,记录ID"`
-	Name       string        `json:"name" binding:"required" swaggo:"true,菜单名称"`
-	Sequence   int           `json:"sequence" swaggo:"false,排序值"`
-	Icon       string        `json:"icon" swaggo:"false,菜单图标"`
-	Router     string        `json:"router" swaggo:"false,访问路由"`
-	Hidden     int           `json:"hidden" swaggo:"false,隐藏菜单(0:不隐藏 1:隐藏)"`
-	ParentID   string        `json:"parent_id" swaggo:"false,父级ID"`
-	ParentPath string        `json:"parent_path" swaggo:"false,父级路径"`
-	Resources  MenuResources `json:"resources" swaggo:"false,资源列表"`
-	Actions    MenuActions   `json:"actions" swaggo:"false,动作列表"`
-	Children   *[]*MenuTree  `json:"children,omitempty" swaggo:"false,子级树"`
+	RecordID   string        `json:"record_id"`               // 记录ID
+	Name       string        `json:"name" binding:"required"` // 菜单名称
+	Sequence   int           `json:"sequence"`                // 排序值
+	Icon       string        `json:"icon"`                    // 菜单图标
+	Router     string        `json:"router"`                  // 访问路由
+	Hidden     int           `json:"hidden"`                  // 隐藏菜单(0:不隐藏 1:隐藏)
+	ParentID   string        `json:"parent_id"`               // 父级ID
+	ParentPath string        `json:"parent_path"`             // 父级路径
+	Resources  MenuResources `json:"resources"`               // 资源列表
+	Actions    MenuActions   `json:"actions"`                 // 动作列表
+	Children   *[]*MenuTree  `json:"children,omitempty"`      // 子级树
 }
 
 // MenuTrees 菜单树列表
