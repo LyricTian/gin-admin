@@ -187,7 +187,7 @@ func (a *Login) QueryUserMenuTree(c *gin.Context) {
 // @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
-// @Router /api/v1/pub/current/password [get]
+// @Router /api/v1/pub/current/password [put]
 func (a *Login) UpdatePassword(c *gin.Context) {
 	var item schema.UpdatePasswordParam
 	if err := ginplus.ParseJSON(c, &item); err != nil {
