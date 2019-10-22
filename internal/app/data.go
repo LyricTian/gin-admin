@@ -36,9 +36,11 @@ func loadCasbinPolicyData(ctx context.Context, container *dig.Container) error {
 		}
 
 		for _, roleItem := range roleResult.Data {
-			err := role.LoadPolicy(ctx, *roleItem)
-			if err != nil {
-				return err
+			if roleItem != nil {
+				err := role.LoadPolicy(ctx, *roleItem)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
@@ -51,9 +53,11 @@ func loadCasbinPolicyData(ctx context.Context, container *dig.Container) error {
 		}
 
 		for _, userItem := range userResult.Data {
-			err := user.LoadPolicy(ctx, *userItem)
-			if err != nil {
-				return err
+			if userItem != nil {
+				err := user.LoadPolicy(ctx, *userItem)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
