@@ -10,8 +10,8 @@ Package api 生成swagger文档
 package api
 
 // @title GinAdmin
-// @version 5.0.0
-// @description RBAC scaffolding based on GIN + GORM + CASBIN + Dig.
+// @version 5.1.0
+// @description RBAC scaffolding based on Gin + GOrm + Casbin + Dig.
 // @schemes http https
 // @host 127.0.0.1:10088
 // @basePath /

@@ -29,24 +29,13 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 		g := app.Group("/api")
 
 		// 用户身份授权
-		g.Use(middleware.UserAuthMiddleware(
-			a,
-			middleware.AllowMethodAndPathPrefixSkipper(
-				middleware.JoinRouter("GET", "/api/v1/pub/login"),
-				middleware.JoinRouter("POST", "/api/v1/pub/login"),
-			),
-			// 也可以使用路径前缀跳过验证路由(将忽略请求方式)
-			// middleware.AllowPathPrefixSkipper(
-			// 	"/api/v1/pub/login",
-			// ),
+		g.Use(middleware.UserAuthMiddleware(a,
+			middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
 		))
 
 		// casbin权限校验中间件
 		g.Use(middleware.CasbinMiddleware(e,
-			middleware.AllowMethodAndPathPrefixSkipper(
-				middleware.JoinRouter("GET", "/api/v1/pub"),
-				middleware.JoinRouter("POST", "/api/v1/pub"),
-			),
+			middleware.AllowPathPrefixSkipper("/api/v1/pub"),
 		))
 
 		// 请求频率限制中间件

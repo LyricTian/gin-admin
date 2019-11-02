@@ -12,7 +12,7 @@
             "email": "tiannianshou@gmail.com"
         },
         "license": {},
-        "version": "5.0.0"
+        "version": "5.1.0"
     },
     "host": "127.0.0.1:10088",
     "basePath": "/",
@@ -731,7 +731,7 @@
             }
         },
         "/api/v1/pub/current/password": {
-            "get": {
+            "put": {
                 "tags": [
                     "登录管理"
                 ],
