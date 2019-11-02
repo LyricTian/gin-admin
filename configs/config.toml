@@ -1,26 +1,41 @@
 # 运行模式(debug:调试,test:测试,release:正式)
 run_mode = "debug"
 
-# casbin模型配置文件(也可以启动服务时使用-m指定)
-casbin_model_conf = ""
-
 # 静态站点目录(也可以启动服务时使用-www指定)
 www = ""
 
 # swagger文档目录(也可以启动服务时使用-swagger指定)
 swagger = ""
 
-# 是否允许初始化菜单数据(检查当前数据库中是否存在菜单数据，如果不存在则执行数据初始化)
-allow_init_menu = true
-
-# 菜单数据文件(json,也可以启动服务时使用-menu指定)
-menu = ""
-
-# 是否启用casbin鉴权
-enable_casbin = true
-
 # 数据存储(支持：gorm)
 store = "gorm"
+
+# http配置
+[http]
+# http监听地址
+host = "0.0.0.0"
+# http监听端口
+port = 10088
+# http优雅关闭等待超时时长(单位秒)
+shutdown_timeout = 30
+
+# 菜单配置
+[menu]
+# 使用启用初始化菜单数据
+enable = true
+# 数据文件(json,也可以启动服务时使用-menu指定)
+data = ""
+
+# casbin配置
+[casbin]
+# 是否启用casbin
+enable = false
+# 模型配置文件(也可以启动服务时使用-m指定)
+model = ""
+# 是否启用定期自动加载策略
+auto_load = false
+# 定期自动加载策略时间间隔（单位秒）
+auto_load_internal = 10
 
 # 日志配置
 [log]
@@ -53,15 +68,6 @@ max_open_conns = 1
 max_idle_conns = 1
 # 数据库表名
 table = "g_logger"
-
-# http配置
-[http]
-# http监听地址
-host = "0.0.0.0"
-# http监听端口
-port = 10088
-# http优雅关闭等待超时时长(单位秒)
-shutdown_timeout = 30
 
 # 服务监控(GOPS:https://github.com/google/gops)
 [monitor]

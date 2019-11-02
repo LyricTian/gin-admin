@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
@@ -12,7 +13,7 @@ import (
 
 // NewRole 创建角色管理实例
 func NewRole(
-	e *casbin.Enforcer,
+	e *casbin.SyncedEnforcer,
 	mRole model.IRole,
 	mMenu model.IMenu,
 	mUser model.IUser,
@@ -22,15 +23,32 @@ func NewRole(
 		RoleModel: mRole,
 		MenuModel: mMenu,
 		UserModel: mUser,
+		DeleteHook: func(ctx context.Context, bRole *Role, recordID string) error {
+			if config.Global().Casbin.Enable {
+				bRole.Enforcer.DeletePermissionsForUser(recordID)
+			}
+			return nil
+		},
+		SaveHook: func(ctx context.Context, bRole *Role, item *schema.Role) error {
+			if config.Global().Casbin.Enable {
+				err := bRole.LoadPolicy(ctx, item)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		},
 	}
 }
 
 // Role 角色管理
 type Role struct {
-	Enforcer  *casbin.Enforcer
-	RoleModel model.IRole
-	MenuModel model.IMenu
-	UserModel model.IUser
+	Enforcer   *casbin.SyncedEnforcer
+	RoleModel  model.IRole
+	MenuModel  model.IMenu
+	UserModel  model.IUser
+	DeleteHook func(context.Context, *Role, string) error
+	SaveHook   func(context.Context, *Role, *schema.Role) error
 }
 
 // Query 查询数据
@@ -72,10 +90,12 @@ func (a *Role) getUpdate(ctx context.Context, recordID string) (*schema.Role, er
 		return nil, err
 	}
 
-	err = a.LoadPolicy(ctx, *nitem)
-	if err != nil {
-		return nil, err
+	if hook := a.SaveHook; hook != nil {
+		if err := hook(ctx, a, nitem); err != nil {
+			return nil, err
+		}
 	}
+
 	return nitem, nil
 }
 
@@ -143,25 +163,27 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 		return err
 	}
 
-	a.Enforcer.DeletePermissionsForUser(recordID)
+	if hook := a.DeleteHook; hook != nil {
+		if err := hook(ctx, a, recordID); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-// LoadPolicy 加载角色权限策略
-func (a *Role) LoadPolicy(ctx context.Context, item schema.Role) error {
+// GetMenuResources 获取资源权限
+func (a *Role) GetMenuResources(ctx context.Context, item *schema.Role) (schema.MenuResources, error) {
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		RecordIDs: item.Menus.ToMenuIDs(),
 	}, schema.MenuQueryOptions{
 		IncludeResources: true,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	var data schema.MenuResources
 	menuMap := result.Data.ToMap()
-	roleID := item.RecordID
-	a.Enforcer.DeletePermissionsForUser(roleID)
-
 	for _, item := range item.Menus {
 		mitem, ok := menuMap[item.MenuID]
 		if !ok {
@@ -173,8 +195,23 @@ func (a *Role) LoadPolicy(ctx context.Context, item schema.Role) error {
 			if !ok || ritem.Path == "" || ritem.Method == "" {
 				continue
 			}
-			a.Enforcer.AddPermissionForUser(roleID, ritem.Path, ritem.Method)
+			data = append(data, ritem)
 		}
+	}
+	return data, nil
+}
+
+// LoadPolicy 加载角色权限策略
+func (a *Role) LoadPolicy(ctx context.Context, item *schema.Role) error {
+	resources, err := a.GetMenuResources(ctx, item)
+	if err != nil {
+		return err
+	}
+
+	roleID := item.RecordID
+	a.Enforcer.DeletePermissionsForUser(roleID)
+	for _, item := range resources {
+		a.Enforcer.AddPermissionForUser(roleID, item.Path, item.Method)
 	}
 
 	return nil
