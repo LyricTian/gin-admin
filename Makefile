@@ -12,10 +12,10 @@ build:
 	@go build -ldflags "-w -s" -o $(SERVER_BIN) ./cmd/server
 
 start: 
-	go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
+	go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./docs/swagger
 
 swagger:
-	swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
+	swag init -g ./internal/app/routers/api/swagger.go -o ./docs/swagger
 
 test:
 	@go test -cover -race ./...
@@ -26,5 +26,5 @@ clean:
 pack: build
 	rm -rf $(RELEASE_ROOT)
 	mkdir -p $(RELEASE_SERVER)
-	cp -r $(SERVER_BIN) configs $(RELEASE_SERVER)
+	cp -r $(SERVER_BIN) configs docs $(RELEASE_SERVER)
 	cd $(RELEASE_ROOT) && zip -r server.$(NOW).zip "server"
