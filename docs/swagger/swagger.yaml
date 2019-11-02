@@ -399,7 +399,7 @@ info:
   description: RBAC scaffolding based on GIN + GORM + CASBIN + Dig.
   license: {}
   title: GinAdmin
-  version: 5.0.0
+  version: 5.1.0
 paths:
   /api/v1/demos:
     get:
@@ -872,7 +872,7 @@ paths:
       tags:
       - 登录管理
   /api/v1/pub/current/password:
-    get:
+    put:
       parameters:
       - description: Bearer 用户令牌
         in: header

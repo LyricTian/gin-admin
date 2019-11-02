@@ -17,6 +17,7 @@ type options struct {
 	ModelFile  string
 	WWWDir     string
 	SwaggerDir string
+	MenuFile   string
 	Version    string
 }
 
@@ -48,6 +49,13 @@ func SetWWWDir(s string) Option {
 func SetSwaggerDir(s string) Option {
 	return func(o *options) {
 		o.SwaggerDir = s
+	}
+}
+
+// SetMenuFile 设定菜单数据文件
+func SetMenuFile(s string) Option {
+	return func(o *options) {
+		o.MenuFile = s
 	}
 }
 
@@ -85,6 +93,12 @@ func Init(ctx context.Context, opts ...Option) func() {
 	}
 	if v := o.SwaggerDir; v != "" {
 		cfg.Swagger = v
+	}
+	if v := o.SwaggerDir; v != "" {
+		cfg.Swagger = v
+	}
+	if v := o.MenuFile; v != "" {
+		cfg.Menu = v
 	}
 
 	loggerCall, err := InitLogger()

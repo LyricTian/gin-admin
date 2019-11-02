@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"sync/atomic"
 	"syscall"
+	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app"
 	"github.com/LyricTian/gin-admin/pkg/logger"
@@ -22,6 +23,7 @@ var (
 	modelFile  string
 	wwwDir     string
 	swaggerDir string
+	menuFile   string
 )
 
 func init() {
@@ -29,6 +31,7 @@ func init() {
 	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&wwwDir, "www", "", "静态站点目录")
 	flag.StringVar(&swaggerDir, "swagger", "", "swagger目录")
+	flag.StringVar(&menuFile, "menu", "", "菜单数据文件(.json)")
 }
 
 func main() {
@@ -50,18 +53,29 @@ func main() {
 		app.SetModelFile(modelFile),
 		app.SetWWWDir(wwwDir),
 		app.SetSwaggerDir(swaggerDir),
+		app.SetMenuFile(menuFile),
 		app.SetVersion(VERSION))
 
-	select {
-	case sig := <-sc:
-		atomic.StoreInt32(&state, 0)
-		span().Printf("获取到退出信号[%s]", sig.String())
+EXIT:
+	for {
+		sig := <-sc
+		span().Printf("获取到信号[%s]", sig.String())
+
+		switch sig {
+		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			atomic.StoreInt32(&state, 0)
+			break EXIT
+		case syscall.SIGHUP:
+		default:
+			break EXIT
+		}
 	}
 
 	if call != nil {
 		call()
 	}
-	span().Printf("服务退出")
 
+	span().Printf("服务退出")
+	time.Sleep(time.Second)
 	os.Exit(int(atomic.LoadInt32(&state)))
 }

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"os"
 
 	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/config"
@@ -17,7 +18,7 @@ func InitData(ctx context.Context, container *dig.Container) error {
 		return err
 	}
 
-	if config.Global().AllowInitMenu {
+	if c := config.Global(); c.AllowInitMenu && c.Menu != "" {
 		return initMenuData(ctx, container)
 	}
 
@@ -78,14 +79,25 @@ func initMenuData(ctx context.Context, container *dig.Container) error {
 			return nil
 		}
 
-		var data schema.MenuTrees
-		err = util.JSONUnmarshal([]byte(menuData), &data)
+		data, err := readMenuData()
 		if err != nil {
 			return err
 		}
 
 		return createMenus(ctx, trans, menu, "", data)
 	})
+}
+
+func readMenuData() (schema.MenuTrees, error) {
+	file, err := os.Open(config.Global().Menu)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var data schema.MenuTrees
+	err = util.JSONNewDecoder(file).Decode(&data)
+	return data, err
 }
 
 func createMenus(ctx context.Context, trans bll.ITrans, menu bll.IMenu, parentID string, list schema.MenuTrees) error {
@@ -117,238 +129,3 @@ func createMenus(ctx context.Context, trans bll.ITrans, menu bll.IMenu, parentID
 		return nil
 	})
 }
-
-// 初始化菜单数据
-const menuData = `
-[
-  {
-    "name": "首页",
-    "icon": "dashboard",
-    "router": "/dashboard",
-    "sequence": 1900000
-  },
-  {
-    "name": "DEMO",
-    "icon": "tag",
-    "router": "/example/demo",
-    "sequence": 1800000,
-    "actions": [
-      { "code": "add", "name": "新增" },
-      { "code": "edit", "name": "编辑" },
-      { "code": "del", "name": "删除" },
-      { "code": "query", "name": "查询" },
-      { "code": "disable", "name": "禁用" },
-      { "code": "enable", "name": "启用" }
-    ],
-    "resources": [
-      {
-        "code": "query",
-        "name": "查询DEMO数据",
-        "method": "GET",
-        "path": "/api/v1/demos"
-      },
-      {
-        "code": "get",
-        "name": "精确查询DEMO数据",
-        "method": "GET",
-        "path": "/api/v1/demos/:id"
-      },
-      {
-        "code": "create",
-        "name": "创建DEMO数据",
-        "method": "POST",
-        "path": "/api/v1/demos"
-      },
-      {
-        "code": "update",
-        "name": "更新DEMO数据",
-        "method": "PUT",
-        "path": "/api/v1/demos/:id"
-      },
-      {
-        "code": "delete",
-        "name": "删除DEMO数据",
-        "method": "DELETE",
-        "path": "/api/v1/demos/:id"
-      },
-      {
-        "code": "disable",
-        "name": "禁用DEMO数据",
-        "method": "PATCH",
-        "path": "/api/v1/demos/:id/disable"
-      },
-      {
-        "code": "enable",
-        "name": "启用DEMO数据",
-        "method": "PATCH",
-        "path": "/api/v1/demos/:id/enable"
-      }
-    ]
-  },
-  {
-    "name": "系统管理",
-    "icon": "setting",
-    "sequence": 1100000,
-    "children": [
-      {
-        "name": "菜单管理",
-        "icon": "solution",
-        "router": "/system/menu",
-        "sequence": 1190000,
-        "actions": [
-          { "code": "add", "name": "新增" },
-          { "code": "edit", "name": "编辑" },
-          { "code": "del", "name": "删除" },
-          { "code": "query", "name": "查询" }
-        ],
-        "resources": [
-          {
-            "code": "query",
-            "name": "查询菜单数据",
-            "method": "GET",
-            "path": "/api/v1/menus"
-          },
-          {
-            "code": "get",
-            "name": "精确查询菜单数据",
-            "method": "GET",
-            "path": "/api/v1/menus/:id"
-          },
-          {
-            "code": "create",
-            "name": "创建菜单数据",
-            "method": "POST",
-            "path": "/api/v1/menus"
-          },
-          {
-            "code": "update",
-            "name": "更新菜单数据",
-            "method": "PUT",
-            "path": "/api/v1/menus/:id"
-          },
-          {
-            "code": "delete",
-            "name": "删除菜单数据",
-            "method": "DELETE",
-            "path": "/api/v1/menus/:id"
-          }
-        ]
-      },
-      {
-        "name": "角色管理",
-        "icon": "audit",
-        "router": "/system/role",
-        "sequence": 1180000,
-        "actions": [
-          { "code": "add", "name": "新增" },
-          { "code": "edit", "name": "编辑" },
-          { "code": "del", "name": "删除" },
-          { "code": "query", "name": "查询" }
-        ],
-        "resources": [
-          {
-            "code": "query",
-            "name": "查询角色数据",
-            "method": "GET",
-            "path": "/api/v1/roles"
-          },
-          {
-            "code": "get",
-            "name": "精确查询角色数据",
-            "method": "GET",
-            "path": "/api/v1/roles/:id"
-          },
-          {
-            "code": "create",
-            "name": "创建角色数据",
-            "method": "POST",
-            "path": "/api/v1/roles"
-          },
-          {
-            "code": "update",
-            "name": "更新角色数据",
-            "method": "PUT",
-            "path": "/api/v1/roles/:id"
-          },
-          {
-            "code": "delete",
-            "name": "删除角色数据",
-            "method": "DELETE",
-            "path": "/api/v1/roles/:id"
-          },
-          {
-            "code": "queryMenu",
-            "name": "查询菜单数据",
-            "method": "GET",
-            "path": "/api/v1/menus"
-          }
-        ]
-      },
-      {
-        "name": "用户管理",
-        "icon": "user",
-        "router": "/system/user",
-        "sequence": 1170000,
-        "actions": [
-          { "code": "add", "name": "新增" },
-          { "code": "edit", "name": "编辑" },
-          { "code": "del", "name": "删除" },
-          { "code": "query", "name": "查询" },
-          { "code": "disable", "name": "禁用" },
-          { "code": "enable", "name": "启用" }
-        ],
-        "resources": [
-          {
-            "code": "query",
-            "name": "查询用户数据",
-            "method": "GET",
-            "path": "/api/v1/users"
-          },
-          {
-            "code": "get",
-            "name": "精确查询用户数据",
-            "method": "GET",
-            "path": "/api/v1/users/:id"
-          },
-          {
-            "code": "create",
-            "name": "创建用户数据",
-            "method": "POST",
-            "path": "/api/v1/users"
-          },
-          {
-            "code": "update",
-            "name": "更新用户数据",
-            "method": "PUT",
-            "path": "/api/v1/users/:id"
-          },
-          {
-            "code": "delete",
-            "name": "删除用户数据",
-            "method": "DELETE",
-            "path": "/api/v1/users/:id"
-          },
-          {
-            "code": "disable",
-            "name": "禁用用户数据",
-            "method": "PATCH",
-            "path": "/api/v1/users/:id/disable"
-          },
-          {
-            "code": "enable",
-            "name": "启用用户数据",
-            "method": "PATCH",
-            "path": "/api/v1/users/:id/enable"
-          },
-          {
-            "code": "queryRole",
-            "name": "查询角色数据",
-            "method": "GET",
-            "path": "/api/v1/roles"
-          }
-        ]
-      }
-    ]
-  }
-]
-`
