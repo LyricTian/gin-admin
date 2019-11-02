@@ -16,7 +16,7 @@ import (
 
 // VERSION 版本号，
 // 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "5.0.0"
+var VERSION = "5.1.0"
 
 var (
 	configFile string
@@ -45,7 +45,10 @@ func main() {
 	sc := make(chan os.Signal)
 	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
-	ctx := logger.NewTraceIDContext(context.Background(), util.MustUUID())
+	// 初始化日志参数
+	logger.SetVersion(VERSION)
+	logger.SetTraceIDFunc(util.NewTraceID)
+	ctx := logger.NewTraceIDContext(context.Background(), util.NewTraceID())
 	span := logger.StartSpanWithCall(ctx)
 
 	call := app.Init(ctx,
