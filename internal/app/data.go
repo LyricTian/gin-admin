@@ -13,57 +13,11 @@ import (
 
 // InitData 初始化应用数据
 func InitData(ctx context.Context, container *dig.Container) error {
-	err := loadCasbinPolicyData(ctx, container)
-	if err != nil {
-		return err
-	}
-
-	if c := config.Global(); c.AllowInitMenu && c.Menu != "" {
+	if c := config.Global().Menu; c.Enable && c.Data != "" {
 		return initMenuData(ctx, container)
 	}
 
 	return nil
-}
-
-// 加载casbin权限策略数据
-func loadCasbinPolicyData(ctx context.Context, container *dig.Container) error {
-	return container.Invoke(func(role bll.IRole, user bll.IUser) error {
-		// 加载角色策略
-		roleResult, err := role.Query(ctx, schema.RoleQueryParam{}, schema.RoleQueryOptions{
-			IncludeMenus: true,
-		})
-		if err != nil {
-			return err
-		}
-
-		for _, roleItem := range roleResult.Data {
-			if roleItem != nil {
-				err := role.LoadPolicy(ctx, *roleItem)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		// 加载用户策略
-		userResult, err := user.Query(ctx, schema.UserQueryParam{
-			Status: 1,
-		}, schema.UserQueryOptions{IncludeRoles: true})
-		if err != nil {
-			return err
-		}
-
-		for _, userItem := range userResult.Data {
-			if userItem != nil {
-				err := user.LoadPolicy(ctx, *userItem)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		return nil
-	})
 }
 
 // initMenuData 初始化菜单数据
@@ -89,7 +43,7 @@ func initMenuData(ctx context.Context, container *dig.Container) error {
 }
 
 func readMenuData() (schema.MenuTrees, error) {
-	file, err := os.Open(config.Global().Menu)
+	file, err := os.Open(config.Global().Menu.Data)
 	if err != nil {
 		return nil, err
 	}
