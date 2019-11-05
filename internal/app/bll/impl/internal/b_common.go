@@ -39,6 +39,13 @@ func ExecTrans(ctx context.Context, transModel model.ITrans, fn TransFunc) error
 		return err
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			_ = transModel.Rollback(ctx, trans)
+			panic(r)
+		}
+	}()
+
 	err = fn(icontext.NewTrans(ctx, trans))
 	if err != nil {
 		_ = transModel.Rollback(ctx, trans)

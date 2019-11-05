@@ -23,6 +23,13 @@ func ExecTrans(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 		return err
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			_ = transModel.Rollback(ctx, trans)
+			panic(r)
+		}
+	}()
+
 	ctx = icontext.NewTrans(ctx, trans)
 	err = fn(ctx)
 	if err != nil {
