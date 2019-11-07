@@ -15,16 +15,21 @@
 package model
 
 import (
-	"github.com/casbin/casbin/log"
-	"github.com/casbin/casbin/rbac"
-	"github.com/casbin/casbin/util"
+	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/rbac"
+	"github.com/casbin/casbin/v2/util"
 )
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks(rm rbac.RoleManager) {
+func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
 	for _, ast := range model["g"] {
-		ast.buildRoleLinks(rm)
+		err := ast.buildRoleLinks(rm)
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // PrintPolicy prints the policy to log.
@@ -138,6 +143,19 @@ func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldInde
 
 	for _, rule := range model[sec][ptype].Policy {
 		values = append(values, rule[fieldIndex])
+	}
+
+	util.ArrayRemoveDuplicates(&values)
+
+	return values
+}
+
+// GetValuesForFieldInPolicyAllTypes gets all values for a field for all rules in a policy of all ptypes, duplicated values are removed.
+func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) []string {
+	values := []string{}
+
+	for ptype := range model[sec] {
+		values = append(values, model.GetValuesForFieldInPolicy(sec, ptype, fieldIndex)...)
 	}
 
 	util.ArrayRemoveDuplicates(&values)

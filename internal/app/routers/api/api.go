@@ -4,7 +4,7 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/middleware"
 	"github.com/LyricTian/gin-admin/internal/app/routers/api/ctl"
 	"github.com/LyricTian/gin-admin/pkg/auth"
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 )

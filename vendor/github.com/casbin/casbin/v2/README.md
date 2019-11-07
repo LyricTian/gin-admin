@@ -3,9 +3,11 @@ Casbin
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/casbin/casbin)](https://goreportcard.com/report/github.com/casbin/casbin)
 [![Build Status](https://travis-ci.org/casbin/casbin.svg?branch=master)](https://travis-ci.org/casbin/casbin)
+[![Coverage Status](https://coveralls.io/repos/github/casbin/casbin/badge.svg?branch=master)](https://coveralls.io/github/casbin/casbin?branch=master)
 [![Godoc](https://godoc.org/github.com/casbin/casbin?status.svg)](https://godoc.org/github.com/casbin/casbin)
 [![Release](https://img.shields.io/github/release/casbin/casbin.svg)](https://github.com/casbin/casbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
+[![Sourcegraph](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
 **News**: still worry about how to write the correct Casbin policy? ``Casbin online editor`` is coming to help! Try it at: http://casbin.org/editor/
 
@@ -143,7 +145,7 @@ https://casbin.org/docs/en/overview
 
 ## Online editor
 
-You can also use the online editor (http://casbin.org/editor/) to write your Casbin model and policy in your web browser. It provides functionality such as ``syntax highlighting`` and ``code completion``, just like an IDE for a programming language.
+You can also use the online editor (https://casbin.org/editor/) to write your Casbin model and policy in your web browser. It provides functionality such as ``syntax highlighting`` and ``code completion``, just like an IDE for a programming language.
 
 ## Tutorials
 
@@ -154,10 +156,10 @@ https://casbin.org/docs/en/tutorials
 1. New a Casbin enforcer with a model file and a policy file:
 
     ```go
-    e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
+    e, _ := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
     ```
 
-Note: you can also initialize an enforcer with policy in DB instead of file, see [Persistence](#persistence) section for details.
+Note: you can also initialize an enforcer with policy in DB instead of file, see [Policy-persistence](#policy-persistence) section for details.
 
 2. Add an enforcement hook into your code right before the access happens:
 
@@ -166,7 +168,7 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
     obj := "data1" // the resource that is going to be accessed.
     act := "read" // the operation that the user performs on the resource.
 
-    if e.Enforce(sub, obj, act) == true {
+    if res := e.Enforce(sub, obj, act); res {
         // permit alice to read data1
     } else {
         // deny the request, show an error
@@ -176,21 +178,19 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
 3. Besides the static policy file, Casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
 
     ```go
-    roles := e.GetImplicitRolesForUser(sub)
+    roles, _ := e.GetImplicitRolesForUser(sub)
     ```
 
 See [Policy management APIs](#policy-management) for more usage.
-
-4. Please refer to the ``_test.go`` files for more usage.
 
 ## Policy management
 
 Casbin provides two sets of APIs to manage permissions:
 
-- [Management API](https://github.com/casbin/casbin/blob/master/management_api.go): the primitive API that provides full support for Casbin policy management. See [here](https://github.com/casbin/casbin/blob/master/management_api_test.go) for examples.
-- [RBAC API](https://github.com/casbin/casbin/blob/master/rbac_api.go): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/casbin/casbin/blob/master/rbac_api_test.go) for examples.
+- [Management API](https://casbin.org/docs/en/management-api): the primitive API that provides full support for Casbin policy management.
+- [RBAC API](https://casbin.org/docs/en/rbac-api): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code.
 
-We also provide a web-based UI for model management and policy management:
+We also provide a [web-based UI](https://casbin.org/docs/en/admin-portal) for model management and policy management:
 
 ![model editor](https://hsluoyz.github.io/casbin/ui_model_editor.png)
 

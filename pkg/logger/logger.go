@@ -149,11 +149,15 @@ func StartSpan(ctx context.Context, opts ...SpanOption) *Entry {
 	}
 
 	fields := map[string]interface{}{
-		UserIDKey:       FromUserIDContext(ctx),
-		TraceIDKey:      FromTraceIDContext(ctx),
-		SpanTitleKey:    o.Title,
-		SpanFunctionKey: o.FuncName,
-		VersionKey:      version,
+		UserIDKey:  FromUserIDContext(ctx),
+		TraceIDKey: FromTraceIDContext(ctx),
+		VersionKey: version,
+	}
+	if v := o.Title; v != "" {
+		fields[SpanTitleKey] = v
+	}
+	if v := o.FuncName; v != "" {
+		fields[SpanFunctionKey] = v
 	}
 
 	return newEntry(logrus.WithFields(fields))

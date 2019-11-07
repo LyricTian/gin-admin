@@ -4,7 +4,7 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +23,7 @@ func CasbinMiddleware(enforcer *casbin.SyncedEnforcer, skippers ...SkipperFunc) 
 
 		p := c.Request.URL.Path
 		m := c.Request.Method
-		if b, err := enforcer.EnforceSafe(ginplus.GetUserID(c), p, m); err != nil {
+		if b, err := enforcer.Enforce(ginplus.GetUserID(c), p, m); err != nil {
 			ginplus.ResError(c, errors.WithStack(err))
 			return
 		} else if !b {

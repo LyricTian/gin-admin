@@ -18,9 +18,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/casbin/casbin/config"
-	"github.com/casbin/casbin/log"
-	"github.com/casbin/casbin/util"
+	"github.com/casbin/casbin/v2/config"
+	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/util"
 )
 
 // Model represents the whole access control model.
@@ -89,11 +89,41 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	}
 }
 
+// NewModel creates an empty model.
+func NewModel() Model {
+	m := make(Model)
+	return m
+}
+
+// NewModel creates a model from a .CONF file.
+func NewModelFromFile(path string) (Model, error) {
+	m := NewModel()
+
+	err := m.LoadModel(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+// NewModel creates a model from a string which contains model text.
+func NewModelFromString(text string) (Model, error) {
+	m := NewModel()
+
+	err := m.LoadModelFromText(text)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
 // LoadModel loads the model from model CONF file.
-func (model Model) LoadModel(path string) {
+func (model Model) LoadModel(path string) error {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	loadSection(model, cfg, "r")
@@ -102,13 +132,15 @@ func (model Model) LoadModel(path string) {
 	loadSection(model, cfg, "m")
 
 	loadSection(model, cfg, "g")
+
+	return nil
 }
 
 // LoadModelFromText loads the model from the text.
-func (model Model) LoadModelFromText(text string) {
+func (model Model) LoadModelFromText(text string) error {
 	cfg, err := config.NewConfigFromText(text)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	loadSection(model, cfg, "r")
@@ -117,6 +149,8 @@ func (model Model) LoadModelFromText(text string) {
 	loadSection(model, cfg, "m")
 
 	loadSection(model, cfg, "g")
+
+	return nil
 }
 
 // PrintModel prints the model to the log.

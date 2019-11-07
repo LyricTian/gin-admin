@@ -2,16 +2,16 @@ package app
 
 import (
 	"context"
-	"strings"
+	"fmt"
 	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/logger"
-	"github.com/casbin/casbin"
-	"github.com/casbin/casbin/model"
-	"github.com/casbin/casbin/persist"
+	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v2/model"
+	"github.com/casbin/casbin/v2/persist"
 	"go.uber.org/dig"
 )
 
@@ -21,7 +21,17 @@ func NewCasbinEnforcer() *casbin.SyncedEnforcer {
 	if !cfg.Enable {
 		return nil
 	}
-	return casbin.NewSyncedEnforcer(cfg.Model)
+
+	e, err := casbin.NewSyncedEnforcer(cfg.Model)
+	handleError(err)
+
+	e.EnableAutoSave(false)
+	e.EnableAutoBuildRoleLinks(true)
+
+	if cfg.Debug {
+		e.EnableLog(true)
+	}
+	return e
 }
 
 // InitCasbinEnforcer 初始化casbin校验器
@@ -42,6 +52,11 @@ func InitCasbinEnforcer(container *dig.Container) error {
 			if err != nil {
 				return err
 			}
+		}
+
+		err := e.BuildRoleLinks()
+		if err != nil {
+			return err
 		}
 
 		return nil
@@ -106,12 +121,14 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, model model.Model) e
 			return err
 		}
 
-		var lines []string
-		lines = append(lines, "p", item.RecordID)
 		for _, ritem := range resources {
-			lines = append(lines, ritem.Path, ritem.Method)
+			if ritem.Path == "" || ritem.Method == "" {
+				continue
+			}
+
+			line := fmt.Sprintf("p,%s,%s,%s", item.RecordID, ritem.Path, ritem.Method)
+			persist.LoadPolicyLine(line, model)
 		}
-		persist.LoadPolicyLine(strings.Join(lines, ","), model)
 	}
 
 	return nil
@@ -126,14 +143,12 @@ func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, model model.Model) e
 	}
 
 	for _, item := range result.Data {
-		var lines []string
-		lines = append(lines, "g", item.RecordID)
-
 		for _, roleID := range item.Roles.ToRoleIDs() {
-			lines = append(lines, roleID)
+			line := fmt.Sprintf("g,%s,%s", item.RecordID, roleID)
+			persist.LoadPolicyLine(line, model)
 		}
-		persist.LoadPolicyLine(strings.Join(lines, ","), model)
 	}
+
 	return nil
 }
 
