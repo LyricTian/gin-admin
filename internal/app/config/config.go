@@ -76,6 +76,7 @@ type Menu struct {
 // Casbin casbin配置参数
 type Casbin struct {
 	Enable           bool   `toml:"enable"`
+	Debug            bool   `toml:"debug"`
 	Model            string `toml:"model"`
 	AutoLoad         bool   `toml:"auto_load"`
 	AutoLoadInternal int    `toml:"auto_load_internal"`

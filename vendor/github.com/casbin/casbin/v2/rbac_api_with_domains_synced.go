@@ -15,30 +15,38 @@
 package casbin
 
 // GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon
-func (e *Enforcer) GetUsersForRoleInDomain(name string, domain string) []string {
-	res, _ := e.model["g"]["g"].RM.GetUsers(name, domain)
-	return res
+func (e *SyncedEnforcer) GetUsersForRoleInDomain(name string, domain string) []string {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.GetUsersForRoleInDomain(name, domain)
 }
 
 // GetRolesForUserInDomain gets the roles that a user has inside a domain.
-func (e *Enforcer) GetRolesForUserInDomain(name string, domain string) []string {
-	res, _ := e.model["g"]["g"].RM.GetRoles(name, domain)
-	return res
+func (e *SyncedEnforcer) GetRolesForUserInDomain(name string, domain string) []string {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.GetRolesForUserInDomain(name, domain)
 }
 
 // GetPermissionsForUserInDomain gets permissions for a user or role inside a domain.
-func (e *Enforcer) GetPermissionsForUserInDomain(user string, domain string) [][]string {
-	return e.GetFilteredPolicy(0, user, domain)
+func (e *SyncedEnforcer) GetPermissionsForUserInDomain(user string, domain string) [][]string {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.GetPermissionsForUserInDomain(user, domain)
 }
 
 // AddRoleForUserInDomain adds a role for a user inside a domain.
 // Returns false if the user already has the role (aka not affected).
-func (e *Enforcer) AddRoleForUserInDomain(user string, role string, domain string) bool {
-	return e.AddGroupingPolicy(user, role, domain)
+func (e *SyncedEnforcer) AddRoleForUserInDomain(user string, role string, domain string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.AddRoleForUserInDomain(user, role, domain)
 }
 
 // DeleteRoleForUserInDomain deletes a role for a user inside a domain.
 // Returns false if the user does not have the role (aka not affected).
-func (e *Enforcer) DeleteRoleForUserInDomain(user string, role string, domain string) bool {
-	return e.RemoveGroupingPolicy(user, role, domain)
+func (e *SyncedEnforcer) DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.DeleteRoleForUserInDomain(user, role, domain)
 }

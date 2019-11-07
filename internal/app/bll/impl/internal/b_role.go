@@ -8,7 +8,7 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/util"
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
 )
 
 // NewRole 创建角色管理实例
