@@ -72,9 +72,8 @@ func TestAPIUser(t *testing.T) {
 	assert.Empty(t, addNewItem.Password)
 	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// query /users?q=page
-	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"q": "page"})))
+	// query /users
+	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.User
 	err = parsePageReader(w.Body, &pageItems)
@@ -92,6 +91,8 @@ func TestAPIUser(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	var putItem schema.User
 	err = parseReader(w.Body, &putItem)
+	assert.Nil(t, err)
+
 	putItem.UserName = util.MustUUID()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)

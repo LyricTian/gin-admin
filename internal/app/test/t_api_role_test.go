@@ -54,9 +54,8 @@ func TestAPIRole(t *testing.T) {
 	assert.Equal(t, len(addItem.Menus), len(addNewItem.Menus))
 	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// query /roles?q=page
-	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"q": "page"})))
+	// query /roles
+	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.Role
 	err = parsePageReader(w.Body, &pageItems)
@@ -73,6 +72,7 @@ func TestAPIRole(t *testing.T) {
 
 	var putItem schema.Role
 	err = parseReader(w.Body, &putItem)
+	assert.Nil(t, err)
 	assert.Equal(t, len(putItem.Menus), 1)
 
 	putItem.Name = util.MustUUID()
