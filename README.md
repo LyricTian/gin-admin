@@ -35,7 +35,7 @@
 $ go get -u github.com/LyricTian/gin-admin-cli
 $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
 $ cd ~/go/src/gin-admin
-$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
+$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./docs/swagger -menu ./configs/menu.json
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -62,7 +62,7 @@ $ go get -v github.com/LyricTian/gin-admin/cmd/server
 
 ```bash
 $ cd github.com/LyricTian/gin-admin
-$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./internal/app/swagger
+$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./docs/swagger -menu ./configs/menu.json
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -84,7 +84,7 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 
 ```bash
 $ go get -u -v github.com/swaggo/swag/cmd/swag
-$ swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
+$ swag init -g ./internal/app/routers/api/swagger.go -o ./docs/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -97,25 +97,24 @@ $ swag init -g ./internal/app/routers/api/swagger.go -o ./internal/app/swagger
 │   └── server：主服务（程序入口）
 ├── configs：配置文件目录(包含运行配置参数及casbin模型配置)
 ├── docs：文档目录
+│   └── swagger：swagger静态文件目录
 ├── internal：内部应用
 │   └── app：主应用目录
 │       ├── bll：业务逻辑层接口
 │       │   └── impl：业务逻辑层的接口实现
 │       ├── config：配置参数（与配置文件一一映射）
 │       ├── context：统一上下文
-│       ├── errors：统一的错误定义
+│       ├── errors：统一的错误处理
 │       ├── ginplus：gin的扩展函数库
 │       ├── middleware：gin中间件
 │       ├── model：存储层接口
 │       │   └── impl：存储层接口实现
-│       │       └── entity：映射数据库的实体
-│       │       └── model：存储层接口实现
+│       │       └── gorm：基于gorm的存储层实现
 │       ├── routers：路由层
 │       │   └── api：/api路由模块
 │       │       └── ctl：/api路由模块对应的控制器层
 │       ├── schema：对象模型
-│       ├── swagger：swagger静态目录
-│       └── test：接口层单元测试
+│       └── test：针对接口的单元测试
 ├── pkg：公共模块
 │   ├── auth：认证模块
 │   │   └── jwtauth：JWT认证模块实现

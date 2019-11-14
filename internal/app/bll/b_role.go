@@ -18,6 +18,6 @@ type IRole interface {
 	Update(ctx context.Context, recordID string, item schema.Role) (*schema.Role, error)
 	// 删除数据
 	Delete(ctx context.Context, recordID string) error
-	// 加载权限策略
-	LoadPolicy(ctx context.Context, item schema.Role) error
+	// 获取资源权限
+	GetMenuResources(ctx context.Context, item *schema.Role) (schema.MenuResources, error)
 }

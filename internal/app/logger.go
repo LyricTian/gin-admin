@@ -9,13 +9,10 @@ import (
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	loggerhook "github.com/LyricTian/gin-admin/pkg/logger/hook"
 	loggergormhook "github.com/LyricTian/gin-admin/pkg/logger/hook/gorm"
-	"github.com/LyricTian/gin-admin/pkg/util"
 )
 
 // InitLogger 初始化日志
 func InitLogger() (func(), error) {
-	logger.SetTraceIDFunc(util.MustUUID)
-
 	c := config.Global().Log
 	logger.SetLevel(c.Level)
 	logger.SetFormatter(c.Format)

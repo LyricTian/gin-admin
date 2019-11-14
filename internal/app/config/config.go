@@ -40,32 +40,46 @@ func Parse(fpath string) (*Config, error) {
 
 // Config 配置参数
 type Config struct {
-	RunMode         string      `toml:"run_mode"`
-	CasbinModelConf string      `toml:"casbin_model_conf"`
-	WWW             string      `toml:"www"`
-	Swagger         string      `toml:"swagger"`
-	Store           string      `toml:"store"`
-	AllowInitMenu   bool        `toml:"allow_init_menu"`
-	EnableCasbin    bool        `toml:"enable_casbin"`
-	Log             Log         `toml:"log"`
-	LogGormHook     LogGormHook `toml:"log_gorm_hook"`
-	Root            Root        `toml:"root"`
-	JWTAuth         JWTAuth     `toml:"jwt_auth"`
-	HTTP            HTTP        `toml:"http"`
-	Monitor         Monitor     `toml:"monitor"`
-	Captcha         Captcha     `toml:"captcha"`
-	RateLimiter     RateLimiter `toml:"rate_limiter"`
-	CORS            CORS        `toml:"cors"`
-	Redis           Redis       `toml:"redis"`
-	Gorm            Gorm        `toml:"gorm"`
-	MySQL           MySQL       `toml:"mysql"`
-	Postgres        Postgres    `toml:"postgres"`
-	Sqlite3         Sqlite3     `toml:"sqlite3"`
+	RunMode     string      `toml:"run_mode"`
+	WWW         string      `toml:"www"`
+	Swagger     string      `toml:"swagger"`
+	Store       string      `toml:"store"`
+	HTTP        HTTP        `toml:"http"`
+	Menu        Menu        `toml:"menu"`
+	Casbin      Casbin      `toml:"casbin"`
+	Log         Log         `toml:"log"`
+	LogGormHook LogGormHook `toml:"log_gorm_hook"`
+	Root        Root        `toml:"root"`
+	JWTAuth     JWTAuth     `toml:"jwt_auth"`
+	Monitor     Monitor     `toml:"monitor"`
+	Captcha     Captcha     `toml:"captcha"`
+	RateLimiter RateLimiter `toml:"rate_limiter"`
+	CORS        CORS        `toml:"cors"`
+	Redis       Redis       `toml:"redis"`
+	Gorm        Gorm        `toml:"gorm"`
+	MySQL       MySQL       `toml:"mysql"`
+	Postgres    Postgres    `toml:"postgres"`
+	Sqlite3     Sqlite3     `toml:"sqlite3"`
 }
 
 // IsDebugMode 是否是debug模式
 func (c *Config) IsDebugMode() bool {
 	return c.RunMode == "debug"
+}
+
+// Menu 菜单配置参数
+type Menu struct {
+	Enable bool   `toml:"enable"`
+	Data   string `toml:"data"`
+}
+
+// Casbin casbin配置参数
+type Casbin struct {
+	Enable           bool   `toml:"enable"`
+	Debug            bool   `toml:"debug"`
+	Model            string `toml:"model"`
+	AutoLoad         bool   `toml:"auto_load"`
+	AutoLoadInternal int    `toml:"auto_load_internal"`
 }
 
 // Log 日志配置参数

@@ -3,16 +3,17 @@ package internal
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/util"
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
 )
 
 // NewUser 创建菜单管理实例
 func NewUser(
-	e *casbin.Enforcer,
+	e *casbin.SyncedEnforcer,
 	mUser model.IUser,
 	mRole model.IRole,
 ) *User {
@@ -20,14 +21,35 @@ func NewUser(
 		Enforcer:  e,
 		UserModel: mUser,
 		RoleModel: mRole,
+		DeleteHook: func(ctx context.Context, bUser *User, recordID string) error {
+			if config.Global().Casbin.Enable {
+				bUser.Enforcer.DeleteUser(recordID)
+			}
+			return nil
+		},
+		SaveHook: func(ctx context.Context, bUser *User, item *schema.User) error {
+			if config.Global().Casbin.Enable {
+				if item.Status == 1 {
+					err := bUser.LoadPolicy(ctx, item)
+					if err != nil {
+						return err
+					}
+				} else {
+					bUser.Enforcer.DeleteUser(item.RecordID)
+				}
+			}
+			return nil
+		},
 	}
 }
 
 // User 用户管理
 type User struct {
-	Enforcer  *casbin.Enforcer
-	UserModel model.IUser
-	RoleModel model.IRole
+	Enforcer   *casbin.SyncedEnforcer
+	UserModel  model.IUser
+	RoleModel  model.IRole
+	DeleteHook func(context.Context, *User, string) error
+	SaveHook   func(context.Context, *User, *schema.User) error
 }
 
 // Query 查询数据
@@ -98,10 +120,12 @@ func (a *User) getUpdate(ctx context.Context, recordID string) (*schema.User, er
 		return nil, err
 	}
 
-	err = a.LoadPolicy(ctx, *nitem)
-	if err != nil {
-		return nil, err
+	if hook := a.SaveHook; hook != nil {
+		if err := hook(ctx, a, nitem); err != nil {
+			return nil, err
+		}
 	}
+
 	return nitem, nil
 }
 
@@ -165,7 +189,13 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 	if err != nil {
 		return err
 	}
-	a.Enforcer.DeleteUser(recordID)
+
+	if hook := a.DeleteHook; hook != nil {
+		if err := hook(ctx, a, recordID); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -179,17 +209,15 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	}
+	oldItem.Status = status
 
 	err = a.UserModel.UpdateStatus(ctx, recordID, status)
 	if err != nil {
 		return err
 	}
 
-	if status == 2 {
-		a.Enforcer.DeleteUser(recordID)
-	} else {
-		err = a.LoadPolicy(ctx, *oldItem)
-		if err != nil {
+	if hook := a.SaveHook; hook != nil {
+		if err := hook(ctx, a, oldItem); err != nil {
 			return err
 		}
 	}
@@ -198,7 +226,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 }
 
 // LoadPolicy 加载用户权限策略
-func (a *User) LoadPolicy(ctx context.Context, item schema.User) error {
+func (a *User) LoadPolicy(ctx context.Context, item *schema.User) error {
 	a.Enforcer.DeleteRolesForUser(item.RecordID)
 	for _, roleID := range item.Roles.ToRoleIDs() {
 		a.Enforcer.AddRoleForUser(item.RecordID, roleID)

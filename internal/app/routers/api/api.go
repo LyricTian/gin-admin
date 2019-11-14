@@ -4,7 +4,7 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/middleware"
 	"github.com/LyricTian/gin-admin/internal/app/routers/api/ctl"
 	"github.com/LyricTian/gin-admin/pkg/auth"
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 )
@@ -18,7 +18,7 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 
 	return container.Invoke(func(
 		a auth.Auther,
-		e *casbin.Enforcer,
+		e *casbin.SyncedEnforcer,
 		cDemo *ctl.Demo,
 		cLogin *ctl.Login,
 		cMenu *ctl.Menu,
@@ -29,24 +29,13 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 		g := app.Group("/api")
 
 		// 用户身份授权
-		g.Use(middleware.UserAuthMiddleware(
-			a,
-			middleware.AllowMethodAndPathPrefixSkipper(
-				middleware.JoinRouter("GET", "/api/v1/pub/login"),
-				middleware.JoinRouter("POST", "/api/v1/pub/login"),
-			),
-			// 也可以使用路径前缀跳过验证路由(将忽略请求方式)
-			// middleware.AllowPathPrefixSkipper(
-			// 	"/api/v1/pub/login",
-			// ),
+		g.Use(middleware.UserAuthMiddleware(a,
+			middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
 		))
 
 		// casbin权限校验中间件
 		g.Use(middleware.CasbinMiddleware(e,
-			middleware.AllowMethodAndPathPrefixSkipper(
-				middleware.JoinRouter("GET", "/api/v1/pub"),
-				middleware.JoinRouter("POST", "/api/v1/pub"),
-			),
+			middleware.AllowPathPrefixSkipper("/api/v1/pub"),
 		))
 
 		// 请求频率限制中间件
@@ -57,53 +46,72 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 			pub := v1.Group("/pub")
 			{
 				// 注册/api/v1/pub/login
-				pub.GET("/login/captchaid", cLogin.GetCaptcha)
-				pub.GET("/login/captcha", cLogin.ResCaptcha)
-				pub.POST("/login", cLogin.Login)
-				pub.POST("/login/exit", cLogin.Logout)
+				gLogin := pub.Group("login")
+				{
+					gLogin.GET("captchaid", cLogin.GetCaptcha)
+					gLogin.GET("captcha", cLogin.ResCaptcha)
+					gLogin.POST("", cLogin.Login)
+					gLogin.POST("exit", cLogin.Logout)
+				}
 
 				// 注册/api/v1/pub/refresh-token
 				pub.POST("/refresh-token", cLogin.RefreshToken)
 
 				// 注册/api/v1/pub/current
-				pub.PUT("/current/password", cLogin.UpdatePassword)
-				pub.GET("/current/user", cLogin.GetUserInfo)
-				pub.GET("/current/menutree", cLogin.QueryUserMenuTree)
+				gCurrent := pub.Group("current")
+				{
+					gCurrent.PUT("password", cLogin.UpdatePassword)
+					gCurrent.GET("user", cLogin.GetUserInfo)
+					gCurrent.GET("menutree", cLogin.QueryUserMenuTree)
+				}
+
 			}
 
 			// 注册/api/v1/demos
-			v1.GET("/demos", cDemo.Query)
-			v1.GET("/demos/:id", cDemo.Get)
-			v1.POST("/demos", cDemo.Create)
-			v1.PUT("/demos/:id", cDemo.Update)
-			v1.DELETE("/demos/:id", cDemo.Delete)
-			v1.PATCH("/demos/:id/enable", cDemo.Enable)
-			v1.PATCH("/demos/:id/disable", cDemo.Disable)
+			gDemo := v1.Group("demos")
+			{
+				gDemo.GET("", cDemo.Query)
+				gDemo.GET(":id", cDemo.Get)
+				gDemo.POST("", cDemo.Create)
+				gDemo.PUT(":id", cDemo.Update)
+				gDemo.DELETE(":id", cDemo.Delete)
+				gDemo.PATCH(":id/enable", cDemo.Enable)
+				gDemo.PATCH(":id/disable", cDemo.Disable)
+			}
 
 			// 注册/api/v1/menus
-			v1.GET("/menus", cMenu.Query)
+			gMenu := v1.Group("menus")
+			{
+				gMenu.GET("", cMenu.Query)
+				gMenu.GET(":id", cMenu.Get)
+				gMenu.POST("", cMenu.Create)
+				gMenu.PUT(":id", cMenu.Update)
+				gMenu.DELETE(":id", cMenu.Delete)
+			}
 			v1.GET("/menus.tree", cMenu.QueryTree)
-			v1.GET("/menus/:id", cMenu.Get)
-			v1.POST("/menus", cMenu.Create)
-			v1.PUT("/menus/:id", cMenu.Update)
-			v1.DELETE("/menus/:id", cMenu.Delete)
 
 			// 注册/api/v1/roles
-			v1.GET("/roles", cRole.Query)
+			gRole := v1.Group("roles")
+			{
+				gRole.GET("", cRole.Query)
+				gRole.GET(":id", cRole.Get)
+				gRole.POST("", cRole.Create)
+				gRole.PUT(":id", cRole.Update)
+				gRole.DELETE(":id", cRole.Delete)
+			}
 			v1.GET("/roles.select", cRole.QuerySelect)
-			v1.GET("/roles/:id", cRole.Get)
-			v1.POST("/roles", cRole.Create)
-			v1.PUT("/roles/:id", cRole.Update)
-			v1.DELETE("/roles/:id", cRole.Delete)
 
 			// 注册/api/v1/users
-			v1.GET("/users", cUser.Query)
-			v1.GET("/users/:id", cUser.Get)
-			v1.POST("/users", cUser.Create)
-			v1.PUT("/users/:id", cUser.Update)
-			v1.DELETE("/users/:id", cUser.Delete)
-			v1.PATCH("/users/:id/enable", cUser.Enable)
-			v1.PATCH("/users/:id/disable", cUser.Disable)
+			gUser := v1.Group("users")
+			{
+				gUser.GET("", cUser.Query)
+				gUser.GET(":id", cUser.Get)
+				gUser.POST("", cUser.Create)
+				gUser.PUT(":id", cUser.Update)
+				gUser.DELETE(":id", cUser.Delete)
+				gUser.PATCH(":id/enable", cUser.Enable)
+				gUser.PATCH(":id/disable", cUser.Disable)
+			}
 		}
 
 		return nil

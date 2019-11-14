@@ -8,7 +8,6 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/LyricTian/gin-admin/pkg/logger"
-	"github.com/casbin/casbin"
 	"go.uber.org/dig"
 )
 
@@ -17,6 +16,7 @@ type options struct {
 	ModelFile  string
 	WWWDir     string
 	SwaggerDir string
+	MenuFile   string
 	Version    string
 }
 
@@ -51,6 +51,13 @@ func SetSwaggerDir(s string) Option {
 	}
 }
 
+// SetMenuFile 设定菜单数据文件
+func SetMenuFile(s string) Option {
+	return func(o *options) {
+		o.MenuFile = s
+	}
+}
+
 // SetVersion 设定版本号
 func SetVersion(s string) Option {
 	return func(o *options) {
@@ -78,13 +85,19 @@ func Init(ctx context.Context, opts ...Option) func() {
 	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", cfg.RunMode, o.Version, os.Getpid())
 
 	if v := o.ModelFile; v != "" {
-		cfg.CasbinModelConf = v
+		cfg.Casbin.Model = v
 	}
 	if v := o.WWWDir; v != "" {
 		cfg.WWW = v
 	}
 	if v := o.SwaggerDir; v != "" {
 		cfg.Swagger = v
+	}
+	if v := o.SwaggerDir; v != "" {
+		cfg.Swagger = v
+	}
+	if v := o.MenuFile; v != "" {
+		cfg.Menu.Data = v
 	}
 
 	loggerCall, err := InitLogger()
@@ -120,19 +133,10 @@ func Init(ctx context.Context, opts ...Option) func() {
 	}
 }
 
-// NewEnforcer 创建casbin校验
-func NewEnforcer() *casbin.Enforcer {
-	cfg := config.Global()
-	return casbin.NewEnforcer(cfg.CasbinModelConf, false)
-}
-
 // BuildContainer 创建依赖注入容器
 func BuildContainer() (*dig.Container, func()) {
 	// 创建依赖注入容器
 	container := dig.New()
-
-	// 注入casbin
-	container.Provide(NewEnforcer)
 
 	// 注入认证模块
 	auther, err := InitAuth()
@@ -140,6 +144,9 @@ func BuildContainer() (*dig.Container, func()) {
 	container.Provide(func() auth.Auther {
 		return auther
 	})
+
+	// 注入casbin
+	container.Provide(NewCasbinEnforcer)
 
 	// 注入存储模块
 	storeCall, err := InitStore(container)
@@ -149,10 +156,18 @@ func BuildContainer() (*dig.Container, func()) {
 	err = impl.Inject(container)
 	handleError(err)
 
+	// 初始化casbin
+	err = InitCasbinEnforcer(container)
+	handleError(err)
+
 	return container, func() {
 		if auther != nil {
 			auther.Release()
 		}
+
+		// 释放资源
+		ReleaseCasbinEnforcer(container)
+
 		if storeCall != nil {
 			storeCall()
 		}
