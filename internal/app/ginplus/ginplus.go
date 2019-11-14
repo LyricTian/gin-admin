@@ -109,6 +109,22 @@ func ParseJSON(c *gin.Context, obj interface{}) error {
 	return nil
 }
 
+// ParseQuery 解析Get请求
+func ParseQuery(c *gin.Context, obj interface{}) error {
+	if err := c.BindQuery(obj); err != nil {
+		return errors.Wrap400Response(err, "解析请求参数发生错误")
+	}
+	return nil
+}
+
+// ParseForm 解析Form请求
+func ParseForm(c *gin.Context, obj interface{}) error {
+	if err := c.ShouldBind(obj); err != nil {
+		return errors.Wrap400Response(err, "解析请求参数发生错误")
+	}
+	return nil
+}
+
 // ResPage 响应分页数据
 func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
 	list := schema.HTTPList{
