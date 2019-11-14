@@ -16,18 +16,18 @@ github.com/PuerkitoBio/urlesc
 # github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 github.com/alecthomas/template
 github.com/alecthomas/template/parse
-# github.com/casbin/casbin v1.9.1
-github.com/casbin/casbin
-github.com/casbin/casbin/config
-github.com/casbin/casbin/effect
-github.com/casbin/casbin/errors
-github.com/casbin/casbin/log
-github.com/casbin/casbin/model
-github.com/casbin/casbin/persist
-github.com/casbin/casbin/persist/file-adapter
-github.com/casbin/casbin/rbac
-github.com/casbin/casbin/rbac/default-role-manager
-github.com/casbin/casbin/util
+# github.com/casbin/casbin/v2 v2.1.0
+github.com/casbin/casbin/v2
+github.com/casbin/casbin/v2/config
+github.com/casbin/casbin/v2/effect
+github.com/casbin/casbin/v2/errors
+github.com/casbin/casbin/v2/log
+github.com/casbin/casbin/v2/model
+github.com/casbin/casbin/v2/persist
+github.com/casbin/casbin/v2/persist/file-adapter
+github.com/casbin/casbin/v2/rbac
+github.com/casbin/casbin/v2/rbac/default-role-manager
+github.com/casbin/casbin/v2/util
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/dgrijalva/jwt-go v0.0.0-20180719211823-0b96aaa70776

@@ -22,6 +22,4 @@ type IUser interface {
 	Delete(ctx context.Context, recordID string) error
 	// 更新状态
 	UpdateStatus(ctx context.Context, recordID string, status int) error
-	// 加载权限策略
-	LoadPolicy(ctx context.Context, item schema.User) error
 }

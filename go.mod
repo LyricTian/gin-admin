@@ -5,7 +5,7 @@ require (
 	github.com/LyricTian/captcha v0.0.0-20190614104510-11aff818cbf4
 	github.com/LyricTian/queue v0.0.0-20180917141405-8f19abe7fd77
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/casbin/casbin v1.9.1
+	github.com/casbin/casbin/v2 v2.1.0
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0 // indirect
 	github.com/dgrijalva/jwt-go v0.0.0-20180719211823-0b96aaa70776
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect

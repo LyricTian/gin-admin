@@ -17,7 +17,7 @@ func TraceMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 		// 优先从请求头中获取请求ID，如果没有则使用UUID
 		traceID := c.GetHeader("X-Request-Id")
 		if traceID == "" {
-			traceID = util.MustUUID()
+			traceID = util.NewTraceID()
 		}
 		c.Set(ginplus.TraceIDKey, traceID)
 		c.Next()
