@@ -72,9 +72,8 @@ func TestAPIUser(t *testing.T) {
 	assert.Empty(t, addNewItem.Password)
 	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// query /users?q=page
-	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"q": "page"})))
+	// query /users
+	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.User
 	err = parsePageReader(w.Body, &pageItems)
@@ -92,6 +91,8 @@ func TestAPIUser(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	var putItem schema.User
 	err = parseReader(w.Body, &putItem)
+	assert.Nil(t, err)
+
 	putItem.UserName = util.MustUUID()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
@@ -120,4 +121,58 @@ func TestAPIUser(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
+}
+
+func BenchmarkAPIUserCreateParallel(b *testing.B) {
+	const router = apiPrefix + "v1/users"
+	w := httptest.NewRecorder()
+
+	// post /menus
+	addMenuItem := &schema.Menu{
+		Name:     util.MustUUID(),
+		Sequence: 9999999,
+		Actions: []*schema.MenuAction{
+			{Code: "query", Name: "query"},
+		},
+		Resources: []*schema.MenuResource{
+			{Code: "query", Name: "query", Method: "GET", Path: "/test/v1/menus"},
+		},
+	}
+	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/menus", addMenuItem))
+	var addNewMenuItem schema.Menu
+	_ = parseReader(w.Body, &addNewMenuItem)
+
+	// post /roles
+	addRoleItem := &schema.Role{
+		Name:     util.MustUUID(),
+		Sequence: 9999999,
+		Menus: []*schema.RoleMenu{
+			{
+				MenuID:    addNewMenuItem.RecordID,
+				Actions:   []string{"query"},
+				Resources: []string{"query"},
+			},
+		},
+	}
+	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/roles", addRoleItem))
+	var addNewRoleItem schema.Role
+	_ = parseReader(w.Body, &addNewRoleItem)
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			// post /users
+			addItem := &schema.User{
+				UserName: util.MustUUID(),
+				RealName: util.MustUUID(),
+				Password: util.MD5HashString("123"),
+				Status:   1,
+				Roles: []*schema.UserRole{
+					{RoleID: addNewRoleItem.RecordID},
+				},
+			}
+
+			w := httptest.NewRecorder()
+			engine.ServeHTTP(w, newPostRequest(router, addItem))
+		}
+	})
 }

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -17,6 +16,7 @@ import (
 
 const (
 	configFile = "../../../configs/config.toml"
+	modelFile  = "../../../configs/model.conf"
 	apiPrefix  = "/api/"
 )
 
@@ -31,7 +31,8 @@ func init() {
 
 	cfg := config.Global()
 	cfg.RunMode = "debug"
-	cfg.Casbin.Enable = false
+	cfg.Casbin.Enable = true
+	cfg.Casbin.Model = modelFile
 	cfg.Gorm.Debug = false
 	cfg.Gorm.DBType = "sqlite3"
 
@@ -41,7 +42,7 @@ func init() {
 
 func toReader(v interface{}) io.Reader {
 	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(v)
+	_ = json.NewEncoder(buf).Encode(v)
 	return buf
 }
 
@@ -63,18 +64,18 @@ func parseOK(r io.Reader) error {
 	return nil
 }
 
-func releaseReader(r io.Reader) {
-	ioutil.ReadAll(r)
-}
-
-func newPageParam(extra map[string]string) map[string]string {
+func newPageParam(extra ...map[string]string) map[string]string {
 	data := map[string]string{
 		"current":  "1",
 		"pageSize": "1",
 	}
-	for k, v := range extra {
-		data[k] = v
+
+	if len(extra) > 0 {
+		for k, v := range extra[0] {
+			data[k] = v
+		}
 	}
+
 	return data
 }
 
@@ -101,11 +102,6 @@ func newPostRequest(router string, v interface{}) *http.Request {
 
 func newPutRequest(formatRouter string, v interface{}, args ...interface{}) *http.Request {
 	req, _ := http.NewRequest("PUT", fmt.Sprintf(formatRouter, args...), toReader(v))
-	return req
-}
-
-func newPatchRequest(formatRouter string, args ...interface{}) *http.Request {
-	req, _ := http.NewRequest("PATCH", fmt.Sprintf(formatRouter, args...), nil)
 	return req
 }
 
