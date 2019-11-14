@@ -106,3 +106,46 @@ func TestAPIRole(t *testing.T) {
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
 }
+
+func BenchmarkAPIRoleCreateParallel(b *testing.B) {
+	const router = apiPrefix + "v1/roles"
+
+	w := httptest.NewRecorder()
+
+	// post /menus
+	addMenuItem := &schema.Menu{
+		Name:     util.MustUUID(),
+		Sequence: 9999999,
+		Actions: []*schema.MenuAction{
+			{Code: "query", Name: "query"},
+		},
+		Resources: []*schema.MenuResource{
+			{Code: "query", Name: "query", Method: "GET", Path: "/test/v1/menus"},
+		},
+	}
+	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/menus", addMenuItem))
+	var addNewMenuItem schema.Menu
+	_ = parseReader(w.Body, &addNewMenuItem)
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			// post /roles
+			addItem := &schema.Role{
+				Name:     util.MustUUID(),
+				Sequence: 9999999,
+				Menus: []*schema.RoleMenu{
+					{
+						MenuID:    addNewMenuItem.RecordID,
+						Actions:   []string{"query"},
+						Resources: []string{"query"},
+					},
+				},
+			}
+			w := httptest.NewRecorder()
+			engine.ServeHTTP(w, newPostRequest(router, addItem))
+			if w.Code != 200 {
+				b.Errorf("Expected value: %d, given value: %d", 200, w.Code)
+			}
+		}
+	})
+}
