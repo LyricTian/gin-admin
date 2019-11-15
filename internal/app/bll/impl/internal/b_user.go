@@ -23,7 +23,7 @@ func NewUser(
 		RoleModel: mRole,
 		DeleteHook: func(ctx context.Context, bUser *User, recordID string) error {
 			if config.Global().Casbin.Enable {
-				bUser.Enforcer.DeleteUser(recordID)
+				_, _ = bUser.Enforcer.DeleteUser(recordID)
 			}
 			return nil
 		},
@@ -35,7 +35,7 @@ func NewUser(
 						return err
 					}
 				} else {
-					bUser.Enforcer.DeleteUser(item.RecordID)
+					_, _ = bUser.Enforcer.DeleteUser(item.RecordID)
 				}
 			}
 			return nil
@@ -227,9 +227,9 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 
 // LoadPolicy 加载用户权限策略
 func (a *User) LoadPolicy(ctx context.Context, item *schema.User) error {
-	a.Enforcer.DeleteRolesForUser(item.RecordID)
+	_, _ = a.Enforcer.DeleteRolesForUser(item.RecordID)
 	for _, roleID := range item.Roles.ToRoleIDs() {
-		a.Enforcer.AddRoleForUser(item.RecordID, roleID)
+		_, _ = a.Enforcer.AddRoleForUser(item.RecordID, roleID)
 	}
 	return nil
 }

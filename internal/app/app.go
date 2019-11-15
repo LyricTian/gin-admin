@@ -93,9 +93,6 @@ func Init(ctx context.Context, opts ...Option) func() {
 	if v := o.SwaggerDir; v != "" {
 		cfg.Swagger = v
 	}
-	if v := o.SwaggerDir; v != "" {
-		cfg.Swagger = v
-	}
 	if v := o.MenuFile; v != "" {
 		cfg.Menu.Data = v
 	}
@@ -162,7 +159,7 @@ func BuildContainer() (*dig.Container, func()) {
 
 	return container, func() {
 		if auther != nil {
-			auther.Release()
+			_ = auther.Release()
 		}
 
 		// 释放资源
