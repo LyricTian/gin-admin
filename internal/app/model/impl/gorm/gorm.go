@@ -78,10 +78,10 @@ func AutoMigrate(db *gorm.DB) error {
 //   container.Invoke(func(foo IDemo) {
 //   })
 func Inject(container *dig.Container) error {
-	container.Provide(imodel.NewTrans, dig.As(new(model.ITrans)))
-	container.Provide(imodel.NewDemo, dig.As(new(model.IDemo)))
-	container.Provide(imodel.NewMenu, dig.As(new(model.IMenu)))
-	container.Provide(imodel.NewRole, dig.As(new(model.IRole)))
-	container.Provide(imodel.NewUser, dig.As(new(model.IUser)))
+	_ = container.Provide(imodel.NewTrans, dig.As(new(model.ITrans)))
+	_ = container.Provide(imodel.NewDemo, dig.As(new(model.IDemo)))
+	_ = container.Provide(imodel.NewMenu, dig.As(new(model.IMenu)))
+	_ = container.Provide(imodel.NewRole, dig.As(new(model.IRole)))
+	_ = container.Provide(imodel.NewUser, dig.As(new(model.IUser)))
 	return nil
 }
