@@ -23,23 +23,19 @@ func InitAuth() (auth.Auther, error) {
 		return []byte(cfg.SigningKey), nil
 	}))
 
+	var method jwt.SigningMethod
 	switch cfg.SigningMethod {
 	case "HS256":
-		opts = append(opts, jwtauth.SetSigningMethod(jwt.SigningMethodHS256))
+		method = jwt.SigningMethodHS256
 	case "HS384":
-		opts = append(opts, jwtauth.SetSigningMethod(jwt.SigningMethodHS384))
-	case "HS512":
-		opts = append(opts, jwtauth.SetSigningMethod(jwt.SigningMethodHS512))
+		method = jwt.SigningMethodHS384
+	default:
+		method = jwt.SigningMethodHS512
 	}
+	opts = append(opts, jwtauth.SetSigningMethod(method))
 
 	var store jwtauth.Storer
 	switch cfg.Store {
-	case "file":
-		s, err := buntdb.NewStore(cfg.FilePath)
-		if err != nil {
-			return nil, err
-		}
-		store = s
 	case "redis":
 		rcfg := config.Global().Redis
 		store = redis.NewStore(&redis.Config{
@@ -48,6 +44,12 @@ func InitAuth() (auth.Auther, error) {
 			DB:        cfg.RedisDB,
 			KeyPrefix: cfg.RedisPrefix,
 		})
+	default:
+		s, err := buntdb.NewStore(cfg.FilePath)
+		if err != nil {
+			return nil, err
+		}
+		store = s
 	}
 
 	return jwtauth.New(store, opts...), nil

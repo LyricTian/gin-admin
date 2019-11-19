@@ -13,11 +13,11 @@ import (
 //   container.Invoke(func(foo IDemo) {
 //   })
 func Inject(container *dig.Container) error {
-	container.Provide(internal.NewTrans, dig.As(new(bll.ITrans)))
-	container.Provide(internal.NewDemo, dig.As(new(bll.IDemo)))
-	container.Provide(internal.NewLogin, dig.As(new(bll.ILogin)))
-	container.Provide(internal.NewMenu, dig.As(new(bll.IMenu)))
-	container.Provide(internal.NewRole, dig.As(new(bll.IRole)))
-	container.Provide(internal.NewUser, dig.As(new(bll.IUser)))
+	_ = container.Provide(internal.NewTrans, dig.As(new(bll.ITrans)))
+	_ = container.Provide(internal.NewDemo, dig.As(new(bll.IDemo)))
+	_ = container.Provide(internal.NewLogin, dig.As(new(bll.ILogin)))
+	_ = container.Provide(internal.NewMenu, dig.As(new(bll.IMenu)))
+	_ = container.Provide(internal.NewRole, dig.As(new(bll.IRole)))
+	_ = container.Provide(internal.NewUser, dig.As(new(bll.IUser)))
 	return nil
 }
