@@ -18,6 +18,8 @@
 /data
 /internal/app/test/data
 /docs/json
+/docs/swagger/docs.go
+/docs/swagger/swagger.yaml
 
 # IDE configs
 .idea
