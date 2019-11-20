@@ -23,7 +23,8 @@ type DemoQueryParam struct {
 
 // DemoQueryOptions demo对象查询可选参数项
 type DemoQueryOptions struct {
-	PageParam *PaginationParam // 分页参数
+	PageParam   *PaginationParam // 分页参数
+	OrderFields []*OrderField    // 排序字段
 }
 
 // DemoQueryResult demo对象查询结果

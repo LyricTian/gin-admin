@@ -17,6 +17,7 @@
 /release
 /data
 /internal/app/test/data
+/docs/json
 
 # IDE configs
 .idea

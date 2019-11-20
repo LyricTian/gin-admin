@@ -32,6 +32,7 @@ type RoleQueryParam struct {
 type RoleQueryOptions struct {
 	PageParam    *PaginationParam // 分页参数
 	IncludeMenus bool             // 包含菜单权限
+	OrderFields  []*OrderField    // 排序字段
 }
 
 // RoleQueryResult 查询结果

@@ -42,6 +42,7 @@ type UserQueryParam struct {
 type UserQueryOptions struct {
 	PageParam    *PaginationParam // 分页参数
 	IncludeRoles bool             // 包含角色权限
+	OrderFields  []*OrderField    // 排序字段
 }
 
 // UserQueryResult 查询结果

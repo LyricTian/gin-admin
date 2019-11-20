@@ -29,6 +29,8 @@ func (a *Demo) getQueryOption(opts ...schema.DemoQueryOptions) schema.DemoQueryO
 
 // Query 查询数据
 func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...schema.DemoQueryOptions) (*schema.DemoQueryResult, error) {
+	opt := a.getQueryOption(opts...)
+
 	db := entity.GetDemoDB(ctx, a.db)
 	if v := params.Code; v != "" {
 		db = db.Where("code=?", v)
@@ -42,9 +44,10 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 	if v := params.Status; v > 0 {
 		db = db.Where("status=?", v)
 	}
-	db = db.Order("id DESC")
 
-	opt := a.getQueryOption(opts...)
+	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
+	db = db.Order(ParseOrder(opt.OrderFields))
+
 	var list entity.Demos
 	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
 	if err != nil {
@@ -74,8 +77,8 @@ func (a *Demo) Get(ctx context.Context, recordID string, opts ...schema.DemoQuer
 
 // Create 创建数据
 func (a *Demo) Create(ctx context.Context, item schema.Demo) error {
-	demo := entity.SchemaDemo(item).ToDemo()
-	result := entity.GetDemoDB(ctx, a.db).Create(demo)
+	eitem := entity.SchemaDemo(item).ToDemo()
+	result := entity.GetDemoDB(ctx, a.db).Create(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -84,8 +87,8 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) error {
 
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
-	demo := entity.SchemaDemo(item).ToDemo()
-	result := entity.GetDemoDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(demo)
+	eitem := entity.SchemaDemo(item).ToDemo()
+	result := entity.GetDemoDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

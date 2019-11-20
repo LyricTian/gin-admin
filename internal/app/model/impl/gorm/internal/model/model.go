@@ -2,6 +2,8 @@ package model
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	icontext "github.com/LyricTian/gin-admin/internal/app/context"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
@@ -112,4 +114,27 @@ func Check(ctx context.Context, db *gorm.DB) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// OrderFieldFunc 排序字段转换函数
+type OrderFieldFunc func(string) string
+
+// ParseOrder 解析排序字段
+func ParseOrder(items []*schema.OrderField, handle ...OrderFieldFunc) string {
+	orders := make([]string, len(items))
+
+	for i, item := range items {
+		key := item.Key
+		if len(handle) > 0 {
+			key = handle[0](key)
+		}
+
+		direction := "ASC"
+		if item.Direction == schema.OrderByDESC {
+			direction = "DESC"
+		}
+		orders[i] = fmt.Sprintf("%s %s", key, direction)
+	}
+
+	return strings.Join(orders, ",")
 }

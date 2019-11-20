@@ -1,5 +1,29 @@
 package schema
 
+// OrderDirection 排序方向
+type OrderDirection int
+
+const (
+	// OrderByASC 升序排序
+	OrderByASC OrderDirection = 1
+	// OrderByDESC 降序排序
+	OrderByDESC OrderDirection = 2
+)
+
+// NewOrderField 创建排序字段
+func NewOrderField(key string, direction OrderDirection) *OrderField {
+	return &OrderField{
+		Key:       key,
+		Direction: direction,
+	}
+}
+
+// OrderField 排序字段
+type OrderField struct {
+	Key       string         // 字段名(字段名约束为小写蛇形)
+	Direction OrderDirection // 排序方向
+}
+
 // HTTPStatusText 定义HTTP状态文本
 type HTTPStatusText string
 
