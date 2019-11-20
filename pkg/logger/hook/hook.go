@@ -131,11 +131,9 @@ func (h *Hook) copyEntry(e *logrus.Entry) *logrus.Entry {
 }
 
 func (h *Hook) exec(entry *logrus.Entry) {
-	if extra := h.opts.extra; extra != nil {
-		for k, v := range extra {
-			if _, ok := entry.Data[k]; !ok {
-				entry.Data[k] = v
-			}
+	for k, v := range h.opts.extra {
+		if _, ok := entry.Data[k]; !ok {
+			entry.Data[k] = v
 		}
 	}
 

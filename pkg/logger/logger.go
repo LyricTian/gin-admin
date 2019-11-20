@@ -79,7 +79,6 @@ func getTraceID() string {
 
 type (
 	traceIDContextKey struct{}
-	spanIDContextKey  struct{}
 	userIDContextKey  struct{}
 )
 
@@ -149,9 +148,13 @@ func StartSpan(ctx context.Context, opts ...SpanOption) *Entry {
 	}
 
 	fields := map[string]interface{}{
-		UserIDKey:  FromUserIDContext(ctx),
-		TraceIDKey: FromTraceIDContext(ctx),
 		VersionKey: version,
+	}
+	if v := FromTraceIDContext(ctx); v != "" {
+		fields[TraceIDKey] = v
+	}
+	if v := FromUserIDContext(ctx); v != "" {
+		fields[UserIDKey] = v
 	}
 	if v := o.Title; v != "" {
 		fields[SpanTitleKey] = v
@@ -211,7 +214,8 @@ type Entry struct {
 
 func (e *Entry) checkAndDelete(fields map[string]interface{}, keys ...string) {
 	for _, key := range keys {
-		if _, ok := fields[key]; ok {
+		_, ok := fields[key]
+		if ok {
 			delete(fields, key)
 		}
 	}
