@@ -37,11 +37,11 @@ func InitStore(container *dig.Container) (func(), error) {
 		}
 
 		// 注入DB
-		container.Provide(func() *gorm.DB {
+		_ = container.Provide(func() *gorm.DB {
 			return db
 		})
 
-		igorm.Inject(container)
+		_ = igorm.Inject(container)
 	default:
 		return nil, errors.New("unknown store")
 	}
@@ -59,7 +59,7 @@ func initGorm() (*gorm.DB, error) {
 		dsn = cfg.MySQL.DSN()
 	case "sqlite3":
 		dsn = cfg.Sqlite3.DSN()
-		os.MkdirAll(filepath.Dir(dsn), 0777)
+		_ = os.MkdirAll(filepath.Dir(dsn), 0777)
 	case "postgres":
 		dsn = cfg.Postgres.DSN()
 	default:
