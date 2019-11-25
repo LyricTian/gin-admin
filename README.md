@@ -99,7 +99,7 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 
 ```bash
 $ go get -u -v github.com/swaggo/swag/cmd/swag
-$ swag init -g ./internal/app/routers/api/swagger.go -o ./docs/swagger
+$ swag init -g ./internal/app/routers/swagger.go -o ./docs/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
