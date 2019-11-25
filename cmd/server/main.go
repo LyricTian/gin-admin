@@ -42,7 +42,7 @@ func main() {
 	}
 
 	var state int32 = 1
-	sc := make(chan os.Signal)
+	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	// 初始化日志参数

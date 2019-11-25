@@ -138,12 +138,12 @@ func BuildContainer() (*dig.Container, func()) {
 	// 注入认证模块
 	auther, err := InitAuth()
 	handleError(err)
-	container.Provide(func() auth.Auther {
+	_ = container.Provide(func() auth.Auther {
 		return auther
 	})
 
 	// 注入casbin
-	container.Provide(NewCasbinEnforcer)
+	_ = container.Provide(NewCasbinEnforcer)
 
 	// 注入存储模块
 	storeCall, err := InitStore(container)
