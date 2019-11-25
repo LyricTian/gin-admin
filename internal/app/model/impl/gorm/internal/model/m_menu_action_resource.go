@@ -9,12 +9,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// NewMenuActionResource 创建菜单动作关联资源管理存储实例
+// NewMenuActionResource 创建菜单动作关联资源存储实例
 func NewMenuActionResource(db *gorm.DB) *MenuActionResource {
 	return &MenuActionResource{db}
 }
 
-// MenuActionResource 菜单动作关联资源管理存储
+// MenuActionResource 菜单动作关联资源存储
 type MenuActionResource struct {
 	db *gorm.DB
 }

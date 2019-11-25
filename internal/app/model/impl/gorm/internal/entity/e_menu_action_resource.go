@@ -6,15 +6,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// GetMenuActionResourceDB 菜单动作关联资源管理
+// GetMenuActionResourceDB 菜单动作关联资源
 func GetMenuActionResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return getDBWithModel(ctx, defDB, MenuActionResource{})
 }
 
-// SchemaMenuActionResource 菜单动作关联资源管理
+// SchemaMenuActionResource 菜单动作关联资源
 type SchemaMenuActionResource schema.MenuActionResource
 
-// ToMenuActionResource 转换为菜单动作关联资源管理实体
+// ToMenuActionResource 转换为菜单动作关联资源实体
 func (a SchemaMenuActionResource) ToMenuActionResource() *MenuActionResource {
 	item := &MenuActionResource{
 		RecordID: &a.RecordID,
@@ -25,7 +25,7 @@ func (a SchemaMenuActionResource) ToMenuActionResource() *MenuActionResource {
 	return item
 }
 
-// MenuActionResource 菜单动作关联资源管理实体
+// MenuActionResource 菜单动作关联资源实体
 type MenuActionResource struct {
 	Model
 	RecordID *string `gorm:"column:record_id;size:36;index;"` // 记录ID
@@ -43,7 +43,7 @@ func (a MenuActionResource) TableName() string {
 	return a.Model.TableName("menu_action_resource")
 }
 
-// ToSchemaMenuActionResource 转换为菜单动作关联资源管理对象
+// ToSchemaMenuActionResource 转换为菜单动作关联资源对象
 func (a MenuActionResource) ToSchemaMenuActionResource() *schema.MenuActionResource {
 	item := &schema.MenuActionResource{
 		RecordID: *a.RecordID,
@@ -54,10 +54,10 @@ func (a MenuActionResource) ToSchemaMenuActionResource() *schema.MenuActionResou
 	return item
 }
 
-// MenuActionResources 菜单动作关联资源管理列表
+// MenuActionResources 菜单动作关联资源列表
 type MenuActionResources []*MenuActionResource
 
-// ToSchemaMenuActionResources 转换为菜单动作关联资源管理对象列表
+// ToSchemaMenuActionResources 转换为菜单动作关联资源对象列表
 func (a MenuActionResources) ToSchemaMenuActionResources() []*schema.MenuActionResource {
 	list := make([]*schema.MenuActionResource, len(a))
 	for i, item := range a {

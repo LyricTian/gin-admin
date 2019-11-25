@@ -1,6 +1,6 @@
 package schema
 
-// MenuAction 菜单动作管理
+// MenuAction 菜单动作对象
 type MenuAction struct {
 	RecordID  string              `json:"record_id"`                  // 记录ID
 	MenuID    string              `json:"menu_id" binding:"required"` // 菜单ID

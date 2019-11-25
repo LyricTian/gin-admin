@@ -9,12 +9,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// NewMenuAction 创建菜单动作管理存储实例
+// NewMenuAction 创建菜单动作存储实例
 func NewMenuAction(db *gorm.DB) *MenuAction {
 	return &MenuAction{db}
 }
 
-// MenuAction 菜单动作管理存储
+// MenuAction 菜单动作存储
 type MenuAction struct {
 	db *gorm.DB
 }

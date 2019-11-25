@@ -68,6 +68,7 @@ func AutoMigrate(db *gorm.DB) error {
 		new(entity.Menu),
 		new(entity.MenuAction),
 		new(entity.MenuActionResource),
+		new(entity.RoleMenu),
 	).Error
 }
 
@@ -78,12 +79,13 @@ func AutoMigrate(db *gorm.DB) error {
 //   container.Invoke(func(foo IDemo) {
 //   })
 func Inject(container *dig.Container) error {
-	_ = container.Provide(imodel.NewTrans, dig.As(new(model.ITrans)))
+	_ = container.Provide(imodel.NewTrans)
 	_ = container.Provide(imodel.NewDemo, dig.As(new(model.IDemo)))
 	_ = container.Provide(imodel.NewMenu, dig.As(new(model.IMenu)))
 	_ = container.Provide(imodel.NewRole, dig.As(new(model.IRole)))
 	_ = container.Provide(imodel.NewUser, dig.As(new(model.IUser)))
 	_ = container.Provide(imodel.NewMenuAction, dig.As(new(model.IMenuAction)))
 	_ = container.Provide(imodel.NewMenuActionResource, dig.As(new(model.IMenuActionResource)))
+	_ = container.Provide(imodel.NewRoleMenu, dig.As(new(model.IRoleMenu)))
 	return nil
 }

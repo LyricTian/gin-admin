@@ -29,6 +29,8 @@ func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryO
 
 // Query 查询数据
 func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
+	opt := a.getQueryOption(opts...)
+
 	db := entity.GetRoleDB(ctx, a.db)
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
@@ -43,9 +45,10 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		subQuery := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", v).Select("role_id").SubQuery()
 		db = db.Where("record_id IN(?)", subQuery)
 	}
-	db = db.Order("sequence DESC,id DESC")
 
-	opt := a.getQueryOption(opts...)
+	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
+	db = db.Order(ParseOrder(opt.OrderFields))
+
 	var list entity.Roles
 	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
 	if err != nil {
@@ -56,41 +59,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		Data:       list.ToSchemaRoles(),
 	}
 
-	err = a.fillSchameRoles(ctx, qr.Data, opts...)
-	if err != nil {
-		return nil, err
-	}
-
 	return qr, nil
-}
-
-// 填充角色对象
-func (a *Role) fillSchameRoles(ctx context.Context, items []*schema.Role, opts ...schema.RoleQueryOptions) error {
-	opt := a.getQueryOption(opts...)
-
-	if opt.IncludeMenus {
-
-		roleIDs := make([]string, len(items))
-		for i, item := range items {
-			roleIDs[i] = item.RecordID
-		}
-
-		var menuList entity.RoleMenus
-		if opt.IncludeMenus {
-			items, err := a.queryMenus(ctx, roleIDs...)
-			if err != nil {
-				return err
-			}
-			menuList = items
-		}
-
-		for i, item := range items {
-			if len(menuList) > 0 {
-				items[i].Menus = menuList.GetByRoleID(item.RecordID)
-			}
-		}
-	}
-	return nil
 }
 
 // Get 查询指定数据
@@ -103,127 +72,34 @@ func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQuer
 		return nil, nil
 	}
 
-	sitem := role.ToSchemaRole()
-	err = a.fillSchameRoles(ctx, []*schema.Role{sitem}, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return sitem, nil
+	return role.ToSchemaRole(), nil
 }
 
 // Create 创建数据
 func (a *Role) Create(ctx context.Context, item schema.Role) error {
-	return ExecTrans(ctx, a.db, func(ctx context.Context) error {
-		sitem := entity.SchemaRole(item)
-		result := entity.GetRoleDB(ctx, a.db).Create(sitem.ToRole())
-		if err := result.Error; err != nil {
-			return errors.WithStack(err)
-		}
-
-		for _, item := range sitem.ToRoleMenus() {
-			result := entity.GetRoleMenuDB(ctx, a.db).Create(item)
-			if err := result.Error; err != nil {
-				return errors.WithStack(err)
-			}
-		}
-
-		return nil
-	})
-}
-
-// 对比并获取需要新增，修改，删除的菜单项
-func (a *Role) compareUpdateMenu(oldList, newList entity.RoleMenus) (clist, dlist, ulist entity.RoleMenus) {
-	oldMap, newMap := oldList.ToMap(), newList.ToMap()
-
-	for _, nitem := range newList {
-		if _, ok := oldMap[nitem.MenuID]; ok {
-			ulist = append(ulist, nitem)
-			continue
-		}
-		clist = append(clist, nitem)
-	}
-
-	for _, oitem := range oldList {
-		if _, ok := newMap[oitem.MenuID]; !ok {
-			dlist = append(dlist, oitem)
-		}
-	}
-	return
-}
-
-// 更新菜单数据
-func (a *Role) updateMenus(ctx context.Context, roleID string, items entity.RoleMenus) error {
-	list, err := a.queryMenus(ctx, roleID)
-	if err != nil {
-		return err
-	}
-
-	clist, dlist, ulist := a.compareUpdateMenu(list, items)
-	for _, item := range clist {
-		result := entity.GetRoleMenuDB(ctx, a.db).Create(item)
-		if err := result.Error; err != nil {
-			return errors.WithStack(err)
-		}
-	}
-
-	for _, item := range dlist {
-		result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", roleID, item.MenuID).Delete(entity.RoleMenu{})
-		if err := result.Error; err != nil {
-			return errors.WithStack(err)
-		}
-	}
-
-	for _, item := range ulist {
-		result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=? AND menu_id=?", roleID, item.MenuID).Omit("role_id", "menu_id").Updates(item)
-		if err := result.Error; err != nil {
-			return errors.WithStack(err)
-		}
+	eitem := entity.SchemaRole(item).ToRole()
+	result := entity.GetRoleDB(ctx, a.db).Create(eitem)
+	if err := result.Error; err != nil {
+		return errors.WithStack(err)
 	}
 	return nil
 }
 
 // Update 更新数据
 func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) error {
-	return ExecTrans(ctx, a.db, func(ctx context.Context) error {
-		sitem := entity.SchemaRole(item)
-		result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(sitem.ToRole())
-		if err := result.Error; err != nil {
-			return errors.WithStack(err)
-		}
-
-		err := a.updateMenus(ctx, recordID, sitem.ToRoleMenus())
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
+	eitem := entity.SchemaRole(item).ToRole()
+	result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
+	if err := result.Error; err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }
 
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, recordID string) error {
-	return ExecTrans(ctx, a.db, func(ctx context.Context) error {
-		result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.Role{})
-		if err := result.Error; err != nil {
-			return errors.WithStack(err)
-		}
-
-		result = entity.GetRoleMenuDB(ctx, a.db).Where("role_id=?", recordID).Delete(entity.RoleMenu{})
-		if err := result.Error; err != nil {
-			return errors.WithStack(err)
-		}
-
-		return nil
-	})
-}
-
-func (a *Role) queryMenus(ctx context.Context, roleIDs ...string) (entity.RoleMenus, error) {
-	var list entity.RoleMenus
-	result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id IN(?)", roleIDs).Find(&list)
+	result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.Role{})
 	if err := result.Error; err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
-
-	return list, nil
+	return nil
 }

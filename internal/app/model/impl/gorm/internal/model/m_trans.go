@@ -9,7 +9,7 @@ import (
 
 // NewTrans 创建事务管理实例
 func NewTrans(db *gorm.DB) *Trans {
-	return &Trans{db}
+	return &Trans{db: db}
 }
 
 // Trans 事务管理

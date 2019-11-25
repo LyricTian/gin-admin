@@ -1,6 +1,6 @@
 package schema
 
-// MenuActionResource 菜单动作关联资源管理
+// MenuActionResource 菜单动作关联资源对象
 type MenuActionResource struct {
 	RecordID string `json:"record_id"`                    // 记录ID
 	ActionID string `json:"action_id" binding:"required"` // 菜单动作ID
