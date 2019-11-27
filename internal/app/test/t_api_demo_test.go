@@ -32,9 +32,8 @@ func TestAPIDemo(t *testing.T) {
 	assert.Equal(t, addItem.Status, addNewItem.Status)
 	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// query /demos?q=page
-	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"q": "page"})))
+	// query /demos
+	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.Demo
 	err = parsePageReader(w.Body, &pageItems)
@@ -50,6 +49,8 @@ func TestAPIDemo(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	var putItem schema.Demo
 	err = parseReader(w.Body, &putItem)
+	assert.Nil(t, err)
+
 	putItem.Name = util.MustUUID()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)

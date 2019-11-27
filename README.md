@@ -29,18 +29,33 @@
 
 > 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具
 
-### 快速创建并运行项目
+### 快速创建项目
 
 ```bash
-$ go get -u github.com/LyricTian/gin-admin-cli
+$ go get -v github.com/LyricTian/gin-admin-cli
 $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
+```
+
+### 使用 air 工具启动服务(推荐)
+
+> 可自动监听文件变化
+
+```bash
+$ go get -v github.com/cosmtrek/air/cmd/air
+$ cd ~/go/src/gin-admin
+$ air
+```
+
+### 使用 run 命令运行服务
+
+```bash
 $ cd ~/go/src/gin-admin
 $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./docs/swagger -menu ./configs/menu.json
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
 
-### 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
+### 解放劳动力 - 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
 
 ```bash
 $ gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
@@ -84,7 +99,7 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 
 ```bash
 $ go get -u -v github.com/swaggo/swag/cmd/swag
-$ swag init -g ./internal/app/routers/api/swagger.go -o ./docs/swagger
+$ swag init -g ./internal/app/routers/swagger.go -o ./docs/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)

@@ -25,7 +25,7 @@ func NewRole(
 		UserModel: mUser,
 		DeleteHook: func(ctx context.Context, bRole *Role, recordID string) error {
 			if config.Global().Casbin.Enable {
-				bRole.Enforcer.DeletePermissionsForUser(recordID)
+				_, _ = bRole.Enforcer.DeletePermissionsForUser(recordID)
 			}
 			return nil
 		},
@@ -209,9 +209,9 @@ func (a *Role) LoadPolicy(ctx context.Context, item *schema.Role) error {
 	}
 
 	roleID := item.RecordID
-	a.Enforcer.DeletePermissionsForUser(roleID)
+	_, _ = a.Enforcer.DeletePermissionsForUser(roleID)
 	for _, item := range resources {
-		a.Enforcer.AddPermissionForUser(roleID, item.Path, item.Method)
+		_, _ = a.Enforcer.AddPermissionForUser(roleID, item.Path, item.Method)
 	}
 
 	return nil

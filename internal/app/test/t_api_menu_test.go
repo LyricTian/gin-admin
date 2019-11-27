@@ -40,9 +40,8 @@ func TestAPIMenu(t *testing.T) {
 	assert.Equal(t, len(addItem.Resources), len(addNewItem.Resources))
 	assert.NotEmpty(t, addNewItem.RecordID)
 
-	// query /menus?q=page
-	engine.ServeHTTP(w, newGetRequest(router,
-		newPageParam(map[string]string{"q": "page"})))
+	// query /menus
+	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
 	assert.Equal(t, 200, w.Code)
 	var pageItems []*schema.Menu
 	err = parsePageReader(w.Body, &pageItems)
@@ -58,6 +57,7 @@ func TestAPIMenu(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	var putItem schema.Menu
 	err = parseReader(w.Body, &putItem)
+	assert.Nil(t, err)
 	putItem.Name = util.MustUUID()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
 	assert.Equal(t, 200, w.Code)
