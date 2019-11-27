@@ -125,6 +125,8 @@ type JWTAuth struct {
 type HTTP struct {
 	Host            string `toml:"host"`
 	Port            int    `toml:"port"`
+	CertFile        string `toml:"cert_file"`
+	KeyFile         string `toml:"key_file"`
 	ShutdownTimeout int    `toml:"shutdown_timeout"`
 }
 
