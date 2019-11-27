@@ -12,6 +12,7 @@ import (
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 )
 
 // 定义上下文中的键
@@ -104,6 +105,22 @@ func SetUserID(c *gin.Context, userID string) {
 // ParseJSON 解析请求JSON
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
+		return errors.Wrap400Response(err, "解析请求参数发生错误")
+	}
+	return nil
+}
+
+// ParseQuery 解析Query参数
+func ParseQuery(c *gin.Context, obj interface{}) error {
+	if err := c.ShouldBindQuery(obj); err != nil {
+		return errors.Wrap400Response(err, "解析请求参数发生错误")
+	}
+	return nil
+}
+
+// ParseForm 解析Form请求
+func ParseForm(c *gin.Context, obj interface{}) error {
+	if err := c.ShouldBindWith(obj, binding.Form); err != nil {
 		return errors.Wrap400Response(err, "解析请求参数发生错误")
 	}
 	return nil

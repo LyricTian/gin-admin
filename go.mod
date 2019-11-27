@@ -5,7 +5,7 @@ require (
 	github.com/LyricTian/captcha v0.0.0-20190614104510-11aff818cbf4
 	github.com/LyricTian/queue v0.0.0-20180917141405-8f19abe7fd77
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/casbin/casbin/v2 v2.1.0
+	github.com/casbin/casbin/v2 v2.1.1
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0 // indirect
 	github.com/dgrijalva/jwt-go v0.0.0-20180719211823-0b96aaa70776
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
@@ -22,10 +22,11 @@ require (
 	github.com/jinzhu/now v1.0.1 // indirect
 	github.com/json-iterator/go v1.1.6
 	github.com/lib/pq v0.0.0-20170117205633-67c3f2a8884c // indirect
+	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.0
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.4.0
 	github.com/swaggo/swag v1.6.3
 	github.com/tidwall/btree v0.0.0-20170113224114-9876f1454cf0 // indirect
 	github.com/tidwall/buntdb v1.1.0
@@ -34,8 +35,10 @@ require (
 	github.com/tidwall/match v1.0.0 // indirect
 	github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e // indirect
 	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
-	go.uber.org/dig v0.0.0-20190614173321-8a567bf6562e
+	go.uber.org/dig v1.8.0
+	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
+	gopkg.in/yaml.v2 v2.2.4 // indirect
 )
 
 go 1.13

@@ -45,7 +45,7 @@ func InitCasbinEnforcer(container *dig.Container) error {
 		adapter := NewCasbinAdapter(bRole, bUser)
 
 		if cfg.AutoLoad {
-			e.InitWithModelAndAdapter(e.GetModel(), adapter)
+			_ = e.InitWithModelAndAdapter(e.GetModel(), adapter)
 			e.StartAutoLoadPolicy(time.Duration(cfg.AutoLoadInternal) * time.Second)
 		} else {
 			err := adapter.LoadPolicy(e.GetModel())
@@ -70,7 +70,7 @@ func ReleaseCasbinEnforcer(container *dig.Container) {
 		return
 	}
 
-	container.Invoke(func(e *casbin.SyncedEnforcer) {
+	_ = container.Invoke(func(e *casbin.SyncedEnforcer) {
 		e.StopAutoLoadPolicy()
 	})
 }
