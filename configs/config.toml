@@ -16,6 +16,10 @@ store = "gorm"
 host = "0.0.0.0"
 # http监听端口
 port = 10088
+# 证书路径
+cert_file = ""
+# 证书密钥
+key_file = ""
 # http优雅关闭等待超时时长(单位秒)
 shutdown_timeout = 30
 
