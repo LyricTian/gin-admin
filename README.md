@@ -55,6 +55,10 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
 
+### Windows用户温馨提示：
+
+1. 执行出现错误：`exec: "gcc": executable file not found in %PATH%`，需要安装gcc，下载地址：[http://tdm-gcc.tdragon.net/download](http://tdm-gcc.tdragon.net/download)
+
 ### 解放劳动力 - 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
 
 ```bash
