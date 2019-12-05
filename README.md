@@ -151,9 +151,10 @@ $ swag init -g ./internal/app/routers/swagger.go -o ./docs/swagger
 
 ## 与作者对话
 
-> 该项目是利用业余时间进行开发的，开发思路主要是来源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，我非常期待！下面是我的微信二维码：
-
+> 该项目是利用业余时间进行开发的，开发思路主要是来源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，我非常期待！下面是我的微信二维码：   
+> QQ群: 1409099
 <img src="./screenshot_wechat.jpeg" width="256" height="256" />
+<img src="./screenshot_qq.jpeg" width="256" height="256" />
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
