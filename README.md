@@ -11,7 +11,7 @@
 - [在线演示地址](http://demo.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
 - [Swagger 文档地址](http://demo.tiannianshou.com/swagger/)
 
-![](./master/docs/screenshots/swagger.png)
+![](https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/swagger.png)
 
 ## 特性
 
@@ -155,11 +155,11 @@ $ swag init -g ./internal/app/routers/swagger.go -o ./docs/swagger
 
 > 该项目是利用业余时间进行开发的，开发思路主要是来源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，我非常期待！下面是我的微信二维码：
 
-<img src="./master/docs/screenshots/wechat.jpeg" width="256" height="256" />
+<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/wechat.jpeg" width="256" height="256" />
 
 ### QQ 群：1409099
 
-<img src="./master/docs/screenshots/qqgroup.jpeg" width="270" height="370" />
+<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/qqgroup.jpeg" width="270" height="370" />
 
 ## MIT License
 
