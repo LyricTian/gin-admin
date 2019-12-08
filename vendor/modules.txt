@@ -1,0 +1,169 @@
+# github.com/BurntSushi/toml v0.3.1
+github.com/BurntSushi/toml
+# github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible
+github.com/Knetic/govaluate
+# github.com/KyleBanks/depth v1.2.1
+github.com/KyleBanks/depth
+# github.com/LyricTian/captcha v1.1.0
+github.com/LyricTian/captcha
+github.com/LyricTian/captcha/store
+# github.com/LyricTian/queue v1.2.0
+github.com/LyricTian/queue
+# github.com/PuerkitoBio/purell v1.1.0
+github.com/PuerkitoBio/purell
+# github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
+github.com/PuerkitoBio/urlesc
+# github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+github.com/alecthomas/template
+github.com/alecthomas/template/parse
+# github.com/casbin/casbin/v2 v2.1.2
+github.com/casbin/casbin/v2
+github.com/casbin/casbin/v2/config
+github.com/casbin/casbin/v2/effect
+github.com/casbin/casbin/v2/errors
+github.com/casbin/casbin/v2/log
+github.com/casbin/casbin/v2/model
+github.com/casbin/casbin/v2/persist
+github.com/casbin/casbin/v2/persist/file-adapter
+github.com/casbin/casbin/v2/rbac
+github.com/casbin/casbin/v2/rbac/default-role-manager
+github.com/casbin/casbin/v2/util
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
+github.com/dgrijalva/jwt-go
+# github.com/gin-contrib/cors v1.3.0
+github.com/gin-contrib/cors
+# github.com/gin-contrib/sse v0.1.0
+github.com/gin-contrib/sse
+# github.com/gin-gonic/gin v1.5.0
+github.com/gin-gonic/gin
+github.com/gin-gonic/gin/binding
+github.com/gin-gonic/gin/internal/json
+github.com/gin-gonic/gin/render
+# github.com/go-openapi/jsonpointer v0.17.0
+github.com/go-openapi/jsonpointer
+# github.com/go-openapi/jsonreference v0.19.0
+github.com/go-openapi/jsonreference
+# github.com/go-openapi/spec v0.19.0
+github.com/go-openapi/spec
+# github.com/go-openapi/swag v0.17.0
+github.com/go-openapi/swag
+# github.com/go-playground/locales v0.12.1
+github.com/go-playground/locales
+github.com/go-playground/locales/currency
+# github.com/go-playground/universal-translator v0.16.0
+github.com/go-playground/universal-translator
+# github.com/go-redis/redis v6.15.6+incompatible
+github.com/go-redis/redis
+github.com/go-redis/redis/internal
+github.com/go-redis/redis/internal/consistenthash
+github.com/go-redis/redis/internal/hashtag
+github.com/go-redis/redis/internal/pool
+github.com/go-redis/redis/internal/proto
+github.com/go-redis/redis/internal/util
+# github.com/go-redis/redis_rate v6.5.0+incompatible
+github.com/go-redis/redis_rate
+# github.com/go-sql-driver/mysql v1.4.1
+github.com/go-sql-driver/mysql
+# github.com/golang/protobuf v1.3.2
+github.com/golang/protobuf/proto
+# github.com/google/gops v0.3.6
+github.com/google/gops/agent
+github.com/google/gops/internal
+github.com/google/gops/signal
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
+# github.com/jinzhu/gorm v1.9.11
+github.com/jinzhu/gorm
+github.com/jinzhu/gorm/dialects/mysql
+github.com/jinzhu/gorm/dialects/postgres
+github.com/jinzhu/gorm/dialects/sqlite
+# github.com/jinzhu/inflection v1.0.0
+github.com/jinzhu/inflection
+# github.com/json-iterator/go v1.1.8
+github.com/json-iterator/go
+# github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1
+github.com/kardianos/osext
+# github.com/konsorten/go-windows-terminal-sequences v1.0.1
+github.com/konsorten/go-windows-terminal-sequences
+# github.com/leodido/go-urn v1.1.0
+github.com/leodido/go-urn
+# github.com/lib/pq v1.1.1
+github.com/lib/pq
+github.com/lib/pq/hstore
+github.com/lib/pq/oid
+github.com/lib/pq/scram
+# github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329
+github.com/mailru/easyjson/buffer
+github.com/mailru/easyjson/jlexer
+github.com/mailru/easyjson/jwriter
+# github.com/mattn/go-isatty v0.0.9
+github.com/mattn/go-isatty
+# github.com/mattn/go-sqlite3 v1.11.0
+github.com/mattn/go-sqlite3
+# github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+github.com/modern-go/concurrent
+# github.com/modern-go/reflect2 v1.0.1
+github.com/modern-go/reflect2
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/sirupsen/logrus v1.4.2
+github.com/sirupsen/logrus
+# github.com/stretchr/testify v1.4.0
+github.com/stretchr/testify/assert
+# github.com/swaggo/swag v1.6.3
+github.com/swaggo/swag
+# github.com/tidwall/btree v0.0.0-20191029221954-400434d76274
+github.com/tidwall/btree
+# github.com/tidwall/buntdb v1.1.2
+github.com/tidwall/buntdb
+# github.com/tidwall/gjson v1.3.4
+github.com/tidwall/gjson
+# github.com/tidwall/grect v0.0.0-20161006141115-ba9a043346eb
+github.com/tidwall/grect
+# github.com/tidwall/match v1.0.1
+github.com/tidwall/match
+# github.com/tidwall/pretty v1.0.0
+github.com/tidwall/pretty
+# github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e
+github.com/tidwall/rtree
+github.com/tidwall/rtree/base
+# github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563
+github.com/tidwall/tinyqueue
+# github.com/ugorji/go/codec v1.1.7
+github.com/ugorji/go/codec
+# go.uber.org/dig v1.8.0
+go.uber.org/dig
+go.uber.org/dig/internal/digreflect
+go.uber.org/dig/internal/dot
+# golang.org/x/lint v0.0.0-20190930215403-16217165b5de
+golang.org/x/lint
+golang.org/x/lint/golint
+# golang.org/x/net v0.0.0-20190620200207-3b0461eec859
+golang.org/x/net/idna
+# golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a
+golang.org/x/sys/unix
+# golang.org/x/text v0.3.2
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+golang.org/x/text/width
+# golang.org/x/time v0.0.0-20191024005414-555d28b269f0
+golang.org/x/time/rate
+# golang.org/x/tools v0.0.0-20191030062658-86caa796c7ab
+golang.org/x/tools/go/ast/astutil
+golang.org/x/tools/go/buildutil
+golang.org/x/tools/go/gcexportdata
+golang.org/x/tools/go/internal/cgo
+golang.org/x/tools/go/internal/gcimporter
+golang.org/x/tools/go/loader
+# google.golang.org/appengine v1.4.0
+google.golang.org/appengine/cloudsql
+# gopkg.in/go-playground/validator.v9 v9.29.1
+gopkg.in/go-playground/validator.v9
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
