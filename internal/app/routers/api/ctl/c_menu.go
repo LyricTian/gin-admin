@@ -4,7 +4,6 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,35 +25,29 @@ type Menu struct {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
-// @Param name query string false "名称"
-// @Param hidden query int false "隐藏菜单(0:不隐藏 1:隐藏)"
+// @Param likeName query string false "名称(模糊查询)"
+// @Param status query int false "状态(1:正常 2:隐藏)"
 // @Param parentID query string false "父级ID"
 // @Success 200 {array} schema.Menu "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus [get]
 func (a *Menu) Query(c *gin.Context) {
-	params := schema.MenuQueryParam{
-		LikeName: c.Query("name"),
-	}
-
-	if v := c.Query("parentID"); v != "" {
-		params.ParentID = &v
-	}
-
-	if v := c.Query("hidden"); v != "" {
-		if hidden := util.S(v).DefaultInt(0); hidden > -1 {
-			params.Hidden = &hidden
-		}
+	var params schema.MenuQueryParam
+	if err := ginplus.ParseQuery(c, &params); err != nil {
+		ginplus.ResError(c, err)
+		return
 	}
 
 	result, err := a.MenuBll.Query(ginplus.NewContext(c), params, schema.MenuQueryOptions{
-		PageParam: ginplus.GetPaginationParam(c),
+		PageParam:   ginplus.GetPaginationParam(c),
+		OrderFields: schema.NewOrderFields(map[string]schema.OrderDirection{"sequence": schema.OrderByDESC}),
 	})
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
+
 	ginplus.ResPage(c, result.Data, result.PageResult)
 }
 
@@ -62,23 +55,29 @@ func (a *Menu) Query(c *gin.Context) {
 // @Tags 菜单管理
 // @Summary 查询菜单树
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Param includeActions query int false "是否包含动作数据(1是)"
-// @Param includeResources query int false "是否包含资源数据(1是)"
+// @Param likeName query string false "名称(模糊查询)"
+// @Param status query int false "状态(1:正常 2:隐藏)"
+// @Param parentID query string false "父级ID"
 // @Success 200 {array} schema.MenuTree "查询结果：{list:列表数据}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus.tree [get]
 func (a *Menu) QueryTree(c *gin.Context) {
-	result, err := a.MenuBll.Query(ginplus.NewContext(c), schema.MenuQueryParam{}, schema.MenuQueryOptions{
-		IncludeActions:   c.Query("includeActions") == "1",
-		IncludeResources: c.Query("includeResources") == "1",
+	var params schema.MenuQueryParam
+	if err := ginplus.ParseQuery(c, &params); err != nil {
+		ginplus.ResError(c, err)
+		return
+	}
+
+	result, err := a.MenuBll.Query(ginplus.NewContext(c), params, schema.MenuQueryOptions{
+		OrderFields: schema.NewOrderFields(map[string]schema.OrderDirection{"sequence": schema.OrderByDESC}),
 	})
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
 
-	ginplus.ResList(c, result.Data.ToTrees().ToTree())
+	ginplus.ResList(c, result.Data.ToTree())
 }
 
 // Get 查询指定数据
@@ -92,14 +91,12 @@ func (a *Menu) QueryTree(c *gin.Context) {
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus/{id} [get]
 func (a *Menu) Get(c *gin.Context) {
-	item, err := a.MenuBll.Get(ginplus.NewContext(c), c.Param("id"), schema.MenuQueryOptions{
-		IncludeActions:   true,
-		IncludeResources: true,
-	})
+	item, err := a.MenuBll.Get(ginplus.NewContext(c), c.Param("id"))
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
+
 	ginplus.ResSuccess(c, item)
 }
 
@@ -126,6 +123,7 @@ func (a *Menu) Create(c *gin.Context) {
 		ginplus.ResError(c, err)
 		return
 	}
+
 	ginplus.ResSuccess(c, nitem)
 }
 
@@ -135,7 +133,7 @@ func (a *Menu) Create(c *gin.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Param body body schema.Menu true "更新数据"
-// @Success 200 {object} schema.Menu
+// @Success 200 {object} schema.HTTPStatus "{status:OK}"
 // @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
@@ -147,12 +145,13 @@ func (a *Menu) Update(c *gin.Context) {
 		return
 	}
 
-	nitem, err := a.MenuBll.Update(ginplus.NewContext(c), c.Param("id"), item)
+	err := a.MenuBll.Update(ginplus.NewContext(c), c.Param("id"), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
-	ginplus.ResSuccess(c, nitem)
+
+	ginplus.ResOK(c)
 }
 
 // Delete 删除数据

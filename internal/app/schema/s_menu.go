@@ -24,12 +24,12 @@ type Menu struct {
 
 // MenuQueryParam 查询条件
 type MenuQueryParam struct {
-	RecordIDs        []string // 记录ID列表
-	LikeName         string   // 菜单名称(模糊查询)
-	Name             string   // 菜单名称
-	ParentID         *string  // 父级内码
-	PrefixParentPath string   // 父级路径(前缀模糊查询)
-	Status           int      // 状态(1:正常 2:隐藏)
+	RecordIDs        []string `form:"-"`        // 记录ID列表
+	Name             string   `form:"-"`        // 菜单名称
+	PrefixParentPath string   `form:"-"`        // 父级路径(前缀模糊查询)
+	LikeName         string   `form:"likeName"` // 菜单名称(模糊查询)
+	ParentID         *string  `form:"parentID"` // 父级内码
+	Status           int      `form:"status"`   // 状态(1:正常 2:隐藏)
 }
 
 // MenuQueryOptions 查询可选参数项

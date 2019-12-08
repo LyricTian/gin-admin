@@ -34,13 +34,7 @@ type Menu struct {
 
 // Query 查询数据
 func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
-	var nopt schema.MenuQueryOptions
-	if len(opts) > 0 {
-		nopt = opts[0]
-	}
-	nopt.OrderFields = append(nopt.OrderFields, schema.NewOrderField("sequence", schema.OrderByDESC))
-
-	return a.MenuModel.Query(ctx, params, nopt)
+	return a.MenuModel.Query(ctx, params, opts...)
 }
 
 // QueryActions 查询动作数据
@@ -126,7 +120,7 @@ func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
 // 创建动作数据
 func (a *Menu) createActions(ctx context.Context, menuID string, items schema.MenuActions) error {
 	for _, item := range items {
-		item.RecordID = util.MustUUID()
+		item.RecordID = util.NewRecordID()
 		item.MenuID = menuID
 		err := a.MenuActionModel.Create(ctx, *item)
 		if err != nil {
@@ -134,7 +128,7 @@ func (a *Menu) createActions(ctx context.Context, menuID string, items schema.Me
 		}
 
 		for _, ritem := range item.Resources {
-			ritem.RecordID = util.MustUUID()
+			ritem.RecordID = util.NewRecordID()
 			ritem.ActionID = item.RecordID
 			err := a.MenuActionResourceModel.Create(ctx, *ritem)
 			if err != nil {
@@ -157,7 +151,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.Menu, erro
 		return nil, err
 	}
 	item.ParentPath = parentPath
-	item.RecordID = util.MustUUID()
+	item.RecordID = util.NewRecordID()
 
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		err := a.createActions(ctx, item.RecordID, item.Actions)
@@ -294,7 +288,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 
 		addResources, delResources, updateResources := a.compareResources(ctx, oitem.Resources, item.Resources)
 		for _, aitem := range addResources {
-			aitem.RecordID = util.MustUUID()
+			aitem.RecordID = util.NewRecordID()
 			aitem.ActionID = item.RecordID
 			err := a.MenuActionResourceModel.Create(ctx, *aitem)
 			if err != nil {

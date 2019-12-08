@@ -10,6 +10,17 @@ const (
 	OrderByDESC OrderDirection = 2
 )
 
+// NewOrderFields 创建排序字段列表
+func NewOrderFields(m map[string]OrderDirection) []*OrderField {
+	var fields []*OrderField
+
+	for k, v := range m {
+		fields = append(fields, NewOrderField(k, v))
+	}
+
+	return fields
+}
+
 // NewOrderField 创建排序字段
 func NewOrderField(key string, direction OrderDirection) *OrderField {
 	return &OrderField{

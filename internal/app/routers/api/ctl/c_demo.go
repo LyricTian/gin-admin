@@ -4,7 +4,6 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,8 +25,8 @@ type Demo struct {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
-// @Param code query string false "编号"
-// @Param name query string false "名称"
+// @Param likeCode query string false "编号(模糊查询)"
+// @Param likeName query string false "名称(模糊查询)"
 // @Param status query int false "状态(1:启用 2:停用)"
 // @Success 200 {array} schema.Demo "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
@@ -35,9 +34,10 @@ type Demo struct {
 // @Router /api/v1/demos [get]
 func (a *Demo) Query(c *gin.Context) {
 	var params schema.DemoQueryParam
-	params.LikeCode = c.Query("code")
-	params.LikeName = c.Query("name")
-	params.Status = util.S(c.Query("status")).DefaultInt(0)
+	if err := ginplus.ParseQuery(c, &params); err != nil {
+		ginplus.ResError(c, err)
+		return
+	}
 
 	result, err := a.DemoBll.Query(ginplus.NewContext(c), params, schema.DemoQueryOptions{
 		PageParam: ginplus.GetPaginationParam(c),
@@ -101,7 +101,7 @@ func (a *Demo) Create(c *gin.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Param body body schema.Demo true "更新数据"
-// @Success 200 {object} schema.Demo
+// @Success 200 {object} schema.HTTPStatus "{status:OK}"
 // @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
@@ -113,12 +113,12 @@ func (a *Demo) Update(c *gin.Context) {
 		return
 	}
 
-	nitem, err := a.DemoBll.Update(ginplus.NewContext(c), c.Param("id"), item)
+	err := a.DemoBll.Update(ginplus.NewContext(c), c.Param("id"), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
-	ginplus.ResSuccess(c, nitem)
+	ginplus.ResOK(c)
 }
 
 // Delete 删除数据

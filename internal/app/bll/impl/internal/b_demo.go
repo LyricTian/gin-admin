@@ -49,11 +49,8 @@ func (a *Demo) checkCode(ctx context.Context, code string) error {
 	} else if result.PageResult.Total > 0 {
 		return errors.New400Response("编号已经存在")
 	}
-	return nil
-}
 
-func (a *Demo) getUpdate(ctx context.Context, recordID string) (*schema.Demo, error) {
-	return a.Get(ctx, recordID)
+	return nil
 }
 
 // Create 创建数据
@@ -63,33 +60,29 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.Demo, erro
 		return nil, err
 	}
 
-	item.RecordID = util.MustUUID()
+	item.RecordID = util.NewRecordID()
 	err = a.DemoModel.Create(ctx, item)
 	if err != nil {
 		return nil, err
 	}
-	return a.getUpdate(ctx, item.RecordID)
+
+	return &item, nil
 }
 
 // Update 更新数据
-func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) (*schema.Demo, error) {
+func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
 	oldItem, err := a.DemoModel.Get(ctx, recordID)
 	if err != nil {
-		return nil, err
+		return err
 	} else if oldItem == nil {
-		return nil, errors.ErrNotFound
+		return errors.ErrNotFound
 	} else if oldItem.Code != item.Code {
-		err := a.checkCode(ctx, item.Code)
-		if err != nil {
-			return nil, err
+		if err := a.checkCode(ctx, item.Code); err != nil {
+			return err
 		}
 	}
 
-	err = a.DemoModel.Update(ctx, recordID, item)
-	if err != nil {
-		return nil, err
-	}
-	return a.getUpdate(ctx, recordID)
+	return a.DemoModel.Update(ctx, recordID, item)
 }
 
 // Delete 删除数据
