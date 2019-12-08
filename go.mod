@@ -1,41 +1,27 @@
 module github.com/LyricTian/gin-admin
 
+go 1.13
+
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/LyricTian/captcha v0.0.0-20190614104510-11aff818cbf4
-	github.com/LyricTian/queue v0.0.0-20180917141405-8f19abe7fd77
+	github.com/LyricTian/captcha v1.1.0
+	github.com/LyricTian/queue v1.2.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/casbin/casbin/v2 v2.1.1
-	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0 // indirect
-	github.com/dgrijalva/jwt-go v0.0.0-20180719211823-0b96aaa70776
-	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
-	github.com/gin-contrib/cors v0.0.0-20190101123304-5e7acb10687f
-	github.com/gin-gonic/gin v1.4.0
-	github.com/go-redis/redis v0.0.0-20190609092923-f8704e4b6b43
-	github.com/go-redis/redis_rate v0.0.0-20180123081253-b7ae80ece379
-	github.com/go-sql-driver/mysql v0.0.0-20170512152933-382e13d099fc // indirect
-	github.com/gofrs/uuid v3.2.0+incompatible // indirect
+	github.com/casbin/casbin/v2 v2.1.2
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-contrib/cors v1.3.0
+	github.com/gin-gonic/gin v1.5.0
+	github.com/go-redis/redis v6.15.6+incompatible
+	github.com/go-redis/redis_rate v6.5.0+incompatible
 	github.com/google/gops v0.3.6
-	github.com/google/uuid v0.0.0-20190416172445-c2e93f3ae59f
-	github.com/jinzhu/gorm v0.0.0-20190102133208-9f1a7f535111
-	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
-	github.com/jinzhu/now v1.0.1 // indirect
-	github.com/json-iterator/go v1.1.6
-	github.com/lib/pq v0.0.0-20170117205633-67c3f2a8884c // indirect
-	github.com/mattn/go-sqlite3 v1.11.0 // indirect
+	github.com/google/uuid v1.1.1
+	github.com/jinzhu/gorm v1.9.11
+	github.com/json-iterator/go v1.1.8
 	github.com/pkg/errors v0.8.1
-	github.com/sirupsen/logrus v1.4.0
-	github.com/stretchr/testify v1.3.0
+	github.com/sirupsen/logrus v1.4.2
+	github.com/stretchr/testify v1.4.0
 	github.com/swaggo/swag v1.6.3
-	github.com/tidwall/btree v0.0.0-20170113224114-9876f1454cf0 // indirect
-	github.com/tidwall/buntdb v1.1.0
-	github.com/tidwall/gjson v0.0.0-20180429151328-3cd3a1192327 // indirect
-	github.com/tidwall/grect v0.0.0-20161006141115-ba9a043346eb // indirect
-	github.com/tidwall/match v1.0.0 // indirect
-	github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e // indirect
-	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
-	go.uber.org/dig v0.0.0-20190614173321-8a567bf6562e
-	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
+	github.com/tidwall/buntdb v1.1.2
+	go.uber.org/dig v1.8.0
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 )
-
-go 1.13

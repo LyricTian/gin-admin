@@ -11,7 +11,7 @@
 - [在线演示地址](http://demo.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
 - [Swagger 文档地址](http://demo.tiannianshou.com/swagger/)
 
-![](./screenshot_swagger.png)
+![](https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/swagger.png)
 
 ## 特性
 
@@ -29,18 +29,37 @@
 
 > 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具
 
-### 快速创建并运行项目
+### 快速创建项目
 
 ```bash
-$ go get -u github.com/LyricTian/gin-admin-cli
+$ go get -v github.com/LyricTian/gin-admin-cli
 $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
+```
+
+### 使用 air 工具启动服务(推荐)
+
+> 可自动监听文件变化
+
+```bash
+$ go get -v github.com/cosmtrek/air/cmd/air
+$ cd ~/go/src/gin-admin
+$ air
+```
+
+### 使用 run 命令运行服务
+
+```bash
 $ cd ~/go/src/gin-admin
 $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./docs/swagger -menu ./configs/menu.json
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
 
-### 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
+### Windows 用户温馨提示：
+
+1. 执行出现错误：`exec: "gcc": executable file not found in %PATH%`，需要安装 gcc，下载地址：[http://tdm-gcc.tdragon.net/download](http://tdm-gcc.tdragon.net/download)
+
+### 解放劳动力 - 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
 
 ```bash
 $ gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
@@ -84,7 +103,7 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 
 ```bash
 $ go get -u -v github.com/swaggo/swag/cmd/swag
-$ swag init -g ./internal/app/routers/api/swagger.go -o ./docs/swagger
+$ swag init -g ./internal/app/routers/swagger.go -o ./docs/swagger
 ```
 
 生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
@@ -130,15 +149,21 @@ $ swag init -g ./internal/app/routers/api/swagger.go -o ./docs/swagger
 - [Casbin] - [https://casbin.org/](https://casbin.org/)
 - [Dig] - [http://go.uber.org/dig](http://go.uber.org/dig)
 
-## MIT License
+## 互动交流
 
-    Copyright (c) 2019 Lyric
-
-## 与作者对话
+### 与作者对话
 
 > 该项目是利用业余时间进行开发的，开发思路主要是来源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，我非常期待！下面是我的微信二维码：
 
-<img src="./screenshot_wechat.jpeg" width="256" height="256" />
+<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/wechat.jpeg" width="256" height="256" />
+
+### QQ 群：1409099
+
+<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/qqgroup.jpeg" width="270" height="370" />
+
+## MIT License
+
+    Copyright (c) 2019 Lyric
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin

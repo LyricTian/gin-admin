@@ -16,7 +16,7 @@ import (
 
 // VERSION 版本号，
 // 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "5.1.0"
+var VERSION = "5.2.1"
 
 var (
 	configFile string
@@ -42,7 +42,7 @@ func main() {
 	}
 
 	var state int32 = 1
-	sc := make(chan os.Signal)
+	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	// 初始化日志参数
