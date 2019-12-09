@@ -87,6 +87,12 @@
             "path": "/api/v1/menus"
           },
           {
+            "code": "tree",
+            "name": "查询菜单树数据",
+            "method": "GET",
+            "path": "/api/v1/menus.tree"
+          },
+          {
             "code": "get",
             "name": "精确查询菜单数据",
             "method": "GET",
@@ -129,6 +135,12 @@
             "name": "查询角色数据",
             "method": "GET",
             "path": "/api/v1/roles"
+          },
+          {
+            "code": "select",
+            "name": "查询角色选择数据",
+            "method": "GET",
+            "path": "/api/v1/roles.select"
           },
           {
             "code": "get",
