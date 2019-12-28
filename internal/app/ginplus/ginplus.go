@@ -32,7 +32,7 @@ func NewContext(c *gin.Context) context.Context {
 
 	if v := GetTraceID(c); v != "" {
 		parent = icontext.NewTraceID(parent, v)
-		parent = logger.NewTraceIDContext(parent, GetTraceID(c))
+		parent = logger.NewTraceIDContext(parent, v)
 	}
 
 	if v := GetUserID(c); v != "" {
