@@ -41,9 +41,10 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	if v := params.LikeName; v != "" {
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
+
 	if v := params.UserID; v != "" {
 		subQuery := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", v).Select("role_id").SubQuery()
-		db = db.Where("record_id IN(?)", subQuery)
+		db = db.Where("record_id IN ?", subQuery)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
