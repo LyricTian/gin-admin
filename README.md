@@ -94,6 +94,7 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 ## 前端实现
 
 - [gin-admin-react](https://github.com/LyricTian/gin-admin-react)：基于[Ant Design React](https://ant.design)的实现版本
+- [gin-admin-react-es6](https://github.com/LyricTian/gin-admin-react/tree/v2.0.0)：基于[Ant Design React](https://ant.design)的实现版本
 
 ## Swagger 文档的使用
 
