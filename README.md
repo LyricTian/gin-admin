@@ -41,8 +41,9 @@ $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
 > 可自动监听文件变化
 
 ```bash
-$ go get -v github.com/cosmtrek/air/cmd/air
+$ go get -u github.com/cosmtrek/air
 $ cd ~/go/src/gin-admin
+$ go mod download
 $ air
 ```
 
