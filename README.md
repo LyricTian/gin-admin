@@ -46,6 +46,7 @@ $ cd ~/go/src/gin-admin
 $ go mod download
 $ air
 ```
+> 注意：在Linux子系统（`WSL1`）下使用需要使用`root`执行`air`命令，例如 `sudo air`，如果提示命令没找到，是因为`GOBIN`没有在`root`设置`PATH`环境变量，如果不想设置可以直接使用绝对路径，例如：`sudo /home/{你的用户名}/go/bin/air`，需要在代码目录下执行。
 
 ### 使用 run 命令运行服务
 
