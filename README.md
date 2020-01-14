@@ -95,8 +95,9 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 
 ## 前端实现
 
-- [gin-admin-react](https://github.com/LyricTian/gin-admin-react)：基于[Ant Design React](https://ant.design)的实现版本
-- [gin-admin-react-es6](https://github.com/LyricTian/gin-admin-react/tree/v2.0.0)：基于[Ant Design React](https://ant.design)的实现版本
+- [gin-admin-react](https://github.com/LyricTian/gin-admin-react)：基于[Ant Design React ES6](https://ant.design)的实现版本
+- [gin-admin-react-ts](https://github.com/LyricTian/gin-admin-react/tree/ts-master)：基于 Ant Design React TypeScript 实现的RBAC权限管理脚手架
+- [gin-admin-react-v4](https://github.com/gin-admin/gin-admin-react)：基于 Ant Design Pro v4 实现的RBAC权限管理脚手架
 
 ## Swagger 文档的使用
 
