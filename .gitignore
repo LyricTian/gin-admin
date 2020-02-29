@@ -17,13 +17,8 @@
 /release
 /data
 /internal/app/test/data
-<<<<<<< HEAD
-/docs/json
-/docs/swagger/docs.go
-/docs/swagger/swagger.yaml
-=======
 /tmp
->>>>>>> master
+/docs/swagger/docs.go
 
 # IDE configs
 .idea
