@@ -41,10 +41,12 @@ $ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
 > 可自动监听文件变化
 
 ```bash
-$ go get -v github.com/cosmtrek/air/cmd/air
+$ go get -u github.com/cosmtrek/air
 $ cd ~/go/src/gin-admin
+$ go mod download
 $ air
 ```
+> 注意：在Linux子系统（`WSL1`）下使用需要使用`root`执行`air`命令，例如 `sudo air`，如果提示命令没找到，是因为`GOBIN`没有在`root`设置`PATH`环境变量，如果不想设置可以直接使用绝对路径，例如：`sudo /home/{你的用户名}/go/bin/air`，需要在代码目录下执行。
 
 ### 使用 run 命令运行服务
 
@@ -93,8 +95,9 @@ $ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -sw
 
 ## 前端实现
 
-- [gin-admin-react-ts](https://github.com/LyricTian/gin-admin-react)：基于[Ant Design React](https://ant.design)的实现版本
-- [gin-admin-react-es6](https://github.com/LyricTian/gin-admin-react/tree/v2.0.0)：基于[Ant Design React](https://ant.design)的实现版本
+- [gin-admin-react](https://github.com/LyricTian/gin-admin-react)：基于[Ant Design React ES6](https://ant.design)的实现版本
+- [gin-admin-react-ts](https://github.com/LyricTian/gin-admin-react/tree/ts-master)：基于 Ant Design React TypeScript 实现的RBAC权限管理脚手架
+- [gin-admin-react-v4](https://github.com/gin-admin/gin-admin-react)：基于 Ant Design Pro v4 实现的RBAC权限管理脚手架
 
 ## Swagger 文档的使用
 
