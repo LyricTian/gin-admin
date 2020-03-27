@@ -70,7 +70,8 @@ func (a *Menu) QueryTree(c *gin.Context) {
 	}
 
 	result, err := a.MenuBll.Query(ginplus.NewContext(c), params, schema.MenuQueryOptions{
-		OrderFields: schema.NewOrderFields(map[string]schema.OrderDirection{"sequence": schema.OrderByDESC}),
+		OrderFields: schema.NewOrderFields([]string{"sequence"},
+			map[int]schema.OrderDirection{0: schema.OrderByDESC}),
 	})
 	if err != nil {
 		ginplus.ResError(c, err)
