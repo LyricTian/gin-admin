@@ -24,11 +24,6 @@ func (a *User) CleanSecure() *User {
 	return a
 }
 
-// UserRole 用户角色
-type UserRole struct {
-	RoleID string `json:"role_id" swaggo:"true,角色ID"`
-}
-
 // UserQueryParam 查询条件
 type UserQueryParam struct {
 	UserName     string   // 用户名
@@ -91,6 +86,15 @@ func (a Users) ToUserShows(mroles map[string]*Role) UserShows {
 	return list
 }
 
+// ----------------------------------------UserRole--------------------------------------
+
+// UserRole 用户角色
+type UserRole struct {
+	RecordID string `json:"record_id"` // 记录ID
+	UserID   string `json:"user_id"`   // 用户ID
+	RoleID   string `json:"role_id"`   // 角色ID
+}
+
 // UserRoles 用户角色列表
 type UserRoles []*UserRole
 
@@ -102,6 +106,8 @@ func (a UserRoles) ToRoleIDs() []string {
 	}
 	return list
 }
+
+// ----------------------------------------UserShow--------------------------------------
 
 // UserShow 用户显示项
 type UserShow struct {

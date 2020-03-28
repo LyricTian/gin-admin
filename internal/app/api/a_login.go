@@ -1,12 +1,12 @@
-package ctl
+package api
 
 import (
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +29,7 @@ type Login struct {
 // @Success 200 {object} schema.LoginCaptcha
 // @Router /api/v1/pub/login/captchaid [get]
 func (a *Login) GetCaptcha(c *gin.Context) {
-	item, err := a.LoginBll.GetCaptcha(ginplus.NewContext(c), config.Global().Captcha.Length)
+	item, err := a.LoginBll.GetCaptcha(ginplus.NewContext(c), config.C.Captcha.Length)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -61,7 +61,7 @@ func (a *Login) ResCaptcha(c *gin.Context) {
 		}
 	}
 
-	cfg := config.Global().Captcha
+	cfg := config.C.Captcha
 	err := a.LoginBll.ResCaptcha(ginplus.NewContext(c), c.Writer, captchaID, cfg.Width, cfg.Height)
 	if err != nil {
 		ginplus.ResError(c, err)

@@ -13,7 +13,7 @@ import (
 
 // InitLogger 初始化日志
 func InitLogger() (func(), error) {
-	c := config.Global().Log
+	c := config.C.Log
 	logger.SetLevel(c.Level)
 	logger.SetFormatter(c.Format)
 
@@ -43,16 +43,16 @@ func InitLogger() (func(), error) {
 	if c.EnableHook {
 		switch c.Hook {
 		case "gorm":
-			hc := config.Global().LogGormHook
+			hc := config.C.LogGormHook
 
 			var dsn string
 			switch hc.DBType {
 			case "mysql":
-				dsn = config.Global().MySQL.DSN()
+				dsn = config.C.MySQL.DSN()
 			case "sqlite3":
-				dsn = config.Global().Sqlite3.DSN()
+				dsn = config.C.Sqlite3.DSN()
 			case "postgres":
-				dsn = config.Global().Postgres.DSN()
+				dsn = config.C.Postgres.DSN()
 			default:
 				return nil, errors.New("unknown db")
 			}

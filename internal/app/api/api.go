@@ -1,14 +1,14 @@
-package ctl
+package api
 
 import (
 	"go.uber.org/dig"
 )
 
-// Inject 注入ctl
+// Inject 注入api
 // 使用方式：
 //   container := dig.New()
 //   Inject(container)
-//   container.Invoke(func(foo *ctl.Demo) {
+//   container.Invoke(func(demo *api.Demo) {
 //   })
 func Inject(container *dig.Container) error {
 	_ = container.Provide(NewDemo)

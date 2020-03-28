@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/auth"

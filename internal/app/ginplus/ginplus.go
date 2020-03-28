@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	icontext "github.com/LyricTian/gin-admin/internal/app/context"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/gin-gonic/gin"
@@ -54,39 +54,6 @@ func GetToken(c *gin.Context) string {
 	return token
 }
 
-// GetPageIndex 获取分页的页索引
-func GetPageIndex(c *gin.Context) int {
-	defaultVal := 1
-	if v := c.Query("current"); v != "" {
-		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
-			return iv
-		}
-	}
-	return defaultVal
-}
-
-// GetPageSize 获取分页的页大小(最大50)
-func GetPageSize(c *gin.Context) int {
-	defaultVal := 10
-	if v := c.Query("pageSize"); v != "" {
-		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
-			if iv > 50 {
-				iv = 50
-			}
-			return iv
-		}
-	}
-	return defaultVal
-}
-
-// GetPaginationParam 获取分页查询参数
-func GetPaginationParam(c *gin.Context) *schema.PaginationParam {
-	return &schema.PaginationParam{
-		PageIndex: GetPageIndex(c),
-		PageSize:  GetPageSize(c),
-	}
-}
-
 // GetTraceID 获取追踪ID
 func GetTraceID(c *gin.Context) string {
 	return c.GetString(TraceIDKey)
@@ -124,22 +91,6 @@ func ParseForm(c *gin.Context, obj interface{}) error {
 		return errors.Wrap400Response(err, "解析请求参数发生错误")
 	}
 	return nil
-}
-
-// ResPage 响应分页数据
-func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
-	list := schema.HTTPList{
-		List: v,
-		Pagination: &schema.HTTPPagination{
-			Current:  GetPageIndex(c),
-			PageSize: GetPageSize(c),
-		},
-	}
-	if pr != nil {
-		list.Pagination.Total = pr.Total
-	}
-
-	ResSuccess(c, list)
 }
 
 // ResList 响应列表数据
@@ -200,4 +151,53 @@ func ResError(c *gin.Context, err error, status ...int) {
 		Message: res.Message,
 	}
 	ResJSON(c, res.StatusCode, schema.HTTPError{Error: eitem})
+}
+
+// GetPageIndex 获取分页的页索引
+func GetPageIndex(c *gin.Context) int {
+	defaultVal := 1
+	if v := c.Query("current"); v != "" {
+		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
+			return iv
+		}
+	}
+	return defaultVal
+}
+
+// GetPageSize 获取分页的页大小(最大50)
+func GetPageSize(c *gin.Context) int {
+	defaultVal := 10
+	if v := c.Query("pageSize"); v != "" {
+		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
+			if iv > 50 {
+				iv = 50
+			}
+			return iv
+		}
+	}
+	return defaultVal
+}
+
+// GetPaginationParam 获取分页查询参数
+func GetPaginationParam(c *gin.Context) *schema.PaginationParam {
+	return &schema.PaginationParam{
+		PageIndex: GetPageIndex(c),
+		PageSize:  GetPageSize(c),
+	}
+}
+
+// ResPage 响应分页数据
+func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
+	list := schema.HTTPList{
+		List: v,
+		Pagination: &schema.HTTPPagination{
+			Current:  GetPageIndex(c),
+			PageSize: GetPageSize(c),
+		},
+	}
+	if pr != nil {
+		list.Pagination.Total = pr.Total
+	}
+
+	ResSuccess(c, list)
 }

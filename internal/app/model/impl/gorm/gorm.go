@@ -55,7 +55,7 @@ func SetTablePrefix(prefix string) {
 
 // AutoMigrate 自动映射数据表
 func AutoMigrate(db *gorm.DB) error {
-	if dbType := config.Global().Gorm.DBType; dbType == "mysql" {
+	if dbType := config.C.Gorm.DBType; dbType == "mysql" {
 		db = db.Set("gorm:table_options", "ENGINE=InnoDB")
 	}
 
@@ -79,25 +79,10 @@ func AutoMigrate(db *gorm.DB) error {
 //   container.Invoke(func(foo IDemo) {
 //   })
 func Inject(container *dig.Container) error {
-	_ = container.Provide(imodel.NewTrans)
-<<<<<<< HEAD
-	_ = container.Provide(imodel.NewDemo, dig.As(new(model.IDemo)))
-	_ = container.Provide(imodel.NewMenu, dig.As(new(model.IMenu)))
-	_ = container.Provide(imodel.NewRole, dig.As(new(model.IRole)))
-	_ = container.Provide(imodel.NewUser, dig.As(new(model.IUser)))
-	_ = container.Provide(imodel.NewMenuAction, dig.As(new(model.IMenuAction)))
-	_ = container.Provide(imodel.NewMenuActionResource, dig.As(new(model.IMenuActionResource)))
-	_ = container.Provide(imodel.NewRoleMenu, dig.As(new(model.IRoleMenu)))
-=======
-	_ = container.Provide(func(m *imodel.Trans) model.ITrans { return m })
-	_ = container.Provide(imodel.NewDemo)
-	_ = container.Provide(func(m *imodel.Demo) model.IDemo { return m })
-	_ = container.Provide(imodel.NewMenu)
-	_ = container.Provide(func(m *imodel.Menu) model.IMenu { return m })
-	_ = container.Provide(imodel.NewRole)
-	_ = container.Provide(func(m *imodel.Role) model.IRole { return m })
-	_ = container.Provide(imodel.NewUser)
-	_ = container.Provide(func(m *imodel.User) model.IUser { return m })
->>>>>>> master
+	_ = container.Provide(func() model.ITrans { return imodel.NewTrans })
+	_ = container.Provide(func() model.IDemo { return imodel.NewDemo })
+	_ = container.Provide(func() model.IMenu { return imodel.NewMenu })
+	_ = container.Provide(func() model.IRole { return imodel.NewRole })
+	_ = container.Provide(func() model.IUser { return imodel.NewUser })
 	return nil
 }

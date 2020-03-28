@@ -12,7 +12,7 @@ import (
 
 // GetRootUser 获取root用户
 func GetRootUser() *schema.User {
-	user := config.Global().Root
+	user := config.C.Root
 	return &schema.User{
 		RecordID: user.UserName,
 		UserName: user.UserName,

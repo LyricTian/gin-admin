@@ -47,7 +47,7 @@ func getDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 		db, ok := trans.(*gorm.DB)
 		if ok {
 			if icontext.FromTransLock(ctx) {
-				if dbType := config.Global().Gorm.DBType; dbType == "mysql" ||
+				if dbType := config.C.Gorm.DBType; dbType == "mysql" ||
 					dbType == "postgres" {
 					db = db.Set("gorm:query_option", "FOR UPDATE")
 				}

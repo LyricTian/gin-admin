@@ -17,7 +17,7 @@ import (
 
 // NewCasbinEnforcer 创建casbin校验器
 func NewCasbinEnforcer() *casbin.SyncedEnforcer {
-	cfg := config.Global().Casbin
+	cfg := config.C.Casbin
 	if !cfg.Enable {
 		return nil
 	}
@@ -36,7 +36,7 @@ func NewCasbinEnforcer() *casbin.SyncedEnforcer {
 
 // InitCasbinEnforcer 初始化casbin校验器
 func InitCasbinEnforcer(container *dig.Container) error {
-	cfg := config.Global().Casbin
+	cfg := config.C.Casbin
 	if !cfg.Enable {
 		return nil
 	}
@@ -65,7 +65,7 @@ func InitCasbinEnforcer(container *dig.Container) error {
 
 // ReleaseCasbinEnforcer 释放casbin资源
 func ReleaseCasbinEnforcer(container *dig.Container) {
-	cfg := config.Global().Casbin
+	cfg := config.C.Casbin
 	if !cfg.Enable || !cfg.AutoLoad {
 		return
 	}

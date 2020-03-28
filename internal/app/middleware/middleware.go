@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LyricTian/gin-admin/internal/app/errors"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/gin-gonic/gin"
 )

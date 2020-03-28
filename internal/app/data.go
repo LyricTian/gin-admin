@@ -13,7 +13,7 @@ import (
 
 // InitData 初始化应用数据
 func InitData(ctx context.Context, container *dig.Container) error {
-	if c := config.Global().Menu; c.Enable && c.Data != "" {
+	if c := config.C.Menu; c.Enable && c.Data != "" {
 		return initMenuData(ctx, container)
 	}
 
@@ -43,7 +43,7 @@ func initMenuData(ctx context.Context, container *dig.Container) error {
 }
 
 func readMenuData() (schema.MenuTrees, error) {
-	file, err := os.Open(config.Global().Menu.Data)
+	file, err := os.Open(config.C.Menu.Data)
 	if err != nil {
 		return nil, err
 	}

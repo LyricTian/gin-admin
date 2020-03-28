@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/pkg/auth"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,7 +34,7 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 			return
 		}
 
-		cfg := config.Global()
+		cfg := config.C
 		if cfg.IsDebugMode() {
 			c.Set(ginplus.UserIDKey, cfg.Root.UserName)
 			c.Next()

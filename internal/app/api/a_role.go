@@ -1,4 +1,4 @@
-package ctl
+package api
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/bll"

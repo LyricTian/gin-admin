@@ -4,7 +4,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/LyricTian/gin-admin/internal/app/bll/impl"
+	"github.com/LyricTian/gin-admin/internal/app/api"
+	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/LyricTian/gin-admin/pkg/logger"
@@ -77,13 +78,9 @@ func Init(ctx context.Context, opts ...Option) func() {
 	for _, opt := range opts {
 		opt(&o)
 	}
-	err := config.LoadGlobal(o.ConfigFile)
-	handleError(err)
 
-	cfg := config.Global()
-
-	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", cfg.RunMode, o.Version, os.Getpid())
-
+	config.MustLoad(o.ConfigFile)
+	cfg := config.C
 	if v := o.ModelFile; v != "" {
 		cfg.Casbin.Model = v
 	}
@@ -96,6 +93,8 @@ func Init(ctx context.Context, opts ...Option) func() {
 	if v := o.MenuFile; v != "" {
 		cfg.Menu.Data = v
 	}
+
+	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", cfg.RunMode, o.Version, os.Getpid())
 
 	loggerCall, err := InitLogger()
 	handleError(err)
@@ -150,7 +149,11 @@ func BuildContainer() (*dig.Container, func()) {
 	handleError(err)
 
 	// 注入bll
-	err = impl.Inject(container)
+	err = bll.Inject(container)
+	handleError(err)
+
+	// 注入api
+	err = api.Inject(container)
 	handleError(err)
 
 	// 初始化casbin

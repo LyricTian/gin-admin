@@ -2,7 +2,7 @@ package schema
 
 import "time"
 
-// Demo demo对象
+// Demo 示例对象
 type Demo struct {
 	RecordID  string    `json:"record_id"`                             // 记录ID
 	Code      string    `json:"code" binding:"required"`               // 编号
@@ -21,13 +21,13 @@ type DemoQueryParam struct {
 	LikeName string `form:"likeName"` // 名称(模糊查询)
 }
 
-// DemoQueryOptions demo对象查询可选参数项
+// DemoQueryOptions 示例对象查询可选参数项
 type DemoQueryOptions struct {
 	PageParam   *PaginationParam // 分页参数
 	OrderFields []*OrderField    // 排序字段
 }
 
-// DemoQueryResult demo对象查询结果
+// DemoQueryResult 示例对象查询结果
 type DemoQueryResult struct {
 	Data       []*Demo
 	PageResult *PaginationResult

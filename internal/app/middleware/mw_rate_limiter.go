@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/go-redis/redis_rate"
@@ -15,12 +15,12 @@ import (
 
 // RateLimiterMiddleware 请求频率限制中间件
 func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
-	cfg := config.Global().RateLimiter
+	cfg := config.C.RateLimiter
 	if !cfg.Enable {
 		return EmptyMiddleware()
 	}
 
-	rc := config.Global().Redis
+	rc := config.C.Redis
 	ring := redis.NewRing(&redis.RingOptions{
 		Addrs: map[string]string{
 			"server1": rc.Addr,

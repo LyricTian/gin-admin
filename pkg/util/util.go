@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/LyricTian/structs"
 )
 
 var (
@@ -20,4 +22,27 @@ func NewTraceID() string {
 // NewRecordID 创建记录ID
 func NewRecordID() string {
 	return NewObjectID().Hex()
+}
+
+// StructMapToStruct 结构体映射
+func StructMapToStruct(s, ts interface{}) error {
+	if !structs.IsStruct(s) || !structs.IsStruct(ts) {
+		return nil
+	}
+
+	ss, tss := structs.New(s), structs.New(ts)
+	for _, field := range tss.Fields() {
+		if !field.IsExported() {
+			continue
+		}
+
+		if sf, ok := ss.FieldOk(field.Name()); ok {
+			err := field.Set2(sf.Value())
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

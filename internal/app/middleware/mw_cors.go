@@ -10,7 +10,7 @@ import (
 
 // CORSMiddleware 跨域请求中间件
 func CORSMiddleware() gin.HandlerFunc {
-	cfg := config.Global().CORS
+	cfg := config.C.CORS
 	return cors.New(cors.Config{
 		AllowOrigins:     cfg.AllowOrigins,
 		AllowMethods:     cfg.AllowMethods,

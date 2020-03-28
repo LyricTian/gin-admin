@@ -29,7 +29,7 @@ func init() {
 		panic(err)
 	}
 
-	cfg := config.Global()
+	cfg := config.C
 	cfg.RunMode = "debug"
 	cfg.Casbin.Enable = true
 	cfg.Casbin.Model = modelFile

@@ -2,40 +2,25 @@ package config
 
 import (
 	"fmt"
+	"sync"
 
-	"github.com/BurntSushi/toml"
+	"github.com/koding/multiconfig"
 )
 
 var (
-	global *Config
+	// C 全局配置(需要先执行MustLoad，否则拿不到配置)
+	C    *Config
+	once sync.Once
 )
 
-// LoadGlobal 加载全局配置
-func LoadGlobal(fpath string) error {
-	c, err := Parse(fpath)
-	if err != nil {
-		return err
-	}
-	global = c
-	return nil
-}
-
-// Global 获取全局配置
-func Global() *Config {
-	if global == nil {
-		return &Config{}
-	}
-	return global
-}
-
-// Parse 解析配置文件
-func Parse(fpath string) (*Config, error) {
-	var c Config
-	_, err := toml.DecodeFile(fpath, &c)
-	if err != nil {
-		return nil, err
-	}
-	return &c, nil
+// MustLoad 加载配置
+func MustLoad(fpath string) {
+	once.Do(func() {
+		m := multiconfig.NewWithPath(fpath)
+		var c Config
+		m.MustLoad(&c)
+		C = &c
+	})
 }
 
 // Config 配置参数

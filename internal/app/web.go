@@ -9,7 +9,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/middleware"
-	"github.com/LyricTian/gin-admin/internal/app/routers/api"
+	"github.com/LyricTian/gin-admin/internal/app/router"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
@@ -17,7 +17,7 @@ import (
 
 // InitWeb 初始化web引擎
 func InitWeb(container *dig.Container) *gin.Engine {
-	cfg := config.Global()
+	cfg := config.C
 	gin.SetMode(cfg.RunMode)
 
 	app := gin.New()
@@ -41,8 +41,7 @@ func InitWeb(container *dig.Container) *gin.Engine {
 	}
 
 	// 注册/api路由
-	err := api.RegisterRouter(app, container)
-	handleError(err)
+	router.RegisterAPIRouter(app, container)
 
 	// swagger文档
 	if dir := cfg.Swagger; dir != "" {
@@ -59,7 +58,7 @@ func InitWeb(container *dig.Container) *gin.Engine {
 
 // InitHTTPServer 初始化http服务
 func InitHTTPServer(ctx context.Context, container *dig.Container) func() {
-	cfg := config.Global().HTTP
+	cfg := config.C.HTTP
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
 		Addr:         addr,

@@ -3,7 +3,7 @@ package internal
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/internal/app/errors"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/util"

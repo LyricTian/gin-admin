@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/casbin/casbin/v2"
 )
@@ -24,13 +24,13 @@ func NewRole(
 		MenuModel: mMenu,
 		UserModel: mUser,
 		DeleteHook: func(ctx context.Context, bRole *Role, recordID string) error {
-			if config.Global().Casbin.Enable {
+			if config.C.Casbin.Enable {
 				_, _ = bRole.Enforcer.DeletePermissionsForUser(recordID)
 			}
 			return nil
 		},
 		SaveHook: func(ctx context.Context, bRole *Role, item *schema.Role) error {
-			if config.Global().Casbin.Enable {
+			if config.C.Casbin.Enable {
 				err := bRole.LoadPolicy(ctx, item)
 				if err != nil {
 					return err

@@ -10,9 +10,9 @@ import (
 
 // InitCaptcha 初始化图形验证码
 func InitCaptcha() {
-	cfg := config.Global().Captcha
+	cfg := config.C.Captcha
 	if cfg.Store == "redis" {
-		rc := config.Global().Redis
+		rc := config.C.Redis
 		captcha.SetCustomStore(store.NewRedisStore(&redis.Options{
 			Addr:     rc.Addr,
 			Password: rc.Password,

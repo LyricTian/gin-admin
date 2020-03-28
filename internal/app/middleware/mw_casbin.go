@@ -2,15 +2,15 @@ package middleware
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
 // CasbinMiddleware casbin中间件
 func CasbinMiddleware(enforcer *casbin.SyncedEnforcer, skippers ...SkipperFunc) gin.HandlerFunc {
-	cfg := config.Global().Casbin
+	cfg := config.C.Casbin
 	if !cfg.Enable {
 		return EmptyMiddleware()
 	}

@@ -1,29 +1,24 @@
-package api
+package router
 
 import (
+	"github.com/LyricTian/gin-admin/internal/app/api"
 	"github.com/LyricTian/gin-admin/internal/app/middleware"
-	"github.com/LyricTian/gin-admin/internal/app/routers/api/ctl"
 	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 )
 
-// RegisterRouter 注册/api路由
-func RegisterRouter(app *gin.Engine, container *dig.Container) error {
-	err := ctl.Inject(container)
-	if err != nil {
-		return err
-	}
-
-	return container.Invoke(func(
+// RegisterAPIRouter 注册/api路由
+func RegisterAPIRouter(app *gin.Engine, container *dig.Container) {
+	err := container.Invoke(func(
 		a auth.Auther,
 		e *casbin.SyncedEnforcer,
-		cDemo *ctl.Demo,
-		cLogin *ctl.Login,
-		cMenu *ctl.Menu,
-		cRole *ctl.Role,
-		cUser *ctl.User,
+		cDemo *api.Demo,
+		cLogin *api.Login,
+		cMenu *api.Menu,
+		cRole *api.Role,
+		cUser *api.User,
 	) error {
 
 		g := app.Group("/api")
@@ -116,4 +111,8 @@ func RegisterRouter(app *gin.Engine, container *dig.Container) error {
 
 		return nil
 	})
+
+	if err != nil {
+		panic(err)
+	}
 }
