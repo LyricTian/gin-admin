@@ -32,7 +32,7 @@ type UserQueryParam struct {
 	LikeUserName string   `form:"likeUserName"` // 用户名(模糊查询)
 	LikeRealName string   `form:"likeRealName"` // 真实姓名(模糊查询)
 	Status       int      `form:"status"`       // 用户状态(1:启用 2:停用)
-	RoleIDs      []string `form:"roleIDs"`      // 角色ID列表
+	RoleIDs      []string `form:"-"`            // 角色ID列表
 }
 
 // UserQueryOptions 查询可选参数项

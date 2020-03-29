@@ -5,14 +5,11 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
 )
 
-// NewDemo 创建demo控制器
-func NewDemo(bDemo bll.IDemo) *Demo {
-	return &Demo{
-		DemoBll: bDemo,
-	}
-}
+// DemoSet 注入Demo
+var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"))
 
 // Demo 示例程序
 type Demo struct {
@@ -46,7 +43,6 @@ func (a *Demo) Query(c *gin.Context) {
 		ginplus.ResError(c, err)
 		return
 	}
-
 	ginplus.ResPage(c, result.Data, result.PageResult)
 }
 
@@ -74,7 +70,7 @@ func (a *Demo) Get(c *gin.Context) {
 // @Summary 创建数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.Demo true "创建数据"
-// @Success 200 {object} schema.Demo
+// @Success 200 {object} schema.HTTPRecordID
 // @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
@@ -87,12 +83,12 @@ func (a *Demo) Create(c *gin.Context) {
 	}
 
 	item.Creator = ginplus.GetUserID(c)
-	nitem, err := a.DemoBll.Create(ginplus.NewContext(c), item)
+	result, err := a.DemoBll.Create(ginplus.NewContext(c), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
-	ginplus.ResSuccess(c, nitem)
+	ginplus.ResSuccess(c, result)
 }
 
 // Update 更新数据

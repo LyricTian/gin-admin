@@ -30,7 +30,7 @@ type MenuQueryParam struct {
 	PrefixParentPath string   `form:"-"`          // 父级路径(前缀模糊查询)
 	LikeName         string   `form:"likeName"`   // 菜单名称(模糊查询)
 	ParentID         *string  `form:"parentID"`   // 父级内码
-	ShowStatus       int      `json:"showStatus"` // 显示状态(1:显示 2:隐藏)
+	ShowStatus       int      `form:"showStatus"` // 显示状态(1:显示 2:隐藏)
 	Status           int      `form:"status"`     // 状态(1:启用 2:禁用)
 }
 

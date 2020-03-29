@@ -9,14 +9,11 @@ import (
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
 )
 
-// NewLogin 创建登录管理控制器
-func NewLogin(bLogin bll.ILogin) *Login {
-	return &Login{
-		LoginBll: bLogin,
-	}
-}
+// LoginSet 注入Login
+var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
 
 // Login 登录管理
 type Login struct {

@@ -5,14 +5,11 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
 )
 
-// NewRole 创建角色管理控制器
-func NewRole(bRole bll.IRole) *Role {
-	return &Role{
-		RoleBll: bRole,
-	}
-}
+// RoleSet 注入Role
+var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
 
 // Role 角色管理
 type Role struct {
@@ -25,17 +22,23 @@ type Role struct {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
-// @Param name query string false "角色名称(模糊查询)"
+// @Param likeName query string false "角色名称(模糊查询)"
+// @Param status query int false "状态(1:启用 2:禁用)"
 // @Success 200 {array} schema.Role "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles [get]
 func (a *Role) Query(c *gin.Context) {
 	var params schema.RoleQueryParam
-	params.LikeName = c.Query("name")
+	if err := ginplus.ParseQuery(c, &params); err != nil {
+		ginplus.ResError(c, err)
+		return
+	}
 
 	result, err := a.RoleBll.Query(ginplus.NewContext(c), params, schema.RoleQueryOptions{
 		PageParam: ginplus.GetPaginationParam(c),
+		OrderFields: schema.NewOrderFields([]string{"sequence"},
+			map[int]schema.OrderDirection{0: schema.OrderByDESC}),
 	})
 	if err != nil {
 		ginplus.ResError(c, err)
@@ -48,13 +51,24 @@ func (a *Role) Query(c *gin.Context) {
 // @Tags 角色管理
 // @Summary 查询选择数据
 // @Param Authorization header string false "Bearer 用户令牌"
+// @Param likeName query string false "角色名称(模糊查询)"
+// @Param status query int false "状态(1:启用 2:禁用)"
 // @Success 200 {array} schema.Role "查询结果：{list:角色列表}"
 // @Failure 400 {object} schema.HTTPError "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles.select [get]
 func (a *Role) QuerySelect(c *gin.Context) {
-	result, err := a.RoleBll.Query(ginplus.NewContext(c), schema.RoleQueryParam{})
+	var params schema.RoleQueryParam
+	if err := ginplus.ParseQuery(c, &params); err != nil {
+		ginplus.ResError(c, err)
+		return
+	}
+
+	result, err := a.RoleBll.Query(ginplus.NewContext(c), params, schema.RoleQueryOptions{
+		OrderFields: schema.NewOrderFields([]string{"sequence"},
+			map[int]schema.OrderDirection{0: schema.OrderByDESC}),
+	})
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -73,9 +87,7 @@ func (a *Role) QuerySelect(c *gin.Context) {
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles/{id} [get]
 func (a *Role) Get(c *gin.Context) {
-	item, err := a.RoleBll.Get(ginplus.NewContext(c), c.Param("id"), schema.RoleQueryOptions{
-		IncludeMenus: true,
-	})
+	item, err := a.RoleBll.Get(ginplus.NewContext(c), c.Param("id"))
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -88,7 +100,7 @@ func (a *Role) Get(c *gin.Context) {
 // @Summary 创建数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.Role true "创建数据"
-// @Success 200 {object} schema.Role
+// @Success 200 {object} schema.HTTPRecordID
 // @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
@@ -101,13 +113,12 @@ func (a *Role) Create(c *gin.Context) {
 	}
 
 	item.Creator = ginplus.GetUserID(c)
-	nitem, err := a.RoleBll.Create(ginplus.NewContext(c), item)
+	result, err := a.RoleBll.Create(ginplus.NewContext(c), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
-
-	ginplus.ResSuccess(c, nitem)
+	ginplus.ResSuccess(c, result)
 }
 
 // Update 更新数据
@@ -128,12 +139,12 @@ func (a *Role) Update(c *gin.Context) {
 		return
 	}
 
-	nitem, err := a.RoleBll.Update(ginplus.NewContext(c), c.Param("id"), item)
+	err := a.RoleBll.Update(ginplus.NewContext(c), c.Param("id"), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
-	ginplus.ResSuccess(c, nitem)
+	ginplus.ResOK(c)
 }
 
 // Delete 删除数据
@@ -147,6 +158,42 @@ func (a *Role) Update(c *gin.Context) {
 // @Router /api/v1/roles/{id} [delete]
 func (a *Role) Delete(c *gin.Context) {
 	err := a.RoleBll.Delete(ginplus.NewContext(c), c.Param("id"))
+	if err != nil {
+		ginplus.ResError(c, err)
+		return
+	}
+	ginplus.ResOK(c)
+}
+
+// Enable 启用数据
+// @Tags Demo
+// @Summary 启用数据
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param id path string true "记录ID"
+// @Success 200 {object} schema.HTTPStatus "{status:OK}"
+// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router /api/v1/roles/{id}/enable [patch]
+func (a *Role) Enable(c *gin.Context) {
+	err := a.RoleBll.UpdateStatus(ginplus.NewContext(c), c.Param("id"), 1)
+	if err != nil {
+		ginplus.ResError(c, err)
+		return
+	}
+	ginplus.ResOK(c)
+}
+
+// Disable 禁用数据
+// @Tags Role
+// @Summary 禁用数据
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param id path string true "记录ID"
+// @Success 200 {object} schema.HTTPStatus "{status:OK}"
+// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Router /api/v1/roles/{id}/disable [patch]
+func (a *Role) Disable(c *gin.Context) {
+	err := a.RoleBll.UpdateStatus(ginplus.NewContext(c), c.Param("id"), 2)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return

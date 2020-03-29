@@ -6,8 +6,6 @@ import (
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/model"
-	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 
 	// gorm存储注入
@@ -70,18 +68,3 @@ func AutoMigrate(db *gorm.DB) error {
 		new(entity.User),
 	).Error
 }
-
-// AllSet model注入
-var AllSet = wire.NewSet(
-	model.DemoSet,
-	model.MenuActionResourceSet,
-	model.MenuActionSet,
-	model.MenuSet,
-	model.RoleMenuSet,
-	model.RoleSet,
-	model.TransSet,
-	model.UserRoleSet,
-	model.RoleSet,
-	model.UserRoleSet,
-	model.UserSet,
-)

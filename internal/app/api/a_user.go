@@ -6,16 +6,13 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/ginplus"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
 )
 
-// NewUser 创建用户管理控制器
-func NewUser(bUser bll.IUser) *User {
-	return &User{
-		UserBll: bUser,
-	}
-}
+// UserSet 注入User
+var UserSet = wire.NewSet(wire.Struct(new(User), "*"))
 
 // User 用户管理
 type User struct {
@@ -38,19 +35,16 @@ type User struct {
 // @Router /api/v1/users [get]
 func (a *User) Query(c *gin.Context) {
 	var params schema.UserQueryParam
-	params.LikeUserName = c.Query("userName")
-	params.LikeRealName = c.Query("realName")
-	if v := util.S(c.Query("status")).DefaultInt(0); v > 0 {
-		params.Status = v
+	if err := ginplus.ParseQuery(c, &params); err != nil {
+		ginplus.ResError(c, err)
+		return
 	}
-
 	if v := c.Query("roleIDs"); v != "" {
 		params.RoleIDs = strings.Split(v, ",")
 	}
 
 	result, err := a.UserBll.QueryShow(ginplus.NewContext(c), params, schema.UserQueryOptions{
-		IncludeRoles: true,
-		PageParam:    ginplus.GetPaginationParam(c),
+		PageParam: ginplus.GetPaginationParam(c),
 	})
 	if err != nil {
 		ginplus.ResError(c, err)
@@ -71,9 +65,7 @@ func (a *User) Query(c *gin.Context) {
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/users/{id} [get]
 func (a *User) Get(c *gin.Context) {
-	item, err := a.UserBll.Get(ginplus.NewContext(c), c.Param("id"), schema.UserQueryOptions{
-		IncludeRoles: true,
-	})
+	item, err := a.UserBll.Get(ginplus.NewContext(c), c.Param("id"))
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -86,7 +78,7 @@ func (a *User) Get(c *gin.Context) {
 // @Summary 创建数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.User true "创建数据"
-// @Success 200 {object} schema.User
+// @Success 200 {object} schema.HTTPRecordID
 // @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
 // @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
@@ -96,15 +88,18 @@ func (a *User) Create(c *gin.Context) {
 	if err := ginplus.ParseJSON(c, &item); err != nil {
 		ginplus.ResError(c, err)
 		return
+	} else if item.Password == "" {
+		ginplus.ResError(c, errors.New400Response("密码不能为空"))
+		return
 	}
 
 	item.Creator = ginplus.GetUserID(c)
-	nitem, err := a.UserBll.Create(ginplus.NewContext(c), item)
+	result, err := a.UserBll.Create(ginplus.NewContext(c), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
-	ginplus.ResSuccess(c, nitem.CleanSecure())
+	ginplus.ResSuccess(c, result)
 }
 
 // Update 更新数据
@@ -125,12 +120,12 @@ func (a *User) Update(c *gin.Context) {
 		return
 	}
 
-	nitem, err := a.UserBll.Update(ginplus.NewContext(c), c.Param("id"), item)
+	err := a.UserBll.Update(ginplus.NewContext(c), c.Param("id"), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
-	ginplus.ResSuccess(c, nitem.CleanSecure())
+	ginplus.ResOK(c)
 }
 
 // Delete 删除数据
