@@ -26,12 +26,12 @@ func (a SchemaRole) ToRole() *Role {
 // Role 角色实体
 type Role struct {
 	Model
-	RecordID string  `gorm:"column:record_id;size:36;index;"` // 记录内码
-	Name     *string `gorm:"column:name;size:100;index;"`     // 角色名称
-	Sequence *int    `gorm:"column:sequence;index;"`          // 排序值
-	Memo     *string `gorm:"column:memo;size:1024;"`          // 备注
-	Status   *int    `gorm:"column:status;index;"`            // 状态(1:启用 2:禁用)
-	Creator  *string `gorm:"column:creator;size:36;"`         // 创建者
+	RecordID string  `gorm:"column:record_id;size:36;index;not null;"` // 记录内码
+	Name     string  `gorm:"column:name;size:100;index;not null;"`     // 角色名称
+	Sequence int     `gorm:"column:sequence;index;not null;"`          // 排序值
+	Memo     *string `gorm:"column:memo;size:1024;"`                   // 备注
+	Status   int     `gorm:"column:status;index;not null;"`            // 状态(1:启用 2:禁用)
+	Creator  string  `gorm:"column:creator;size:36;"`                  // 创建者
 }
 
 func (a Role) String() string {
@@ -58,60 +58,6 @@ func (a Roles) ToSchemaRoles() []*schema.Role {
 	list := make([]*schema.Role, len(a))
 	for i, item := range a {
 		list[i] = item.ToSchemaRole()
-	}
-	return list
-}
-
-// ----------------------------------------RoleMenu--------------------------------------
-
-// GetRoleMenuDB 角色菜单
-func GetRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return getDBWithModel(ctx, defDB, new(RoleMenu))
-}
-
-// SchemaRoleMenu 角色菜单
-type SchemaRoleMenu schema.RoleMenu
-
-// ToRoleMenu 转换为角色菜单实体
-func (a SchemaRoleMenu) ToRoleMenu() *RoleMenu {
-	item := new(RoleMenu)
-	util.StructMapToStruct(a, item)
-	return item
-}
-
-// RoleMenu 角色菜单实体
-type RoleMenu struct {
-	Model
-	RecordID string  `gorm:"column:record_id;size:36;index;"` // 记录ID
-	RoleID   *string `gorm:"column:role_id;size:36;index;"`   // 角色ID
-	MenuID   *string `gorm:"column:menu_id;size:36;index;"`   // 菜单ID
-	ActionID *string `gorm:"column:action_id;size:36;index;"` // 动作ID
-}
-
-func (a RoleMenu) String() string {
-	return toString(a)
-}
-
-// TableName 表名
-func (a RoleMenu) TableName() string {
-	return a.Model.TableName("role_menu")
-}
-
-// ToSchemaRoleMenu 转换为角色菜单对象
-func (a RoleMenu) ToSchemaRoleMenu() *schema.RoleMenu {
-	item := new(schema.RoleMenu)
-	util.StructMapToStruct(a, item)
-	return item
-}
-
-// RoleMenus 角色菜单列表
-type RoleMenus []*RoleMenu
-
-// ToSchemaRoleMenus 转换为角色菜单对象列表
-func (a RoleMenus) ToSchemaRoleMenus() []*schema.RoleMenu {
-	list := make([]*schema.RoleMenu, len(a))
-	for i, item := range a {
-		list[i] = item.ToSchemaRoleMenu()
 	}
 	return list
 }

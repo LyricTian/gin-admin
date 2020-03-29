@@ -27,10 +27,10 @@ func (a SchemaDemo) ToDemo() *Demo {
 type Demo struct {
 	Model
 	RecordID string  `gorm:"column:record_id;size:36;index;not null;"` // 记录内码
-	Code     *string `gorm:"column:code;size:50;index;"`               // 编号
-	Name     *string `gorm:"column:name;size:100;index;"`              // 名称
+	Code     string  `gorm:"column:code;size:50;index;not null;"`      // 编号
+	Name     string  `gorm:"column:name;size:100;index;not null;"`     // 名称
 	Memo     *string `gorm:"column:memo;size:200;"`                    // 备注
-	Status   *int    `gorm:"column:status;index;"`                     // 状态(1:启用 2:停用)
+	Status   int     `gorm:"column:status;index;not null;"`            // 状态(1:启用 2:停用)
 	Creator  *string `gorm:"column:creator;size:36;"`                  // 创建者
 }
 

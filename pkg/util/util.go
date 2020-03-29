@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/LyricTian/structs"
@@ -31,16 +32,35 @@ func StructMapToStruct(s, ts interface{}) error {
 	}
 
 	ss, tss := structs.New(s), structs.New(ts)
-	for _, field := range tss.Fields() {
-		if !field.IsExported() {
-			continue
-		}
 
+	var setValue = func(field *structs.Field) error {
 		if sf, ok := ss.FieldOk(field.Name()); ok {
 			err := field.Set2(sf.Value())
 			if err != nil {
 				return err
 			}
+		}
+		return nil
+	}
+
+	for _, field := range tss.Fields() {
+		if !field.IsExported() {
+			continue
+		}
+
+		if field.IsEmbedded() && field.Kind() == reflect.Struct {
+			for _, field := range field.Fields() {
+				err := setValue(field)
+				if err != nil {
+					return err
+				}
+			}
+			continue
+		}
+
+		err := setValue(field)
+		if err != nil {
+			return err
 		}
 	}
 
