@@ -3,11 +3,18 @@ package model
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
+	"github.com/LyricTian/gin-admin/internal/app/model"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
+
+var _ model.IRole = new(Role)
+
+// RoleSet 注入Role
+var RoleSet = wire.NewSet(NewRole, wire.Bind(new(model.IRole), new(*Role)))
 
 // NewRole 创建角色存储实例
 func NewRole(db *gorm.DB) *Role {
@@ -41,7 +48,6 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	if v := params.LikeName; v != "" {
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
-
 	if v := params.UserID; v != "" {
 		subQuery := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", v).Select("role_id").SubQuery()
 		db = db.Where("record_id IN ?", subQuery)
@@ -99,6 +105,15 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, recordID string) error {
 	result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.Role{})
+	if err := result.Error; err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+// UpdateStatus 更新状态
+func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
+	result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

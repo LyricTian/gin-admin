@@ -17,6 +17,7 @@ require (
 	github.com/go-redis/redis_rate v6.5.0+incompatible
 	github.com/google/gops v0.3.7
 	github.com/google/uuid v1.1.1
+	github.com/google/wire v0.4.0
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.9
 	github.com/koding/multiconfig v0.0.0-20171124222453-69c27309b2d7

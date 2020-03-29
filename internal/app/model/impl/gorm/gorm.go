@@ -1,14 +1,14 @@
 package gorm
 
 import (
+	"strings"
 	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/model"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
-	imodel "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/model"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/model"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
-	"go.uber.org/dig"
 
 	// gorm存储注入
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -55,34 +55,33 @@ func SetTablePrefix(prefix string) {
 
 // AutoMigrate 自动映射数据表
 func AutoMigrate(db *gorm.DB) error {
-	if dbType := config.C.Gorm.DBType; dbType == "mysql" {
+	if dbType := config.C.Gorm.DBType; strings.ToLower(dbType) == "mysql" {
 		db = db.Set("gorm:table_options", "ENGINE=InnoDB")
 	}
 
 	return db.AutoMigrate(
 		new(entity.Demo),
-		new(entity.User),
-		new(entity.UserRole),
-		new(entity.Role),
-		new(entity.RoleMenu),
-		new(entity.Menu),
 		new(entity.MenuAction),
 		new(entity.MenuActionResource),
+		new(entity.Menu),
 		new(entity.RoleMenu),
+		new(entity.Role),
+		new(entity.UserRole),
+		new(entity.User),
 	).Error
 }
 
-// Inject 注入gorm实现
-// 使用方式：
-//   container := dig.New()
-//   Inject(container)
-//   container.Invoke(func(foo IDemo) {
-//   })
-func Inject(container *dig.Container) error {
-	_ = container.Provide(func() model.ITrans { return imodel.NewTrans })
-	_ = container.Provide(func() model.IDemo { return imodel.NewDemo })
-	_ = container.Provide(func() model.IMenu { return imodel.NewMenu })
-	_ = container.Provide(func() model.IRole { return imodel.NewRole })
-	_ = container.Provide(func() model.IUser { return imodel.NewUser })
-	return nil
-}
+// AllSet model注入
+var AllSet = wire.NewSet(
+	model.DemoSet,
+	model.MenuActionResourceSet,
+	model.MenuActionSet,
+	model.MenuSet,
+	model.RoleMenuSet,
+	model.RoleSet,
+	model.TransSet,
+	model.UserRoleSet,
+	model.RoleSet,
+	model.UserRoleSet,
+	model.UserSet,
+)

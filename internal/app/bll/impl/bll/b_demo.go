@@ -1,20 +1,20 @@
-package internal
+package bll
 
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/google/wire"
 )
 
-// NewDemo 创建demo
-func NewDemo(mDemo model.IDemo) *Demo {
-	return &Demo{
-		DemoModel: mDemo,
-	}
-}
+var _ bll.IDemo = new(Demo)
+
+// DemoSet 注入Demo
+var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"), wire.Bind(new(bll.IDemo), new(*Demo)))
 
 // Demo 示例程序
 type Demo struct {

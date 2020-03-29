@@ -3,9 +3,16 @@ package model
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
+
+var _ model.ITrans = new(Trans)
+
+// TransSet 注入Trans
+var TransSet = wire.NewSet(NewTrans, wire.Bind(new(model.ITrans), new(*Trans)))
 
 // NewTrans 创建事务管理实例
 func NewTrans(db *gorm.DB) *Trans {

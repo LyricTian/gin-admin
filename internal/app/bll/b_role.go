@@ -13,11 +13,11 @@ type IRole interface {
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error)
 	// 创建数据
-	Create(ctx context.Context, item schema.Role) (*schema.Role, error)
+	Create(ctx context.Context, item schema.Role) (*schema.HTTPRecordID, error)
 	// 更新数据
-	Update(ctx context.Context, recordID string, item schema.Role) (*schema.Role, error)
+	Update(ctx context.Context, recordID string, item schema.Role) error
 	// 删除数据
 	Delete(ctx context.Context, recordID string) error
-	// 获取资源权限
-	GetMenuResources(ctx context.Context, item *schema.Role) (schema.MenuResources, error)
+	// 更新状态
+	UpdateStatus(ctx context.Context, recordID string, status int) error
 }

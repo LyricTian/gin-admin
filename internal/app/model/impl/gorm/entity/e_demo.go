@@ -31,7 +31,7 @@ type Demo struct {
 	Name     string  `gorm:"column:name;size:100;index;not null;"`     // 名称
 	Memo     *string `gorm:"column:memo;size:200;"`                    // 备注
 	Status   int     `gorm:"column:status;index;not null;"`            // 状态(1:启用 2:停用)
-	Creator  *string `gorm:"column:creator;size:36;"`                  // 创建者
+	Creator  string  `gorm:"column:creator;size:36;"`                  // 创建者
 }
 
 func (a Demo) String() string {

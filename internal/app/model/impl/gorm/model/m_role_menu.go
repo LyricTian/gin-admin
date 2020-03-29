@@ -3,11 +3,18 @@ package model
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
+	"github.com/LyricTian/gin-admin/internal/app/model"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
+
+var _ model.IRoleMenu = new(RoleMenu)
+
+// RoleMenuSet 注入RoleMenu
+var RoleMenuSet = wire.NewSet(NewRoleMenu, wire.Bind(new(model.IRoleMenu), new(*RoleMenu)))
 
 // NewRoleMenu 创建角色菜单存储实例
 func NewRoleMenu(db *gorm.DB) *RoleMenu {
@@ -34,6 +41,9 @@ func (a *RoleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 	db := entity.GetRoleMenuDB(ctx, a.db)
 	if v := params.RoleID; v != "" {
 		db = db.Where("role_id=?", v)
+	}
+	if v := params.RoleIDs; len(v) > 0 {
+		db = db.Where("role_id IN(?)", v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))

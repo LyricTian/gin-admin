@@ -2,6 +2,8 @@ package schema
 
 import (
 	"time"
+
+	"github.com/LyricTian/gin-admin/pkg/util"
 )
 
 // User 用户对象
@@ -15,7 +17,7 @@ type User struct {
 	Status    int       `json:"status" binding:"required,max=2,min=1"` // 用户状态(1:启用 2:停用)
 	Creator   string    `json:"creator"`                               // 创建者
 	CreatedAt time.Time `json:"created_at"`                            // 创建时间
-	Roles     UserRoles `json:"roles" binding:"required,gt=0"`         // 角色授权
+	UserRoles UserRoles `json:"user_roles" binding:"required,gt=0"`    // 角色授权
 }
 
 // CleanSecure 清理安全数据
@@ -26,18 +28,17 @@ func (a *User) CleanSecure() *User {
 
 // UserQueryParam 查询条件
 type UserQueryParam struct {
-	UserName     string   // 用户名
-	LikeUserName string   // 用户名(模糊查询)
-	LikeRealName string   // 真实姓名(模糊查询)
-	Status       int      // 用户状态(1:启用 2:停用)
-	RoleIDs      []string // 角色ID列表
+	UserName     string   `form:"userName"`     // 用户名
+	LikeUserName string   `form:"likeUserName"` // 用户名(模糊查询)
+	LikeRealName string   `form:"likeRealName"` // 真实姓名(模糊查询)
+	Status       int      `form:"status"`       // 用户状态(1:启用 2:停用)
+	RoleIDs      []string `form:"roleIDs"`      // 角色ID列表
 }
 
 // UserQueryOptions 查询可选参数项
 type UserQueryOptions struct {
-	PageParam    *PaginationParam // 分页参数
-	IncludeRoles bool             // 包含角色权限
-	OrderFields  []*OrderField    // 排序字段
+	PageParam   *PaginationParam // 分页参数
+	OrderFields []*OrderField    // 排序字段
 }
 
 // UserQueryResult 查询结果
@@ -46,40 +47,37 @@ type UserQueryResult struct {
 	PageResult *PaginationResult
 }
 
+// ToShowResult 转换为显示结果
+func (a UserQueryResult) ToShowResult(mUserRoles map[string]UserRoles, mRoles map[string]*Role) *UserShowQueryResult {
+	return &UserShowQueryResult{
+		PageResult: a.PageResult,
+		Data:       a.Data.ToUserShows(mUserRoles, mRoles),
+	}
+}
+
 // Users 用户对象列表
 type Users []*User
 
-// ToRoleIDs 获取角色ID列表
-func (a Users) ToRoleIDs() []string {
-	var roleIDs []string
-	for _, item := range a {
-		roleIDs = append(roleIDs, item.Roles.ToRoleIDs()...)
+// ToRecordIDs 转换为记录ID列表
+func (a Users) ToRecordIDs() []string {
+	idList := make([]string, len(a))
+	for i, item := range a {
+		idList[i] = item.RecordID
 	}
-	return roleIDs
+	return idList
 }
 
 // ToUserShows 转换为用户显示列表
-func (a Users) ToUserShows(mroles map[string]*Role) UserShows {
+func (a Users) ToUserShows(mUserRoles map[string]UserRoles, mRoles map[string]*Role) UserShows {
 	list := make(UserShows, len(a))
-
 	for i, item := range a {
-		showItem := &UserShow{
-			RecordID:  item.RecordID,
-			RealName:  item.RealName,
-			UserName:  item.UserName,
-			Email:     item.Email,
-			Phone:     item.Phone,
-			Status:    item.Status,
-			CreatedAt: item.CreatedAt,
-		}
-
-		var roles Roles
-		for _, roleID := range item.Roles.ToRoleIDs() {
-			if v, ok := mroles[roleID]; ok {
-				roles = append(roles, v)
+		showItem := new(UserShow)
+		util.StructMapToStruct(item, showItem)
+		for _, roleID := range mUserRoles[item.RecordID].ToRoleIDs() {
+			if v, ok := mRoles[roleID]; ok {
+				showItem.Roles = append(showItem.Roles, v)
 			}
 		}
-		showItem.Roles = roles
 		list[i] = showItem
 	}
 
@@ -95,8 +93,35 @@ type UserRole struct {
 	RoleID   string `json:"role_id"`   // 角色ID
 }
 
-// UserRoles 用户角色列表
+// UserRoleQueryParam 查询条件
+type UserRoleQueryParam struct {
+	UserID  string   // 用户ID
+	UserIDs []string // 用户ID列表
+}
+
+// UserRoleQueryOptions 查询可选参数项
+type UserRoleQueryOptions struct {
+	PageParam   *PaginationParam // 分页参数
+	OrderFields []*OrderField    // 排序字段
+}
+
+// UserRoleQueryResult 查询结果
+type UserRoleQueryResult struct {
+	Data       UserRoles
+	PageResult *PaginationResult
+}
+
+// UserRoles 角色菜单列表
 type UserRoles []*UserRole
+
+// ToMap 转换为map
+func (a UserRoles) ToMap() map[string]*UserRole {
+	m := make(map[string]*UserRole)
+	for _, item := range a {
+		m[item.RecordID] = item
+	}
+	return m
+}
 
 // ToRoleIDs 转换为角色ID列表
 func (a UserRoles) ToRoleIDs() []string {
@@ -105,6 +130,15 @@ func (a UserRoles) ToRoleIDs() []string {
 		list[i] = item.RoleID
 	}
 	return list
+}
+
+// ToUserIDMap 转换为用户ID映射
+func (a UserRoles) ToUserIDMap() map[string]UserRoles {
+	m := make(map[string]UserRoles)
+	for _, item := range a {
+		m[item.UserID] = append(m[item.UserID], item)
+	}
+	return m
 }
 
 // ----------------------------------------UserShow--------------------------------------

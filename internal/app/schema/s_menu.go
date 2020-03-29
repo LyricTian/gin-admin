@@ -58,30 +58,26 @@ func (a Menus) ToMap() map[string]*Menu {
 	return m
 }
 
-// SplitAndGetAllRecordIDs 拆分父级路径并获取所有记录ID
-func (a Menus) SplitAndGetAllRecordIDs() []string {
-	recordIDs := make([]string, 0, len(a))
+// SplitParentRecordIDs 拆分父级路径的记录ID列表
+func (a Menus) SplitParentRecordIDs() []string {
+	idList := make([]string, 0, len(a))
+	mIDList := make(map[string]struct{})
+
 	for _, item := range a {
-		recordIDs = append(recordIDs, item.RecordID)
-		if item.ParentPath == "" {
+		if _, ok := mIDList[item.RecordID]; ok || item.ParentPath == "" {
 			continue
 		}
 
-		pps := strings.Split(item.ParentPath, "/")
-		for _, pp := range pps {
-			var exists bool
-			for _, recordID := range recordIDs {
-				if pp == recordID {
-					exists = true
-					break
-				}
+		for _, pp := range strings.Split(item.ParentPath, "/") {
+			if _, ok := mIDList[pp]; ok {
+				continue
 			}
-			if !exists {
-				recordIDs = append(recordIDs, pp)
-			}
+			idList = append(idList, pp)
+			mIDList[pp] = struct{}{}
 		}
 	}
-	return recordIDs
+
+	return idList
 }
 
 // ToTree 转换为菜单树
@@ -118,6 +114,16 @@ func (a Menus) fillLeafNodeID(tree *MenuTrees, leafNodeIDs *[]string) {
 		}
 		a.fillLeafNodeID(node.Children, leafNodeIDs)
 	}
+}
+
+// FillMenuAction 填充菜单动作列表
+func (a Menus) FillMenuAction(mActions map[string]MenuActions) Menus {
+	for _, item := range a {
+		if v, ok := mActions[item.RecordID]; ok {
+			item.Actions = v
+		}
+	}
+	return a
 }
 
 // ----------------------------------------MenuTree--------------------------------------
@@ -177,7 +183,8 @@ type MenuAction struct {
 
 // MenuActionQueryParam 查询条件
 type MenuActionQueryParam struct {
-	MenuID string // 菜单ID
+	MenuID    string   // 菜单ID
+	RecordIDs []string // 记录ID列表
 }
 
 // MenuActionQueryOptions 查询可选参数项
@@ -195,6 +202,15 @@ type MenuActionQueryResult struct {
 // MenuActions 菜单动作管理列表
 type MenuActions []*MenuAction
 
+// ToMap 转换为map
+func (a MenuActions) ToMap() map[string]*MenuAction {
+	m := make(map[string]*MenuAction)
+	for _, item := range a {
+		m[item.RecordID] = item
+	}
+	return m
+}
+
 // FillResources 填充资源数据
 func (a MenuActions) FillResources(mResources map[string]MenuActionResources) {
 	for i, item := range a {
@@ -202,14 +218,13 @@ func (a MenuActions) FillResources(mResources map[string]MenuActionResources) {
 	}
 }
 
-// GetByRecordID 根据记录ID获取数据项
-func (a MenuActions) GetByRecordID(recordID string) *MenuAction {
+// ToMenuIDMap 转换为菜单ID映射
+func (a MenuActions) ToMenuIDMap() map[string]MenuActions {
+	m := make(map[string]MenuActions)
 	for _, item := range a {
-		if item.RecordID == recordID {
-			return item
-		}
+		m[item.MenuID] = append(m[item.MenuID], item)
 	}
-	return nil
+	return m
 }
 
 // ----------------------------------------MenuActionResource--------------------------------------
@@ -242,6 +257,15 @@ type MenuActionResourceQueryResult struct {
 // MenuActionResources 菜单动作关联资源管理列表
 type MenuActionResources []*MenuActionResource
 
+// ToMap 转换为map
+func (a MenuActionResources) ToMap() map[string]*MenuActionResource {
+	m := make(map[string]*MenuActionResource)
+	for _, item := range a {
+		m[item.RecordID] = item
+	}
+	return m
+}
+
 // ToActionIDMap 转换为动作ID映射
 func (a MenuActionResources) ToActionIDMap() map[string]MenuActionResources {
 	m := make(map[string]MenuActionResources)
@@ -254,14 +278,4 @@ func (a MenuActionResources) ToActionIDMap() map[string]MenuActionResources {
 		m[item.ActionID] = MenuActionResources{item}
 	}
 	return m
-}
-
-// GetByRecordID 根据记录ID获取数据项
-func (a MenuActionResources) GetByRecordID(recordID string) *MenuActionResource {
-	for _, item := range a {
-		if item.RecordID == recordID {
-			return item
-		}
-	}
-	return nil
 }

@@ -43,7 +43,7 @@ func toString(v interface{}) string {
 
 func getDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	trans, ok := icontext.FromTrans(ctx)
-	if ok {
+	if ok && !icontext.FromNoTrans(ctx) {
 		db, ok := trans.(*gorm.DB)
 		if ok {
 			if icontext.FromTransLock(ctx) {
@@ -58,6 +58,14 @@ func getDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return defDB
 }
 
+type tabler interface {
+	TableName() string
+}
+
 func getDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB {
-	return getDB(ctx, defDB).Model(m)
+	db := getDB(ctx, defDB)
+	if t, ok := m.(tabler); ok {
+		return db.Table(t.TableName())
+	}
+	return db.Model(m)
 }

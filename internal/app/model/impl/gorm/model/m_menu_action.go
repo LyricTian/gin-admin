@@ -3,11 +3,18 @@ package model
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
+	"github.com/LyricTian/gin-admin/internal/app/model"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
+
+var _ model.IMenuAction = new(MenuAction)
+
+// MenuActionSet 注入MenuAction
+var MenuActionSet = wire.NewSet(NewMenuAction, wire.Bind(new(model.IMenuAction), new(*MenuAction)))
 
 // NewMenuAction 创建菜单动作存储实例
 func NewMenuAction(db *gorm.DB) *MenuAction {
@@ -34,6 +41,9 @@ func (a *MenuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 	db := entity.GetMenuActionDB(ctx, a.db)
 	if v := params.MenuID; v != "" {
 		db = db.Where("menu_id=?", v)
+	}
+	if v := params.RecordIDs; len(v) > 0 {
+		db = db.Where("record_id IN(?)", v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))

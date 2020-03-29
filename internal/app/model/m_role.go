@@ -18,4 +18,6 @@ type IRole interface {
 	Update(ctx context.Context, recordID string, item schema.Role) error
 	// 删除数据
 	Delete(ctx context.Context, recordID string) error
+	// 更新状态
+	UpdateStatus(ctx context.Context, recordID string, status int) error
 }

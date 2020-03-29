@@ -3,18 +3,25 @@ package model
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
+	"github.com/LyricTian/gin-admin/internal/app/model"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
 
-// NewDemo 创建demo存储实例
+var _ model.IDemo = new(Demo)
+
+// DemoSet 注入Demo
+var DemoSet = wire.NewSet(NewDemo, wire.Bind(new(model.IDemo), new(*Demo)))
+
+// NewDemo 创建示例存储实例
 func NewDemo(db *gorm.DB) *Demo {
 	return &Demo{db}
 }
 
-// Demo demo存储
+// Demo 示例存储
 type Demo struct {
 	db *gorm.DB
 }

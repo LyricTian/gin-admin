@@ -1,17 +1,17 @@
-package internal
+package bll
 
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/model"
+	"github.com/google/wire"
 )
 
-// NewTrans 创建角色管理实例
-func NewTrans(trans model.ITrans) *Trans {
-	return &Trans{
-		TransModel: trans,
-	}
-}
+var _ bll.ITrans = new(Trans)
+
+// TransSet 注入Trans
+var TransSet = wire.NewSet(wire.Struct(new(Trans), "*"), wire.Bind(new(bll.ITrans), new(*Trans)))
 
 // Trans 事务管理
 type Trans struct {

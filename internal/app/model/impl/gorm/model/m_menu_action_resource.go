@@ -3,11 +3,18 @@ package model
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
+	"github.com/LyricTian/gin-admin/internal/app/model"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
+
+var _ model.IMenuActionResource = new(MenuActionResource)
+
+// MenuActionResourceSet 注入MenuActionResource
+var MenuActionResourceSet = wire.NewSet(NewMenuActionResource, wire.Bind(new(model.IMenuActionResource), new(*MenuActionResource)))
 
 // NewMenuActionResource 创建菜单动作关联资源存储实例
 func NewMenuActionResource(db *gorm.DB) *MenuActionResource {

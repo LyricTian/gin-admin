@@ -22,7 +22,7 @@ type ILogin interface {
 	// 获取用户登录信息
 	GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error)
 	// 查询用户的权限菜单树
-	QueryUserMenuTree(ctx context.Context, userID string) ([]*schema.MenuTree, error)
+	QueryUserMenuTree(ctx context.Context, userID string) (schema.MenuTrees, error)
 	// 更新用户登录密码
 	UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error
 }

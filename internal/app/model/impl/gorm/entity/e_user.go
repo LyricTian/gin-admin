@@ -23,18 +23,6 @@ func (a SchemaUser) ToUser() *User {
 	return item
 }
 
-// ToUserRoles 转换为用户角色关联列表
-func (a SchemaUser) ToUserRoles() []*UserRole {
-	list := make([]*UserRole, len(a.Roles))
-	for i, item := range a.Roles {
-		list[i] = &UserRole{
-			UserID: a.RecordID,
-			RoleID: item.RoleID,
-		}
-	}
-	return list
-}
-
 // User 用户实体
 type User struct {
 	Model

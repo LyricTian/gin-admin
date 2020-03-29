@@ -25,20 +25,21 @@ func ExecTrans(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 		return err
 	}
 
+	panicked := true
 	defer func() {
-		if r := recover(); r != nil {
+		if panicked || err != nil {
 			_ = transModel.Rollback(ctx, trans)
-			panic(r)
 		}
 	}()
 
 	ctx = icontext.NewTrans(ctx, trans)
 	err = fn(ctx)
-	if err != nil {
-		_ = transModel.Rollback(ctx, trans)
-		return err
+	if err == nil {
+		err = transModel.Commit(ctx, trans)
 	}
-	return transModel.Commit(ctx, trans)
+
+	panicked = false
+	return err
 }
 
 // ExecTransWithLock 执行事务（加锁）

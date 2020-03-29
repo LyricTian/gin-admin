@@ -1,4 +1,4 @@
-package internal
+package bll
 
 import (
 	"context"
@@ -34,24 +34,26 @@ func ExecTrans(ctx context.Context, transModel model.ITrans, fn TransFunc) error
 	if _, ok := icontext.FromTrans(ctx); ok {
 		return fn(ctx)
 	}
+
 	trans, err := transModel.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
+	panicked := true
 	defer func() {
-		if r := recover(); r != nil {
+		if panicked || err != nil {
 			_ = transModel.Rollback(ctx, trans)
-			panic(r)
 		}
 	}()
 
 	err = fn(icontext.NewTrans(ctx, trans))
-	if err != nil {
-		_ = transModel.Rollback(ctx, trans)
-		return err
+	if err == nil {
+		err = transModel.Commit(ctx, trans)
 	}
-	return transModel.Commit(ctx, trans)
+
+	panicked = false
+	return err
 }
 
 // ExecTransWithLock 执行事务（加锁）
@@ -60,4 +62,12 @@ func ExecTransWithLock(ctx context.Context, transModel model.ITrans, fn TransFun
 		ctx = icontext.NewTransLock(ctx)
 	}
 	return ExecTrans(ctx, transModel, fn)
+}
+
+// NewNoTrans 不使用事务执行
+func NewNoTrans(ctx context.Context) context.Context {
+	if !icontext.FromNoTrans(ctx) {
+		return icontext.NewNoTrans(ctx)
+	}
+	return ctx
 }

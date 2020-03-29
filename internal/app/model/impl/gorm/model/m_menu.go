@@ -3,11 +3,18 @@ package model
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
+	"github.com/LyricTian/gin-admin/internal/app/model"
+	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/pkg/errors"
+	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
+
+var _ model.IMenu = new(Menu)
+
+// MenuSet 注入Menu
+var MenuSet = wire.NewSet(NewMenu, wire.Bind(new(model.IMenu), new(*Menu)))
 
 // NewMenu 创建菜单存储实例
 func NewMenu(db *gorm.DB) *Menu {
@@ -46,6 +53,9 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	}
 	if v := params.PrefixParentPath; v != "" {
 		db = db.Where("parent_path LIKE ?", v+"%")
+	}
+	if v := params.ShowStatus; v != 0 {
+		db = db.Where("show_status=?", v)
 	}
 	if v := params.Status; v != 0 {
 		db = db.Where("status=?", v)
@@ -113,6 +123,15 @@ func (a *Menu) UpdateParentPath(ctx context.Context, recordID, parentPath string
 // Delete 删除数据
 func (a *Menu) Delete(ctx context.Context, recordID string) error {
 	result := entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.Menu{})
+	if err := result.Error; err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+// UpdateStatus 更新状态
+func (a *Menu) UpdateStatus(ctx context.Context, recordID string, status int) error {
+	result := entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

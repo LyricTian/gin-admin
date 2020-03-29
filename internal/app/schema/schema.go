@@ -41,6 +41,19 @@ type HTTPPagination struct {
 	PageSize int `json:"pageSize"`
 }
 
+// NewPaginationParam 创建分页查询条件实例
+func NewPaginationParam(pageSize int, pageIndex ...int) *PaginationParam {
+	item := &PaginationParam{
+		PageSize: pageSize,
+	}
+
+	if len(pageIndex) > 0 {
+		item.PageIndex = pageIndex[0]
+	}
+
+	return item
+}
+
 // PaginationParam 分页查询条件
 type PaginationParam struct {
 	PageIndex int // 页索引
@@ -50,6 +63,18 @@ type PaginationParam struct {
 // PaginationResult 分页查询结果
 type PaginationResult struct {
 	Total int // 总数据条数
+}
+
+// NewHTTPRecordID 创建HTTP记录ID实例
+func NewHTTPRecordID(recordID string) *HTTPRecordID {
+	return &HTTPRecordID{
+		RecordID: recordID,
+	}
+}
+
+// HTTPRecordID HTTP记录ID
+type HTTPRecordID struct {
+	RecordID string `json:"record_id"`
 }
 
 // ----------------------------------------OrderField--------------------------------------

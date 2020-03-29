@@ -15,9 +15,9 @@ type IUser interface {
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error)
 	// 创建数据
-	Create(ctx context.Context, item schema.User) (*schema.User, error)
+	Create(ctx context.Context, item schema.User) (*schema.HTTPRecordID, error)
 	// 更新数据
-	Update(ctx context.Context, recordID string, item schema.User) (*schema.User, error)
+	Update(ctx context.Context, recordID string, item schema.User) error
 	// 删除数据
 	Delete(ctx context.Context, recordID string) error
 	// 更新状态

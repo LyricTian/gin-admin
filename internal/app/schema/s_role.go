@@ -12,7 +12,7 @@ type Role struct {
 	Creator   string    `json:"creator"`                               // 创建者
 	CreatedAt time.Time `json:"created_at"`                            // 创建时间
 	UpdatedAt time.Time `json:"updated_at"`                            // 更新时间
-	Menus     RoleMenus `json:"menus" binding:"required,gt=0"`         // 菜单列表
+	RoleMenus RoleMenus `json:"role_menus" binding:"required,gt=0"`    // 角色菜单列表
 }
 
 // RoleQueryParam 查询条件
@@ -69,7 +69,8 @@ type RoleMenu struct {
 
 // RoleMenuQueryParam 查询条件
 type RoleMenuQueryParam struct {
-	RoleID string // 角色ID
+	RoleID  string   // 角色ID
+	RoleIDs []string // 角色ID列表
 }
 
 // RoleMenuQueryOptions 查询可选参数项
@@ -86,3 +87,37 @@ type RoleMenuQueryResult struct {
 
 // RoleMenus 角色菜单列表
 type RoleMenus []*RoleMenu
+
+// ToMap 转换为map
+func (a RoleMenus) ToMap() map[string]*RoleMenu {
+	m := make(map[string]*RoleMenu)
+	for _, item := range a {
+		m[item.RecordID] = item
+	}
+	return m
+}
+
+// ToMenuIDs 转换为菜单ID列表
+func (a RoleMenus) ToMenuIDs() []string {
+	var idList []string
+	m := make(map[string]struct{})
+
+	for _, item := range a {
+		if _, ok := m[item.MenuID]; ok {
+			continue
+		}
+		idList = append(idList, item.MenuID)
+		m[item.MenuID] = struct{}{}
+	}
+
+	return idList
+}
+
+// ToActionIDs 转换为动作ID列表
+func (a RoleMenus) ToActionIDs() []string {
+	idList := make([]string, len(a))
+	for i, item := range a {
+		idList[i] = item.ActionID
+	}
+	return idList
+}
