@@ -22,7 +22,6 @@ var (
 	configFile string
 	modelFile  string
 	wwwDir     string
-	swaggerDir string
 	menuFile   string
 )
 
@@ -30,7 +29,6 @@ func init() {
 	flag.StringVar(&configFile, "c", "", "配置文件(.json,.yaml,.toml)")
 	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&wwwDir, "www", "", "静态站点目录")
-	flag.StringVar(&swaggerDir, "swagger", "", "swagger目录")
 	flag.StringVar(&menuFile, "menu", "", "菜单数据文件(.json)")
 }
 
@@ -55,7 +53,6 @@ func main() {
 		app.SetConfigFile(configFile),
 		app.SetModelFile(modelFile),
 		app.SetWWWDir(wwwDir),
-		app.SetSwaggerDir(swaggerDir),
 		app.SetMenuFile(menuFile),
 		app.SetVersion(VERSION))
 

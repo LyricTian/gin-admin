@@ -5,6 +5,11 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/middleware"
 	"github.com/LyricTian/gin-admin/internal/app/router"
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	// 引入swagger
+	_ "github.com/LyricTian/gin-admin/internal/app/swagger"
 )
 
 // InitHTTPEngine 初始化gin引擎
@@ -35,8 +40,8 @@ func InitHTTPEngine(r *router.Router) *gin.Engine {
 	r.RegisterAPI(app)
 
 	// swagger文档
-	if dir := config.C.Swagger; dir != "" {
-		app.Static("/swagger", dir)
+	if config.C.Swagger {
+		app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	// 静态站点

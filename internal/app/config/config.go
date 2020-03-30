@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/koding/multiconfig"
@@ -16,7 +17,24 @@ var (
 // MustLoad 加载配置
 func MustLoad(fpath string) {
 	once.Do(func() {
-		m := multiconfig.NewWithPath(fpath)
+		loaders := []multiconfig.Loader{
+			&multiconfig.TagLoader{},
+		}
+
+		if strings.HasSuffix(fpath, "toml") {
+			loaders = append(loaders, &multiconfig.TOMLLoader{Path: fpath})
+		}
+		if strings.HasSuffix(fpath, "json") {
+			loaders = append(loaders, &multiconfig.JSONLoader{Path: fpath})
+		}
+		if strings.HasSuffix(fpath, "yaml") {
+			loaders = append(loaders, &multiconfig.YAMLLoader{Path: fpath})
+		}
+
+		m := multiconfig.DefaultLoader{
+			Loader:    multiconfig.MultiLoader(loaders...),
+			Validator: multiconfig.MultiValidator(&multiconfig.RequiredValidator{}),
+		}
 		m.MustLoad(C)
 	})
 }
@@ -25,7 +43,7 @@ func MustLoad(fpath string) {
 type Config struct {
 	RunMode     string      `toml:"run_mode"`
 	WWW         string      `toml:"www"`
-	Swagger     string      `toml:"swagger"`
+	Swagger     bool        `toml:"swagger"`
 	HTTP        HTTP        `toml:"http"`
 	Menu        Menu        `toml:"menu"`
 	Casbin      Casbin      `toml:"casbin"`

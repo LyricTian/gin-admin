@@ -15,6 +15,7 @@
 package model
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -37,6 +38,9 @@ var sectionNameMap = map[string]string{
 	"m": "matchers",
 }
 
+// Minimal required sections for a model to be valid
+var requiredSections = []string{"r", "p", "e", "m"}
+
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
 	value := cfg.String(sectionNameMap[sec] + "::" + key)
 	return model.AddDef(sec, key, value)
@@ -44,13 +48,13 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 
 // AddDef adds an assertion to the model.
 func (model Model) AddDef(sec string, key string, value string) bool {
+	if value == "" {
+		return false
+	}
+
 	ast := Assertion{}
 	ast.Key = key
 	ast.Value = value
-
-	if ast.Value == "" {
-		return false
-	}
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ", ")
@@ -95,7 +99,7 @@ func NewModel() Model {
 	return m
 }
 
-// NewModel creates a model from a .CONF file.
+// NewModelFromFile creates a model from a .CONF file.
 func NewModelFromFile(path string) (Model, error) {
 	m := NewModel()
 
@@ -107,7 +111,7 @@ func NewModelFromFile(path string) (Model, error) {
 	return m, nil
 }
 
-// NewModel creates a model from a string which contains model text.
+// NewModelFromString creates a model from a string which contains model text.
 func NewModelFromString(text string) (Model, error) {
 	m := NewModel()
 
@@ -126,14 +130,7 @@ func (model Model) LoadModel(path string) error {
 		return err
 	}
 
-	loadSection(model, cfg, "r")
-	loadSection(model, cfg, "p")
-	loadSection(model, cfg, "e")
-	loadSection(model, cfg, "m")
-
-	loadSection(model, cfg, "g")
-
-	return nil
+	return model.loadModelFromConfig(cfg)
 }
 
 // LoadModelFromText loads the model from the text.
@@ -143,14 +140,28 @@ func (model Model) LoadModelFromText(text string) error {
 		return err
 	}
 
-	loadSection(model, cfg, "r")
-	loadSection(model, cfg, "p")
-	loadSection(model, cfg, "e")
-	loadSection(model, cfg, "m")
+	return model.loadModelFromConfig(cfg)
+}
 
-	loadSection(model, cfg, "g")
-
+func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
+	for s := range sectionNameMap {
+		loadSection(model, cfg, s)
+	}
+	ms := make([]string, 0)
+	for _, rs := range requiredSections {
+		if !model.hasSection(rs) {
+			ms = append(ms, sectionNameMap[rs])
+		}
+	}
+	if len(ms) > 0 {
+		return fmt.Errorf("missing required sections: %s", strings.Join(ms, ","))
+	}
 	return nil
+}
+
+func (model Model) hasSection(sec string) bool {
+	section := model[sec]
+	return section != nil
 }
 
 // PrintModel prints the model to the log.

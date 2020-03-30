@@ -26,10 +26,10 @@ func (a SchemaMenuAction) ToMenuAction() *MenuAction {
 // MenuAction 菜单动作实体
 type MenuAction struct {
 	Model
-	RecordID string `gorm:"column:record_id;size:36;index;not null;"` // 记录ID
-	MenuID   string `gorm:"column:menu_id;size:36;index;not null;"`   // 菜单ID
-	Code     string `gorm:"column:code;size:100;not null;"`           // 动作编号
-	Name     string `gorm:"column:name;size:100;not null;"`           // 动作名称
+	RecordID string `gorm:"column:record_id;size:36;index;default:'';not null;"` // 记录ID
+	MenuID   string `gorm:"column:menu_id;size:36;index;default:'';not null;"`   // 菜单ID
+	Code     string `gorm:"column:code;size:100;default:'';not null;"`           // 动作编号
+	Name     string `gorm:"column:name;size:100;default:'';not null;"`           // 动作名称
 }
 
 func (a MenuAction) String() string {

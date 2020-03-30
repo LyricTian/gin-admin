@@ -7,7 +7,6 @@ require (
 	github.com/LyricTian/queue v1.2.0
 	github.com/LyricTian/structs v1.1.1
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/casbin/casbin v1.9.1
 	github.com/casbin/casbin/v2 v2.2.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/camelcase v1.0.0 // indirect
@@ -25,8 +24,9 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.5.0
 	github.com/stretchr/testify v1.5.1
+	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.5
 	github.com/tidwall/buntdb v1.1.2
-	go.uber.org/dig v1.8.0
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
+	golang.org/x/tools v0.0.0-20191030062658-86caa796c7ab // indirect
 )

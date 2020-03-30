@@ -4,8 +4,8 @@ run_mode = "debug"
 # 静态站点目录(也可以启动服务时使用-www指定)
 www = ""
 
-# swagger文档目录(也可以启动服务时使用-swagger指定)
-swagger = ""
+# 是否启用swagger
+swagger = true
 
 # http配置
 [http]
@@ -23,7 +23,7 @@ shutdown_timeout = 30
 # 菜单配置
 [menu]
 # 使用启用初始化菜单数据
-enable = true
+enable = false
 # 数据文件(json,也可以启动服务时使用-menu指定)
 data = ""
 

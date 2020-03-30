@@ -116,7 +116,6 @@ func BuildInjector() (*Injector, func(), error) {
 		Auth:           auther,
 		CasbinEnforcer: syncedEnforcer,
 		MenuData:       menuData,
-		DB:             db,
 	}
 	return injector, func() {
 		cleanup3()

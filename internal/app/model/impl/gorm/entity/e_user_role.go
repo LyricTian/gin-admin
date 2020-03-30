@@ -26,9 +26,9 @@ func (a SchemaUserRole) ToUserRole() *UserRole {
 // UserRole 用户角色关联实体
 type UserRole struct {
 	Model
-	RecordID string `gorm:"column:record_id;size:36;index;not null;"` // 记录ID
-	UserID   string `gorm:"column:user_id;size:36;index;not null;"`   // 用户内码
-	RoleID   string `gorm:"column:role_id;size:36;index;not null;"`   // 角色内码
+	RecordID string `gorm:"column:record_id;size:36;index;default:'';not null;"` // 记录ID
+	UserID   string `gorm:"column:user_id;size:36;index;default:'';not null;"`   // 用户内码
+	RoleID   string `gorm:"column:role_id;size:36;index;default:'';not null;"`   // 角色内码
 }
 
 // TableName 表名

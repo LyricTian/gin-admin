@@ -44,6 +44,7 @@ type Enforcer struct {
 	enabled            bool
 	autoSave           bool
 	autoBuildRoleLinks bool
+	autoNotifyWatcher  bool
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -171,6 +172,7 @@ func (e *Enforcer) initialize() {
 	e.enabled = true
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
+	e.autoNotifyWatcher = true
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -316,6 +318,11 @@ func (e *Enforcer) EnableLog(enable bool) {
 	log.GetLogger().EnableLog(enable)
 }
 
+// EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
+func (e *Enforcer) EnableAutoNotifyWatcher(enable bool)  {
+	e.autoNotifyWatcher = enable
+}
+
 // EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
 func (e *Enforcer) EnableAutoSave(autoSave bool) {
 	e.autoSave = autoSave
@@ -338,6 +345,12 @@ func (e *Enforcer) BuildRoleLinks() error {
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Errorf("panic: %v", err)
+		}
+	}()
+
 	if !e.enabled {
 		return true, nil
 	}

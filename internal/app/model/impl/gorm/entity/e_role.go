@@ -26,12 +26,12 @@ func (a SchemaRole) ToRole() *Role {
 // Role 角色实体
 type Role struct {
 	Model
-	RecordID string  `gorm:"column:record_id;size:36;index;not null;"` // 记录内码
-	Name     string  `gorm:"column:name;size:100;index;not null;"`     // 角色名称
-	Sequence int     `gorm:"column:sequence;index;not null;"`          // 排序值
-	Memo     *string `gorm:"column:memo;size:1024;"`                   // 备注
-	Status   int     `gorm:"column:status;index;not null;"`            // 状态(1:启用 2:禁用)
-	Creator  string  `gorm:"column:creator;size:36;"`                  // 创建者
+	RecordID string  `gorm:"column:record_id;size:36;index;default:'';not null;"` // 记录内码
+	Name     string  `gorm:"column:name;size:100;index;default:'';not null;"`     // 角色名称
+	Sequence int     `gorm:"column:sequence;index;default:0;not null;"`           // 排序值
+	Memo     *string `gorm:"column:memo;size:1024;"`                              // 备注
+	Status   int     `gorm:"column:status;index;default:0;not null;"`             // 状态(1:启用 2:禁用)
+	Creator  string  `gorm:"column:creator;size:36;"`                             // 创建者
 }
 
 func (a Role) String() string {

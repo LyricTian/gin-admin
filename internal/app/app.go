@@ -91,9 +91,6 @@ func Init(ctx context.Context, opts ...Option) func() {
 	if v := o.WWWDir; v != "" {
 		config.C.WWW = v
 	}
-	if v := o.SwaggerDir; v != "" {
-		config.C.Swagger = v
-	}
 	if v := o.MenuFile; v != "" {
 		config.C.Menu.Data = v
 	}

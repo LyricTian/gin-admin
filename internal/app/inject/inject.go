@@ -7,7 +7,6 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
-	"github.com/jinzhu/gorm"
 )
 
 var (
@@ -37,5 +36,4 @@ type Injector struct {
 	Auth           auth.Auther
 	CasbinEnforcer *casbin.SyncedEnforcer
 	MenuData       *MenuData
-	DB             *gorm.DB
 }
