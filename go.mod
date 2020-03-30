@@ -7,6 +7,7 @@ require (
 	github.com/LyricTian/captcha v1.1.0
 	github.com/LyricTian/queue v1.2.0
 	github.com/LyricTian/structs v1.1.1
+	github.com/casbin/casbin v1.9.1
 	github.com/casbin/casbin/v2 v2.2.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/camelcase v1.0.0 // indirect

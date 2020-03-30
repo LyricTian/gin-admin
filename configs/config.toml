@@ -7,9 +7,6 @@ www = ""
 # swagger文档目录(也可以启动服务时使用-swagger指定)
 swagger = ""
 
-# 数据存储(支持：gorm)
-store = "gorm"
-
 # http配置
 [http]
 # http监听地址
@@ -39,9 +36,9 @@ debug = false
 # 模型配置文件(也可以启动服务时使用-m指定)
 model = ""
 # 是否启用定期自动加载策略
-auto_load = false
+auto_load = true
 # 定期自动加载策略时间间隔（单位秒）
-auto_load_internal = 10
+auto_load_internal = 30
 
 # 日志配置
 [log]

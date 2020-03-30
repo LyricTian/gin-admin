@@ -97,6 +97,15 @@ func (a RoleMenus) ToMap() map[string]*RoleMenu {
 	return m
 }
 
+// ToRoleIDMap 转换为角色ID映射
+func (a RoleMenus) ToRoleIDMap() map[string]RoleMenus {
+	m := make(map[string]RoleMenus)
+	for _, item := range a {
+		m[item.RoleID] = append(m[item.RoleID], item)
+	}
+	return m
+}
+
 // ToMenuIDs 转换为菜单ID列表
 func (a RoleMenus) ToMenuIDs() []string {
 	var idList []string
@@ -116,8 +125,13 @@ func (a RoleMenus) ToMenuIDs() []string {
 // ToActionIDs 转换为动作ID列表
 func (a RoleMenus) ToActionIDs() []string {
 	idList := make([]string, len(a))
+	m := make(map[string]struct{})
 	for i, item := range a {
+		if _, ok := m[item.ActionID]; ok {
+			continue
+		}
 		idList[i] = item.ActionID
+		m[item.ActionID] = struct{}{}
 	}
 	return idList
 }

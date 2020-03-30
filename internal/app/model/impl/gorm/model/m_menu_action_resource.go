@@ -43,6 +43,10 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 		subQuery := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", v).Select("record_id").SubQuery()
 		db = db.Where("action_id IN(?)", subQuery)
 	}
+	if v := params.MenuIDs; len(v) > 0 {
+		subQuery := entity.GetMenuActionDB(ctx, a.db).Where("menu_id IN(?)", v).Select("record_id").SubQuery()
+		db = db.Where("action_id IN(?)", subQuery)
+	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
 	db = db.Order(ParseOrder(opt.OrderFields))

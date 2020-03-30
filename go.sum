@@ -9,6 +9,8 @@ github.com/LyricTian/queue v1.2.0/go.mod h1:CMJcrjcVYLOqN2FnVpXqYJzITcDJNdlq7VLk
 github.com/LyricTian/structs v1.1.1 h1:Bn+/o3WgFavzNxXAb+V2xrPsAghda/xXZ6epPkt9a/0=
 github.com/LyricTian/structs v1.1.1/go.mod h1:/flA4L8Ltg7IrugE2yV9F9umQrDe9aPBItaO95HNyP4=
 github.com/StackExchange/wmi v0.0.0-20170410192909-ea383cf3ba6e/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
+github.com/casbin/casbin v1.9.1 h1:ucjbS5zTrmSLtH4XogqOG920Poe6QatdXtz1FEbApeM=
+github.com/casbin/casbin v1.9.1/go.mod h1:z8uPsfBJGUsnkagrt3G8QvjgTKFMBJ32UP8HpZllfog=
 github.com/casbin/casbin/v2 v2.2.2 h1:QHtOUVnNeQZrIQkrR6zmla92hqRYnY4WPm/KErI+OLs=
 github.com/casbin/casbin/v2 v2.2.2/go.mod h1:XXtYGrs/0zlOsJMeRteEdVi/FsB0ph7KgNfjoCoJUD8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

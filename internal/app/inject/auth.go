@@ -1,4 +1,4 @@
-package app
+package inject
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
@@ -10,7 +10,7 @@ import (
 )
 
 // InitAuth 初始化用户认证
-func InitAuth() (auth.Auther, error) {
+func InitAuth() (auth.Auther, func(), error) {
 	cfg := config.C.JWTAuth
 
 	var opts []jwtauth.Option
@@ -47,10 +47,14 @@ func InitAuth() (auth.Auther, error) {
 	default:
 		s, err := buntdb.NewStore(cfg.FilePath)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		store = s
 	}
 
-	return jwtauth.New(store, opts...), nil
+	auth := jwtauth.New(store, opts...)
+	cleanFunc := func() {
+		auth.Release()
+	}
+	return auth, cleanFunc, nil
 }

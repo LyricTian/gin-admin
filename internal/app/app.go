@@ -2,14 +2,19 @@ package app
 
 import (
 	"context"
+	"crypto/tls"
+	"fmt"
+	"net/http"
 	"os"
+	"time"
 
-	"github.com/LyricTian/gin-admin/internal/app/api"
-	"github.com/LyricTian/gin-admin/internal/app/bll"
+	"github.com/LyricTian/captcha"
+	"github.com/LyricTian/captcha/store"
 	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/pkg/auth"
+	"github.com/LyricTian/gin-admin/internal/app/inject"
 	"github.com/LyricTian/gin-admin/pkg/logger"
-	"go.uber.org/dig"
+	"github.com/go-redis/redis"
+	"github.com/google/gops/agent"
 )
 
 type options struct {
@@ -80,96 +85,107 @@ func Init(ctx context.Context, opts ...Option) func() {
 	}
 
 	config.MustLoad(o.ConfigFile)
-	cfg := config.C
 	if v := o.ModelFile; v != "" {
-		cfg.Casbin.Model = v
+		config.C.Casbin.Model = v
 	}
 	if v := o.WWWDir; v != "" {
-		cfg.WWW = v
+		config.C.WWW = v
 	}
 	if v := o.SwaggerDir; v != "" {
-		cfg.Swagger = v
+		config.C.Swagger = v
 	}
 	if v := o.MenuFile; v != "" {
-		cfg.Menu.Data = v
+		config.C.Menu.Data = v
 	}
 
-	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", cfg.RunMode, o.Version, os.Getpid())
+	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", config.C.RunMode, o.Version, os.Getpid())
 
-	loggerCall, err := InitLogger()
+	loggerCleanFunc, err := InitLogger()
 	handleError(err)
 
 	err = InitMonitor()
 	if err != nil {
-		logger.Errorf(ctx, err.Error())
+		logger.Errorf(ctx, "initialize monitor error: %s", err.Error())
 	}
 
 	// 初始化图形验证码
 	InitCaptcha()
 
-	// 创建依赖注入容器
-	container, containerCall := BuildContainer()
+	// 初始化注入器
+	injector, injectorCleanFunc, err := inject.InitializeInjector()
+	handleError(err)
 
-	// 初始化数据
-	err = InitData(ctx, container)
+	// 初始化菜单数据
+	err = injector.MenuData.Load()
 	handleError(err)
 
 	// 初始化HTTP服务
-	httpCall := InitHTTPServer(ctx, container)
+	httpCleanFunc := InitHTTPServer(ctx, injector.App)
+
 	return func() {
-		if httpCall != nil {
-			httpCall()
-		}
-		if containerCall != nil {
-			containerCall()
-		}
-		if loggerCall != nil {
-			loggerCall()
-		}
+		httpCleanFunc()
+		injectorCleanFunc()
+		loggerCleanFunc()
 	}
 }
 
-// BuildContainer 创建依赖注入容器
-func BuildContainer() (*dig.Container, func()) {
-	// 创建依赖注入容器
-	container := dig.New()
+// InitCaptcha 初始化图形验证码
+func InitCaptcha() {
+	cfg := config.C.Captcha
+	if cfg.Store == "redis" {
+		rc := config.C.Redis
+		captcha.SetCustomStore(store.NewRedisStore(&redis.Options{
+			Addr:     rc.Addr,
+			Password: rc.Password,
+			DB:       cfg.RedisDB,
+		}, captcha.Expiration, logger.StandardLogger(), cfg.RedisPrefix))
+	}
+}
 
-	// 注入认证模块
-	auther, err := InitAuth()
-	handleError(err)
-	_ = container.Provide(func() auth.Auther {
-		return auther
-	})
-
-	// 注入casbin
-	_ = container.Provide(NewCasbinEnforcer)
-
-	// 注入存储模块
-	storeCall, err := InitStore(container)
-	handleError(err)
-
-	// 注入bll
-	err = bll.Inject(container)
-	handleError(err)
-
-	// 注入api
-	err = api.Inject(container)
-	handleError(err)
-
-	// 初始化casbin
-	err = InitCasbinEnforcer(container)
-	handleError(err)
-
-	return container, func() {
-		if auther != nil {
-			_ = auther.Release()
+// InitMonitor 初始化服务监控
+func InitMonitor() error {
+	if c := config.C.Monitor; c.Enable {
+		err := agent.Listen(agent.Options{Addr: c.Addr, ConfigDir: c.ConfigDir, ShutdownCleanup: true})
+		if err != nil {
+			return err
 		}
+	}
+	return nil
+}
 
-		// 释放资源
-		ReleaseCasbinEnforcer(container)
+// InitHTTPServer 初始化http服务
+func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
+	cfg := config.C.HTTP
+	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+	srv := &http.Server{
+		Addr:         addr,
+		Handler:      handler,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  15 * time.Second,
+	}
 
-		if storeCall != nil {
-			storeCall()
+	go func() {
+		logger.Printf(ctx, "HTTP服务开始启动，地址监听在：[%s]", addr)
+		var err error
+		if cfg.CertFile != "" && cfg.KeyFile != "" {
+			srv.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
+			err = srv.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
+		} else {
+			err = srv.ListenAndServe()
+		}
+		if err != nil && err != http.ErrServerClosed {
+			logger.Errorf(ctx, err.Error())
+		}
+	}()
+
+	return func() {
+		ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(cfg.ShutdownTimeout))
+		defer cancel()
+
+		srv.SetKeepAlivesEnabled(false)
+		if err := srv.Shutdown(ctx); err != nil {
+			logger.Errorf(ctx, err.Error())
 		}
 	}
 }

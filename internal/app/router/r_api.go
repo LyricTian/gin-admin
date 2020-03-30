@@ -1,118 +1,101 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/internal/app/api"
 	"github.com/LyricTian/gin-admin/internal/app/middleware"
-	"github.com/LyricTian/gin-admin/pkg/auth"
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/dig"
 )
 
-// RegisterAPIRouter 注册/api路由
-func RegisterAPIRouter(app *gin.Engine, container *dig.Container) {
-	err := container.Invoke(func(
-		a auth.Auther,
-		e *casbin.SyncedEnforcer,
-		cDemo *api.Demo,
-		cLogin *api.Login,
-		cMenu *api.Menu,
-		cRole *api.Role,
-		cUser *api.User,
-	) error {
+// RegisterAPI 注册/api
+func (a *Router) RegisterAPI(app *gin.Engine) {
+	g := app.Group("/api")
 
-		g := app.Group("/api")
+	// 用户身份授权
+	g.Use(middleware.UserAuthMiddleware(a.Auth,
+		middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
+	))
 
-		// 用户身份授权
-		g.Use(middleware.UserAuthMiddleware(a,
-			middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
-		))
+	// casbin权限校验中间件
+	g.Use(middleware.CasbinMiddleware(a.CasbinEnforcer,
+		middleware.AllowPathPrefixSkipper("/api/v1/pub"),
+	))
 
-		// casbin权限校验中间件
-		g.Use(middleware.CasbinMiddleware(e,
-			middleware.AllowPathPrefixSkipper("/api/v1/pub"),
-		))
+	// 请求频率限制中间件
+	g.Use(middleware.RateLimiterMiddleware())
 
-		// 请求频率限制中间件
-		g.Use(middleware.RateLimiterMiddleware())
-
-		v1 := g.Group("/v1")
+	v1 := g.Group("/v1")
+	{
+		pub := v1.Group("/pub")
 		{
-			pub := v1.Group("/pub")
+			// 注册/api/v1/pub/login
+			gLogin := pub.Group("login")
 			{
-				// 注册/api/v1/pub/login
-				gLogin := pub.Group("login")
-				{
-					gLogin.GET("captchaid", cLogin.GetCaptcha)
-					gLogin.GET("captcha", cLogin.ResCaptcha)
-					gLogin.POST("", cLogin.Login)
-					gLogin.POST("exit", cLogin.Logout)
-				}
-
-				// 注册/api/v1/pub/refresh-token
-				pub.POST("/refresh-token", cLogin.RefreshToken)
-
-				// 注册/api/v1/pub/current
-				gCurrent := pub.Group("current")
-				{
-					gCurrent.PUT("password", cLogin.UpdatePassword)
-					gCurrent.GET("user", cLogin.GetUserInfo)
-					gCurrent.GET("menutree", cLogin.QueryUserMenuTree)
-				}
-
+				gLogin.GET("captchaid", a.LoginAPI.GetCaptcha)
+				gLogin.GET("captcha", a.LoginAPI.ResCaptcha)
+				gLogin.POST("", a.LoginAPI.Login)
+				gLogin.POST("exit", a.LoginAPI.Logout)
 			}
 
-			// 注册/api/v1/demos
-			gDemo := v1.Group("demos")
+			// 注册/api/v1/pub/refresh-token
+			pub.POST("/refresh-token", a.LoginAPI.RefreshToken)
+
+			// 注册/api/v1/pub/current
+			gCurrent := pub.Group("current")
 			{
-				gDemo.GET("", cDemo.Query)
-				gDemo.GET(":id", cDemo.Get)
-				gDemo.POST("", cDemo.Create)
-				gDemo.PUT(":id", cDemo.Update)
-				gDemo.DELETE(":id", cDemo.Delete)
-				gDemo.PATCH(":id/enable", cDemo.Enable)
-				gDemo.PATCH(":id/disable", cDemo.Disable)
+				gCurrent.PUT("password", a.LoginAPI.UpdatePassword)
+				gCurrent.GET("user", a.LoginAPI.GetUserInfo)
+				gCurrent.GET("menutree", a.LoginAPI.QueryUserMenuTree)
 			}
 
-			// 注册/api/v1/menus
-			gMenu := v1.Group("menus")
-			{
-				gMenu.GET("", cMenu.Query)
-				gMenu.GET(":id", cMenu.Get)
-				gMenu.POST("", cMenu.Create)
-				gMenu.PUT(":id", cMenu.Update)
-				gMenu.DELETE(":id", cMenu.Delete)
-			}
-			v1.GET("/menus.tree", cMenu.QueryTree)
-
-			// 注册/api/v1/roles
-			gRole := v1.Group("roles")
-			{
-				gRole.GET("", cRole.Query)
-				gRole.GET(":id", cRole.Get)
-				gRole.POST("", cRole.Create)
-				gRole.PUT(":id", cRole.Update)
-				gRole.DELETE(":id", cRole.Delete)
-			}
-			v1.GET("/roles.select", cRole.QuerySelect)
-
-			// 注册/api/v1/users
-			gUser := v1.Group("users")
-			{
-				gUser.GET("", cUser.Query)
-				gUser.GET(":id", cUser.Get)
-				gUser.POST("", cUser.Create)
-				gUser.PUT(":id", cUser.Update)
-				gUser.DELETE(":id", cUser.Delete)
-				gUser.PATCH(":id/enable", cUser.Enable)
-				gUser.PATCH(":id/disable", cUser.Disable)
-			}
 		}
 
-		return nil
-	})
+		// 注册/api/v1/demos
+		gDemo := v1.Group("demos")
+		{
+			gDemo.GET("", a.DemoAPI.Query)
+			gDemo.GET(":id", a.DemoAPI.Get)
+			gDemo.POST("", a.DemoAPI.Create)
+			gDemo.PUT(":id", a.DemoAPI.Update)
+			gDemo.DELETE(":id", a.DemoAPI.Delete)
+			gDemo.PATCH(":id/enable", a.DemoAPI.Enable)
+			gDemo.PATCH(":id/disable", a.DemoAPI.Disable)
+		}
 
-	if err != nil {
-		panic(err)
+		// 注册/api/v1/menus
+		gMenu := v1.Group("menus")
+		{
+			gMenu.GET("", a.MenuAPI.Query)
+			gMenu.GET(":id", a.MenuAPI.Get)
+			gMenu.POST("", a.MenuAPI.Create)
+			gMenu.PUT(":id", a.MenuAPI.Update)
+			gMenu.DELETE(":id", a.MenuAPI.Delete)
+			gMenu.PATCH(":id/enable", a.MenuAPI.Enable)
+			gMenu.PATCH(":id/disable", a.MenuAPI.Disable)
+		}
+		v1.GET("/menus.tree", a.MenuAPI.QueryTree)
+
+		// 注册/api/v1/roles
+		gRole := v1.Group("roles")
+		{
+			gRole.GET("", a.RoleAPI.Query)
+			gRole.GET(":id", a.RoleAPI.Get)
+			gRole.POST("", a.RoleAPI.Create)
+			gRole.PUT(":id", a.RoleAPI.Update)
+			gRole.DELETE(":id", a.RoleAPI.Delete)
+			gRole.PATCH(":id/enable", a.RoleAPI.Enable)
+			gRole.PATCH(":id/disable", a.RoleAPI.Disable)
+		}
+		v1.GET("/roles.select", a.RoleAPI.QuerySelect)
+
+		// 注册/api/v1/users
+		gUser := v1.Group("users")
+		{
+			gUser.GET("", a.UserAPI.Query)
+			gUser.GET(":id", a.UserAPI.Get)
+			gUser.POST("", a.UserAPI.Create)
+			gUser.PUT(":id", a.UserAPI.Update)
+			gUser.DELETE(":id", a.UserAPI.Delete)
+			gUser.PATCH(":id/enable", a.UserAPI.Enable)
+			gUser.PATCH(":id/disable", a.UserAPI.Disable)
+		}
 	}
 }

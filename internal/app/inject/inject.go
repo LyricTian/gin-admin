@@ -1,12 +1,41 @@
 package inject
 
-// I 全局注入器
-var I *Injector
+import (
+	"sync"
 
-// BuildInjector 生成注入器
-func BuildInjector() (*Injector, func(), error) {
-	return nil, nil, nil
+	"github.com/LyricTian/gin-admin/pkg/auth"
+	"github.com/casbin/casbin/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
+	"github.com/jinzhu/gorm"
+)
+
+var (
+	// I 全局注入器
+	I    *Injector
+	once sync.Once
+)
+
+// InitializeInjector 初始化注入器
+func InitializeInjector() (*Injector, func(), error) {
+	var (
+		cleanFunc func()
+		err       error
+	)
+	once.Do(func() {
+		I, cleanFunc, err = BuildInjector()
+	})
+	return I, cleanFunc, err
 }
 
-// Injector 注入器
-type Injector struct{}
+// InjectorSet 注入Injector
+var InjectorSet = wire.NewSet(wire.Struct(new(Injector), "*"))
+
+// Injector 全局注入器
+type Injector struct {
+	App            *gin.Engine
+	Auth           auth.Auther
+	CasbinEnforcer *casbin.SyncedEnforcer
+	MenuData       *MenuData
+	DB             *gorm.DB
+}

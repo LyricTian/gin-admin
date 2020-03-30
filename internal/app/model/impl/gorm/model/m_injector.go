@@ -12,7 +12,5 @@ var AllSet = wire.NewSet(
 	RoleSet,
 	TransSet,
 	UserRoleSet,
-	RoleSet,
-	UserRoleSet,
 	UserSet,
 )

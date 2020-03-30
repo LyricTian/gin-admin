@@ -1,4 +1,4 @@
-package app
+package inject
 
 import (
 	"errors"
@@ -8,49 +8,32 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	igorm "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm"
 	"github.com/jinzhu/gorm"
-	"go.uber.org/dig"
 )
 
-// InitStore 初始化存储
-func InitStore(container *dig.Container) (func(), error) {
-	var storeCall func()
-	cfg := config.C
-
-	switch cfg.Store {
-	case "gorm":
-		db, err := initGorm()
-		if err != nil {
-			return nil, err
-		}
-
-		storeCall = func() {
-			db.Close()
-		}
-
-		igorm.SetTablePrefix(cfg.Gorm.TablePrefix)
-
-		if cfg.Gorm.EnableAutoMigrate {
-			err = igorm.AutoMigrate(db)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		// 注入DB
-		_ = container.Provide(func() *gorm.DB {
-			return db
-		})
-
-		_ = igorm.Inject(container)
-	default:
-		return nil, errors.New("unknown store")
+// InitGormDB 初始化存储
+func InitGormDB() (*gorm.DB, func(), error) {
+	cfg := config.C.Gorm
+	db, err := getGormDB()
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return storeCall, nil
+	cleanFunc := func() {
+		db.Close()
+	}
+	igorm.SetTablePrefix(cfg.TablePrefix)
+	if cfg.EnableAutoMigrate {
+		err = igorm.AutoMigrate(db)
+		if err != nil {
+			return nil, cleanFunc, err
+		}
+	}
+
+	return db, cleanFunc, nil
 }
 
-// initGorm 实例化gorm存储
-func initGorm() (*gorm.DB, error) {
+// getGormDB 获取gorm存储
+func getGormDB() (*gorm.DB, error) {
 	cfg := config.C
 
 	var dsn string

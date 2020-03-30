@@ -91,7 +91,9 @@ func (a Menus) ToTree() MenuTrees {
 			Router:     item.Router,
 			ParentID:   item.ParentID,
 			ParentPath: item.ParentPath,
+			Sequence:   item.Sequence,
 			ShowStatus: item.ShowStatus,
+			Status:     item.Status,
 			Actions:    item.Actions,
 		}
 	}
@@ -136,7 +138,9 @@ type MenuTree struct {
 	Router     string      `json:"router"`             // 访问路由
 	ParentID   string      `json:"parent_id"`          // 父级ID
 	ParentPath string      `json:"parent_path"`        // 父级路径
+	Sequence   int         `json:"sequence"`           // 排序值
 	ShowStatus int         `json:"show_status"`        // 显示状态(1:显示 2:隐藏)
+	Status     int         `json:"status"`             // 状态(1:启用 2:禁用)
 	Actions    MenuActions `json:"actions"`            // 动作列表
 	Children   *MenuTrees  `json:"children,omitempty"` // 子级树
 }
@@ -239,7 +243,8 @@ type MenuActionResource struct {
 
 // MenuActionResourceQueryParam 查询条件
 type MenuActionResourceQueryParam struct {
-	MenuID string // 菜单ID
+	MenuID  string   // 菜单ID
+	MenuIDs []string // 菜单ID列表
 }
 
 // MenuActionResourceQueryOptions 查询可选参数项
@@ -270,12 +275,7 @@ func (a MenuActionResources) ToMap() map[string]*MenuActionResource {
 func (a MenuActionResources) ToActionIDMap() map[string]MenuActionResources {
 	m := make(map[string]MenuActionResources)
 	for _, item := range a {
-		if v, ok := m[item.ActionID]; ok {
-			v = append(v, item)
-			m[item.ActionID] = v
-			continue
-		}
-		m[item.ActionID] = MenuActionResources{item}
+		m[item.ActionID] = append(m[item.ActionID], item)
 	}
 	return m
 }

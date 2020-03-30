@@ -9,7 +9,7 @@ import (
 
 var (
 	// C 全局配置(需要先执行MustLoad，否则拿不到配置)
-	C    *Config
+	C    = new(Config)
 	once sync.Once
 )
 
@@ -17,9 +17,7 @@ var (
 func MustLoad(fpath string) {
 	once.Do(func() {
 		m := multiconfig.NewWithPath(fpath)
-		var c Config
-		m.MustLoad(&c)
-		C = &c
+		m.MustLoad(C)
 	})
 }
 
@@ -28,7 +26,6 @@ type Config struct {
 	RunMode     string      `toml:"run_mode"`
 	WWW         string      `toml:"www"`
 	Swagger     string      `toml:"swagger"`
-	Store       string      `toml:"store"`
 	HTTP        HTTP        `toml:"http"`
 	Menu        Menu        `toml:"menu"`
 	Casbin      Casbin      `toml:"casbin"`
