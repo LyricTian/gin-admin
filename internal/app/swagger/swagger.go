@@ -6,7 +6,7 @@ Package swagger 生成swagger文档
 使用方式：
 
 	go get -u github.com/swaggo/swag/cmd/swag
-	swag init -g ./swagger.go -d ../ -o ./ */
+	swag init -g ./swagger.go -o ./ */
 package swagger
 
 // @title GinAdmin
