@@ -17,6 +17,7 @@ type Role struct {
 
 // RoleQueryParam 查询条件
 type RoleQueryParam struct {
+	PaginationParam
 	RecordIDs []string `form:"-"`        // 记录ID列表
 	Name      string   `form:"-"`        // 角色名称
 	LikeName  string   `form:"likeName"` // 角色名称(模糊查询)
@@ -26,8 +27,7 @@ type RoleQueryParam struct {
 
 // RoleQueryOptions 查询可选参数项
 type RoleQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // RoleQueryResult 查询结果
@@ -69,14 +69,14 @@ type RoleMenu struct {
 
 // RoleMenuQueryParam 查询条件
 type RoleMenuQueryParam struct {
+	PaginationParam
 	RoleID  string   // 角色ID
 	RoleIDs []string // 角色ID列表
 }
 
 // RoleMenuQueryOptions 查询可选参数项
 type RoleMenuQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // RoleMenuQueryResult 查询结果

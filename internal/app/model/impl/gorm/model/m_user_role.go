@@ -50,7 +50,7 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 	db = db.Order(ParseOrder(opt.OrderFields))
 
 	var list entity.UserRoles
-	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

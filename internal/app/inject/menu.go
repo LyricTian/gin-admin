@@ -28,8 +28,8 @@ func (a *Menu) Load() error {
 	}
 
 	ctx := context.Background()
-	result, err := a.MenuBll.Query(ctx, schema.MenuQueryParam{}, schema.MenuQueryOptions{
-		PageParam: schema.NewPaginationParam(-1),
+	result, err := a.MenuBll.Query(ctx, schema.MenuQueryParam{
+		PaginationParam: schema.PaginationParam{OnlyCount: true},
 	})
 	if err != nil {
 		return err

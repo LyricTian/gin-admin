@@ -78,7 +78,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 }
 
 // Create 创建数据
-func (a *User) Create(ctx context.Context, item schema.User) (*schema.HTTPRecordID, error) {
+func (a *User) Create(ctx context.Context, item schema.User) (*schema.ResRecordID, error) {
 	err := a.checkUserName(ctx, item.UserName)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.HTTPRecord
 		return nil, err
 	}
 
-	return schema.NewHTTPRecordID(item.RecordID), nil
+	return schema.NewResRecordID(item.RecordID), nil
 }
 
 func (a *User) checkUserName(ctx context.Context, userName string) error {
@@ -111,9 +111,8 @@ func (a *User) checkUserName(ctx context.Context, userName string) error {
 	}
 
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
-		UserName: userName,
-	}, schema.UserQueryOptions{
-		PageParam: &schema.PaginationParam{PageSize: -1},
+		PaginationParam: schema.PaginationParam{OnlyCount: true},
+		UserName:        userName,
 	})
 	if err != nil {
 		return err

@@ -56,7 +56,7 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 	db = db.Order(ParseOrder(opt.OrderFields))
 
 	var list entity.Demos
-	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

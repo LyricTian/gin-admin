@@ -65,7 +65,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	db = db.Order(ParseOrder(opt.OrderFields))
 
 	var list entity.Menus
-	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -73,10 +73,11 @@ func (a *Menu) QueryActions(ctx context.Context, recordID string) (schema.MenuAc
 
 func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		PaginationParam: schema.PaginationParam{
+			OnlyCount: true,
+		},
 		ParentID: &item.ParentID,
 		Name:     item.Name,
-	}, schema.MenuQueryOptions{
-		PageParam: &schema.PaginationParam{PageSize: -1},
 	})
 	if err != nil {
 		return err
@@ -87,7 +88,7 @@ func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
 }
 
 // Create 创建数据
-func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.HTTPRecordID, error) {
+func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.ResRecordID, error) {
 	if err := a.checkName(ctx, item); err != nil {
 		return nil, err
 	}
@@ -111,7 +112,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.HTTPRecord
 		return nil, err
 	}
 
-	return schema.NewHTTPRecordID(item.RecordID), nil
+	return schema.NewResRecordID(item.RecordID), nil
 }
 
 // 创建动作数据
@@ -340,8 +341,9 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 	}
 
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		ParentID: &recordID,
-	}, schema.MenuQueryOptions{PageParam: schema.NewPaginationParam(-1)})
+		PaginationParam: schema.PaginationParam{OnlyCount: true},
+		ParentID:        &recordID,
+	})
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {

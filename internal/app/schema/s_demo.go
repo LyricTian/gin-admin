@@ -15,6 +15,7 @@ type Demo struct {
 
 // DemoQueryParam 查询条件
 type DemoQueryParam struct {
+	PaginationParam
 	Code     string `form:"-"`        // 编号
 	Status   int    `form:"status"`   // 状态(1:启用 2:停用)
 	LikeCode string `form:"likeCode"` // 编号(模糊查询)
@@ -23,8 +24,7 @@ type DemoQueryParam struct {
 
 // DemoQueryOptions 示例对象查询可选参数项
 type DemoQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // DemoQueryResult 示例对象查询结果

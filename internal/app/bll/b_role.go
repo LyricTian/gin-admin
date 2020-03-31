@@ -13,7 +13,7 @@ type IRole interface {
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error)
 	// 创建数据
-	Create(ctx context.Context, item schema.Role) (*schema.HTTPRecordID, error)
+	Create(ctx context.Context, item schema.Role) (*schema.ResRecordID, error)
 	// 更新数据
 	Update(ctx context.Context, recordID string, item schema.Role) error
 	// 删除数据

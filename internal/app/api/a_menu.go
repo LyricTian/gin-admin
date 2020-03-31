@@ -24,8 +24,8 @@ func (a *Menu) Query(c *gin.Context) {
 		return
 	}
 
+	params.Pagination = true
 	result, err := a.MenuBll.Query(ginplus.NewContext(c), params, schema.MenuQueryOptions{
-		PageParam: ginplus.GetPaginationParam(c),
 		OrderFields: schema.NewOrderFields([]string{"sequence"},
 			map[int]schema.OrderDirection{0: schema.OrderByDESC}),
 	})

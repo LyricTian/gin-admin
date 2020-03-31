@@ -36,6 +36,8 @@ func (a *User) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryO
 
 // Query 查询数据
 func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
+	opt := a.getQueryOption(opts...)
+
 	db := entity.GetUserDB(ctx, a.db)
 	if v := params.UserName; v != "" {
 		db = db.Where("user_name=?", v)
@@ -57,11 +59,12 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 			SubQuery()
 		db = db.Where("record_id IN ?", subQuery)
 	}
-	db = db.Order("id DESC")
 
-	opt := a.getQueryOption(opts...)
+	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
+	db = db.Order(ParseOrder(opt.OrderFields))
+
 	var list entity.Users
-	pr, err := WrapPageQuery(ctx, db, opt.PageParam, &list)
+	pr, err := WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

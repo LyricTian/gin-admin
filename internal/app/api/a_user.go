@@ -30,9 +30,8 @@ func (a *User) Query(c *gin.Context) {
 		params.RoleIDs = strings.Split(v, ",")
 	}
 
-	result, err := a.UserBll.QueryShow(ginplus.NewContext(c), params, schema.UserQueryOptions{
-		PageParam: ginplus.GetPaginationParam(c),
-	})
+	params.Pagination = true
+	result, err := a.UserBll.QueryShow(ginplus.NewContext(c), params)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return

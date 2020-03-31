@@ -51,48 +51,45 @@ func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 }
 
 // WrapPageQuery 包装带有分页的查询
-func WrapPageQuery(ctx context.Context, db *gorm.DB, pp *schema.PaginationParam, out interface{}) (*schema.PaginationResult, error) {
-	if pp != nil {
-		total, err := FindPage(ctx, db, pp.PageIndex, pp.PageSize, out)
+func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (*schema.PaginationResult, error) {
+	if pp.OnlyCount {
+		var count int
+		err := db.Count(&count).Error
 		if err != nil {
 			return nil, err
 		}
-		return &schema.PaginationResult{
-			Total: total,
-		}, nil
+		return &schema.PaginationResult{Total: count}, nil
+	} else if !pp.Pagination {
+		err := db.Find(out).Error
+		return nil, err
 	}
 
-	result := db.Find(out)
-	return nil, result.Error
+	total, err := FindPage(ctx, db, pp, out)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schema.PaginationResult{
+		Total:    total,
+		Current:  pp.Current,
+		PageSize: pp.PageSize,
+	}, nil
 }
 
 // FindPage 查询分页数据
-func FindPage(ctx context.Context, db *gorm.DB, pageIndex, pageSize int, out interface{}) (int, error) {
+func FindPage(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (int, error) {
 	var count int
-	result := db.Count(&count)
-	if err := result.Error; err != nil {
+	err := db.Count(&count).Error
+	if err != nil {
 		return 0, err
 	} else if count == 0 {
-		return 0, nil
-	}
-
-	// 如果分页大小小于0或者分页索引小于0，则不查询数据
-	if pageSize < 0 || pageIndex < 0 {
 		return count, nil
 	}
 
-	if pageIndex > 0 && pageSize > 0 {
-		db = db.Offset((pageIndex - 1) * pageSize)
-	}
-	if pageSize > 0 {
-		db = db.Limit(pageSize)
-	}
-	result = db.Find(out)
-	if err := result.Error; err != nil {
-		return 0, err
-	}
-
-	return count, nil
+	current, pageSize := pp.GetCurrent(), pp.GetPageSize()
+	db = db.Offset((current - 1) * pageSize).Limit(pageSize)
+	err = db.Find(out).Error
+	return count, err
 }
 
 // FindOne 查询单条数据

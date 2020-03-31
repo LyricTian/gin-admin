@@ -24,9 +24,8 @@ func (a *Demo) Query(c *gin.Context) {
 		return
 	}
 
-	result, err := a.DemoBll.Query(ginplus.NewContext(c), params, schema.DemoQueryOptions{
-		PageParam: ginplus.GetPaginationParam(c),
-	})
+	params.Pagination = true
+	result, err := a.DemoBll.Query(ginplus.NewContext(c), params)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return

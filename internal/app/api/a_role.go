@@ -24,8 +24,8 @@ func (a *Role) Query(c *gin.Context) {
 		return
 	}
 
+	params.Pagination = true
 	result, err := a.RoleBll.Query(ginplus.NewContext(c), params, schema.RoleQueryOptions{
-		PageParam: ginplus.GetPaginationParam(c),
 		OrderFields: schema.NewOrderFields([]string{"sequence"},
 			map[int]schema.OrderDirection{0: schema.OrderByDESC}),
 	})

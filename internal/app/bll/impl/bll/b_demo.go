@@ -40,9 +40,10 @@ func (a *Demo) Get(ctx context.Context, recordID string, opts ...schema.DemoQuer
 
 func (a *Demo) checkCode(ctx context.Context, code string) error {
 	result, err := a.DemoModel.Query(ctx, schema.DemoQueryParam{
+		PaginationParam: schema.PaginationParam{
+			OnlyCount: true,
+		},
 		Code: code,
-	}, schema.DemoQueryOptions{
-		PageParam: &schema.PaginationParam{PageSize: -1},
 	})
 	if err != nil {
 		return err
@@ -54,7 +55,7 @@ func (a *Demo) checkCode(ctx context.Context, code string) error {
 }
 
 // Create 创建数据
-func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.HTTPRecordID, error) {
+func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.ResRecordID, error) {
 	err := a.checkCode(ctx, item.Code)
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.HTTPRecord
 		return nil, err
 	}
 
-	return schema.NewHTTPRecordID(item.RecordID), nil
+	return schema.NewResRecordID(item.RecordID), nil
 }
 
 // Update 更新数据

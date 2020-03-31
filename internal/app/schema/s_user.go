@@ -28,6 +28,7 @@ func (a *User) CleanSecure() *User {
 
 // UserQueryParam 查询条件
 type UserQueryParam struct {
+	PaginationParam
 	UserName     string   `form:"userName"`     // 用户名
 	LikeUserName string   `form:"likeUserName"` // 用户名(模糊查询)
 	LikeRealName string   `form:"likeRealName"` // 真实姓名(模糊查询)
@@ -37,8 +38,7 @@ type UserQueryParam struct {
 
 // UserQueryOptions 查询可选参数项
 type UserQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // UserQueryResult 查询结果
@@ -95,14 +95,14 @@ type UserRole struct {
 
 // UserRoleQueryParam 查询条件
 type UserRoleQueryParam struct {
+	PaginationParam
 	UserID  string   // 用户ID
 	UserIDs []string // 用户ID列表
 }
 
 // UserRoleQueryOptions 查询可选参数项
 type UserRoleQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // UserRoleQueryResult 查询结果

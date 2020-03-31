@@ -93,14 +93,23 @@ func ParseForm(c *gin.Context, obj interface{}) error {
 	return nil
 }
 
-// ResList 响应列表数据
-func ResList(c *gin.Context, v interface{}) {
-	ResSuccess(c, schema.HTTPList{List: v})
-}
-
 // ResOK 响应OK
 func ResOK(c *gin.Context) {
-	ResSuccess(c, schema.HTTPStatus{Status: schema.OKStatusText.String()})
+	ResSuccess(c, schema.StatusResult{Status: schema.OKStatus})
+}
+
+// ResList 响应列表数据
+func ResList(c *gin.Context, v interface{}) {
+	ResSuccess(c, schema.ListResult{List: v})
+}
+
+// ResPage 响应分页数据
+func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
+	list := schema.ListResult{
+		List:       v,
+		Pagination: pr,
+	}
+	ResSuccess(c, list)
 }
 
 // ResSuccess 响应成功
@@ -146,58 +155,9 @@ func ResError(c *gin.Context, err error, status ...int) {
 		}
 	}
 
-	eitem := schema.HTTPErrorItem{
+	eitem := schema.ErrorItem{
 		Code:    res.Code,
 		Message: res.Message,
 	}
-	ResJSON(c, res.StatusCode, schema.HTTPError{Error: eitem})
-}
-
-// GetPageIndex 获取分页的页索引
-func GetPageIndex(c *gin.Context) int {
-	defaultVal := 1
-	if v := c.Query("current"); v != "" {
-		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
-			return iv
-		}
-	}
-	return defaultVal
-}
-
-// GetPageSize 获取分页的页大小(最大50)
-func GetPageSize(c *gin.Context) int {
-	defaultVal := 10
-	if v := c.Query("pageSize"); v != "" {
-		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
-			if iv > 50 {
-				iv = 50
-			}
-			return iv
-		}
-	}
-	return defaultVal
-}
-
-// GetPaginationParam 获取分页查询参数
-func GetPaginationParam(c *gin.Context) *schema.PaginationParam {
-	return &schema.PaginationParam{
-		PageIndex: GetPageIndex(c),
-		PageSize:  GetPageSize(c),
-	}
-}
-
-// ResPage 响应分页数据
-func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
-	list := schema.HTTPList{
-		List: v,
-		Pagination: &schema.HTTPPagination{
-			Current:  GetPageIndex(c),
-			PageSize: GetPageSize(c),
-		},
-	}
-	if pr != nil {
-		list.Pagination.Total = pr.Total
-	}
-
-	ResSuccess(c, list)
+	ResJSON(c, res.StatusCode, schema.ErrorResult{Error: eitem})
 }

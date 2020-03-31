@@ -61,7 +61,7 @@ func (a *Role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMe
 }
 
 // Create 创建数据
-func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.HTTPRecordID, error) {
+func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.ResRecordID, error) {
 	err := a.checkName(ctx, item.Name)
 	if err != nil {
 		return nil, err
@@ -82,14 +82,13 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.HTTPRecord
 	if err != nil {
 		return nil, err
 	}
-	return schema.NewHTTPRecordID(item.RecordID), nil
+	return schema.NewResRecordID(item.RecordID), nil
 }
 
 func (a *Role) checkName(ctx context.Context, name string) error {
 	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-		Name: name,
-	}, schema.RoleQueryOptions{
-		PageParam: schema.NewPaginationParam(-1),
+		PaginationParam: schema.PaginationParam{OnlyCount: true},
+		Name:            name,
 	})
 	if err != nil {
 		return err
@@ -163,9 +162,8 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	}
 
 	userResult, err := a.UserModel.Query(ctx, schema.UserQueryParam{
-		RoleIDs: []string{recordID},
-	}, schema.UserQueryOptions{
-		PageParam: schema.NewPaginationParam(-1),
+		PaginationParam: schema.PaginationParam{OnlyCount: true},
+		RoleIDs:         []string{recordID},
 	})
 	if err != nil {
 		return err

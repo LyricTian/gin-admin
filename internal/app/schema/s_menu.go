@@ -25,6 +25,7 @@ type Menu struct {
 
 // MenuQueryParam 查询条件
 type MenuQueryParam struct {
+	PaginationParam
 	RecordIDs        []string `form:"-"`          // 记录ID列表
 	Name             string   `form:"-"`          // 菜单名称
 	PrefixParentPath string   `form:"-"`          // 父级路径(前缀模糊查询)
@@ -36,8 +37,7 @@ type MenuQueryParam struct {
 
 // MenuQueryOptions 查询可选参数项
 type MenuQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // MenuQueryResult 查询结果
@@ -199,14 +199,14 @@ type MenuAction struct {
 
 // MenuActionQueryParam 查询条件
 type MenuActionQueryParam struct {
+	PaginationParam
 	MenuID    string   // 菜单ID
 	RecordIDs []string // 记录ID列表
 }
 
 // MenuActionQueryOptions 查询可选参数项
 type MenuActionQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // MenuActionQueryResult 查询结果
@@ -255,14 +255,14 @@ type MenuActionResource struct {
 
 // MenuActionResourceQueryParam 查询条件
 type MenuActionResourceQueryParam struct {
+	PaginationParam
 	MenuID  string   // 菜单ID
 	MenuIDs []string // 菜单ID列表
 }
 
 // MenuActionResourceQueryOptions 查询可选参数项
 type MenuActionResourceQueryOptions struct {
-	PageParam   *PaginationParam // 分页参数
-	OrderFields []*OrderField    // 排序字段
+	OrderFields []*OrderField // 排序字段
 }
 
 // MenuActionResourceQueryResult 查询结果
