@@ -710,7 +710,7 @@ var doc = `{
         "/api/v1/menus/{id}/disable": {
             "patch": {
                 "tags": [
-                    "Menu"
+                    "菜单管理"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -753,7 +753,7 @@ var doc = `{
         "/api/v1/menus/{id}/enable": {
             "patch": {
                 "tags": [
-                    "Demo"
+                    "菜单管理"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -1388,7 +1388,7 @@ var doc = `{
         "/api/v1/roles/{id}/disable": {
             "patch": {
                 "tags": [
-                    "Role"
+                    "角色管理"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -1431,7 +1431,7 @@ var doc = `{
         "/api/v1/roles/{id}/enable": {
             "patch": {
                 "tags": [
-                    "Demo"
+                    "角色管理"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -2411,7 +2411,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "6.0.0",
-	Host:        "127.0.0.1:10088",
+	Host:        "",
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
 	Title:       "GinAdmin",

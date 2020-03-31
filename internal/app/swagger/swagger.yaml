@@ -409,7 +409,6 @@ definitions:
         description: 用户名
         type: string
     type: object
-host: 127.0.0.1:10088
 info:
   contact:
     email: tiannianshou@gmail.com
@@ -893,7 +892,7 @@ paths:
             $ref: '#/definitions/schema.HTTPError'
       summary: 禁用数据
       tags:
-      - Menu
+      - 菜单管理
   /api/v1/menus/{id}/enable:
     patch:
       parameters:
@@ -921,7 +920,7 @@ paths:
             $ref: '#/definitions/schema.HTTPError'
       summary: 启用数据
       tags:
-      - Demo
+      - 菜单管理
   /api/v1/pub/current/menutree:
     get:
       parameters:
@@ -1334,7 +1333,7 @@ paths:
             $ref: '#/definitions/schema.HTTPError'
       summary: 禁用数据
       tags:
-      - Role
+      - 角色管理
   /api/v1/roles/{id}/enable:
     patch:
       parameters:
@@ -1362,7 +1361,7 @@ paths:
             $ref: '#/definitions/schema.HTTPError'
       summary: 启用数据
       tags:
-      - Demo
+      - 角色管理
   /api/v1/users:
     get:
       parameters:

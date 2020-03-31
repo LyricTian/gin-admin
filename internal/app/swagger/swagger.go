@@ -13,7 +13,6 @@ package swagger
 // @version 6.0.0
 // @description RBAC scaffolding based on Gin + Gorm + Casbin + Dig.
 // @schemes http https
-// @host 127.0.0.1:10088
 // @basePath /
 // @contact.name LyricTian
 // @contact.email tiannianshou@gmail.com

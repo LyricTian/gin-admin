@@ -86,7 +86,7 @@ func (a *Menu) Delete() {
 }
 
 // Enable 启用数据
-// @Tags Demo
+// @Tags 菜单管理
 // @Summary 启用数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
@@ -98,7 +98,7 @@ func (a *Menu) Enable() {
 }
 
 // Disable 禁用数据
-// @Tags Menu
+// @Tags 菜单管理
 // @Summary 禁用数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"

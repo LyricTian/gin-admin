@@ -14,7 +14,6 @@
         "license": {},
         "version": "6.0.0"
     },
-    "host": "127.0.0.1:10088",
     "basePath": "/",
     "paths": {
         "/api/v1/demos": {
@@ -699,7 +698,7 @@
         "/api/v1/menus/{id}/disable": {
             "patch": {
                 "tags": [
-                    "Menu"
+                    "菜单管理"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -742,7 +741,7 @@
         "/api/v1/menus/{id}/enable": {
             "patch": {
                 "tags": [
-                    "Demo"
+                    "菜单管理"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -1377,7 +1376,7 @@
         "/api/v1/roles/{id}/disable": {
             "patch": {
                 "tags": [
-                    "Role"
+                    "角色管理"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -1420,7 +1419,7 @@
         "/api/v1/roles/{id}/enable": {
             "patch": {
                 "tags": [
-                    "Demo"
+                    "角色管理"
                 ],
                 "summary": "启用数据",
                 "parameters": [
