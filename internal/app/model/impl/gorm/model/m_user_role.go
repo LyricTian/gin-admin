@@ -14,16 +14,11 @@ import (
 var _ model.IUserRole = new(UserRole)
 
 // UserRoleSet 注入UserRole
-var UserRoleSet = wire.NewSet(NewUserRole, wire.Bind(new(model.IUserRole), new(*UserRole)))
-
-// NewUserRole 创建用户角色存储实例
-func NewUserRole(db *gorm.DB) *UserRole {
-	return &UserRole{db}
-}
+var UserRoleSet = wire.NewSet(wire.Struct(new(UserRole), "*"), wire.Bind(new(model.IUserRole), new(*UserRole)))
 
 // UserRole 用户角色存储
 type UserRole struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
 func (a *UserRole) getQueryOption(opts ...schema.UserRoleQueryOptions) schema.UserRoleQueryOptions {
@@ -38,7 +33,7 @@ func (a *UserRole) getQueryOption(opts ...schema.UserRoleQueryOptions) schema.Us
 func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, opts ...schema.UserRoleQueryOptions) (*schema.UserRoleQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetUserRoleDB(ctx, a.db)
+	db := entity.GetUserRoleDB(ctx, a.DB)
 	if v := params.UserID; v != "" {
 		db = db.Where("user_id=?", v)
 	}
@@ -64,7 +59,7 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 
 // Get 查询指定数据
 func (a *UserRole) Get(ctx context.Context, recordID string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
-	db := entity.GetUserRoleDB(ctx, a.db).Where("record_id=?", recordID)
+	db := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID)
 	var item entity.UserRole
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -79,7 +74,7 @@ func (a *UserRole) Get(ctx context.Context, recordID string, opts ...schema.User
 // Create 创建数据
 func (a *UserRole) Create(ctx context.Context, item schema.UserRole) error {
 	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := entity.GetUserRoleDB(ctx, a.db).Create(eitem)
+	result := entity.GetUserRoleDB(ctx, a.DB).Create(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -89,7 +84,7 @@ func (a *UserRole) Create(ctx context.Context, item schema.UserRole) error {
 // Update 更新数据
 func (a *UserRole) Update(ctx context.Context, recordID string, item schema.UserRole) error {
 	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := entity.GetUserRoleDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id").Updates(eitem)
+	result := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id").Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -98,7 +93,7 @@ func (a *UserRole) Update(ctx context.Context, recordID string, item schema.User
 
 // Delete 删除数据
 func (a *UserRole) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetUserRoleDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.UserRole{})
+	result := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.UserRole{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -107,7 +102,7 @@ func (a *UserRole) Delete(ctx context.Context, recordID string) error {
 
 // DeleteByUserID 根据用户ID删除数据
 func (a *UserRole) DeleteByUserID(ctx context.Context, userID string) error {
-	result := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", userID).Delete(entity.UserRole{})
+	result := entity.GetUserRoleDB(ctx, a.DB).Where("user_id=?", userID).Delete(entity.UserRole{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

@@ -15,6 +15,9 @@ import (
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/go-redis/redis"
 	"github.com/google/gops/agent"
+
+	// 引入swagger
+	_ "github.com/LyricTian/gin-admin/internal/app/swagger"
 )
 
 type options struct {

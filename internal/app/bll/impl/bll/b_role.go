@@ -61,7 +61,7 @@ func (a *Role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMe
 }
 
 // Create 创建数据
-func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.ResRecordID, error) {
+func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDResult, error) {
 	err := a.checkName(ctx, item.Name)
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.ResRecordI
 	if err != nil {
 		return nil, err
 	}
-	return schema.NewResRecordID(item.RecordID), nil
+	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
 func (a *Role) checkName(ctx context.Context, name string) error {

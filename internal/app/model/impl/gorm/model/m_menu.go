@@ -14,16 +14,11 @@ import (
 var _ model.IMenu = new(Menu)
 
 // MenuSet 注入Menu
-var MenuSet = wire.NewSet(NewMenu, wire.Bind(new(model.IMenu), new(*Menu)))
-
-// NewMenu 创建菜单存储实例
-func NewMenu(db *gorm.DB) *Menu {
-	return &Menu{db: db}
-}
+var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"), wire.Bind(new(model.IMenu), new(*Menu)))
 
 // Menu 菜单存储
 type Menu struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
 func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
@@ -38,7 +33,7 @@ func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryO
 func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetMenuDB(ctx, a.db)
+	db := entity.GetMenuDB(ctx, a.DB)
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
 	}
@@ -81,7 +76,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 // Get 查询指定数据
 func (a *Menu) Get(ctx context.Context, recordID string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
 	var item entity.Menu
-	ok, err := FindOne(ctx, entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID), &item)
+	ok, err := FindOne(ctx, entity.GetMenuDB(ctx, a.DB).Where("record_id=?", recordID), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -94,7 +89,7 @@ func (a *Menu) Get(ctx context.Context, recordID string, opts ...schema.MenuQuer
 // Create 创建数据
 func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
-	result := entity.GetMenuDB(ctx, a.db).Create(eitem)
+	result := entity.GetMenuDB(ctx, a.DB).Create(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -104,7 +99,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 // Update 更新数据
 func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
-	result := entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
+	result := entity.GetMenuDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -113,7 +108,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 
 // UpdateParentPath 更新父级路径
 func (a *Menu) UpdateParentPath(ctx context.Context, recordID, parentPath string) error {
-	result := entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID).Update("parent_path", parentPath)
+	result := entity.GetMenuDB(ctx, a.DB).Where("record_id=?", recordID).Update("parent_path", parentPath)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -122,7 +117,7 @@ func (a *Menu) UpdateParentPath(ctx context.Context, recordID, parentPath string
 
 // Delete 删除数据
 func (a *Menu) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.Menu{})
+	result := entity.GetMenuDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.Menu{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -131,7 +126,7 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 
 // UpdateStatus 更新状态
 func (a *Menu) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	result := entity.GetMenuDB(ctx, a.db).Where("record_id=?", recordID).Update("status", status)
+	result := entity.GetMenuDB(ctx, a.DB).Where("record_id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

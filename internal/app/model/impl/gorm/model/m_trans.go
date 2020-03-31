@@ -12,21 +12,16 @@ import (
 var _ model.ITrans = new(Trans)
 
 // TransSet 注入Trans
-var TransSet = wire.NewSet(NewTrans, wire.Bind(new(model.ITrans), new(*Trans)))
-
-// NewTrans 创建事务管理实例
-func NewTrans(db *gorm.DB) *Trans {
-	return &Trans{db: db}
-}
+var TransSet = wire.NewSet(wire.Struct(new(Trans), "*"), wire.Bind(new(model.ITrans), new(*Trans)))
 
 // Trans 事务管理
 type Trans struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
 // Begin 开启事务
 func (a *Trans) Begin(ctx context.Context) (interface{}, error) {
-	result := a.db.Begin()
+	result := a.DB.Begin()
 	if err := result.Error; err != nil {
 		return nil, errors.WithStack(err)
 	}

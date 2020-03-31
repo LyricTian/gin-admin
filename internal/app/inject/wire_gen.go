@@ -13,10 +13,6 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/router"
 )
 
-import (
-	_ "github.com/LyricTian/gin-admin/internal/app/swagger"
-)
-
 // Injectors from wire.go:
 
 func BuildInjector() (*Injector, func(), error) {
@@ -29,11 +25,21 @@ func BuildInjector() (*Injector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	role := model.NewRole(db)
-	roleMenu := model.NewRoleMenu(db)
-	menuActionResource := model.NewMenuActionResource(db)
-	user := model.NewUser(db)
-	userRole := model.NewUserRole(db)
+	role := &model.Role{
+		DB: db,
+	}
+	roleMenu := &model.RoleMenu{
+		DB: db,
+	}
+	menuActionResource := &model.MenuActionResource{
+		DB: db,
+	}
+	user := &model.User{
+		DB: db,
+	}
+	userRole := &model.UserRole{
+		DB: db,
+	}
 	casbinAdapter := &adapter.CasbinAdapter{
 		RoleModel:         role,
 		RoleMenuModel:     roleMenu,
@@ -47,15 +53,21 @@ func BuildInjector() (*Injector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	demo := model.NewDemo(db)
+	demo := &model.Demo{
+		DB: db,
+	}
 	bllDemo := &bll.Demo{
 		DemoModel: demo,
 	}
 	apiDemo := &api.Demo{
 		DemoBll: bllDemo,
 	}
-	menu := model.NewMenu(db)
-	menuAction := model.NewMenuAction(db)
+	menu := &model.Menu{
+		DB: db,
+	}
+	menuAction := &model.MenuAction{
+		DB: db,
+	}
 	login := &bll.Login{
 		Auth:            auther,
 		UserModel:       user,
@@ -68,7 +80,9 @@ func BuildInjector() (*Injector, func(), error) {
 	apiLogin := &api.Login{
 		LoginBll: login,
 	}
-	trans := model.NewTrans(db)
+	trans := &model.Trans{
+		DB: db,
+	}
 	bllMenu := &bll.Menu{
 		TransModel:              trans,
 		MenuModel:               menu,

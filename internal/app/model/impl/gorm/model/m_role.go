@@ -14,16 +14,11 @@ import (
 var _ model.IRole = new(Role)
 
 // RoleSet 注入Role
-var RoleSet = wire.NewSet(NewRole, wire.Bind(new(model.IRole), new(*Role)))
-
-// NewRole 创建角色存储实例
-func NewRole(db *gorm.DB) *Role {
-	return &Role{db}
-}
+var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"), wire.Bind(new(model.IRole), new(*Role)))
 
 // Role 角色存储
 type Role struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
 func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
@@ -38,7 +33,7 @@ func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryO
 func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetRoleDB(ctx, a.db)
+	db := entity.GetRoleDB(ctx, a.DB)
 	if v := params.RecordIDs; len(v) > 0 {
 		db = db.Where("record_id IN(?)", v)
 	}
@@ -49,7 +44,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
 	if v := params.UserID; v != "" {
-		subQuery := entity.GetUserRoleDB(ctx, a.db).
+		subQuery := entity.GetUserRoleDB(ctx, a.DB).
 			Where("deleted_at is null").
 			Where("user_id=?", v).
 			Select("role_id").SubQuery()
@@ -75,7 +70,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 // Get 查询指定数据
 func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	var role entity.Role
-	ok, err := FindOne(ctx, entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID), &role)
+	ok, err := FindOne(ctx, entity.GetRoleDB(ctx, a.DB).Where("record_id=?", recordID), &role)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -88,7 +83,7 @@ func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQuer
 // Create 创建数据
 func (a *Role) Create(ctx context.Context, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
-	result := entity.GetRoleDB(ctx, a.db).Create(eitem)
+	result := entity.GetRoleDB(ctx, a.DB).Create(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -98,7 +93,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 // Update 更新数据
 func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
-	result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
+	result := entity.GetRoleDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -107,7 +102,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.Role{})
+	result := entity.GetRoleDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.Role{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -116,7 +111,7 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 
 // UpdateStatus 更新状态
 func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	result := entity.GetRoleDB(ctx, a.db).Where("record_id=?", recordID).Update("status", status)
+	result := entity.GetRoleDB(ctx, a.DB).Where("record_id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

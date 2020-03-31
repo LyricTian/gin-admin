@@ -7,9 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
-
-	// 引入swagger
-	_ "github.com/LyricTian/gin-admin/internal/app/swagger"
 )
 
 // InitHTTPEngine 初始化gin引擎

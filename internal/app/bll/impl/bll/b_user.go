@@ -78,7 +78,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 }
 
 // Create 创建数据
-func (a *User) Create(ctx context.Context, item schema.User) (*schema.ResRecordID, error) {
+func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDResult, error) {
 	err := a.checkUserName(ctx, item.UserName)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.ResRecordI
 		return nil, err
 	}
 
-	return schema.NewResRecordID(item.RecordID), nil
+	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
 func (a *User) checkUserName(ctx context.Context, userName string) error {

@@ -19,7 +19,7 @@ func ExecTrans(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 		return fn(ctx)
 	}
 
-	transModel := NewTrans(db)
+	transModel := &Trans{DB: db}
 	trans, err := transModel.Begin(ctx)
 	if err != nil {
 		return err

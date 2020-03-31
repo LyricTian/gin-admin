@@ -14,16 +14,11 @@ import (
 var _ model.IUser = new(User)
 
 // UserSet 注入User
-var UserSet = wire.NewSet(NewUser, wire.Bind(new(model.IUser), new(*User)))
-
-// NewUser 创建用户存储实例
-func NewUser(db *gorm.DB) *User {
-	return &User{db}
-}
+var UserSet = wire.NewSet(wire.Struct(new(User), "*"), wire.Bind(new(model.IUser), new(*User)))
 
 // User 用户存储
 type User struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
 func (a *User) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryOptions {
@@ -38,7 +33,7 @@ func (a *User) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryO
 func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetUserDB(ctx, a.db)
+	db := entity.GetUserDB(ctx, a.DB)
 	if v := params.UserName; v != "" {
 		db = db.Where("user_name=?", v)
 	}
@@ -52,7 +47,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 		db = db.Where("status=?", v)
 	}
 	if v := params.RoleIDs; len(v) > 0 {
-		subQuery := entity.GetUserRoleDB(ctx, a.db).
+		subQuery := entity.GetUserRoleDB(ctx, a.DB).
 			Select("user_id").
 			Where("deleted_at is null").
 			Where("role_id IN(?)", v).
@@ -79,7 +74,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 // Get 查询指定数据
 func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	var item entity.User
-	ok, err := FindOne(ctx, entity.GetUserDB(ctx, a.db).Where("record_id=?", recordID), &item)
+	ok, err := FindOne(ctx, entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -92,7 +87,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item schema.User) error {
 	sitem := entity.SchemaUser(item)
-	result := entity.GetUserDB(ctx, a.db).Create(sitem.ToUser())
+	result := entity.GetUserDB(ctx, a.DB).Create(sitem.ToUser())
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -102,7 +97,7 @@ func (a *User) Create(ctx context.Context, item schema.User) error {
 // Update 更新数据
 func (a *User) Update(ctx context.Context, recordID string, item schema.User) error {
 	eitem := entity.SchemaUser(item).ToUser()
-	result := entity.GetUserDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
+	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -111,7 +106,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 
 // Delete 删除数据
 func (a *User) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetUserDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.User{})
+	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.User{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -120,7 +115,7 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 
 // UpdateStatus 更新状态
 func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	result := entity.GetUserDB(ctx, a.db).Where("record_id=?", recordID).Update("status", status)
+	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -129,7 +124,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 
 // UpdatePassword 更新密码
 func (a *User) UpdatePassword(ctx context.Context, recordID, password string) error {
-	result := entity.GetUserDB(ctx, a.db).Where("record_id=?", recordID).Update("password", password)
+	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Update("password", password)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

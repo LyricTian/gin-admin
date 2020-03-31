@@ -88,7 +88,7 @@ func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
 }
 
 // Create 创建数据
-func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.ResRecordID, error) {
+func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.RecordIDResult, error) {
 	if err := a.checkName(ctx, item); err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.ResRecordI
 		return nil, err
 	}
 
-	return schema.NewResRecordID(item.RecordID), nil
+	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
 // 创建动作数据

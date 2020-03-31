@@ -14,16 +14,11 @@ import (
 var _ model.IMenuActionResource = new(MenuActionResource)
 
 // MenuActionResourceSet 注入MenuActionResource
-var MenuActionResourceSet = wire.NewSet(NewMenuActionResource, wire.Bind(new(model.IMenuActionResource), new(*MenuActionResource)))
-
-// NewMenuActionResource 创建菜单动作关联资源存储实例
-func NewMenuActionResource(db *gorm.DB) *MenuActionResource {
-	return &MenuActionResource{db}
-}
+var MenuActionResourceSet = wire.NewSet(wire.Struct(new(MenuActionResource), "*"), wire.Bind(new(model.IMenuActionResource), new(*MenuActionResource)))
 
 // MenuActionResource 菜单动作关联资源存储
 type MenuActionResource struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
 func (a *MenuActionResource) getQueryOption(opts ...schema.MenuActionResourceQueryOptions) schema.MenuActionResourceQueryOptions {
@@ -38,16 +33,16 @@ func (a *MenuActionResource) getQueryOption(opts ...schema.MenuActionResourceQue
 func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuActionResourceQueryParam, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResourceQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetMenuActionResourceDB(ctx, a.db)
+	db := entity.GetMenuActionResourceDB(ctx, a.DB)
 	if v := params.MenuID; v != "" {
-		subQuery := entity.GetMenuActionDB(ctx, a.db).
+		subQuery := entity.GetMenuActionDB(ctx, a.DB).
 			Where("deleted_at is null").
 			Where("menu_id=?", v).
 			Select("record_id").SubQuery()
 		db = db.Where("action_id IN(?)", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {
-		subQuery := entity.GetMenuActionDB(ctx, a.db).Where("menu_id IN(?)", v).Select("record_id").SubQuery()
+		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN(?)", v).Select("record_id").SubQuery()
 		db = db.Where("action_id IN(?)", subQuery)
 	}
 
@@ -69,7 +64,7 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 
 // Get 查询指定数据
 func (a *MenuActionResource) Get(ctx context.Context, recordID string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error) {
-	db := entity.GetMenuActionResourceDB(ctx, a.db).Where("record_id=?", recordID)
+	db := entity.GetMenuActionResourceDB(ctx, a.DB).Where("record_id=?", recordID)
 	var item entity.MenuActionResource
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -84,7 +79,7 @@ func (a *MenuActionResource) Get(ctx context.Context, recordID string, opts ...s
 // Create 创建数据
 func (a *MenuActionResource) Create(ctx context.Context, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Create(eitem)
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Create(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -94,7 +89,7 @@ func (a *MenuActionResource) Create(ctx context.Context, item schema.MenuActionR
 // Update 更新数据
 func (a *MenuActionResource) Update(ctx context.Context, recordID string, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("record_id=?", recordID).Omit("record_id").Updates(eitem)
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id").Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -103,7 +98,7 @@ func (a *MenuActionResource) Update(ctx context.Context, recordID string, item s
 
 // Delete 删除数据
 func (a *MenuActionResource) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("record_id=?", recordID).Delete(entity.MenuActionResource{})
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.MenuActionResource{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -112,7 +107,7 @@ func (a *MenuActionResource) Delete(ctx context.Context, recordID string) error 
 
 // DeleteByActionID 根据动作ID删除数据
 func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("action_id IN(?)", actionID).Delete(entity.MenuAction{})
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN(?)", actionID).Delete(entity.MenuAction{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -121,8 +116,8 @@ func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID stri
 
 // DeleteByMenuID 根据菜单ID删除数据
 func (a *MenuActionResource) DeleteByMenuID(ctx context.Context, menuID string) error {
-	subQuery := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", menuID).Select("record_id").SubQuery()
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("action_id IN(?)", subQuery).Delete(entity.MenuAction{})
+	subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id=?", menuID).Select("record_id").SubQuery()
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN(?)", subQuery).Delete(entity.MenuAction{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
