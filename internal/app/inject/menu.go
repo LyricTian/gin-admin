@@ -11,17 +11,17 @@ import (
 	"github.com/google/wire"
 )
 
-// MenuDataSet 注入MenuData
-var MenuDataSet = wire.NewSet(wire.Struct(new(MenuData), "*"))
+// MenuSet 注入Menu
+var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
 
-// MenuData 菜单数据
-type MenuData struct {
+// Menu 菜单数据
+type Menu struct {
 	MenuBll  bll.IMenu
 	TransBll bll.ITrans
 }
 
 // Load 加载菜单数据
-func (a *MenuData) Load() error {
+func (a *Menu) Load() error {
 	c := config.C.Menu
 	if !c.Enable || c.Data == "" {
 		return nil
@@ -45,7 +45,7 @@ func (a *MenuData) Load() error {
 	return a.createMenus(ctx, "", data)
 }
 
-func (a *MenuData) readData(name string) (schema.MenuTrees, error) {
+func (a *Menu) readData(name string) (schema.MenuTrees, error) {
 	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
@@ -53,11 +53,13 @@ func (a *MenuData) readData(name string) (schema.MenuTrees, error) {
 	defer file.Close()
 
 	var data schema.MenuTrees
-	err = util.JSONNewDecoder(file).Decode(&data)
+	d := util.YAMLNewDecoder(file)
+	d.SetStrict(true)
+	err = d.Decode(&data)
 	return data, err
 }
 
-func (a *MenuData) createMenus(ctx context.Context, parentID string, list schema.MenuTrees) error {
+func (a *Menu) createMenus(ctx context.Context, parentID string, list schema.MenuTrees) error {
 	return a.TransBll.Exec(ctx, func(ctx context.Context) error {
 		for _, item := range list {
 			sitem := schema.Menu{

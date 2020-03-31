@@ -3,6 +3,7 @@ package bll
 import (
 	"context"
 	"net/http"
+	"sort"
 
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/gin-admin/internal/app/bll"
@@ -169,6 +170,9 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	if isRoot {
 		result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 			Status: 1,
+		}, schema.MenuQueryOptions{
+			OrderFields: schema.NewOrderFields([]string{"sequence"},
+				map[int]schema.OrderDirection{0: schema.OrderByDESC}),
 		})
 		if err != nil {
 			return nil, err
@@ -216,6 +220,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 		return nil, err
 	}
 	menuResult.Data = append(menuResult.Data, pmenuResult.Data...)
+	sort.Sort(menuResult.Data)
 
 	menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
 		RecordIDs: roleMenuResult.Data.ToActionIDs(),

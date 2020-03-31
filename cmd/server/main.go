@@ -29,7 +29,7 @@ func init() {
 	flag.StringVar(&configFile, "c", "", "配置文件(.json,.yaml,.toml)")
 	flag.StringVar(&modelFile, "m", "", "Casbin的访问控制模型(.conf)")
 	flag.StringVar(&wwwDir, "www", "", "静态站点目录")
-	flag.StringVar(&menuFile, "menu", "", "菜单数据文件(.json)")
+	flag.StringVar(&menuFile, "menu", "", "菜单数据文件(.yaml)")
 }
 
 func main() {

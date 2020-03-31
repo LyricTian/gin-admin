@@ -24,7 +24,7 @@ func BuildInjector() (*Injector, func(), error) {
 		InitHTTPEngine,
 		adapter.CasbinAdapterSet,
 		InitCasbin,
-		MenuDataSet,
+		MenuSet,
 		InjectorSet,
 	)
 	return new(Injector), nil, nil

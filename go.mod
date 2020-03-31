@@ -29,4 +29,5 @@ require (
 	github.com/tidwall/buntdb v1.1.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20191030062658-86caa796c7ab // indirect
+	gopkg.in/yaml.v2 v2.2.8
 )

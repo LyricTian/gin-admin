@@ -13,6 +13,10 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/router"
 )
 
+import (
+	_ "github.com/LyricTian/gin-admin/internal/app/swagger"
+)
+
 // Injectors from wire.go:
 
 func BuildInjector() (*Injector, func(), error) {
@@ -107,7 +111,7 @@ func BuildInjector() (*Injector, func(), error) {
 	bllTrans := &bll.Trans{
 		TransModel: trans,
 	}
-	menuData := &MenuData{
+	injectMenu := &Menu{
 		MenuBll:  bllMenu,
 		TransBll: bllTrans,
 	}
@@ -115,7 +119,7 @@ func BuildInjector() (*Injector, func(), error) {
 		App:            engine,
 		Auth:           auther,
 		CasbinEnforcer: syncedEnforcer,
-		MenuData:       menuData,
+		Menu:           injectMenu,
 	}
 	return injector, func() {
 		cleanup3()

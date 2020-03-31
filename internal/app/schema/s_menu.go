@@ -49,6 +49,18 @@ type MenuQueryResult struct {
 // Menus 菜单列表
 type Menus []*Menu
 
+func (a Menus) Len() int {
+	return len(a)
+}
+
+func (a Menus) Less(i, j int) bool {
+	return a[i].Sequence > a[i].Sequence
+}
+
+func (a Menus) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
 // ToMap 转换为键值映射
 func (a Menus) ToMap() map[string]*Menu {
 	m := make(map[string]*Menu)

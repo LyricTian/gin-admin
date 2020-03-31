@@ -35,5 +35,5 @@ type Injector struct {
 	App            *gin.Engine
 	Auth           auth.Auther
 	CasbinEnforcer *casbin.SyncedEnforcer
-	MenuData       *MenuData
+	Menu           *Menu
 }

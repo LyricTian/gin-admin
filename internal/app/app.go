@@ -113,7 +113,7 @@ func Init(ctx context.Context, opts ...Option) func() {
 	handleError(err)
 
 	// 初始化菜单数据
-	err = injector.MenuData.Load()
+	err = injector.Menu.Load()
 	handleError(err)
 
 	// 初始化HTTP服务
