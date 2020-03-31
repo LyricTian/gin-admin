@@ -116,7 +116,7 @@ func BuildInjector() (*Injector, func(), error) {
 		TransBll: bllTrans,
 	}
 	injector := &Injector{
-		App:            engine,
+		Engine:         engine,
 		Auth:           auther,
 		CasbinEnforcer: syncedEnforcer,
 		Menu:           injectMenu,

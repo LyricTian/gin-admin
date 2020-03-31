@@ -23,14 +23,28 @@ func TestAPIDemo(t *testing.T) {
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
-
-	var addNewItem schema.Demo
-	err = parseReader(w.Body, &addNewItem)
+	var addItemRes ResRecordID
+	err = parseReader(w.Body, &addItemRes)
 	assert.Nil(t, err)
-	assert.Equal(t, addItem.Code, addNewItem.Code)
-	assert.Equal(t, addItem.Code, addNewItem.Code)
-	assert.Equal(t, addItem.Status, addNewItem.Status)
-	assert.NotEmpty(t, addNewItem.RecordID)
+
+	// get /demos/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.RecordID))
+	assert.Equal(t, 200, w.Code)
+	var getItem schema.Demo
+	err = parseReader(w.Body, &getItem)
+	assert.Nil(t, err)
+	assert.Equal(t, addItem.Code, getItem.Code)
+	assert.Equal(t, addItem.Name, getItem.Name)
+	assert.Equal(t, addItem.Status, getItem.Status)
+	assert.NotEmpty(t, getItem.RecordID)
+
+	// put /demos/:id
+	putItem := getItem
+	putItem.Name = util.MustUUID()
+	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+	err = parseOK(w.Body)
+	assert.Nil(t, err)
 
 	// query /demos
 	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
@@ -38,30 +52,14 @@ func TestAPIDemo(t *testing.T) {
 	var pageItems []*schema.Demo
 	err = parsePageReader(w.Body, &pageItems)
 	assert.Nil(t, err)
-	assert.Equal(t, len(pageItems), 1)
+	assert.GreaterOrEqual(t, len(pageItems), 1)
 	if len(pageItems) > 0 {
-		assert.Equal(t, addNewItem.RecordID, pageItems[0].RecordID)
-		assert.Equal(t, addNewItem.Name, pageItems[0].Name)
+		assert.Equal(t, putItem.RecordID, pageItems[0].RecordID)
+		assert.Equal(t, putItem.Name, pageItems[0].Name)
 	}
 
-	// put /demos/:id
-	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-	var putItem schema.Demo
-	err = parseReader(w.Body, &putItem)
-	assert.Nil(t, err)
-
-	putItem.Name = util.MustUUID()
-	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-
-	var putNewItem schema.Demo
-	err = parseReader(w.Body, &putNewItem)
-	assert.Nil(t, err)
-	assert.Equal(t, putItem.Name, putNewItem.Name)
-
 	// delete /demos/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))
+	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.RecordID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)

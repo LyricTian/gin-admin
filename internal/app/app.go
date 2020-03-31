@@ -117,7 +117,7 @@ func Init(ctx context.Context, opts ...Option) func() {
 	handleError(err)
 
 	// 初始化HTTP服务
-	httpCleanFunc := InitHTTPServer(ctx, injector.App)
+	httpCleanFunc := InitHTTPServer(ctx, injector.Engine)
 
 	return func() {
 		httpCleanFunc()

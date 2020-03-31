@@ -50,7 +50,11 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 		db = db.Where("status=?", v)
 	}
 	if v := params.RoleIDs; len(v) > 0 {
-		subQuery := entity.GetUserRoleDB(ctx, a.db).Select("user_id").Where("role_id IN(?)", v).SubQuery()
+		subQuery := entity.GetUserRoleDB(ctx, a.db).
+			Select("user_id").
+			Where("deleted_at is null").
+			Where("role_id IN(?)", v).
+			SubQuery()
 		db = db.Where("record_id IN ?", subQuery)
 	}
 	db = db.Order("id DESC")

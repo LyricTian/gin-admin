@@ -40,7 +40,10 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 
 	db := entity.GetMenuActionResourceDB(ctx, a.db)
 	if v := params.MenuID; v != "" {
-		subQuery := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", v).Select("record_id").SubQuery()
+		subQuery := entity.GetMenuActionDB(ctx, a.db).
+			Where("deleted_at is null").
+			Where("menu_id=?", v).
+			Select("record_id").SubQuery()
 		db = db.Where("action_id IN(?)", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {

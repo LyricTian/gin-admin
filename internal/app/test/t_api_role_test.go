@@ -17,42 +17,49 @@ func TestAPIRole(t *testing.T) {
 
 	// post /menus
 	addMenuItem := &schema.Menu{
-		Name:     util.MustUUID(),
-		Sequence: 9999999,
-		Actions: []*schema.MenuAction{
-			{Code: "query", Name: "query"},
-		},
-		Resources: []*schema.MenuResource{
-			{Code: "query", Name: "query", Method: "GET", Path: "/test/v1/menus"},
-		},
+		Name:       util.MustUUID(),
+		ShowStatus: 1,
+		Status:     1,
 	}
 	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/menus", addMenuItem))
 	assert.Equal(t, 200, w.Code)
-	var addNewMenuItem schema.Menu
-	err = parseReader(w.Body, &addNewMenuItem)
+	var addMenuItemRes ResRecordID
+	err = parseReader(w.Body, &addMenuItemRes)
 	assert.Nil(t, err)
 
 	// post /roles
 	addItem := &schema.Role{
-		Name:     util.MustUUID(),
-		Sequence: 9999999,
-		Menus: []*schema.RoleMenu{
-			{
-				MenuID:    addNewMenuItem.RecordID,
-				Actions:   []string{"query"},
-				Resources: []string{"query"},
+		Name:   util.MustUUID(),
+		Status: 1,
+		RoleMenus: schema.RoleMenus{
+			&schema.RoleMenu{
+				MenuID: addMenuItemRes.RecordID,
 			},
 		},
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
-	var addNewItem schema.Role
-	err = parseReader(w.Body, &addNewItem)
+	var addItemRes ResRecordID
+	err = parseReader(w.Body, &addItemRes)
 	assert.Nil(t, err)
-	assert.Equal(t, addItem.Name, addNewItem.Name)
-	assert.Equal(t, addItem.Sequence, addNewItem.Sequence)
-	assert.Equal(t, len(addItem.Menus), len(addNewItem.Menus))
-	assert.NotEmpty(t, addNewItem.RecordID)
+
+	// get /roles/:id
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.RecordID))
+	assert.Equal(t, 200, w.Code)
+	var getItem schema.Role
+	err = parseReader(w.Body, &getItem)
+	assert.Nil(t, err)
+	assert.Equal(t, addItem.Name, getItem.Name)
+	assert.Equal(t, addItem.Status, getItem.Status)
+	assert.NotEmpty(t, getItem.RecordID)
+
+	// put /roles/:id
+	putItem := getItem
+	putItem.Name = util.MustUUID()
+	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.RecordID))
+	assert.Equal(t, 200, w.Code)
+	err = parseOK(w.Body)
+	assert.Nil(t, err)
 
 	// query /roles
 	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
@@ -60,92 +67,21 @@ func TestAPIRole(t *testing.T) {
 	var pageItems []*schema.Role
 	err = parsePageReader(w.Body, &pageItems)
 	assert.Nil(t, err)
-	assert.Equal(t, len(pageItems), 1)
+	assert.GreaterOrEqual(t, len(pageItems), 1)
 	if len(pageItems) > 0 {
-		assert.Equal(t, addNewItem.RecordID, pageItems[0].RecordID)
-		assert.Equal(t, addNewItem.Name, pageItems[0].Name)
+		assert.Equal(t, putItem.RecordID, pageItems[0].RecordID)
+		assert.Equal(t, putItem.Name, pageItems[0].Name)
 	}
-
-	// put /roles/:id
-	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addNewItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-
-	var putItem schema.Role
-	err = parseReader(w.Body, &putItem)
-	assert.Nil(t, err)
-	assert.Equal(t, len(putItem.Menus), 1)
-
-	putItem.Name = util.MustUUID()
-	putItem.Menus = []*schema.RoleMenu{
-		{
-			MenuID:    addNewMenuItem.RecordID,
-			Actions:   []string{},
-			Resources: []string{"query"},
-		},
-	}
-
-	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, addNewItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-	var putNewItem schema.Role
-	err = parseReader(w.Body, &putNewItem)
-	assert.Nil(t, err)
-	assert.Equal(t, putItem.Name, putNewItem.Name)
-	assert.Equal(t, len(putItem.Menus), len(putNewItem.Menus))
-	assert.Equal(t, 0, len(putNewItem.Menus[0].Actions))
-	assert.Equal(t, 1, len(putNewItem.Menus[0].Resources))
-
-	// delete /menus/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", apiPrefix+"v1/menus", addNewMenuItem.RecordID))
-	assert.Equal(t, 200, w.Code)
-	err = parseOK(w.Body)
-	assert.Nil(t, err)
 
 	// delete /roles/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addNewItem.RecordID))
+	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.RecordID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
-}
 
-func BenchmarkAPIRoleCreateParallel(b *testing.B) {
-	const router = apiPrefix + "v1/roles"
-
-	w := httptest.NewRecorder()
-
-	// post /menus
-	addMenuItem := &schema.Menu{
-		Name:     util.MustUUID(),
-		Sequence: 9999999,
-		Actions: []*schema.MenuAction{
-			{Code: "query", Name: "query"},
-		},
-		Resources: []*schema.MenuResource{
-			{Code: "query", Name: "query", Method: "GET", Path: "/test/v1/menus"},
-		},
-	}
-	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/menus", addMenuItem))
-	var addNewMenuItem schema.Menu
-	_ = parseReader(w.Body, &addNewMenuItem)
-
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			// post /roles
-			addItem := &schema.Role{
-				Name:     util.MustUUID(),
-				Sequence: 9999999,
-				Menus: []*schema.RoleMenu{
-					{
-						MenuID:    addNewMenuItem.RecordID,
-						Actions:   []string{"query"},
-						Resources: []string{"query"},
-					},
-				},
-			}
-			w := httptest.NewRecorder()
-			engine.ServeHTTP(w, newPostRequest(router, addItem))
-			if w.Code != 200 {
-				b.Errorf("Expected value: %d, given value: %d", 200, w.Code)
-			}
-		}
-	})
+	// delete /menus/:id
+	engine.ServeHTTP(w, newDeleteRequest(apiPrefix+"v1/menus/%s", addMenuItemRes.RecordID))
+	assert.Equal(t, 200, w.Code)
+	err = parseOK(w.Body)
+	assert.Nil(t, err)
 }

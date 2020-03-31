@@ -32,7 +32,7 @@ var InjectorSet = wire.NewSet(wire.Struct(new(Injector), "*"))
 
 // Injector 全局注入器
 type Injector struct {
-	App            *gin.Engine
+	Engine         *gin.Engine
 	Auth           auth.Auther
 	CasbinEnforcer *casbin.SyncedEnforcer
 	Menu           *Menu

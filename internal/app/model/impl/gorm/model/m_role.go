@@ -49,7 +49,10 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
 	if v := params.UserID; v != "" {
-		subQuery := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", v).Select("role_id").SubQuery()
+		subQuery := entity.GetUserRoleDB(ctx, a.db).
+			Where("deleted_at is null").
+			Where("user_id=?", v).
+			Select("role_id").SubQuery()
 		db = db.Where("record_id IN ?", subQuery)
 	}
 
