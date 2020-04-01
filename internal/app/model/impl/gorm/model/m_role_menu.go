@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var _ model.IRoleMenu = new(RoleMenu)
+var _ model.IRoleMenu = (*RoleMenu)(nil)
 
 // RoleMenuSet 注入RoleMenu
 var RoleMenuSet = wire.NewSet(wire.Struct(new(RoleMenu), "*"), wire.Bind(new(model.IRoleMenu), new(*RoleMenu)))

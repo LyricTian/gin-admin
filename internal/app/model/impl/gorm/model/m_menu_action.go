@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var _ model.IMenuAction = new(MenuAction)
+var _ model.IMenuAction = (*MenuAction)(nil)
 
 // MenuActionSet 注入MenuAction
 var MenuActionSet = wire.NewSet(wire.Struct(new(MenuAction), "*"), wire.Bind(new(model.IMenuAction), new(*MenuAction)))

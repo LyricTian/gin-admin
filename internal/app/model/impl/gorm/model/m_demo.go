@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var _ model.IDemo = new(Demo)
+var _ model.IDemo = (*Demo)(nil)
 
 // DemoSet 注入Demo
 var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"), wire.Bind(new(model.IDemo), new(*Demo)))

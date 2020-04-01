@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var _ model.IRole = new(Role)
+var _ model.IRole = (*Role)(nil)
 
 // RoleSet 注入Role
 var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"), wire.Bind(new(model.IRole), new(*Role)))

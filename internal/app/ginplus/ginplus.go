@@ -72,7 +72,7 @@ func SetUserID(c *gin.Context, userID string) {
 // ParseJSON 解析请求JSON
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
-		return errors.Wrap400Response(err, "解析请求参数发生错误")
+		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
 	}
 	return nil
 }
@@ -80,7 +80,7 @@ func ParseJSON(c *gin.Context, obj interface{}) error {
 // ParseQuery 解析Query参数
 func ParseQuery(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindQuery(obj); err != nil {
-		return errors.Wrap400Response(err, "解析请求参数发生错误")
+		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
 	}
 	return nil
 }
@@ -88,7 +88,7 @@ func ParseQuery(c *gin.Context, obj interface{}) error {
 // ParseForm 解析Form请求
 func ParseForm(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindWith(obj, binding.Form); err != nil {
-		return errors.Wrap400Response(err, "解析请求参数发生错误")
+		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
 	}
 	return nil
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/google/wire"
 )
 
-var _ bll.IMenu = new(Menu)
+var _ bll.IMenu = (*Menu)(nil)
 
 // MenuSet 注入Menu
 var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"), wire.Bind(new(bll.IMenu), new(*Menu)))

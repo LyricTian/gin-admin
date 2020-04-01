@@ -12,7 +12,7 @@ import (
 	"github.com/google/wire"
 )
 
-var _ bll.IRole = new(Role)
+var _ bll.IRole = (*Role)(nil)
 
 // RoleSet 注入Role
 var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"), wire.Bind(new(bll.IRole), new(*Role)))

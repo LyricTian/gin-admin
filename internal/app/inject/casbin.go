@@ -11,6 +11,10 @@ import (
 // InitCasbin 初始化casbin
 func InitCasbin(adapter *adapter.CasbinAdapter) (*casbin.SyncedEnforcer, func(), error) {
 	cfg := config.C.Casbin
+	if cfg.Model == "" {
+		return new(casbin.SyncedEnforcer), nil, nil
+	}
+
 	e, err := casbin.NewSyncedEnforcer(cfg.Model, cfg.Debug)
 	if err != nil {
 		return nil, nil, err

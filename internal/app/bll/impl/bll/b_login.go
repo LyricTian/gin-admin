@@ -15,7 +15,7 @@ import (
 	"github.com/google/wire"
 )
 
-var _ bll.ILogin = new(Login)
+var _ bll.ILogin = (*Login)(nil)
 
 // LoginSet 注入Login
 var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"), wire.Bind(new(bll.ILogin), new(*Login)))

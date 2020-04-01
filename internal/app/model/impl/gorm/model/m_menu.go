@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var _ model.IMenu = new(Menu)
+var _ model.IMenu = (*Menu)(nil)
 
 // MenuSet 注入Menu
 var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"), wire.Bind(new(model.IMenu), new(*Menu)))

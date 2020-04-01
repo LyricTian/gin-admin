@@ -11,7 +11,7 @@ import (
 	"github.com/google/wire"
 )
 
-var _ bll.IDemo = new(Demo)
+var _ bll.IDemo = (*Demo)(nil)
 
 // DemoSet 注入Demo
 var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"), wire.Bind(new(bll.IDemo), new(*Demo)))

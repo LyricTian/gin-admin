@@ -12,7 +12,7 @@ import (
 	"github.com/google/wire"
 )
 
-var _ bll.IUser = new(User)
+var _ bll.IUser = (*User)(nil)
 
 // UserSet 注入User
 var UserSet = wire.NewSet(wire.Struct(new(User), "*"), wire.Bind(new(bll.IUser), new(*User)))

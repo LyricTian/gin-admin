@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var _ model.IUser = new(User)
+var _ model.IUser = (*User)(nil)
 
 // UserSet 注入User
 var UserSet = wire.NewSet(wire.Struct(new(User), "*"), wire.Bind(new(model.IUser), new(*User)))

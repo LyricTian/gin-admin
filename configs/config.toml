@@ -158,7 +158,7 @@ password = ""
 # 是否开启调试模式
 debug = true
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
-db_type = "mysql"
+db_type = "sqlite3"
 # 设置连接可以重用的最长时间(单位：秒)
 max_lifetime = 7200
 # 设置数据库的最大打开连接数
@@ -173,13 +173,13 @@ enable_auto_migrate = true
 # mysql数据库配置
 [mysql]
 # 连接地址
-host = "47.105.189.180"
+host = "127.0.0.1"
 # 连接端口
 port= 3306
 # 用户名
 user = "root"
 # 密码
-password = "T1013z0229@"
+password = "123456"
 # 数据库
 db_name = "ginadmin"
 # 连接参数
