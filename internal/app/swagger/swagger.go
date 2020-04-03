@@ -9,7 +9,7 @@ Package swagger 生成swagger文档
 	swag init --generalInfo ./internal/app/swagger/swagger.go --output ./internal/app/swagger */
 package swagger
 
-// @title Gin Admin
+// @title gin-admin
 // @version 6.0.0
 // @description RBAC scaffolding based on Gin + Gorm + Casbin + Wire.
 // @schemes http https

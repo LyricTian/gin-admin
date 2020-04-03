@@ -2414,7 +2414,7 @@ var SwaggerInfo = swaggerInfo{
 	Host:        "",
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
-	Title:       "Gin Admin",
+	Title:       "gin-admin",
 	Description: "RBAC scaffolding based on Gin + Gorm + Casbin + Wire.",
 }
 
