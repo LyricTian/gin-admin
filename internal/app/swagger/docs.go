@@ -89,13 +89,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -126,25 +126,25 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPRecordID"
+                            "$ref": "#/definitions/schema.RecordIDResult"
                         }
                     },
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -181,19 +181,19 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "404": {
                         "description": "{error:{code:0,message:资源不存在}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -231,25 +231,25 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -278,19 +278,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -321,19 +321,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -364,19 +364,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -449,13 +449,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -486,25 +486,25 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPRecordID"
+                            "$ref": "#/definitions/schema.RecordIDResult"
                         }
                     },
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -549,13 +549,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -592,19 +592,19 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "404": {
                         "description": "{error:{code:0,message:资源不存在}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -642,25 +642,25 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -689,19 +689,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -732,19 +732,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -775,19 +775,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -817,13 +817,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -856,25 +856,25 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -904,13 +904,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -943,13 +943,13 @@ var doc = `{
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -986,13 +986,13 @@ var doc = `{
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1024,7 +1024,7 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     }
                 }
@@ -1054,13 +1054,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1121,13 +1121,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1158,25 +1158,25 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPRecordID"
+                            "$ref": "#/definitions/schema.RecordIDResult"
                         }
                     },
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1221,19 +1221,19 @@ var doc = `{
                     "400": {
                         "description": "{error:{code:0,message:未知的查询类型}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1270,19 +1270,19 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "404": {
                         "description": "{error:{code:0,message:资源不存在}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1326,19 +1326,19 @@ var doc = `{
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1367,19 +1367,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1410,19 +1410,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1453,19 +1453,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1538,13 +1538,13 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1575,25 +1575,25 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPRecordID"
+                            "$ref": "#/definitions/schema.RecordIDResult"
                         }
                     },
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1630,19 +1630,19 @@ var doc = `{
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "404": {
                         "description": "{error:{code:0,message:资源不存在}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1686,19 +1686,19 @@ var doc = `{
                     "400": {
                         "description": "{error:{code:0,message:无效的请求参数}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1727,19 +1727,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1770,19 +1770,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1813,19 +1813,19 @@ var doc = `{
                     "200": {
                         "description": "{status:OK}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPStatus"
+                            "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
                     "401": {
                         "description": "{error:{code:0,message:未授权}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
                         "description": "{error:{code:0,message:服务器错误}}",
                         "schema": {
-                            "$ref": "#/definitions/schema.HTTPError"
+                            "$ref": "#/definitions/schema.ErrorResult"
                         }
                     }
                 }
@@ -1871,17 +1871,7 @@ var doc = `{
                 }
             }
         },
-        "schema.HTTPError": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "description": "错误项",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.HTTPErrorItem"
-                }
-            }
-        },
-        "schema.HTTPErrorItem": {
+        "schema.ErrorItem": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1894,20 +1884,13 @@ var doc = `{
                 }
             }
         },
-        "schema.HTTPRecordID": {
+        "schema.ErrorResult": {
             "type": "object",
             "properties": {
-                "record_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "schema.HTTPStatus": {
-            "type": "object",
-            "properties": {
-                "status": {
-                    "description": "状态(OK)",
-                    "type": "string"
+                "error": {
+                    "description": "错误项",
+                    "type": "object",
+                    "$ref": "#/definitions/schema.ErrorItem"
                 }
             }
         },
@@ -2157,6 +2140,14 @@ var doc = `{
                 "$ref": "#/definitions/schema.MenuTree"
             }
         },
+        "schema.RecordIDResult": {
+            "type": "object",
+            "properties": {
+                "record_id": {
+                    "type": "string"
+                }
+            }
+        },
         "schema.Role": {
             "type": "object",
             "required": [
@@ -2240,6 +2231,15 @@ var doc = `{
             "type": "array",
             "items": {
                 "$ref": "#/definitions/schema.Role"
+            }
+        },
+        "schema.StatusResult": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "description": "状态(OK)",
+                    "type": "string"
+                }
             }
         },
         "schema.UpdatePasswordParam": {
@@ -2415,7 +2415,7 @@ var SwaggerInfo = swaggerInfo{
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
 	Title:       "GinAdmin",
-	Description: "RBAC scaffolding based on Gin + Gorm + Casbin + Dig.",
+	Description: "RBAC scaffolding based on Gin + Gorm + Casbin + Wire.",
 }
 
 type s struct{}

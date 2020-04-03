@@ -9,17 +9,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAPIDemo(t *testing.T) {
-	const router = apiPrefix + "v1/demos"
+func TestRole(t *testing.T) {
+	const router = apiPrefix + "v1/roles"
 	var err error
 
 	w := httptest.NewRecorder()
 
-	// post /demos
-	addItem := &schema.Demo{
-		Code:   util.MustUUID(),
+	// post /menus
+	addMenuItem := &schema.Menu{
+		Name:       util.MustUUID(),
+		ShowStatus: 1,
+		Status:     1,
+	}
+	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/menus", addMenuItem))
+	assert.Equal(t, 200, w.Code)
+	var addMenuItemRes ResRecordID
+	err = parseReader(w.Body, &addMenuItemRes)
+	assert.Nil(t, err)
+
+	// post /roles
+	addItem := &schema.Role{
 		Name:   util.MustUUID(),
 		Status: 1,
+		RoleMenus: schema.RoleMenus{
+			&schema.RoleMenu{
+				MenuID: addMenuItemRes.RecordID,
+			},
+		},
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
@@ -27,18 +43,17 @@ func TestAPIDemo(t *testing.T) {
 	err = parseReader(w.Body, &addItemRes)
 	assert.Nil(t, err)
 
-	// get /demos/:id
+	// get /roles/:id
 	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.RecordID))
 	assert.Equal(t, 200, w.Code)
-	var getItem schema.Demo
+	var getItem schema.Role
 	err = parseReader(w.Body, &getItem)
 	assert.Nil(t, err)
-	assert.Equal(t, addItem.Code, getItem.Code)
 	assert.Equal(t, addItem.Name, getItem.Name)
 	assert.Equal(t, addItem.Status, getItem.Status)
 	assert.NotEmpty(t, getItem.RecordID)
 
-	// put /demos/:id
+	// put /roles/:id
 	putItem := getItem
 	putItem.Name = util.MustUUID()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.RecordID))
@@ -46,10 +61,10 @@ func TestAPIDemo(t *testing.T) {
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
 
-	// query /demos
+	// query /roles
 	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
 	assert.Equal(t, 200, w.Code)
-	var pageItems []*schema.Demo
+	var pageItems []*schema.Role
 	err = parsePageReader(w.Body, &pageItems)
 	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, len(pageItems), 1)
@@ -58,8 +73,14 @@ func TestAPIDemo(t *testing.T) {
 		assert.Equal(t, putItem.Name, pageItems[0].Name)
 	}
 
-	// delete /demos/:id
+	// delete /roles/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.RecordID))
+	assert.Equal(t, 200, w.Code)
+	err = parseOK(w.Body)
+	assert.Nil(t, err)
+
+	// delete /menus/:id
+	engine.ServeHTTP(w, newDeleteRequest(apiPrefix+"v1/menus/%s", addMenuItemRes.RecordID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)

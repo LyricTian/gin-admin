@@ -1,4 +1,9 @@
-package api
+package mock
+
+import "github.com/google/wire"
+
+// LoginSet 注入Login
+var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
 
 // Login 登录管理
 type Login struct {
@@ -19,8 +24,8 @@ func (a *Login) GetCaptcha() {
 // @Param reload query string false "重新加载"
 // @Produce image/png
 // @Success 200 "图形验证码"
-// @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/login/captcha [get]
 func (a *Login) ResCaptcha() {
 }
@@ -30,8 +35,8 @@ func (a *Login) ResCaptcha() {
 // @Summary 用户登录
 // @Param body body schema.LoginParam true "请求参数"
 // @Success 200 {object} schema.LoginTokenInfo
-// @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/login [post]
 func (a *Login) Login() {
 }
@@ -39,7 +44,7 @@ func (a *Login) Login() {
 // Logout 用户登出
 // @Tags 登录管理
 // @Summary 用户登出
-// @Success 200 {object} schema.HTTPStatus "{status:OK}"
+// @Success 200 {object} schema.StatusResult "{status:OK}"
 // @Router /api/v1/pub/login/exit [post]
 func (a *Login) Logout() {
 }
@@ -49,8 +54,8 @@ func (a *Login) Logout() {
 // @Summary 刷新令牌
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 {object} schema.LoginTokenInfo
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/refresh-token [post]
 func (a *Login) RefreshToken() {
 }
@@ -60,8 +65,8 @@ func (a *Login) RefreshToken() {
 // @Summary 获取当前用户信息
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 {object} schema.UserLoginInfo
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/current/user [get]
 func (a *Login) GetUserInfo() {
 }
@@ -71,8 +76,8 @@ func (a *Login) GetUserInfo() {
 // @Summary 查询当前用户菜单树
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200 {object} schema.Menu "查询结果：{list:菜单树}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/current/menutree [get]
 func (a *Login) QueryUserMenuTree() {
 }
@@ -82,10 +87,10 @@ func (a *Login) QueryUserMenuTree() {
 // @Summary 更新个人密码
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.UpdatePasswordParam true "请求参数"
-// @Success 200 {object} schema.HTTPStatus "{status:OK}"
-// @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Success 200 {object} schema.StatusResult "{status:OK}"
+// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/current/password [put]
 func (a *Login) UpdatePassword() {
 }

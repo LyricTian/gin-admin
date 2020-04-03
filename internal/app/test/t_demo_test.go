@@ -9,17 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAPIMenu(t *testing.T) {
-	const router = apiPrefix + "v1/menus"
+func TestDemo(t *testing.T) {
+	const router = apiPrefix + "v1/demos"
 	var err error
 
 	w := httptest.NewRecorder()
 
-	// post /menus
-	addItem := &schema.Menu{
-		Name:       util.MustUUID(),
-		ShowStatus: 1,
-		Status:     1,
+	// post /demos
+	addItem := &schema.Demo{
+		Code:   util.MustUUID(),
+		Name:   util.MustUUID(),
+		Status: 1,
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
@@ -27,17 +27,18 @@ func TestAPIMenu(t *testing.T) {
 	err = parseReader(w.Body, &addItemRes)
 	assert.Nil(t, err)
 
-	// get /menus/:id
+	// get /demos/:id
 	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.RecordID))
 	assert.Equal(t, 200, w.Code)
-	var getItem schema.Menu
+	var getItem schema.Demo
 	err = parseReader(w.Body, &getItem)
 	assert.Nil(t, err)
+	assert.Equal(t, addItem.Code, getItem.Code)
 	assert.Equal(t, addItem.Name, getItem.Name)
 	assert.Equal(t, addItem.Status, getItem.Status)
 	assert.NotEmpty(t, getItem.RecordID)
 
-	// put /menus/:id
+	// put /demos/:id
 	putItem := getItem
 	putItem.Name = util.MustUUID()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.RecordID))
@@ -45,10 +46,10 @@ func TestAPIMenu(t *testing.T) {
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
 
-	// query /menus
+	// query /demos
 	engine.ServeHTTP(w, newGetRequest(router, newPageParam()))
 	assert.Equal(t, 200, w.Code)
-	var pageItems []*schema.Menu
+	var pageItems []*schema.Demo
 	err = parsePageReader(w.Body, &pageItems)
 	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, len(pageItems), 1)
@@ -57,7 +58,7 @@ func TestAPIMenu(t *testing.T) {
 		assert.Equal(t, putItem.Name, pageItems[0].Name)
 	}
 
-	// delete /menus/:id
+	// delete /demos/:id
 	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.RecordID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)

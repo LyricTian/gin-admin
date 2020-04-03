@@ -1,4 +1,9 @@
-package api
+package mock
+
+import "github.com/google/wire"
+
+// DemoSet 注入Demo
+var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"))
 
 // Demo 示例程序
 type Demo struct {
@@ -14,8 +19,8 @@ type Demo struct {
 // @Param likeName query string false "名称(模糊查询)"
 // @Param status query int false "状态(1:启用 2:停用)"
 // @Success 200 {array} schema.Demo "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos [get]
 func (a *Demo) Query() {
 }
@@ -26,9 +31,9 @@ func (a *Demo) Query() {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Success 200 {object} schema.Demo
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 404 {object} schema.HTTPError "{error:{code:0,message:资源不存在}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 404 {object} schema.ErrorResult "{error:{code:0,message:资源不存在}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id} [get]
 func (a *Demo) Get() {
 }
@@ -38,10 +43,10 @@ func (a *Demo) Get() {
 // @Summary 创建数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param body body schema.Demo true "创建数据"
-// @Success 200 {object} schema.HTTPRecordID
-// @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Success 200 {object} schema.RecordIDResult
+// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos [post]
 func (a *Demo) Create() {
 }
@@ -52,10 +57,10 @@ func (a *Demo) Create() {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
 // @Param body body schema.Demo true "更新数据"
-// @Success 200 {object} schema.HTTPStatus "{status:OK}"
-// @Failure 400 {object} schema.HTTPError "{error:{code:0,message:无效的请求参数}}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Success 200 {object} schema.StatusResult "{status:OK}"
+// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id} [put]
 func (a *Demo) Update() {
 }
@@ -65,9 +70,9 @@ func (a *Demo) Update() {
 // @Summary 删除数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
-// @Success 200 {object} schema.HTTPStatus "{status:OK}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Success 200 {object} schema.StatusResult "{status:OK}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id} [delete]
 func (a *Demo) Delete() {
 }
@@ -77,9 +82,9 @@ func (a *Demo) Delete() {
 // @Summary 启用数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
-// @Success 200 {object} schema.HTTPStatus "{status:OK}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Success 200 {object} schema.StatusResult "{status:OK}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id}/enable [patch]
 func (a *Demo) Enable() {
 }
@@ -89,9 +94,9 @@ func (a *Demo) Enable() {
 // @Summary 禁用数据
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param id path string true "记录ID"
-// @Success 200 {object} schema.HTTPStatus "{status:OK}"
-// @Failure 401 {object} schema.HTTPError "{error:{code:0,message:未授权}}"
-// @Failure 500 {object} schema.HTTPError "{error:{code:0,message:服务器错误}}"
+// @Success 200 {object} schema.StatusResult "{status:OK}"
+// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
+// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id}/disable [patch]
 func (a *Demo) Disable() {
 }

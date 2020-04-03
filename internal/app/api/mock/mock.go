@@ -1,13 +1,12 @@
-package bll
+package mock
 
 import "github.com/google/wire"
 
-// AllSet bll注入
-var AllSet = wire.NewSet(
+// MockSet 注入mock
+var MockSet = wire.NewSet(
 	DemoSet,
 	LoginSet,
 	MenuSet,
 	RoleSet,
-	TransSet,
 	UserSet,
 )

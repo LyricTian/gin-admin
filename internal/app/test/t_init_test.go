@@ -28,7 +28,7 @@ func init() {
 	config.C.RunMode = "debug"
 	config.C.Casbin.Enable = false
 	config.C.Casbin.Model = ""
-	config.C.Gorm.Debug = true
+	config.C.Gorm.Debug = false
 	config.C.Gorm.DBType = "sqlite3"
 
 	injector, _, err := initialize.InitInjector()

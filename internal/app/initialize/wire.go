@@ -5,6 +5,7 @@ package initialize
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/api"
+	"github.com/LyricTian/gin-admin/internal/app/api/mock"
 	"github.com/LyricTian/gin-admin/internal/app/bll/impl/bll"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/model"
 	"github.com/LyricTian/gin-admin/internal/app/module/adapter"
@@ -17,9 +18,10 @@ func BuildInjector() (*Injector, func(), error) {
 	wire.Build(
 		InitAuth,
 		InitGormDB,
-		model.AllSet,
-		bll.AllSet,
-		api.AllSet,
+		model.ModelSet,
+		bll.BllSet,
+		api.APISet,
+		mock.MockSet,
 		router.RouterSet,
 		InitGinEngine,
 		adapter.CasbinAdapterSet,

@@ -28,14 +28,7 @@ definitions:
     - name
     - status
     type: object
-  schema.HTTPError:
-    properties:
-      error:
-        $ref: '#/definitions/schema.HTTPErrorItem'
-        description: 错误项
-        type: object
-    type: object
-  schema.HTTPErrorItem:
+  schema.ErrorItem:
     properties:
       code:
         description: 错误码
@@ -44,16 +37,12 @@ definitions:
         description: 错误信息
         type: string
     type: object
-  schema.HTTPRecordID:
+  schema.ErrorResult:
     properties:
-      record_id:
-        type: string
-    type: object
-  schema.HTTPStatus:
-    properties:
-      status:
-        description: 状态(OK)
-        type: string
+      error:
+        $ref: '#/definitions/schema.ErrorItem'
+        description: 错误项
+        type: object
     type: object
   schema.LoginCaptcha:
     properties:
@@ -235,6 +224,11 @@ definitions:
     items:
       $ref: '#/definitions/schema.MenuTree'
     type: array
+  schema.RecordIDResult:
+    properties:
+      record_id:
+        type: string
+    type: object
   schema.Role:
     properties:
       created_at:
@@ -297,6 +291,12 @@ definitions:
     items:
       $ref: '#/definitions/schema.Role'
     type: array
+  schema.StatusResult:
+    properties:
+      status:
+        description: 状态(OK)
+        type: string
+    type: object
   schema.UpdatePasswordParam:
     properties:
       new_password:
@@ -413,7 +413,7 @@ info:
   contact:
     email: tiannianshou@gmail.com
     name: LyricTian
-  description: RBAC scaffolding based on Gin + Gorm + Casbin + Dig.
+  description: RBAC scaffolding based on Gin + Gorm + Casbin + Wire.
   license: {}
   title: GinAdmin
   version: 6.0.0
@@ -459,11 +459,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询数据
       tags:
       - Demo
@@ -483,19 +483,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.HTTPRecordID'
+            $ref: '#/definitions/schema.RecordIDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 创建数据
       tags:
       - Demo
@@ -515,15 +515,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 删除数据
       tags:
       - Demo
@@ -546,15 +546,15 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "404":
           description: '{error:{code:0,message:资源不存在}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询指定数据
       tags:
       - Demo
@@ -579,19 +579,19 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 更新数据
       tags:
       - Demo
@@ -611,15 +611,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 禁用数据
       tags:
       - Demo
@@ -639,15 +639,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 启用数据
       tags:
       - Demo
@@ -696,11 +696,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询数据
       tags:
       - 菜单管理
@@ -720,19 +720,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.HTTPRecordID'
+            $ref: '#/definitions/schema.RecordIDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 创建数据
       tags:
       - 菜单管理
@@ -761,11 +761,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询菜单树
       tags:
       - 菜单管理
@@ -785,15 +785,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 删除数据
       tags:
       - 菜单管理
@@ -816,15 +816,15 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "404":
           description: '{error:{code:0,message:资源不存在}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询指定数据
       tags:
       - 菜单管理
@@ -849,19 +849,19 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 更新数据
       tags:
       - 菜单管理
@@ -881,15 +881,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 禁用数据
       tags:
       - 菜单管理
@@ -909,15 +909,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 启用数据
       tags:
       - 菜单管理
@@ -936,11 +936,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询当前用户菜单树
       tags:
       - 登录管理
@@ -961,19 +961,19 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 更新个人密码
       tags:
       - 登录管理
@@ -992,11 +992,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 获取当前用户信息
       tags:
       - 登录管理
@@ -1017,11 +1017,11 @@ paths:
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 用户登录
       tags:
       - 登录管理
@@ -1045,11 +1045,11 @@ paths:
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 响应图形验证码
       tags:
       - 登录管理
@@ -1069,7 +1069,7 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
       summary: 用户登出
       tags:
       - 登录管理
@@ -1088,11 +1088,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 刷新令牌
       tags:
       - 登录管理
@@ -1133,11 +1133,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询数据
       tags:
       - 角色管理
@@ -1157,19 +1157,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.HTTPRecordID'
+            $ref: '#/definitions/schema.RecordIDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 创建数据
       tags:
       - 角色管理
@@ -1198,15 +1198,15 @@ paths:
         "400":
           description: '{error:{code:0,message:未知的查询类型}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询选择数据
       tags:
       - 角色管理
@@ -1226,15 +1226,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 删除数据
       tags:
       - 角色管理
@@ -1257,15 +1257,15 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "404":
           description: '{error:{code:0,message:资源不存在}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询指定数据
       tags:
       - 角色管理
@@ -1294,15 +1294,15 @@ paths:
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 更新数据
       tags:
       - 角色管理
@@ -1322,15 +1322,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 禁用数据
       tags:
       - 角色管理
@@ -1350,15 +1350,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 启用数据
       tags:
       - 角色管理
@@ -1407,11 +1407,11 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询数据
       tags:
       - 用户管理
@@ -1431,19 +1431,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.HTTPRecordID'
+            $ref: '#/definitions/schema.RecordIDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 创建数据
       tags:
       - 用户管理
@@ -1463,15 +1463,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 删除数据
       tags:
       - 用户管理
@@ -1494,15 +1494,15 @@ paths:
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "404":
           description: '{error:{code:0,message:资源不存在}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 查询指定数据
       tags:
       - 用户管理
@@ -1531,15 +1531,15 @@ paths:
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 更新数据
       tags:
       - 用户管理
@@ -1559,15 +1559,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 禁用数据
       tags:
       - 用户管理
@@ -1587,15 +1587,15 @@ paths:
         "200":
           description: '{status:OK}'
           schema:
-            $ref: '#/definitions/schema.HTTPStatus'
+            $ref: '#/definitions/schema.StatusResult'
         "401":
           description: '{error:{code:0,message:未授权}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
         "500":
           description: '{error:{code:0,message:服务器错误}}'
           schema:
-            $ref: '#/definitions/schema.HTTPError'
+            $ref: '#/definitions/schema.ErrorResult'
       summary: 启用数据
       tags:
       - 用户管理

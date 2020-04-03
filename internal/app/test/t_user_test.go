@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAPIUser(t *testing.T) {
+func TestUser(t *testing.T) {
 	const router = apiPrefix + "v1/users"
 	var err error
 
