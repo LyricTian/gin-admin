@@ -156,7 +156,7 @@ password = ""
 # gorm配置
 [gorm]
 # 是否开启调试模式
-debug = false
+debug = true
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
 db_type = "sqlite3"
 # 设置连接可以重用的最长时间(单位：秒)

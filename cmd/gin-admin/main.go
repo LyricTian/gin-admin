@@ -3,10 +3,6 @@ package main
 import (
 	"context"
 	"os"
-	"os/signal"
-	"sync/atomic"
-	"syscall"
-	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app"
 	"github.com/LyricTian/gin-admin/pkg/logger"
@@ -39,7 +35,7 @@ func main() {
 func newWebCmd(ctx context.Context) *cli.Command {
 	return &cli.Command{
 		Name:  "web",
-		Usage: "启动HTTP服务",
+		Usage: "运行web服务",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "conf",
@@ -63,36 +59,12 @@ func newWebCmd(ctx context.Context) *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			var state int32 = 1
-			sc := make(chan os.Signal, 1)
-			signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-
-			cleanFunc := app.Init(ctx,
+			return app.Run(ctx,
 				app.SetConfigFile(c.String("conf")),
 				app.SetModelFile(c.String("model")),
 				app.SetWWWDir(c.String("www")),
-				app.SetMenuFile(c.String("menu_data")),
+				app.SetMenuFile(c.String("menu")),
 				app.SetVersion(VERSION))
-
-		EXIT:
-			for {
-				sig := <-sc
-				logger.Printf(ctx, "获取到信号[%s]", sig.String())
-				switch sig {
-				case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-					atomic.CompareAndSwapInt32(&state, 1, 0)
-					break EXIT
-				case syscall.SIGHUP:
-				default:
-					break EXIT
-				}
-			}
-
-			cleanFunc()
-			logger.Printf(ctx, "服务退出")
-			time.Sleep(time.Second)
-			os.Exit(int(atomic.LoadInt32(&state)))
-			return nil
 		},
 	}
 }

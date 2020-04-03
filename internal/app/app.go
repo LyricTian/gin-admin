@@ -3,6 +3,10 @@ package app
 import (
 	"context"
 	"os"
+	"os/signal"
+	"sync/atomic"
+	"syscall"
+	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/initialize"
@@ -58,8 +62,39 @@ func SetVersion(s string) Option {
 	}
 }
 
+// Run 运行服务
+func Run(ctx context.Context, opts ...Option) error {
+	var state int32 = 1
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	cleanFunc, err := Init(ctx, opts...)
+	if err != nil {
+		return err
+	}
+
+EXIT:
+	for {
+		sig := <-sc
+		logger.Printf(ctx, "接收到信号[%s]", sig.String())
+		switch sig {
+		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			atomic.CompareAndSwapInt32(&state, 1, 0)
+			break EXIT
+		case syscall.SIGHUP:
+		default:
+			break EXIT
+		}
+	}
+
+	cleanFunc()
+	logger.Printf(ctx, "服务退出")
+	time.Sleep(time.Second)
+	os.Exit(int(atomic.LoadInt32(&state)))
+	return nil
+}
+
 // Init 应用初始化
-func Init(ctx context.Context, opts ...Option) func() {
+func Init(ctx context.Context, opts ...Option) (func(), error) {
 	var o options
 	for _, opt := range opts {
 		opt(&o)
@@ -80,7 +115,9 @@ func Init(ctx context.Context, opts ...Option) func() {
 
 	// 初始化日志模块
 	loggerCleanFunc, err := initialize.InitLogger()
-	handleError(err)
+	if err != nil {
+		return nil, err
+	}
 
 	// 初始化服务运行监控
 	initialize.InitMonitor(ctx)
@@ -90,11 +127,15 @@ func Init(ctx context.Context, opts ...Option) func() {
 
 	// 初始化依赖注入器
 	injector, injectorCleanFunc, err := initialize.InitInjector()
-	handleError(err)
+	if err != nil {
+		return nil, err
+	}
 
 	// 初始化菜单数据
 	err = injector.Menu.Load()
-	handleError(err)
+	if err != nil {
+		return nil, err
+	}
 
 	// 初始化HTTP服务
 	httpServerCleanFunc := initialize.InitHTTPServer(ctx, injector.Engine)
@@ -103,11 +144,5 @@ func Init(ctx context.Context, opts ...Option) func() {
 		httpServerCleanFunc()
 		injectorCleanFunc()
 		loggerCleanFunc()
-	}
-}
-
-func handleError(err error) {
-	if err != nil {
-		panic(err)
-	}
+	}, nil
 }
