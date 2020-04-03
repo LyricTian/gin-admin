@@ -49,7 +49,7 @@ format = "text"
 # 日志输出(支持：stdout/stderr/file)
 output = "stdout"
 # 指定日志输出的文件路径
-output_file = "data/ginadmin.log"
+output_file = "data/gin-admin.log"
 # 是否启用日志钩子
 enable_hook = false
 # 日志钩子(支持：gorm)
@@ -183,7 +183,7 @@ user = "root"
 # 密码
 password = "123456"
 # 数据库
-db_name = "ginadmin"
+db_name = "gin-admin"
 # 连接参数
 parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
 
@@ -198,11 +198,11 @@ user = "root"
 # 密码
 password = "123456"
 # 数据库
-db_name = "ginadmin"
+db_name = "gin-admin"
 # SSL模式
 ssl_mode = "disable"
 
 # sqlite数据库配置
 [sqlite3]
 # 数据库路径
-path = "data/ginadmin.db"
+path = "data/gin-admin.db"
