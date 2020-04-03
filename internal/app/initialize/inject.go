@@ -1,4 +1,4 @@
-package inject
+package initialize
 
 import (
 	"sync"
@@ -15,8 +15,8 @@ var (
 	once sync.Once
 )
 
-// InitializeInjector 初始化注入器
-func InitializeInjector() (*Injector, func(), error) {
+// InitInjector 初始化注入器
+func InitInjector() (*Injector, func(), error) {
 	var (
 		cleanFunc func()
 		err       error

@@ -3,7 +3,7 @@
 //go:generate wire
 //+build !wireinject
 
-package inject
+package initialize
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/api"
@@ -121,11 +121,11 @@ func BuildInjector() (*Injector, func(), error) {
 		RoleAPI:        apiRole,
 		UserAPI:        apiUser,
 	}
-	engine := InitHTTPEngine(routerRouter)
+	engine := InitGinEngine(routerRouter)
 	bllTrans := &bll.Trans{
 		TransModel: trans,
 	}
-	injectMenu := &Menu{
+	initializeMenu := &Menu{
 		MenuBll:  bllMenu,
 		TransBll: bllTrans,
 	}
@@ -133,7 +133,7 @@ func BuildInjector() (*Injector, func(), error) {
 		Engine:         engine,
 		Auth:           auther,
 		CasbinEnforcer: syncedEnforcer,
-		Menu:           injectMenu,
+		Menu:           initializeMenu,
 	}
 	return injector, func() {
 		cleanup3()

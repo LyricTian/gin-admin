@@ -3,11 +3,11 @@
 - name: 首页
   icon: dashboard
   router: "/dashboard"
-  sequence: 1900000
+  sequence: 1999999
 - name: DEMO
   icon: tag
   router: "/example/demo"
-  sequence: 1800000
+  sequence: 1029999
   actions:
     - code: add
       name: 新增
@@ -43,12 +43,12 @@
           path: "/api/v1/demos/:id/enable"
 - name: 系统管理
   icon: setting
-  sequence: 1100000
+  sequence: 1019999
   children:
     - name: 菜单管理
       icon: solution
       router: "/system/menu"
-      sequence: 1190000
+      sequence: 1010999
       actions:
         - code: add
           name: 新增
@@ -87,7 +87,7 @@
     - name: 角色管理
       icon: audit
       router: "/system/role"
-      sequence: 1180000
+      sequence: 1010899
       actions:
         - code: add
           name: 新增
@@ -128,7 +128,7 @@
     - name: 用户管理
       icon: user
       router: "/system/user"
-      sequence: 1170000
+      sequence: 1010799
       actions:
         - code: add
           name: 新增

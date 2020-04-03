@@ -30,6 +30,8 @@ github.com/casbin/casbin/v2/persist/file-adapter
 github.com/casbin/casbin/v2/rbac
 github.com/casbin/casbin/v2/rbac/default-role-manager
 github.com/casbin/casbin/v2/util
+# github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d
+github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -123,6 +125,10 @@ github.com/modern-go/reflect2
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
+# github.com/russross/blackfriday/v2 v2.0.1
+github.com/russross/blackfriday/v2
+# github.com/shurcooL/sanitized_anchor_name v1.0.0
+github.com/shurcooL/sanitized_anchor_name
 # github.com/sirupsen/logrus v1.5.0
 github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.5.1
@@ -152,6 +158,8 @@ github.com/tidwall/rtree/base
 github.com/tidwall/tinyqueue
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
+# github.com/urfave/cli/v2 v2.2.0
+github.com/urfave/cli/v2
 # golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 golang.org/x/net/context
 golang.org/x/net/idna

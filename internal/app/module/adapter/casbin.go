@@ -12,8 +12,10 @@ import (
 	"github.com/google/wire"
 )
 
+var _ persist.Adapter = (*CasbinAdapter)(nil)
+
 // CasbinAdapterSet 注入CasbinAdapter
-var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"))
+var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"), wire.Bind(new(persist.Adapter), new(*CasbinAdapter)))
 
 // CasbinAdapter casbin适配器
 type CasbinAdapter struct {

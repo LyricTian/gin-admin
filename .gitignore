@@ -12,13 +12,12 @@
 *.out
 
 *.DS_Store
-/cmd/server/server
-/cmd/server/server/data
+/cmd/gin-admin/gin-admin
+/cmd/gin-admin/data
 /release
 /data
 /internal/app/test/data
 /tmp
-/docs/swagger/docs.go
 
 # IDE configs
 .idea

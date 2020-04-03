@@ -11,7 +11,7 @@ package swagger
 
 // @title GinAdmin
 // @version 6.0.0
-// @description RBAC scaffolding based on Gin + Gorm + Casbin + Dig.
+// @description RBAC scaffolding based on Gin + Gorm + Casbin + Wire.
 // @schemes http https
 // @basePath /
 // @contact.name LyricTian

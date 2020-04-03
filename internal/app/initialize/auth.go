@@ -1,4 +1,4 @@
-package inject
+package initialize
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/config"

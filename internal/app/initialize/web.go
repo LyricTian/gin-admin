@@ -1,4 +1,4 @@
-package inject
+package initialize
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
@@ -9,15 +9,15 @@ import (
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
-// InitHTTPEngine 初始化gin引擎
-func InitHTTPEngine(r *router.Router) *gin.Engine {
+// InitGinEngine 初始化gin引擎
+func InitGinEngine(r router.IRouter) *gin.Engine {
 	gin.SetMode(config.C.RunMode)
 
 	app := gin.New()
 	app.NoMethod(middleware.NoMethodHandler())
 	app.NoRoute(middleware.NoRouteHandler())
 
-	prefixes := []string{"/api/"}
+	prefixes := r.Prefixes()
 
 	// 跟踪ID
 	app.Use(middleware.TraceMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
@@ -33,8 +33,8 @@ func InitHTTPEngine(r *router.Router) *gin.Engine {
 		app.Use(middleware.CORSMiddleware())
 	}
 
-	// 注册/api路由
-	r.RegisterAPI(app)
+	// 注册路由
+	r.Register(app)
 
 	// swagger文档
 	if config.C.Swagger {

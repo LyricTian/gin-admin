@@ -166,13 +166,6 @@ func StartSpan(ctx context.Context, opts ...SpanOption) *Entry {
 	return newEntry(logrus.WithFields(fields))
 }
 
-// StartSpanWithCall 开始一个追踪单元（回调执行）
-func StartSpanWithCall(ctx context.Context, opts ...SpanOption) func() *Entry {
-	return func() *Entry {
-		return StartSpan(ctx, opts...)
-	}
-}
-
 // Debugf 写入调试日志
 func Debugf(ctx context.Context, format string, args ...interface{}) {
 	StartSpan(ctx).Debugf(format, args...)

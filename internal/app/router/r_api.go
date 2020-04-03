@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterAPI 注册/api
+// RegisterAPI 注册/api路由
 func (a *Router) RegisterAPI(app *gin.Engine) {
 	g := app.Group("/api")
 

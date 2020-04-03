@@ -1,7 +1,7 @@
 // +build wireinject
 // The build tag makes sure the stub is not built in the final build.
 
-package inject
+package initialize
 
 import (
 	"github.com/LyricTian/gin-admin/internal/app/api"
@@ -15,13 +15,13 @@ import (
 //  BuildInjector 生成注入器
 func BuildInjector() (*Injector, func(), error) {
 	wire.Build(
-		InitGormDB,
 		InitAuth,
+		InitGormDB,
 		model.AllSet,
 		bll.AllSet,
 		api.AllSet,
 		router.RouterSet,
-		InitHTTPEngine,
+		InitGinEngine,
 		adapter.CasbinAdapterSet,
 		InitCasbin,
 		MenuSet,

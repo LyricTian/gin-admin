@@ -19,8 +19,8 @@
 - 基于 GIN WEB 框架，提供了丰富的中间件支持（用户认证、跨域、访问日志、请求频率限制、追踪 ID 等）
 - 基于 Casbin 的 RBAC 访问控制模型
 - 基于 GORM 的数据库存储(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离)
-- 依赖注入(基于[dig](http://go.uber.org/dig))
-- 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，日志钩子支持 gorm)
+- 依赖注入(基于[wire](https://github.com/google/wire))
+- 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，支持日志钩子)
 - JWT 认证(基于黑名单的认证模式，存储支持：file/redis)
 - 支持 Swagger 文档(基于[swaggo](https://github.com/swaggo/swag))
 - 单元测试(基于`net/http/httptest`包，覆盖所有接口层的测试)

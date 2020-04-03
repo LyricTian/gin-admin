@@ -1,4 +1,4 @@
-package app
+package initialize
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 	loggergormhook "github.com/LyricTian/gin-admin/pkg/logger/hook/gorm"
 )
 
-// InitLogger 初始化日志
+// InitLogger 初始化日志模块
 func InitLogger() (func(), error) {
 	c := config.C.Log
 	logger.SetLevel(c.Level)

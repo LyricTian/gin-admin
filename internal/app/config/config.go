@@ -19,6 +19,7 @@ func MustLoad(fpath string) {
 	once.Do(func() {
 		loaders := []multiconfig.Loader{
 			&multiconfig.TagLoader{},
+			&multiconfig.EnvironmentLoader{},
 		}
 
 		if strings.HasSuffix(fpath, "toml") {

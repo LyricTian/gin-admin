@@ -1,4 +1,4 @@
-package inject
+package initialize
 
 import (
 	"errors"
@@ -10,10 +10,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// InitGormDB 初始化存储
+// InitGormDB 初始化gorm存储
 func InitGormDB() (*gorm.DB, func(), error) {
 	cfg := config.C.Gorm
-	db, err := getGormDB()
+	db, err := NewGormDB()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -32,8 +32,8 @@ func InitGormDB() (*gorm.DB, func(), error) {
 	return db, cleanFunc, nil
 }
 
-// getGormDB 获取gorm存储
-func getGormDB() (*gorm.DB, error) {
+// NewGormDB 创建DB实例
+func NewGormDB() (*gorm.DB, error) {
 	cfg := config.C
 
 	var dsn string
