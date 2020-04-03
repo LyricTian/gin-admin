@@ -25,12 +25,15 @@ func init() {
 	// 初始化配置文件
 	config.MustLoad(configFile)
 
-	config.C.RunMode = "debug"
+	config.C.RunMode = "test"
+	config.C.Log.Level = 2
+	config.C.JWTAuth.Enable = false
 	config.C.Casbin.Enable = false
 	config.C.Casbin.Model = ""
 	config.C.Gorm.Debug = false
 	config.C.Gorm.DBType = "sqlite3"
 
+	initialize.InitLogger()
 	injector, _, err := initialize.InitInjector()
 	if err != nil {
 		panic(err)

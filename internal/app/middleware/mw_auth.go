@@ -11,6 +11,13 @@ import (
 // UserAuthMiddleware 用户授权中间件
 func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		cfg := config.C
+		if !cfg.JWTAuth.Enable {
+			c.Set(ginplus.UserIDKey, cfg.Root.UserName)
+			c.Next()
+			return
+		}
+
 		if t := ginplus.GetToken(c); t != "" {
 			id, err := a.ParseUserID(ginplus.NewContext(c), t)
 			if err != nil {
@@ -34,7 +41,6 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 			return
 		}
 
-		cfg := config.C
 		if cfg.IsDebugMode() {
 			c.Set(ginplus.UserIDKey, cfg.Root.UserName)
 			c.Next()

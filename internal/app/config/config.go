@@ -113,6 +113,7 @@ type Root struct {
 
 // JWTAuth 用户认证
 type JWTAuth struct {
+	Enable        bool   `toml:"enable"`
 	SigningMethod string `toml:"signing_method"`
 	SigningKey    string `toml:"signing_key"`
 	Expired       int    `toml:"expired"`

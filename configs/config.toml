@@ -92,6 +92,8 @@ real_name = "超级管理员"
 
 # 用户认证(jwt)
 [jwt_auth]
+# 是否启用
+enable = true
 # 签名方式(支持：HS512/HS384/HS512)
 signing_method = "HS512"
 # 签名key
