@@ -1,7 +1,7 @@
 <h1 align="center">Gin Admin</h1>
 
 <div align="center">
- 基于 Gin + GORM + Casbin + Dig 实现的RBAC权限管理脚手架，目的是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
+ 基于 Gin + GORM + Casbin + Wire 实现的RBAC权限管理脚手架，目的是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
 <br/>
 
 [![ReportCard][reportcard-image]][reportcard-url] [![GoDoc][godoc-image]][godoc-url] [![License][license-image]][license-url]
@@ -11,147 +11,85 @@
 - [在线演示地址](http://gin-admin.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
 - [Swagger 文档地址](http://gin-admin.tiannianshou.com/swagger/)
 
-![](https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/swagger.png)
-
 ## 特性
 
-- 遵循 RESTful API 设计规范
-- 基于 GIN WEB 框架，提供了丰富的中间件支持（用户认证、跨域、访问日志、请求频率限制、追踪 ID 等）
-- 基于 Casbin 的 RBAC 访问控制模型
-- 基于 GORM 的数据库存储(存储层对外采用接口的方式供业务层调用，实现了存储层的完全隔离)
-- 依赖注入(基于[wire](https://github.com/google/wire))
-- 日志追踪(基于[logrus](https://github.com/sirupsen/logrus)，支持日志钩子)
-- JWT 认证(基于黑名单的认证模式，存储支持：file/redis)
-- 支持 Swagger 文档(基于[swaggo](https://github.com/swaggo/swag))
-- 单元测试(基于`net/http/httptest`包，覆盖所有接口层的测试)
+- 遵循 `RESTful API` 设计规范
+- 基于 `GIN` 框架，提供了丰富的中间件支持（JWTAuth、CORS、RequestLogger、RequestRateLimiter、TraceID、CasbinEnforce、Recover）
+- 基于 `Casbin` 的 RBAC 访问控制模型
+- 基于 `GORM` 的数据库存储 -- 存储层抽象了标准的外部业务层调用接口，内部采用封闭式实现（为后续切换数据存储提供了较大的便利）
+- 基于 `WIRE` 的依赖注入 -- 依赖注入本身的作用是解决了各个模块间层级依赖繁琐的初始化过程
+- 基于 `Logrus & Context` 实现了日志输出，通过结合 Context 实现了统一的 TraceID/UserID 等关键字段的输出
+- 基于 `JWT` 的用户认证
+- 基于 `Swaggo` 自动生成 `Swagger` 文档
+- 基于 `net/http/httptest` 标准包实现了 API 的单元测试
+
+<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/v6.0/docs/screenshots/swagger.png" width="800" height="743" />
+
+## 依赖工具
+
+```
+go get -u github.com/cosmtrek/air
+go get -u github.com/google/wire/cmd/wire
+go get -u github.com/swaggo/swag/cmd/swag
+```
+
+- [air](https://github.com/cosmtrek/air) -- Live reload for Go apps
+- [wire](https://github.com/google/wire) -- Compile-time Dependency Injection for Go
+- [swag](https://github.com/swaggo/swag) -- Automatically generate RESTful API documentation with Swagger 2.0 for Go.
+
+## 依赖框架
+
+- [Gin](https://gin-gonic.com/) -- The fastest full-featured web framework for Go.
+- [GORM](http://gorm.io/) -- The fantastic ORM library for Golang
+- [Casbin](https://casbin.org/) -- An authorization library that supports access control models like ACL, RBAC, ABAC in Golang
+- [Wire](https://github.com/google/wire) -- Compile-time Dependency Injection for Go
 
 ## 快速开始
 
-> 使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)工具
-
-### 快速创建项目
-
-```bash
-$ go get -v github.com/LyricTian/gin-admin-cli
-$ gin-admin-cli new -m -d ~/go/src/gin-admin -p gin-admin
+```
+go get -v github.com/LyricTian/gin-admin/cmd/gin-admin
+cd $GOPATH/src/github.com/LyricTian/gin-admin
+air
 ```
 
-### 使用 air 工具启动服务(推荐)
-
-> 可自动监听文件变化
-
-```bash
-$ go get -u github.com/cosmtrek/air
-$ cd ~/go/src/gin-admin
-$ go mod download
-$ air
-```
-> 注意：在Linux子系统（`WSL1`）下使用需要使用`root`执行`air`命令，例如 `sudo air`，如果提示命令没找到，是因为`GOBIN`没有在`root`设置`PATH`环境变量，如果不想设置可以直接使用绝对路径，例如：`sudo /home/{你的用户名}/go/bin/air`，需要在代码目录下执行。
-
-### 使用 run 命令运行服务
-
-```bash
-$ cd ~/go/src/gin-admin
-$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./docs/swagger -menu ./configs/menu.json
-```
-
-> 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
-
-### Windows 用户温馨提示：
-
-1. 执行出现错误：`exec: "gcc": executable file not found in %PATH%`，需要安装 gcc，下载地址：[http://tdm-gcc.tdragon.net/download](http://tdm-gcc.tdragon.net/download)
-
-### 解放劳动力 - 快速生成功能模块(`以Task为例`，具体可参考：[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli))
-
-```bash
-$ gin-admin-cli g -d ~/go/src/gin-admin -p gin-admin -n Task -c '任务管理'
-```
-
-## 手动下载并运行
-
-### 获取代码
-
-```bash
-$ go get -v github.com/LyricTian/gin-admin/cmd/server
-```
-
-### 运行
-
-#### 运行服务
-
-> 也可以使用脚本运行(详情可查看`Makefile`)：`make start`
-
-```bash
-$ cd github.com/LyricTian/gin-admin
-$ go run cmd/server/main.go -c ./configs/config.toml -m ./configs/model.conf -swagger ./docs/swagger -menu ./configs/menu.json
-```
-
-> 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
-
-#### 温馨提醒
-
-1. 默认配置采用的是 sqlite 数据库，数据库文件(`自动生成`)在`data/gadmin.db`。如果想切换为`mysql`或`postgres`，请更改配置文件，并创建数据库（数据库创建脚本在`script`目录下）。
-2. 日志的默认配置为标准输出，如果想切换到写入文件或写入到 gorm 存储，可以自行切换配置。
-
-## 前端实现
-
-- [gin-admin-react](https://github.com/LyricTian/gin-admin-react)：基于[Ant Design React ES6](https://ant.design)的实现版本
-- [gin-admin-react-ts](https://github.com/LyricTian/gin-admin-react/tree/ts-master)：基于 Ant Design React TypeScript 实现的RBAC权限管理脚手架
-- [gin-admin-react-v4](https://github.com/gin-admin/gin-admin-react)：基于 Ant Design Pro v4 实现的RBAC权限管理脚手架
-
-## Swagger 文档的使用
-
-> 文档规则请参考：[https://github.com/swaggo/swag#declarative-comments-format](https://github.com/swaggo/swag#declarative-comments-format)
-
-### 安装工具并生成文档
-
-```bash
-$ go get -u -v github.com/swaggo/swag/cmd/swag
-$ swag init -g ./internal/app/routers/swagger.go -o ./docs/swagger
-```
-
-生成文档之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/](http://127.0.0.1:10088/swagger/)
+> 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/index.html](http://127.0.0.1:10088/swagger/index.html)
 
 ## 项目结构概览
 
 ```
-.
 ├── cmd
-│   └── server：主服务（程序入口）
-├── configs：配置文件目录(包含运行配置参数及casbin模型配置)
-├── docs：文档目录
-│   └── swagger：swagger静态文件目录
-├── internal：内部应用
-│   └── app：主应用目录
-│       ├── bll：业务逻辑层接口
-│       │   └── impl：业务逻辑层的接口实现
-│       ├── config：配置参数（与配置文件一一映射）
-│       ├── context：统一上下文
-│       ├── errors：统一的错误处理
-│       ├── ginplus：gin的扩展函数库
-│       ├── middleware：gin中间件
-│       ├── model：存储层接口
-│       │   └── impl：存储层接口实现
-│       │       └── gorm：基于gorm的存储层实现
-│       ├── routers：路由层
-│       │   └── api：/api路由模块
-│       │       └── ctl：/api路由模块对应的控制器层
-│       ├── schema：对象模型
-│       └── test：针对接口的单元测试
-├── pkg：公共模块
-│   ├── auth：认证模块
-│   │   └── jwtauth：JWT认证模块实现
-│   ├── logger：日志模块
-│   └── util：工具库
-└── scripts：执行脚本
+│   └── gin-admin # 主服务（程序入口）
+├── configs # 配置文件目录(包含运行配置参数及casbin模型配置)
+├── docs # 文档目录
+├── internal # 内部代码模块
+│   └── app # 内部应用模块入口
+│       ├── api # API控制器模块
+│       │   └── mock # API Mock模块(包括swagger的注释描述)
+│       ├── bll # 业务逻辑模块接口
+│       │   └── impl
+│       │       └── bll # 业务逻辑模块接口的实现
+│       ├── config # 配置参数(与config.toml一一映射)
+│       ├── context # 统一上下文模块
+│       ├── ginplus # gin的扩展模块
+│       ├── initialize # 初始化模块（提供依赖模块的初始化函数及依赖注入的初始化）
+│       ├── middleware # gin中间件模块
+│       ├── model # 存储层模块接口
+│       │   └── impl
+│       │       └── gorm
+│       │           ├── entity # 与数据库表及字段的映射实体
+│       │           └── model # 存储层模块接口的gorm实现
+│       ├── module # 内部模块间依赖的公共模块
+│       ├── router # gin的路由模块
+│       ├── schema # 提供Request/Response的对象模块
+│       ├── swagger # swagger配置及自动生成的文件
+│       └── test # API的单元测试
+├── pkg # 公共模块
+│   ├── auth # JWT认证模块
+│   ├── errors # 统一错误处理模块
+│   ├── logger # 日志模块
+│   └── util # 工具库模块
+├── scripts # 脚本目录
 ```
-
-## 感谢以下框架的开源支持
-
-- [Gin] - [https://gin-gonic.com/](https://gin-gonic.com/)
-- [GORM] - [http://gorm.io/](http://gorm.io/)
-- [Casbin] - [https://casbin.org/](https://casbin.org/)
-- [Dig] - [http://go.uber.org/dig](http://go.uber.org/dig)
 
 ## 互动交流
 
@@ -167,7 +105,7 @@ $ swag init -g ./internal/app/routers/swagger.go -o ./docs/swagger
 
 ## MIT License
 
-    Copyright (c) 2019 Lyric
+    Copyright (c) 2020 Lyric
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin

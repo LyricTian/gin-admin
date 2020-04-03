@@ -415,7 +415,7 @@ info:
     name: LyricTian
   description: RBAC scaffolding based on Gin + Gorm + Casbin + Wire.
   license: {}
-  title: GinAdmin
+  title: Gin Admin
   version: 6.0.0
 paths:
   /api/v1/demos:

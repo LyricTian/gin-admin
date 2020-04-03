@@ -6,7 +6,7 @@
     "swagger": "2.0",
     "info": {
         "description": "RBAC scaffolding based on Gin + Gorm + Casbin + Wire.",
-        "title": "GinAdmin",
+        "title": "Gin Admin",
         "contact": {
             "name": "LyricTian",
             "email": "tiannianshou@gmail.com"
