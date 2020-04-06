@@ -4,11 +4,13 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	loggerhook "github.com/LyricTian/gin-admin/pkg/logger/hook"
 	loggergormhook "github.com/LyricTian/gin-admin/pkg/logger/hook/gorm"
+	loggermongohook "github.com/LyricTian/gin-admin/pkg/logger/hook/mongo"
 )
 
 // InitLogger 初始化日志模块
@@ -41,8 +43,8 @@ func InitLogger() (func(), error) {
 
 	var hook *loggerhook.Hook
 	if c.EnableHook {
-		switch c.Hook {
-		case "gorm":
+		switch {
+		case c.Hook.IsGorm():
 			hc := config.C.LogGormHook
 
 			var dsn string
@@ -64,6 +66,18 @@ func InitLogger() (func(), error) {
 				MaxOpenConns: hc.MaxOpenConns,
 				MaxIdleConns: hc.MaxIdleConns,
 				TableName:    hc.Table,
+			}),
+				loggerhook.SetMaxWorkers(c.HookMaxThread),
+				loggerhook.SetMaxQueues(c.HookMaxBuffer),
+			)
+			logger.AddHook(h)
+			hook = h
+		case c.Hook.IsMongo():
+			h := loggerhook.New(loggermongohook.New(&loggermongohook.Config{
+				URI:        config.C.Mongo.URI,
+				Database:   config.C.Mongo.Database,
+				Timeout:    time.Duration(config.C.Mongo.Timeout) * time.Second,
+				Collection: config.C.LogMongoHook.Collection,
 			}),
 				loggerhook.SetMaxWorkers(c.HookMaxThread),
 				loggerhook.SetMaxQueues(c.HookMaxBuffer),

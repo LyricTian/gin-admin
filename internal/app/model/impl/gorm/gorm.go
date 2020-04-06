@@ -1,11 +1,13 @@
 package gorm
 
 import (
+	"context"
 	"strings"
 	"time"
 
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/entity"
+	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/jinzhu/gorm"
 
 	// gorm存储注入
@@ -25,30 +27,32 @@ type Config struct {
 }
 
 // NewDB 创建DB实例
-func NewDB(c *Config) (*gorm.DB, error) {
+func NewDB(c *Config) (*gorm.DB, func(), error) {
 	db, err := gorm.Open(c.DBType, c.DSN)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if c.Debug {
 		db = db.Debug()
 	}
 
+	cleanFunc := func() {
+		err := db.Close()
+		if err != nil {
+			logger.Errorf(context.Background(), "Gorm db close error: %s", err.Error())
+		}
+	}
+
 	err = db.DB().Ping()
 	if err != nil {
-		return nil, err
+		return nil, cleanFunc, err
 	}
 
 	db.DB().SetMaxIdleConns(c.MaxIdleConns)
 	db.DB().SetMaxOpenConns(c.MaxOpenConns)
 	db.DB().SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
-	return db, nil
-}
-
-// SetTablePrefix 设定表名前缀
-func SetTablePrefix(prefix string) {
-	entity.SetTablePrefix(prefix)
+	return db, cleanFunc, nil
 }
 
 // AutoMigrate 自动映射数据表

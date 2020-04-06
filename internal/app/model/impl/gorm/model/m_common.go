@@ -15,31 +15,8 @@ type TransFunc func(context.Context) error
 
 // ExecTrans 执行事务
 func ExecTrans(ctx context.Context, db *gorm.DB, fn TransFunc) error {
-	if _, ok := icontext.FromTrans(ctx); ok {
-		return fn(ctx)
-	}
-
 	transModel := &Trans{DB: db}
-	trans, err := transModel.Begin(ctx)
-	if err != nil {
-		return err
-	}
-
-	panicked := true
-	defer func() {
-		if panicked || err != nil {
-			_ = transModel.Rollback(ctx, trans)
-		}
-	}()
-
-	ctx = icontext.NewTrans(ctx, trans)
-	err = fn(ctx)
-	if err == nil {
-		err = transModel.Commit(ctx, trans)
-	}
-
-	panicked = false
-	return err
+	return transModel.Exec(ctx, fn)
 }
 
 // ExecTransWithLock 执行事务（加锁）

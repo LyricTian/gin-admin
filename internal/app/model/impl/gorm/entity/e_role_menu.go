@@ -26,7 +26,6 @@ func (a SchemaRoleMenu) ToRoleMenu() *RoleMenu {
 // RoleMenu 角色菜单实体
 type RoleMenu struct {
 	Model
-	RecordID string `gorm:"column:record_id;size:36;index;default:'';not null;"` // 记录ID
 	RoleID   string `gorm:"column:role_id;size:36;index;default:'';not null;"`   // 角色ID
 	MenuID   string `gorm:"column:menu_id;size:36;index;default:'';not null;"`   // 菜单ID
 	ActionID string `gorm:"column:action_id;size:36;index;default:'';not null;"` // 动作ID

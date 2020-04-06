@@ -7,7 +7,9 @@ www = ""
 # 是否启用swagger
 swagger = true
 
-# http配置
+# model存储类型(支持：gorm/mongo)
+storage = "gorm"
+
 [http]
 # http监听地址
 host = "0.0.0.0"
@@ -20,14 +22,12 @@ key_file = ""
 # http优雅关闭等待超时时长(单位秒)
 shutdown_timeout = 30
 
-# 菜单配置
 [menu]
 # 使用启用初始化菜单数据
 enable = true
 # 数据文件(json,也可以启动服务时使用-menu指定)
 data = ""
 
-# casbin配置
 [casbin]
 # 是否启用casbin
 enable = true
@@ -40,7 +40,6 @@ auto_load = true
 # 定期自动加载策略时间间隔（单位秒）
 auto_load_internal = 30
 
-# 日志配置
 [log]
 # 日志级别(1:fatal 2:error,3:warn,4:info,5:debug)
 level = 5
@@ -52,14 +51,13 @@ output = "stdout"
 output_file = "data/gin-admin.log"
 # 是否启用日志钩子
 enable_hook = false
-# 日志钩子(支持：gorm)
+# 日志钩子(支持：gorm/mongo)
 hook = "gorm"
 # 写入钩子的最大工作线程数量
 hook_max_thread = 1
 # 写入钩子的最大缓冲区数量
 hook_max_buffer = 512
 
-# 日志gorm钩子配置
 [log_gorm_hook]
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
 db_type = "sqlite3"
@@ -72,6 +70,10 @@ max_idle_conns = 1
 # 数据库表名
 table = "g_logger"
 
+[log_mongo_hook]
+# 数据库表名
+collection = "g_logger"
+
 # 服务监控(GOPS:https://github.com/google/gops)
 [monitor]
 # 是否启用
@@ -81,7 +83,6 @@ addr = "127.0.0.1:16060"
 # 配置文件目录(为空则使用默认目录)
 config_dir = ""
 
-# root用户
 [root]
 # 登录用户名
 user_name = "root"
@@ -90,7 +91,6 @@ password = "abc-123"
 # 显示的真实姓名
 real_name = "超级管理员"
 
-# 用户认证(jwt)
 [jwt_auth]
 # 是否启用
 enable = true
@@ -109,7 +109,6 @@ redis_db = 10
 # 存储到redis数据库中的键名前缀
 redis_prefix = "auth_"
 
-# 图形验证码
 [captcha]
 # 存储方式(支持：memory/redis)
 store = "memory"
@@ -133,7 +132,6 @@ count = 300
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
 redis_db = 10
 
-# 跨域请求
 [cors]
 # 是否启用
 enable = false
@@ -148,14 +146,12 @@ allow_credentials = true
 # 可以缓存预检请求结果的时间（以秒为单位）
 max_age = 7200
 
-# redis配置
 [redis]
 # 地址
 addr = "127.0.0.1:6379"
 # 密码
 password = ""
 
-# gorm配置
 [gorm]
 # 是否开启调试模式
 debug = true
@@ -172,7 +168,6 @@ table_prefix = "g_"
 # 是否启用自动映射数据库表结构
 enable_auto_migrate = true
 
-# mysql数据库配置
 [mysql]
 # 连接地址
 host = "127.0.0.1"
@@ -187,7 +182,6 @@ db_name = "gin-admin"
 # 连接参数
 parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
 
-# postgres数据库配置
 [postgres]
 # 连接地址
 host = "127.0.0.1"
@@ -202,7 +196,24 @@ db_name = "gin-admin"
 # SSL模式
 ssl_mode = "disable"
 
-# sqlite数据库配置
 [sqlite3]
 # 数据库路径
 path = "data/gin-admin.db"
+
+# mongo需要满足一下条件：
+# 4.0以上版本
+# 安装后时以replication set（复本集）模式启动；
+# replication:
+#   replSetName: rs0
+# rs.initiate()
+# rs.status()
+# storageEngine存储引擎须是wiredTiger (支持文档级别的锁)，4.0以上版本已经默认是这个
+[mongo]
+# 连接地址(mongodb://user:password@localhost:27017/?authSource=admin)
+uri = "mongodb://localhost:27017/?appName=gin-admin"
+# 数据库
+database = "gin-admin"
+# 连接超时(单位秒)
+timeout = 30
+# 集合名前缀
+collection_prefix = "g_"

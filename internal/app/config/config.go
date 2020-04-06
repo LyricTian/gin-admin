@@ -40,27 +40,43 @@ func MustLoad(fpath string) {
 	})
 }
 
+// Storage 存储类型
+type Storage string
+
+// IsGorm 基于gorm存储
+func (s Storage) IsGorm() bool {
+	return s == "gorm"
+}
+
+// IsMongo 基于mongo存储
+func (s Storage) IsMongo() bool {
+	return s == "mongo"
+}
+
 // Config 配置参数
 type Config struct {
-	RunMode     string      `toml:"run_mode"`
-	WWW         string      `toml:"www"`
-	Swagger     bool        `toml:"swagger"`
-	HTTP        HTTP        `toml:"http"`
-	Menu        Menu        `toml:"menu"`
-	Casbin      Casbin      `toml:"casbin"`
-	Log         Log         `toml:"log"`
-	LogGormHook LogGormHook `toml:"log_gorm_hook"`
-	Root        Root        `toml:"root"`
-	JWTAuth     JWTAuth     `toml:"jwt_auth"`
-	Monitor     Monitor     `toml:"monitor"`
-	Captcha     Captcha     `toml:"captcha"`
-	RateLimiter RateLimiter `toml:"rate_limiter"`
-	CORS        CORS        `toml:"cors"`
-	Redis       Redis       `toml:"redis"`
-	Gorm        Gorm        `toml:"gorm"`
-	MySQL       MySQL       `toml:"mysql"`
-	Postgres    Postgres    `toml:"postgres"`
-	Sqlite3     Sqlite3     `toml:"sqlite3"`
+	RunMode      string       `toml:"run_mode"`
+	WWW          string       `toml:"www"`
+	Swagger      bool         `toml:"swagger"`
+	Storage      Storage      `toml:"storage"`
+	HTTP         HTTP         `toml:"http"`
+	Menu         Menu         `toml:"menu"`
+	Casbin       Casbin       `toml:"casbin"`
+	Log          Log          `toml:"log"`
+	LogGormHook  LogGormHook  `toml:"log_gorm_hook"`
+	LogMongoHook LogMongoHook `toml:"log_mongo_hook"`
+	Root         Root         `toml:"root"`
+	JWTAuth      JWTAuth      `toml:"jwt_auth"`
+	Monitor      Monitor      `toml:"monitor"`
+	Captcha      Captcha      `toml:"captcha"`
+	RateLimiter  RateLimiter  `toml:"rate_limiter"`
+	CORS         CORS         `toml:"cors"`
+	Redis        Redis        `toml:"redis"`
+	Gorm         Gorm         `toml:"gorm"`
+	MySQL        MySQL        `toml:"mysql"`
+	Postgres     Postgres     `toml:"postgres"`
+	Sqlite3      Sqlite3      `toml:"sqlite3"`
+	Mongo        Mongo        `toml:"mongo"`
 }
 
 // IsDebugMode 是否是debug模式
@@ -83,16 +99,29 @@ type Casbin struct {
 	AutoLoadInternal int    `toml:"auto_load_internal"`
 }
 
+// LogHook 日志钩子
+type LogHook string
+
+// IsGorm 是否是gorm钩子
+func (h LogHook) IsGorm() bool {
+	return h == "gorm"
+}
+
+// IsMongo 是否是mongo钩子
+func (h LogHook) IsMongo() bool {
+	return h == "mongo"
+}
+
 // Log 日志配置参数
 type Log struct {
-	Level         int    `toml:"level"`
-	Format        string `toml:"format"`
-	Output        string `toml:"output"`
-	OutputFile    string `toml:"output_file"`
-	EnableHook    bool   `toml:"enable_hook"`
-	Hook          string `toml:"hook"`
-	HookMaxThread int    `toml:"hook_max_thread"`
-	HookMaxBuffer int    `toml:"hook_max_buffer"`
+	Level         int     `toml:"level"`
+	Format        string  `toml:"format"`
+	Output        string  `toml:"output"`
+	OutputFile    string  `toml:"output_file"`
+	EnableHook    bool    `toml:"enable_hook"`
+	Hook          LogHook `toml:"hook"`
+	HookMaxThread int     `toml:"hook_max_thread"`
+	HookMaxBuffer int     `toml:"hook_max_buffer"`
 }
 
 // LogGormHook 日志gorm钩子配置
@@ -102,6 +131,11 @@ type LogGormHook struct {
 	MaxOpenConns int    `toml:"max_open_conns"`
 	MaxIdleConns int    `toml:"max_idle_conns"`
 	Table        string `toml:"table"`
+}
+
+// LogMongoHook 日志mongo钩子配置
+type LogMongoHook struct {
+	Collection string `toml:"collection"`
 }
 
 // Root root用户
@@ -223,4 +257,12 @@ type Sqlite3 struct {
 // DSN 数据库连接串
 func (a Sqlite3) DSN() string {
 	return a.Path
+}
+
+// Mongo mongo配置参数
+type Mongo struct {
+	URI              string `toml:"uri"`
+	Database         string `toml:"database"`
+	Timeout          int    `toml:"timeout"`
+	CollectionPrefix string `toml:"collection_prefix"`
 }

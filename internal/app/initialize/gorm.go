@@ -13,15 +13,11 @@ import (
 // InitGormDB 初始化gorm存储
 func InitGormDB() (*gorm.DB, func(), error) {
 	cfg := config.C.Gorm
-	db, err := NewGormDB()
+	db, cleanFunc, err := NewGormDB()
 	if err != nil {
-		return nil, nil, err
+		return nil, cleanFunc, err
 	}
 
-	cleanFunc := func() {
-		db.Close()
-	}
-	igorm.SetTablePrefix(cfg.TablePrefix)
 	if cfg.EnableAutoMigrate {
 		err = igorm.AutoMigrate(db)
 		if err != nil {
@@ -33,9 +29,8 @@ func InitGormDB() (*gorm.DB, func(), error) {
 }
 
 // NewGormDB 创建DB实例
-func NewGormDB() (*gorm.DB, error) {
+func NewGormDB() (*gorm.DB, func(), error) {
 	cfg := config.C
-
 	var dsn string
 	switch cfg.Gorm.DBType {
 	case "mysql":
@@ -46,7 +41,7 @@ func NewGormDB() (*gorm.DB, error) {
 	case "postgres":
 		dsn = cfg.Postgres.DSN()
 	default:
-		return nil, errors.New("unknown db")
+		return nil, nil, errors.New("unknown db")
 	}
 
 	return igorm.NewDB(&igorm.Config{

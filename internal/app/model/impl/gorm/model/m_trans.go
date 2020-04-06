@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 
+	icontext "github.com/LyricTian/gin-admin/internal/app/context"
 	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/google/wire"
@@ -19,38 +20,16 @@ type Trans struct {
 	DB *gorm.DB
 }
 
-// Begin 开启事务
-func (a *Trans) Begin(ctx context.Context) (interface{}, error) {
-	result := a.DB.Begin()
-	if err := result.Error; err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return result, nil
-}
-
-// Commit 提交事务
-func (a *Trans) Commit(ctx context.Context, trans interface{}) error {
-	db, ok := trans.(*gorm.DB)
-	if !ok {
-		return errors.New("unknow trans")
+// Exec 执行事务
+func (a *Trans) Exec(ctx context.Context, fn func(context.Context) error) error {
+	if _, ok := icontext.FromTrans(ctx); ok {
+		return fn(ctx)
 	}
 
-	result := db.Commit()
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
-}
-
-// Rollback 回滚事务
-func (a *Trans) Rollback(ctx context.Context, trans interface{}) error {
-	db, ok := trans.(*gorm.DB)
-	if !ok {
-		return errors.New("unknow trans")
-	}
-
-	result := db.Rollback()
-	if err := result.Error; err != nil {
+	err := a.DB.Transaction(func(db *gorm.DB) error {
+		return fn(icontext.NewTrans(ctx, db))
+	})
+	if err != nil {
 		return errors.WithStack(err)
 	}
 	return nil

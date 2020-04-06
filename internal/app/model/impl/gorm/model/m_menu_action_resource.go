@@ -107,7 +107,7 @@ func (a *MenuActionResource) Delete(ctx context.Context, recordID string) error 
 
 // DeleteByActionID 根据动作ID删除数据
 func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN(?)", actionID).Delete(entity.MenuAction{})
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id =?", actionID).Delete(entity.MenuAction{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

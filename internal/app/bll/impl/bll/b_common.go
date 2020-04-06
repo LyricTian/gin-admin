@@ -31,29 +31,7 @@ type TransFunc func(context.Context) error
 
 // ExecTrans 执行事务
 func ExecTrans(ctx context.Context, transModel model.ITrans, fn TransFunc) error {
-	if _, ok := icontext.FromTrans(ctx); ok {
-		return fn(ctx)
-	}
-
-	trans, err := transModel.Begin(ctx)
-	if err != nil {
-		return err
-	}
-
-	panicked := true
-	defer func() {
-		if panicked || err != nil {
-			_ = transModel.Rollback(ctx, trans)
-		}
-	}()
-
-	err = fn(icontext.NewTrans(ctx, trans))
-	if err == nil {
-		err = transModel.Commit(ctx, trans)
-	}
-
-	panicked = false
-	return err
+	return transModel.Exec(ctx, fn)
 }
 
 // ExecTransWithLock 执行事务（加锁）

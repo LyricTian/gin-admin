@@ -6,6 +6,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/internal/app/bll"
 	"github.com/LyricTian/gin-admin/internal/app/config"
+	"github.com/LyricTian/gin-admin/internal/app/model"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/google/wire"
@@ -16,8 +17,8 @@ var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
 
 // Menu 菜单数据
 type Menu struct {
-	MenuBll  bll.IMenu
-	TransBll bll.ITrans
+	TransModel model.ITrans
+	MenuBll    bll.IMenu
 }
 
 // Load 加载菜单数据
@@ -60,7 +61,7 @@ func (a *Menu) readData(name string) (schema.MenuTrees, error) {
 }
 
 func (a *Menu) createMenus(ctx context.Context, parentID string, list schema.MenuTrees) error {
-	return a.TransBll.Exec(ctx, func(ctx context.Context) error {
+	return a.TransModel.Exec(ctx, func(ctx context.Context) error {
 		for _, item := range list {
 			sitem := schema.Menu{
 				Name:       item.Name,

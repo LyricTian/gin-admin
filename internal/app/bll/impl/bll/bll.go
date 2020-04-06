@@ -8,6 +8,5 @@ var BllSet = wire.NewSet(
 	LoginSet,
 	MenuSet,
 	RoleSet,
-	TransSet,
 	UserSet,
 )

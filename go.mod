@@ -28,6 +28,7 @@ require (
 	github.com/swaggo/swag v1.6.5
 	github.com/tidwall/buntdb v1.1.2
 	github.com/urfave/cli/v2 v2.2.0
+	go.mongodb.org/mongo-driver v1.3.1
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20191030062658-86caa796c7ab // indirect
 	gopkg.in/yaml.v2 v2.2.8
