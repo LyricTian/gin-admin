@@ -284,7 +284,3 @@ func BuildMongoInjector() (*Injector, func(), error) {
 		cleanup()
 	}, nil
 }
-
-// wire.go:
-
-var buildContainer = []interface{}{}

@@ -14,8 +14,6 @@ import (
 	"github.com/google/wire"
 )
 
-var buildContainer = []interface{}{}
-
 //  BuildGormInjector 生成基于gorm实现的存储注入器
 func BuildGormInjector() (*Injector, func(), error) {
 	wire.Build(
