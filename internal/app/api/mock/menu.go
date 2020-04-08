@@ -1,6 +1,9 @@
 package mock
 
-import "github.com/google/wire"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
+)
 
 // MenuSet 注入Menu
 var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
@@ -22,7 +25,7 @@ type Menu struct{}
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus [get]
-func (a *Menu) Query() {
+func (a *Menu) Query(c *gin.Context) {
 }
 
 // QueryTree 查询菜单树
@@ -35,7 +38,7 @@ func (a *Menu) Query() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus.tree [get]
-func (a *Menu) QueryTree() {
+func (a *Menu) QueryTree(c *gin.Context) {
 }
 
 // Get 查询指定数据
@@ -48,7 +51,7 @@ func (a *Menu) QueryTree() {
 // @Failure 404 {object} schema.ErrorResult "{error:{code:0,message:资源不存在}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus/{id} [get]
-func (a *Menu) Get() {
+func (a *Menu) Get(c *gin.Context) {
 }
 
 // Create 创建数据
@@ -61,7 +64,7 @@ func (a *Menu) Get() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus [post]
-func (a *Menu) Create() {
+func (a *Menu) Create(c *gin.Context) {
 }
 
 // Update 更新数据
@@ -75,7 +78,7 @@ func (a *Menu) Create() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus/{id} [put]
-func (a *Menu) Update() {
+func (a *Menu) Update(c *gin.Context) {
 }
 
 // Delete 删除数据
@@ -87,7 +90,7 @@ func (a *Menu) Update() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus/{id} [delete]
-func (a *Menu) Delete() {
+func (a *Menu) Delete(c *gin.Context) {
 }
 
 // Enable 启用数据
@@ -99,7 +102,7 @@ func (a *Menu) Delete() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus/{id}/enable [patch]
-func (a *Menu) Enable() {
+func (a *Menu) Enable(c *gin.Context) {
 }
 
 // Disable 禁用数据
@@ -111,5 +114,5 @@ func (a *Menu) Enable() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus/{id}/disable [patch]
-func (a *Menu) Disable() {
+func (a *Menu) Disable(c *gin.Context) {
 }

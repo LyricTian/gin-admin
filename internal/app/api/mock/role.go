@@ -1,6 +1,9 @@
 package mock
 
-import "github.com/google/wire"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
+)
 
 // RoleSet 注入Role
 var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
@@ -21,7 +24,7 @@ type Role struct {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles [get]
-func (a *Role) Query() {
+func (a *Role) Query(c *gin.Context) {
 }
 
 // QuerySelect 查询选择数据
@@ -35,7 +38,7 @@ func (a *Role) Query() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles.select [get]
-func (a *Role) QuerySelect() {
+func (a *Role) QuerySelect(c *gin.Context) {
 }
 
 // Get 查询指定数据
@@ -48,7 +51,7 @@ func (a *Role) QuerySelect() {
 // @Failure 404 {object} schema.ErrorResult "{error:{code:0,message:资源不存在}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles/{id} [get]
-func (a *Role) Get() {
+func (a *Role) Get(c *gin.Context) {
 }
 
 // Create 创建数据
@@ -61,7 +64,7 @@ func (a *Role) Get() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles [post]
-func (a *Role) Create() {
+func (a *Role) Create(c *gin.Context) {
 }
 
 // Update 更新数据
@@ -75,7 +78,7 @@ func (a *Role) Create() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles/{id} [put]
-func (a *Role) Update() {
+func (a *Role) Update(c *gin.Context) {
 }
 
 // Delete 删除数据
@@ -87,7 +90,7 @@ func (a *Role) Update() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles/{id} [delete]
-func (a *Role) Delete() {
+func (a *Role) Delete(c *gin.Context) {
 }
 
 // Enable 启用数据
@@ -99,7 +102,7 @@ func (a *Role) Delete() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles/{id}/enable [patch]
-func (a *Role) Enable() {
+func (a *Role) Enable(c *gin.Context) {
 }
 
 // Disable 禁用数据
@@ -111,5 +114,5 @@ func (a *Role) Enable() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/roles/{id}/disable [patch]
-func (a *Role) Disable() {
+func (a *Role) Disable(c *gin.Context) {
 }

@@ -1,6 +1,9 @@
 package mock
 
-import "github.com/google/wire"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
+)
 
 // DemoSet 注入Demo
 var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"))
@@ -22,7 +25,7 @@ type Demo struct {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos [get]
-func (a *Demo) Query() {
+func (a *Demo) Query(c *gin.Context) {
 }
 
 // Get 查询指定数据
@@ -35,7 +38,7 @@ func (a *Demo) Query() {
 // @Failure 404 {object} schema.ErrorResult "{error:{code:0,message:资源不存在}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id} [get]
-func (a *Demo) Get() {
+func (a *Demo) Get(c *gin.Context) {
 }
 
 // Create 创建数据
@@ -48,7 +51,7 @@ func (a *Demo) Get() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos [post]
-func (a *Demo) Create() {
+func (a *Demo) Create(c *gin.Context) {
 }
 
 // Update 更新数据
@@ -62,7 +65,7 @@ func (a *Demo) Create() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id} [put]
-func (a *Demo) Update() {
+func (a *Demo) Update(c *gin.Context) {
 }
 
 // Delete 删除数据
@@ -74,7 +77,7 @@ func (a *Demo) Update() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id} [delete]
-func (a *Demo) Delete() {
+func (a *Demo) Delete(c *gin.Context) {
 }
 
 // Enable 启用数据
@@ -86,7 +89,7 @@ func (a *Demo) Delete() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id}/enable [patch]
-func (a *Demo) Enable() {
+func (a *Demo) Enable(c *gin.Context) {
 }
 
 // Disable 禁用数据
@@ -98,5 +101,5 @@ func (a *Demo) Enable() {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos/{id}/disable [patch]
-func (a *Demo) Disable() {
+func (a *Demo) Disable(c *gin.Context) {
 }
