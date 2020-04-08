@@ -79,7 +79,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDResult, error) {
-	err := a.checkUserName(ctx, item.UserName)
+	err := a.checkUserName(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -105,14 +105,14 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDRe
 	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
-func (a *User) checkUserName(ctx context.Context, userName string) error {
-	if userName == GetRootUser().UserName {
+func (a *User) checkUserName(ctx context.Context, item schema.User) error {
+	if item.UserName == GetRootUser().UserName {
 		return errors.New400Response("用户名不合法")
 	}
 
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
-		UserName:        userName,
+		UserName:        item.UserName,
 	})
 	if err != nil {
 		return err
@@ -130,7 +130,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	} else if oldItem.UserName != item.UserName {
-		err := a.checkUserName(ctx, item.UserName)
+		err := a.checkUserName(ctx, item)
 		if err != nil {
 			return err
 		}

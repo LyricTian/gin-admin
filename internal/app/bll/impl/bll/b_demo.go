@@ -38,25 +38,9 @@ func (a *Demo) Get(ctx context.Context, recordID string, opts ...schema.DemoQuer
 	return item, nil
 }
 
-func (a *Demo) checkCode(ctx context.Context, code string) error {
-	result, err := a.DemoModel.Query(ctx, schema.DemoQueryParam{
-		PaginationParam: schema.PaginationParam{
-			OnlyCount: true,
-		},
-		Code: code,
-	})
-	if err != nil {
-		return err
-	} else if result.PageResult.Total > 0 {
-		return errors.New400Response("编号已经存在")
-	}
-
-	return nil
-}
-
 // Create 创建数据
 func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.RecordIDResult, error) {
-	err := a.checkCode(ctx, item.Code)
+	err := a.checkCode(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +54,22 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.RecordIDRe
 	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
+func (a *Demo) checkCode(ctx context.Context, item schema.Demo) error {
+	result, err := a.DemoModel.Query(ctx, schema.DemoQueryParam{
+		PaginationParam: schema.PaginationParam{
+			OnlyCount: true,
+		},
+		Code: item.Code,
+	})
+	if err != nil {
+		return err
+	} else if result.PageResult.Total > 0 {
+		return errors.New400Response("编号已经存在")
+	}
+
+	return nil
+}
+
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
 	oldItem, err := a.DemoModel.Get(ctx, recordID)
@@ -78,7 +78,7 @@ func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) er
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	} else if oldItem.Code != item.Code {
-		if err := a.checkCode(ctx, item.Code); err != nil {
+		if err := a.checkCode(ctx, item); err != nil {
 			return err
 		}
 	}

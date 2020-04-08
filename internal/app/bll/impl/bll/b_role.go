@@ -62,7 +62,7 @@ func (a *Role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMe
 
 // Create 创建数据
 func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDResult, error) {
-	err := a.checkName(ctx, item.Name)
+	err := a.checkName(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +85,10 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDRe
 	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
-func (a *Role) checkName(ctx context.Context, name string) error {
+func (a *Role) checkName(ctx context.Context, item schema.Role) error {
 	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
-		Name:            name,
+		Name:            item.Name,
 	})
 	if err != nil {
 		return err
@@ -106,7 +106,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	} else if oldItem.Name != item.Name {
-		err := a.checkName(ctx, item.Name)
+		err := a.checkName(ctx, item)
 		if err != nil {
 			return err
 		}

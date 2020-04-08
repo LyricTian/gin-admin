@@ -112,24 +112,6 @@ func (a Menus) ToTree() MenuTrees {
 	return list.ToTree()
 }
 
-// ToLeafRecordIDs 转换为叶子节点记录ID列表
-func (a Menus) ToLeafRecordIDs() []string {
-	var leafNodeIDs []string
-	tree := a.ToTree()
-	a.fillLeafNodeID(&tree, &leafNodeIDs)
-	return leafNodeIDs
-}
-
-func (a Menus) fillLeafNodeID(tree *MenuTrees, leafNodeIDs *[]string) {
-	for _, node := range *tree {
-		if node.Children == nil || len(*node.Children) == 0 {
-			*leafNodeIDs = append(*leafNodeIDs, node.RecordID)
-			continue
-		}
-		a.fillLeafNodeID(node.Children, leafNodeIDs)
-	}
-}
-
 // FillMenuAction 填充菜单动作列表
 func (a Menus) FillMenuAction(mActions map[string]MenuActions) Menus {
 	for _, item := range a {
@@ -161,13 +143,13 @@ type MenuTree struct {
 type MenuTrees []*MenuTree
 
 // ToTree 转换为树形结构
-func (a MenuTrees) ToTree() []*MenuTree {
+func (a MenuTrees) ToTree() MenuTrees {
 	mi := make(map[string]*MenuTree)
 	for _, item := range a {
 		mi[item.RecordID] = item
 	}
 
-	var list []*MenuTree
+	var list MenuTrees
 	for _, item := range a {
 		if item.ParentID == "" {
 			list = append(list, item)
@@ -175,8 +157,7 @@ func (a MenuTrees) ToTree() []*MenuTree {
 		}
 		if pitem, ok := mi[item.ParentID]; ok {
 			if pitem.Children == nil {
-				var children MenuTrees
-				children = append(children, item)
+				children := MenuTrees{item}
 				pitem.Children = &children
 				continue
 			}
