@@ -1,10 +1,8 @@
 package initialize
 
 import (
-	"errors"
 	"sync"
 
-	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/pkg/auth"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -24,14 +22,7 @@ func InitInjector() (*Injector, func(), error) {
 		err       error
 	)
 	once.Do(func() {
-		switch {
-		case config.C.Storage.IsGorm():
-			I, cleanFunc, err = BuildGormInjector()
-		case config.C.Storage.IsMongo():
-			I, cleanFunc, err = BuildMongoInjector()
-		default:
-			err = errors.New("Unknown storage")
-		}
+		I, cleanFunc, err = BuildInjector()
 	})
 	return I, cleanFunc, err
 }

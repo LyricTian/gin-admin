@@ -40,25 +40,11 @@ func MustLoad(fpath string) {
 	})
 }
 
-// Storage 存储类型
-type Storage string
-
-// IsGorm 基于gorm存储
-func (s Storage) IsGorm() bool {
-	return s == "gorm"
-}
-
-// IsMongo 基于mongo存储
-func (s Storage) IsMongo() bool {
-	return s == "mongo"
-}
-
 // Config 配置参数
 type Config struct {
 	RunMode      string       `toml:"run_mode"`
 	WWW          string       `toml:"www"`
 	Swagger      bool         `toml:"swagger"`
-	Storage      Storage      `toml:"storage"`
 	HTTP         HTTP         `toml:"http"`
 	Menu         Menu         `toml:"menu"`
 	Casbin       Casbin       `toml:"casbin"`

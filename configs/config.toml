@@ -7,9 +7,6 @@ www = ""
 # 是否启用swagger
 swagger = true
 
-# model存储类型(支持：gorm/mongo)
-storage = "gorm"
-
 [http]
 # http监听地址
 host = "0.0.0.0"

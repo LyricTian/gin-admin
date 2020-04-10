@@ -10,14 +10,13 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/api/mock"
 	"github.com/LyricTian/gin-admin/internal/app/bll/impl/bll"
 	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/model"
-	model2 "github.com/LyricTian/gin-admin/internal/app/model/impl/mongo/model"
 	"github.com/LyricTian/gin-admin/internal/app/module/adapter"
 	"github.com/LyricTian/gin-admin/internal/app/router"
 )
 
 // Injectors from wire.go:
 
-func BuildGormInjector() (*Injector, func(), error) {
+func BuildInjector() (*Injector, func(), error) {
 	auther, cleanup, err := InitAuth()
 	if err != nil {
 		return nil, nil, err
@@ -86,140 +85,6 @@ func BuildGormInjector() (*Injector, func(), error) {
 	mockLogin := &mock.Login{}
 	trans := &model.Trans{
 		DB: db,
-	}
-	bllMenu := &bll.Menu{
-		TransModel:              trans,
-		MenuModel:               menu,
-		MenuActionModel:         menuAction,
-		MenuActionResourceModel: menuActionResource,
-	}
-	apiMenu := &api.Menu{
-		MenuBll: bllMenu,
-	}
-	mockMenu := &mock.Menu{}
-	bllRole := &bll.Role{
-		Enforcer:      syncedEnforcer,
-		TransModel:    trans,
-		RoleModel:     role,
-		RoleMenuModel: roleMenu,
-		UserModel:     user,
-	}
-	apiRole := &api.Role{
-		RoleBll: bllRole,
-	}
-	mockRole := &mock.Role{}
-	bllUser := &bll.User{
-		Enforcer:      syncedEnforcer,
-		TransModel:    trans,
-		UserModel:     user,
-		UserRoleModel: userRole,
-		RoleModel:     role,
-	}
-	apiUser := &api.User{
-		UserBll: bllUser,
-	}
-	mockUser := &mock.User{}
-	routerRouter := &router.Router{
-		Auth:           auther,
-		CasbinEnforcer: syncedEnforcer,
-		DemoAPI:        apiDemo,
-		DemoMock:       mockDemo,
-		LoginAPI:       apiLogin,
-		LoginMock:      mockLogin,
-		MenuAPI:        apiMenu,
-		MenuMock:       mockMenu,
-		RoleAPI:        apiRole,
-		RoleMock:       mockRole,
-		UserAPI:        apiUser,
-		UserMock:       mockUser,
-	}
-	engine := InitGinEngine(routerRouter)
-	initializeMenu := &Menu{
-		TransModel: trans,
-		MenuBll:    bllMenu,
-	}
-	injector := &Injector{
-		Engine:         engine,
-		Auth:           auther,
-		CasbinEnforcer: syncedEnforcer,
-		Menu:           initializeMenu,
-	}
-	return injector, func() {
-		cleanup3()
-		cleanup2()
-		cleanup()
-	}, nil
-}
-
-func BuildMongoInjector() (*Injector, func(), error) {
-	auther, cleanup, err := InitAuth()
-	if err != nil {
-		return nil, nil, err
-	}
-	client, cleanup2, err := InitMongo()
-	if err != nil {
-		cleanup()
-		return nil, nil, err
-	}
-	role := &model2.Role{
-		Client: client,
-	}
-	roleMenu := &model2.RoleMenu{
-		Client: client,
-	}
-	menuActionResource := &model2.MenuActionResource{
-		Client: client,
-	}
-	user := &model2.User{
-		Client: client,
-	}
-	userRole := &model2.UserRole{
-		Client: client,
-	}
-	casbinAdapter := &adapter.CasbinAdapter{
-		RoleModel:         role,
-		RoleMenuModel:     roleMenu,
-		MenuResourceModel: menuActionResource,
-		UserModel:         user,
-		UserRoleModel:     userRole,
-	}
-	syncedEnforcer, cleanup3, err := InitCasbin(casbinAdapter)
-	if err != nil {
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	demo := &model2.Demo{
-		Client: client,
-	}
-	bllDemo := &bll.Demo{
-		DemoModel: demo,
-	}
-	apiDemo := &api.Demo{
-		DemoBll: bllDemo,
-	}
-	mockDemo := &mock.Demo{}
-	menu := &model2.Menu{
-		Client: client,
-	}
-	menuAction := &model2.MenuAction{
-		Client: client,
-	}
-	login := &bll.Login{
-		Auth:            auther,
-		UserModel:       user,
-		UserRoleModel:   userRole,
-		RoleModel:       role,
-		RoleMenuModel:   roleMenu,
-		MenuModel:       menu,
-		MenuActionModel: menuAction,
-	}
-	apiLogin := &api.Login{
-		LoginBll: login,
-	}
-	mockLogin := &mock.Login{}
-	trans := &model2.Trans{
-		Client: client,
 	}
 	bllMenu := &bll.Menu{
 		TransModel:              trans,
