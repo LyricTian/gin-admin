@@ -16,7 +16,7 @@ start:
 	go run cmd/${APP}/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
 
 swagger:
-	swag init --generalInfo ./internal/app/swagger/swagger.go --output ./internal/app/swagger
+	swag init --generalInfo ./internal/app/swagger.go --output ./internal/app/swagger
 
 wire:
 	wire gen ./internal/app/initialize
