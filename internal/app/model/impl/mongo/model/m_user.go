@@ -41,11 +41,13 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 	if v := params.UserName; v != "" {
 		filter = append(filter, Filter("user_name", v))
 	}
-	if v := params.LikeUserName; v != "" {
-		filter = append(filter, RegexFilter("user_name", v))
-	}
-	if v := params.LikeRealName; v != "" {
-		filter = append(filter, RegexFilter("real_name", v))
+	if v := params.QueryValue; v != "" {
+		filter = append(filter, Filter("$or", bson.A{
+			OrRegexFilter("user_name", v),
+			OrRegexFilter("real_name", v),
+			OrRegexFilter("phone", v),
+			OrRegexFilter("email", v),
+		}))
 	}
 	if v := params.RoleIDs; len(v) > 0 {
 		result, err := entity.GetUserRoleCollection(ctx, a.Client).Distinct(ctx, "user_id", DefaultFilter(ctx, Filter("role_id", bson.M{"$in": v})))

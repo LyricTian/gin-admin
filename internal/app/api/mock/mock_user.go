@@ -18,8 +18,7 @@ type User struct {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
-// @Param userName query string false "用户名(模糊查询)"
-// @Param realName query string false "真实姓名(模糊查询)"
+// @Param queryValue query string false "查询值"
 // @Param roleIDs query string false "角色ID(多个以英文逗号分隔)"
 // @Param status query int false "状态(1:启用 2:停用)"
 // @Success 200 {array} schema.UserShow "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"

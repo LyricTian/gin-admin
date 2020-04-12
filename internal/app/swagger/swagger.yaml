@@ -23,6 +23,9 @@ definitions:
       status:
         description: 状态(1:启用 2:停用)
         type: integer
+      updated_at:
+        description: 更新时间
+        type: string
     required:
     - code
     - name
@@ -170,7 +173,6 @@ definitions:
         description: 记录ID
         type: string
     required:
-    - action_id
     - method
     - path
     type: object
@@ -411,12 +413,12 @@ definitions:
     type: object
 info:
   contact:
-    email: tiannianshou@gmail.com
-    name: LyricTian
-  description: RBAC scaffolding based on Gin + Gorm + Casbin + Wire.
+    email: nstian@aibee.com
+    name: NSTian
+  description: 提供自动化送标服务、FacePipeline参数配置、在线调参等
   license: {}
-  title: gin-admin
-  version: 6.0.0
+  title: face-studio
+  version: 1.0.0
 paths:
   /api/v1/demos:
     get:
@@ -437,18 +439,10 @@ paths:
         name: pageSize
         required: true
         type: integer
-      - description: 编号(模糊查询)
+      - description: 查询值
         in: query
-        name: likeCode
+        name: queryValue
         type: string
-      - description: 名称(模糊查询)
-        in: query
-        name: likeName
-        type: string
-      - description: 状态(1:启用 2:停用)
-        in: query
-        name: status
-        type: integer
       responses:
         "200":
           description: 查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}
@@ -670,9 +664,9 @@ paths:
         name: pageSize
         required: true
         type: integer
-      - description: 名称(模糊查询)
+      - description: 查询值
         in: query
-        name: likeName
+        name: queryValue
         type: string
       - description: 状态(1:启用 2:禁用)
         in: query
@@ -1115,9 +1109,9 @@ paths:
         name: pageSize
         required: true
         type: integer
-      - description: 角色名称(模糊查询)
+      - description: 查询值
         in: query
-        name: likeName
+        name: queryValue
         type: string
       - description: 状态(1:启用 2:禁用)
         in: query
@@ -1180,9 +1174,9 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 角色名称(模糊查询)
+      - description: 查询值
         in: query
-        name: likeName
+        name: queryValue
         type: string
       - description: 状态(1:启用 2:禁用)
         in: query
@@ -1381,13 +1375,9 @@ paths:
         name: pageSize
         required: true
         type: integer
-      - description: 用户名(模糊查询)
+      - description: 查询值
         in: query
-        name: userName
-        type: string
-      - description: 真实姓名(模糊查询)
-        in: query
-        name: realName
+        name: queryValue
         type: string
       - description: 角色ID(多个以英文逗号分隔)
         in: query

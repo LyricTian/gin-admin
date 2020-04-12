@@ -40,15 +40,16 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	if v := params.Name; v != "" {
 		db = db.Where("name=?", v)
 	}
-	if v := params.LikeName; v != "" {
-		db = db.Where("name LIKE ?", "%"+v+"%")
-	}
 	if v := params.UserID; v != "" {
 		subQuery := entity.GetUserRoleDB(ctx, a.DB).
 			Where("deleted_at is null").
 			Where("user_id=?", v).
 			Select("role_id").SubQuery()
 		db = db.Where("record_id IN ?", subQuery)
+	}
+	if v := params.QueryValue; v != "" {
+		v = "%" + v + "%"
+		db = db.Where("name LIKE ? OR memo LIKE ?", v, v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))

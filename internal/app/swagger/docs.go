@@ -19,8 +19,8 @@ var doc = `{
         "description": "{{.Description}}",
         "title": "{{.Title}}",
         "contact": {
-            "name": "LyricTian",
-            "email": "tiannianshou@gmail.com"
+            "name": "NSTian",
+            "email": "nstian@aibee.com"
         },
         "license": {},
         "version": "{{.Version}}"
@@ -59,20 +59,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "编号(模糊查询)",
-                        "name": "likeCode",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "名称(模糊查询)",
-                        "name": "likeName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "状态(1:启用 2:停用)",
-                        "name": "status",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     }
                 ],
@@ -413,8 +401,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "名称(模糊查询)",
-                        "name": "likeName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1097,8 +1085,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "角色名称(模糊查询)",
-                        "name": "likeName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1197,8 +1185,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "角色名称(模糊查询)",
-                        "name": "likeName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1502,14 +1490,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "用户名(模糊查询)",
-                        "name": "userName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "真实姓名(模糊查询)",
-                        "name": "realName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1868,6 +1850,10 @@ var doc = `{
                 "status": {
                     "description": "状态(1:启用 2:停用)",
                     "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
                 }
             }
         },
@@ -2048,7 +2034,6 @@ var doc = `{
         "schema.MenuActionResource": {
             "type": "object",
             "required": [
-                "action_id",
                 "method",
                 "path"
             ],
@@ -2410,12 +2395,12 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "6.0.0",
+	Version:     "1.0.0",
 	Host:        "",
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
-	Title:       "gin-admin",
-	Description: "RBAC scaffolding based on Gin + Gorm + Casbin + Wire.",
+	Title:       "face-studio",
+	Description: "提供自动化送标服务、FacePipeline参数配置、在线调参等",
 }
 
 type s struct{}

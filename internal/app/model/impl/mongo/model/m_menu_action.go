@@ -45,7 +45,7 @@ func (a *MenuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 		filter = append(filter, Filter("_id", bson.M{"$in": v}))
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("_id", schema.OrderByDESC))
+	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("_id", schema.OrderByASC))
 
 	var list entity.MenuActions
 	pr, err := WrapPageQuery(ctx, c, params.PaginationParam, filter, &list, options.Find().SetSort(ParseOrder(opt.OrderFields)))

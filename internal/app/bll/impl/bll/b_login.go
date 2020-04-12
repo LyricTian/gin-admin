@@ -213,15 +213,25 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 		return nil, errors.ErrNoPerm
 	}
 
-	pmenuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		RecordIDs: menuResult.Data.SplitParentRecordIDs(),
-	})
-	if err != nil {
-		return nil, err
+	mData := menuResult.Data.ToMap()
+	var qRecordIDs []string
+	for _, pid := range menuResult.Data.SplitParentRecordIDs() {
+		if _, ok := mData[pid]; !ok {
+			qRecordIDs = append(qRecordIDs, pid)
+		}
 	}
-	menuResult.Data = append(menuResult.Data, pmenuResult.Data...)
-	sort.Sort(menuResult.Data)
 
+	if len(qRecordIDs) > 0 {
+		pmenuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+			RecordIDs: menuResult.Data.SplitParentRecordIDs(),
+		})
+		if err != nil {
+			return nil, err
+		}
+		menuResult.Data = append(menuResult.Data, pmenuResult.Data...)
+	}
+
+	sort.Sort(menuResult.Data)
 	menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
 		RecordIDs: roleMenuResult.Data.ToActionIDs(),
 	})

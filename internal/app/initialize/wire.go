@@ -7,15 +7,17 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/api"
 	"github.com/LyricTian/gin-admin/internal/app/api/mock"
 	"github.com/LyricTian/gin-admin/internal/app/bll/impl/bll"
+
+	// mongoModel "github.com/LyricTian/gin-admin/internal/app/model/impl/mongo/model"
 	gormModel "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/model"
 	"github.com/LyricTian/gin-admin/internal/app/module/adapter"
 	"github.com/LyricTian/gin-admin/internal/app/router"
 	"github.com/google/wire"
 )
 
-//  BuildInjector 生成注入器
+// BuildInjector 生成注入器
 func BuildInjector() (*Injector, func(), error) {
-	// 默认使用 gorm 存储注入，这里可使用 InitMongo & mongoModel.ModelSet 替换为 mongo 存储
+	// 默认使用gorm存储注入，这里可使用 InitMongoDB & mongoModel.ModelSet 替换为 gorm 存储
 	wire.Build(
 		InitGormDB,
 		gormModel.ModelSet,

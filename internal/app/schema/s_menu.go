@@ -29,7 +29,7 @@ type MenuQueryParam struct {
 	RecordIDs        []string `form:"-"`          // 记录ID列表
 	Name             string   `form:"-"`          // 菜单名称
 	PrefixParentPath string   `form:"-"`          // 父级路径(前缀模糊查询)
-	LikeName         string   `form:"likeName"`   // 菜单名称(模糊查询)
+	QueryValue       string   `form:"queryValue"` // 模糊查询
 	ParentID         *string  `form:"parentID"`   // 父级内码
 	ShowStatus       int      `form:"showStatus"` // 显示状态(1:显示 2:隐藏)
 	Status           int      `form:"status"`     // 状态(1:启用 2:禁用)
@@ -54,7 +54,7 @@ func (a Menus) Len() int {
 }
 
 func (a Menus) Less(i, j int) bool {
-	return a[i].Sequence > a[i].Sequence
+	return a[i].Sequence > a[j].Sequence
 }
 
 func (a Menus) Swap(i, j int) {
@@ -228,10 +228,10 @@ func (a MenuActions) ToMenuIDMap() map[string]MenuActions {
 
 // MenuActionResource 菜单动作关联资源对象
 type MenuActionResource struct {
-	RecordID string `json:"record_id"`                    // 记录ID
-	ActionID string `json:"action_id" binding:"required"` // 菜单动作ID
-	Method   string `json:"method" binding:"required"`    // 资源请求方式(支持正则)
-	Path     string `json:"path" binding:"required"`      // 资源请求路径（支持/:id匹配）
+	RecordID string `json:"record_id"`                 // 记录ID
+	ActionID string `json:"action_id"`                 // 菜单动作ID
+	Method   string `json:"method" binding:"required"` // 资源请求方式(支持正则)
+	Path     string `json:"path" binding:"required"`   // 资源请求路径（支持/:id匹配）
 }
 
 // MenuActionResourceQueryParam 查询条件

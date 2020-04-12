@@ -8,7 +8,6 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/util"
-	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
 )
 
@@ -19,7 +18,6 @@ var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"), wire.Bind(new(bll.IRole),
 
 // Role 角色管理
 type Role struct {
-	Enforcer      *casbin.SyncedEnforcer
 	TransModel    model.ITrans
 	RoleModel     model.IRole
 	RoleMenuModel model.IRoleMenu
@@ -62,7 +60,7 @@ func (a *Role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMe
 
 // Create 创建数据
 func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDResult, error) {
-	err := a.checkName(ctx, item)
+	err := a.checkName(ctx, item.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +83,10 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDRe
 	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
-func (a *Role) checkName(ctx context.Context, item schema.Role) error {
+func (a *Role) checkName(ctx context.Context, name string) error {
 	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
-		Name:            item.Name,
+		Name:            name,
 	})
 	if err != nil {
 		return err
@@ -106,12 +104,15 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	} else if oldItem.Name != item.Name {
-		err := a.checkName(ctx, item)
+		err := a.checkName(ctx, item.Name)
 		if err != nil {
 			return err
 		}
 	}
 
+	item.RecordID = oldItem.RecordID
+	item.Creator = oldItem.Creator
+	item.CreatedAt = oldItem.CreatedAt
 	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		addRoleMenus, delRoleMenus := a.compareRoleMenus(ctx, oldItem.RoleMenus, item.RoleMenus)
 		for _, rmitem := range addRoleMenus {

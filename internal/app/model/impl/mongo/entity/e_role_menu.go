@@ -44,9 +44,9 @@ func (a RoleMenu) CollectionName() string {
 // CreateIndexes 创建索引
 func (a RoleMenu) CreateIndexes(ctx context.Context, cli *mongo.Client) error {
 	return a.Model.CreateIndexes(ctx, cli, a, []mongo.IndexModel{
-		mongo.IndexModel{Keys: bson.M{"role_id": 1}},
-		mongo.IndexModel{Keys: bson.M{"menu_id": 1}},
-		mongo.IndexModel{Keys: bson.M{"action_id": 1}},
+		{Keys: bson.M{"role_id": 1}},
+		{Keys: bson.M{"menu_id": 1}},
+		{Keys: bson.M{"action_id": 1}},
 	})
 }
 

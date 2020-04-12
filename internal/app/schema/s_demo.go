@@ -11,15 +11,14 @@ type Demo struct {
 	Status    int       `json:"status" binding:"required,max=2,min=1"` // 状态(1:启用 2:停用)
 	Creator   string    `json:"creator"`                               // 创建者
 	CreatedAt time.Time `json:"created_at"`                            // 创建时间
+	UpdatedAt time.Time `json:"updated_at"`                            // 更新时间
 }
 
 // DemoQueryParam 查询条件
 type DemoQueryParam struct {
 	PaginationParam
-	Code     string `form:"-"`        // 编号
-	Status   int    `form:"status"`   // 状态(1:启用 2:停用)
-	LikeCode string `form:"likeCode"` // 编号(模糊查询)
-	LikeName string `form:"likeName"` // 名称(模糊查询)
+	Code       string `form:"-"`          // 编号
+	QueryValue string `form:"queryValue"` // 查询值
 }
 
 // DemoQueryOptions 示例对象查询可选参数项

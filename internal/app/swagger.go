@@ -9,10 +9,10 @@ Package app 生成swagger文档
 	swag init --generalInfo ./internal/app/swagger.go --output ./internal/app/swagger */
 package app
 
-// @title gin-admin
-// @version 6.0.0
-// @description RBAC scaffolding based on Gin + Gorm + Casbin + Wire.
+// @title face-studio
+// @version 1.0.0
+// @description 提供自动化送标服务、FacePipeline参数配置、在线调参等
 // @schemes http https
 // @basePath /
-// @contact.name LyricTian
-// @contact.email tiannianshou@gmail.com
+// @contact.name NSTian
+// @contact.email nstian@aibee.com

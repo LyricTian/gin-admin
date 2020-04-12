@@ -121,7 +121,6 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 
 	// 初始化服务运行监控
 	initialize.InitMonitor(ctx)
-
 	// 初始化图形验证码
 	initialize.InitCaptcha()
 

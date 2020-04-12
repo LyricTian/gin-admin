@@ -26,7 +26,17 @@ type Menu struct {
 
 // Query 查询数据
 func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
-	return a.MenuModel.Query(ctx, params, opts...)
+	menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{})
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := a.MenuModel.Query(ctx, params, opts...)
+	if err != nil {
+		return nil, err
+	}
+	result.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap())
+	return result, nil
 }
 
 // Get 查询指定数据
@@ -178,6 +188,10 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 		}
 	}
 
+	item.RecordID = oldItem.RecordID
+	item.Creator = oldItem.Creator
+	item.CreatedAt = oldItem.CreatedAt
+
 	if oldItem.ParentID != item.ParentID {
 		parentPath, err := a.getParentPath(ctx, item.ParentID)
 		if err != nil {
@@ -206,6 +220,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 // 更新动作数据
 func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newItems schema.MenuActions) error {
 	addActions, delActions, updateActions := a.compareActions(ctx, oldItems, newItems)
+
 	err := a.createActions(ctx, menuID, addActions)
 	if err != nil {
 		return err

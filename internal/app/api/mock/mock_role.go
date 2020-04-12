@@ -18,7 +18,7 @@ type Role struct {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
-// @Param likeName query string false "角色名称(模糊查询)"
+// @Param queryValue query string false "查询值"
 // @Param status query int false "状态(1:启用 2:禁用)"
 // @Success 200 {array} schema.Role "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
@@ -31,7 +31,7 @@ func (a *Role) Query(c *gin.Context) {
 // @Tags 角色管理
 // @Summary 查询选择数据
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Param likeName query string false "角色名称(模糊查询)"
+// @Param queryValue query string false "查询值"
 // @Param status query int false "状态(1:启用 2:禁用)"
 // @Success 200 {array} schema.Role "查询结果：{list:角色列表}"
 // @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:未知的查询类型}}"

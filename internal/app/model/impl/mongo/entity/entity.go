@@ -27,9 +27,9 @@ func (Model) CollectionName(name string) string {
 // CreateIndexes 创建索引
 func (Model) CreateIndexes(ctx context.Context, cli *mongo.Client, m collectioner, indexes []mongo.IndexModel) error {
 	models := []mongo.IndexModel{
-		mongo.IndexModel{Keys: bson.M{"created_at": 1}},
-		mongo.IndexModel{Keys: bson.M{"updated_at": 1}},
-		mongo.IndexModel{Keys: bson.M{"deleted_at": 1}},
+		{Keys: bson.M{"created_at": 1}},
+		{Keys: bson.M{"updated_at": 1}},
+		{Keys: bson.M{"deleted_at": 1}},
 	}
 	if len(indexes) > 0 {
 		models = append(models, indexes...)

@@ -46,9 +46,9 @@ func (a Demo) CollectionName() string {
 // CreateIndexes 创建索引
 func (a Demo) CreateIndexes(ctx context.Context, cli *mongo.Client) error {
 	return a.Model.CreateIndexes(ctx, cli, a, []mongo.IndexModel{
-		mongo.IndexModel{Keys: bson.M{"code": 1}},
-		mongo.IndexModel{Keys: bson.M{"name": 1}},
-		mongo.IndexModel{Keys: bson.M{"status": 1}},
+		{Keys: bson.M{"code": 1}},
+		{Keys: bson.M{"name": 1}},
+		{Keys: bson.M{"status": 1}},
 	})
 }
 

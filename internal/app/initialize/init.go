@@ -60,7 +60,7 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 			err = srv.ListenAndServe()
 		}
 		if err != nil && err != http.ErrServerClosed {
-			logger.Errorf(ctx, err.Error())
+			panic(err)
 		}
 	}()
 

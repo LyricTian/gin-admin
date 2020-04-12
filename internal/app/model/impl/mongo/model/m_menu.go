@@ -45,8 +45,11 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	if v := params.Name; v != "" {
 		filter = append(filter, Filter("name", v))
 	}
-	if v := params.LikeName; v != "" {
-		filter = append(filter, RegexFilter("name", v))
+	if v := params.QueryValue; v != "" {
+		filter = append(filter, Filter("$or", bson.A{
+			OrRegexFilter("name", v),
+			OrRegexFilter("memo", v),
+		}))
 	}
 	if v := params.ParentID; v != nil {
 		filter = append(filter, Filter("parent_id", *v))

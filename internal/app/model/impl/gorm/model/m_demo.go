@@ -37,14 +37,9 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 	if v := params.Code; v != "" {
 		db = db.Where("code=?", v)
 	}
-	if v := params.LikeCode; v != "" {
-		db = db.Where("code LIKE ?", "%"+v+"%")
-	}
-	if v := params.LikeName; v != "" {
-		db = db.Where("name LIKE ?", "%"+v+"%")
-	}
-	if v := params.Status; v > 0 {
-		db = db.Where("status=?", v)
+	if v := params.QueryValue; v != "" {
+		v = "%" + v + "%"
+		db = db.Where("code LIKE ? OR name LIKE ? OR memo LIKE ?", v, v, v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))

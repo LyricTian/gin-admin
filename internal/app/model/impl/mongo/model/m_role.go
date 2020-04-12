@@ -52,8 +52,11 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		}
 		filter = append(filter, Filter("_id", bson.M{"$in": result}))
 	}
-	if v := params.LikeName; v != "" {
-		filter = append(filter, RegexFilter("name", v))
+	if v := params.QueryValue; v != "" {
+		filter = append(filter, Filter("$or", bson.A{
+			OrRegexFilter("name", v),
+			OrRegexFilter("memo", v),
+		}))
 	}
 	if v := params.Status; v > 0 {
 		filter = append(filter, Filter("status", v))

@@ -5,14 +5,14 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "RBAC scaffolding based on Gin + Gorm + Casbin + Wire.",
-        "title": "gin-admin",
+        "description": "提供自动化送标服务、FacePipeline参数配置、在线调参等",
+        "title": "face-studio",
         "contact": {
-            "name": "LyricTian",
-            "email": "tiannianshou@gmail.com"
+            "name": "NSTian",
+            "email": "nstian@aibee.com"
         },
         "license": {},
-        "version": "6.0.0"
+        "version": "1.0.0"
     },
     "basePath": "/",
     "paths": {
@@ -47,20 +47,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "编号(模糊查询)",
-                        "name": "likeCode",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "名称(模糊查询)",
-                        "name": "likeName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "状态(1:启用 2:停用)",
-                        "name": "status",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     }
                 ],
@@ -401,8 +389,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "名称(模糊查询)",
-                        "name": "likeName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1085,8 +1073,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "角色名称(模糊查询)",
-                        "name": "likeName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1185,8 +1173,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "角色名称(模糊查询)",
-                        "name": "likeName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1490,14 +1478,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "用户名(模糊查询)",
-                        "name": "userName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "真实姓名(模糊查询)",
-                        "name": "realName",
+                        "description": "查询值",
+                        "name": "queryValue",
                         "in": "query"
                     },
                     {
@@ -1856,6 +1838,10 @@
                 "status": {
                     "description": "状态(1:启用 2:停用)",
                     "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
                 }
             }
         },
@@ -2036,7 +2022,6 @@
         "schema.MenuActionResource": {
             "type": "object",
             "required": [
-                "action_id",
                 "method",
                 "path"
             ],

@@ -18,11 +18,11 @@ type Role struct {
 // RoleQueryParam 查询条件
 type RoleQueryParam struct {
 	PaginationParam
-	RecordIDs []string `form:"-"`        // 记录ID列表
-	Name      string   `form:"-"`        // 角色名称
-	LikeName  string   `form:"likeName"` // 角色名称(模糊查询)
-	UserID    string   `form:"-"`        // 用户ID
-	Status    int      `form:"status"`   // 状态(1:启用 2:禁用)
+	RecordIDs  []string `form:"-"`          // 记录ID列表
+	Name       string   `form:"-"`          // 角色名称
+	QueryValue string   `form:"queryValue"` // 模糊查询
+	UserID     string   `form:"-"`          // 用户ID
+	Status     int      `form:"status"`     // 状态(1:启用 2:禁用)
 }
 
 // RoleQueryOptions 查询可选参数项
@@ -92,7 +92,7 @@ type RoleMenus []*RoleMenu
 func (a RoleMenus) ToMap() map[string]*RoleMenu {
 	m := make(map[string]*RoleMenu)
 	for _, item := range a {
-		m[item.RecordID] = item
+		m[item.MenuID+"-"+item.ActionID] = item
 	}
 	return m
 }

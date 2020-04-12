@@ -48,8 +48,8 @@ func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, 
 
 	return &schema.PaginationResult{
 		Total:    total,
-		Current:  pp.Current,
-		PageSize: pp.PageSize,
+		Current:  pp.GetCurrent(),
+		PageSize: pp.GetPageSize(),
 	}, nil
 }
 

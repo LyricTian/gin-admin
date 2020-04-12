@@ -44,7 +44,7 @@ func (a MenuActionResource) CollectionName() string {
 // CreateIndexes 创建索引
 func (a MenuActionResource) CreateIndexes(ctx context.Context, cli *mongo.Client) error {
 	return a.Model.CreateIndexes(ctx, cli, a, []mongo.IndexModel{
-		mongo.IndexModel{Keys: bson.M{"action_id": 1}},
+		{Keys: bson.M{"action_id": 1}},
 	})
 }
 

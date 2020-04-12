@@ -18,9 +18,7 @@ type Demo struct {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
-// @Param likeCode query string false "编号(模糊查询)"
-// @Param likeName query string false "名称(模糊查询)"
-// @Param status query int false "状态(1:启用 2:停用)"
+// @Param queryValue query string false "查询值"
 // @Success 200 {array} schema.Demo "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"

@@ -27,11 +27,11 @@ func (a SchemaRole) ToRole() *Role {
 // Role 角色实体
 type Role struct {
 	Model    `bson:",inline"`
-	Name     string  `bson:"name"`     // 角色名称
-	Sequence int     `bson:"sequence"` // 排序值
-	Memo     *string `bson:"memo"`     // 备注
-	Status   int     `bson:"status"`   // 状态(1:启用 2:禁用)
-	Creator  string  `bson:"creator"`  // 创建者
+	Name     string `bson:"name"`     // 角色名称
+	Sequence int    `bson:"sequence"` // 排序值
+	Memo     string `bson:"memo"`     // 备注
+	Status   int    `bson:"status"`   // 状态(1:启用 2:禁用)
+	Creator  string `bson:"creator"`  // 创建者
 }
 
 func (a Role) String() string {
@@ -46,9 +46,9 @@ func (a Role) CollectionName() string {
 // CreateIndexes 创建索引
 func (a Role) CreateIndexes(ctx context.Context, cli *mongo.Client) error {
 	return a.Model.CreateIndexes(ctx, cli, a, []mongo.IndexModel{
-		mongo.IndexModel{Keys: bson.M{"name": 1}},
-		mongo.IndexModel{Keys: bson.M{"sequence": -1}},
-		mongo.IndexModel{Keys: bson.M{"status": 1}},
+		{Keys: bson.M{"name": 1}},
+		{Keys: bson.M{"sequence": -1}},
+		{Keys: bson.M{"status": 1}},
 	})
 }
 

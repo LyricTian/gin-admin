@@ -97,7 +97,6 @@ func BuildInjector() (*Injector, func(), error) {
 	}
 	mockMenu := &mock.Menu{}
 	bllRole := &bll.Role{
-		Enforcer:      syncedEnforcer,
 		TransModel:    trans,
 		RoleModel:     role,
 		RoleMenuModel: roleMenu,
@@ -108,7 +107,6 @@ func BuildInjector() (*Injector, func(), error) {
 	}
 	mockRole := &mock.Role{}
 	bllUser := &bll.User{
-		Enforcer:      syncedEnforcer,
 		TransModel:    trans,
 		UserModel:     user,
 		UserRoleModel: userRole,

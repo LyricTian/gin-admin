@@ -29,11 +29,10 @@ func (a *User) CleanSecure() *User {
 // UserQueryParam 查询条件
 type UserQueryParam struct {
 	PaginationParam
-	UserName     string   `form:"userName"`     // 用户名
-	LikeUserName string   `form:"likeUserName"` // 用户名(模糊查询)
-	LikeRealName string   `form:"likeRealName"` // 真实姓名(模糊查询)
-	Status       int      `form:"status"`       // 用户状态(1:启用 2:停用)
-	RoleIDs      []string `form:"-"`            // 角色ID列表
+	UserName   string   `form:"userName"`   // 用户名
+	QueryValue string   `form:"queryValue"` // 模糊查询
+	Status     int      `form:"status"`     // 用户状态(1:启用 2:停用)
+	RoleIDs    []string `form:"-"`          // 角色ID列表
 }
 
 // UserQueryOptions 查询可选参数项
@@ -118,7 +117,7 @@ type UserRoles []*UserRole
 func (a UserRoles) ToMap() map[string]*UserRole {
 	m := make(map[string]*UserRole)
 	for _, item := range a {
-		m[item.RecordID] = item
+		m[item.RoleID] = item
 	}
 	return m
 }

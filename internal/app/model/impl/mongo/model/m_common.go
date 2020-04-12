@@ -43,8 +43,8 @@ func WrapPageQuery(ctx context.Context, c *mongo.Collection, pp schema.Paginatio
 
 	return &schema.PaginationResult{
 		Total:    total,
-		Current:  pp.Current,
-		PageSize: pp.PageSize,
+		Current:  pp.GetCurrent(),
+		PageSize: pp.GetPageSize(),
 	}, nil
 }
 
@@ -150,6 +150,16 @@ func RegexFilter(key, value string) bson.E {
 	return bson.E{
 		Key: key,
 		Value: bson.M{
+			"$regex":   value,
+			"$options": "i",
+		},
+	}
+}
+
+// OrRegexFilter 正则过滤($or)
+func OrRegexFilter(key, value string) bson.M {
+	return bson.M{
+		key: bson.M{
 			"$regex":   value,
 			"$options": "i",
 		},

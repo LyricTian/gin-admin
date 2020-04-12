@@ -39,8 +39,8 @@ func (a UserRole) CollectionName() string {
 // CreateIndexes 创建索引
 func (a UserRole) CreateIndexes(ctx context.Context, cli *mongo.Client) error {
 	return a.Model.CreateIndexes(ctx, cli, a, []mongo.IndexModel{
-		mongo.IndexModel{Keys: bson.M{"user_id": 1}},
-		mongo.IndexModel{Keys: bson.M{"role_id": 1}},
+		{Keys: bson.M{"user_id": 1}},
+		{Keys: bson.M{"role_id": 1}},
 	})
 }
 

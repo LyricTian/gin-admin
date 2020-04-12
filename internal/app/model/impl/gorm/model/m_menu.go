@@ -40,9 +40,6 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	if v := params.Name; v != "" {
 		db = db.Where("name=?", v)
 	}
-	if v := params.LikeName; v != "" {
-		db = db.Where("name LIKE ?", "%"+v+"%")
-	}
 	if v := params.ParentID; v != nil {
 		db = db.Where("parent_id=?", *v)
 	}
@@ -54,6 +51,10 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	}
 	if v := params.Status; v != 0 {
 		db = db.Where("status=?", v)
+	}
+	if v := params.QueryValue; v != "" {
+		v = "%" + v + "%"
+		db = db.Where("name LIKE ? OR memo LIKE ?", v, v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))

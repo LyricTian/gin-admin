@@ -8,7 +8,6 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/util"
-	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
 )
 
@@ -19,7 +18,6 @@ var UserSet = wire.NewSet(wire.Struct(new(User), "*"), wire.Bind(new(bll.IUser),
 
 // User 用户管理
 type User struct {
-	Enforcer      *casbin.SyncedEnforcer
 	TransModel    model.ITrans
 	UserModel     model.IUser
 	UserRoleModel model.IUserRole
@@ -54,7 +52,7 @@ func (a *User) QueryShow(ctx context.Context, params schema.UserQueryParam, opts
 		return nil, err
 	}
 
-	return result.ToShowResult(GetRootUser().UserRoles.ToUserIDMap(), roleResult.Data.ToMap()), nil
+	return result.ToShowResult(userRoleResult.Data.ToUserIDMap(), roleResult.Data.ToMap()), nil
 }
 
 // Get 查询指定数据
@@ -79,7 +77,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 
 // Create 创建数据
 func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDResult, error) {
-	err := a.checkUserName(ctx, item)
+	err := a.checkUserName(ctx, item.UserName)
 	if err != nil {
 		return nil, err
 	}
@@ -105,14 +103,14 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDRe
 	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
-func (a *User) checkUserName(ctx context.Context, item schema.User) error {
-	if item.UserName == GetRootUser().UserName {
+func (a *User) checkUserName(ctx context.Context, userName string) error {
+	if userName == GetRootUser().UserName {
 		return errors.New400Response("用户名不合法")
 	}
 
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
-		UserName:        item.UserName,
+		UserName:        userName,
 	})
 	if err != nil {
 		return err
@@ -130,12 +128,16 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	} else if oldItem.UserName != item.UserName {
-		err := a.checkUserName(ctx, item)
+		err := a.checkUserName(ctx, item.UserName)
 		if err != nil {
 			return err
 		}
 	}
 
+	item.Password = oldItem.Password
+	item.RecordID = oldItem.RecordID
+	item.Creator = oldItem.Creator
+	item.CreatedAt = oldItem.CreatedAt
 	if item.Password != "" {
 		item.Password = util.SHA1HashString(item.Password)
 	}

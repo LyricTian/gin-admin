@@ -17,7 +17,7 @@ type Menu struct{}
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
-// @Param likeName query string false "名称(模糊查询)"
+// @Param queryValue query string false "查询值"
 // @Param status query int false "状态(1:启用 2:禁用)"
 // @Param showStatus query int false "显示状态(1:显示 2:隐藏)"
 // @Param parentID query string false "父级ID"

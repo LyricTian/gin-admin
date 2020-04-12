@@ -41,15 +41,14 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 	if v := params.Code; v != "" {
 		filter = append(filter, Filter("code", v))
 	}
-	if v := params.LikeCode; v != "" {
-		filter = append(filter, RegexFilter("code", v))
+	if v := params.QueryValue; v != "" {
+		filter = append(filter, Filter("$or", bson.A{
+			OrRegexFilter("code", v),
+			OrRegexFilter("name", v),
+			OrRegexFilter("memo", v),
+		}))
 	}
-	if v := params.LikeName; v != "" {
-		filter = append(filter, RegexFilter("name", v))
-	}
-	if v := params.Status; v > 0 {
-		filter = append(filter, Filter("status", v))
-	}
+
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("_id", schema.OrderByDESC))
 
 	var list entity.Demos

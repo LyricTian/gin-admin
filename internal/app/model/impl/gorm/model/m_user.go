@@ -37,12 +37,6 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 	if v := params.UserName; v != "" {
 		db = db.Where("user_name=?", v)
 	}
-	if v := params.LikeUserName; v != "" {
-		db = db.Where("user_name LIKE ?", "%"+v+"%")
-	}
-	if v := params.LikeRealName; v != "" {
-		db = db.Where("real_name LIKE ?", "%"+v+"%")
-	}
 	if v := params.Status; v > 0 {
 		db = db.Where("status=?", v)
 	}
@@ -53,6 +47,10 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 			Where("role_id IN(?)", v).
 			SubQuery()
 		db = db.Where("record_id IN ?", subQuery)
+	}
+	if v := params.QueryValue; v != "" {
+		v = "%" + v + "%"
+		db = db.Where("user_name LIKE ? OR real_name LIKE ? OR phone LIKE ? OR email LIKE ?", v, v, v, v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
