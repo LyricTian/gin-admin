@@ -37,7 +37,7 @@ func StructMapToStruct(s, ts interface{}) error {
 		if sf, ok := ss.FieldOk(field.Name()); ok {
 			err := field.Set2(sf.Value())
 			if err != nil {
-				return err
+				fmt.Printf("[warning] StructMapToStruct set field [%s->%s] error: %s", field.Name(), sf.Name(), err.Error())
 			}
 		}
 		return nil
@@ -50,18 +50,11 @@ func StructMapToStruct(s, ts interface{}) error {
 
 		if field.IsEmbedded() && field.Kind() == reflect.Struct {
 			for _, field := range field.Fields() {
-				err := setValue(field)
-				if err != nil {
-					return err
-				}
+				setValue(field)
 			}
 			continue
 		}
-
-		err := setValue(field)
-		if err != nil {
-			return err
-		}
+		setValue(field)
 	}
 
 	return nil
