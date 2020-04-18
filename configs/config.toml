@@ -1,5 +1,5 @@
 # 运行模式(debug:调试,test:测试,release:正式)
-run_mode = "debug"
+run_mode = "release"
 
 # 静态站点目录(也可以启动服务时使用-www指定)
 www = ""
@@ -88,13 +88,20 @@ password = "abc-123"
 # 显示的真实姓名
 real_name = "超级管理员"
 
+# redis配置信息
+[redis]
+# 地址
+addr = "127.0.0.1:6379"
+# 密码
+password = ""
+
 [jwt_auth]
 # 是否启用
 enable = true
 # 签名方式(支持：HS512/HS384/HS512)
 signing_method = "HS512"
 # 签名key
-signing_key = "GINADMIN"
+signing_key = "gin-admin"
 # 过期时间（单位秒）
 expired = 7200
 # 存储(支持：file/redis)
@@ -112,9 +119,9 @@ store = "memory"
 # 数字长度
 length = 4
 # 图片宽度
-width = 300
+width = 400
 # 图片高度
-height = 120
+height = 160
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
 redis_db = 10
 # 存储到redis数据库中的键名前缀
@@ -142,12 +149,6 @@ allow_headers = []
 allow_credentials = true
 # 可以缓存预检请求结果的时间（以秒为单位）
 max_age = 7200
-
-[redis]
-# 地址
-addr = "127.0.0.1:6379"
-# 密码
-password = ""
 
 [gorm]
 # 是否开启调试模式
@@ -197,14 +198,14 @@ ssl_mode = "disable"
 # 数据库路径
 path = "data/gin-admin.db"
 
-# mongo需要满足一下条件：
+# mongo需要满足以下条件：
 # 4.0以上版本
-# 安装后时以replication set（复本集）模式启动；
+# 安装后以replication set（复本集）模式启动；
 # replication:
 #   replSetName: rs0
 # rs.initiate()
 # rs.status()
-# storageEngine存储引擎须是wiredTiger (支持文档级别的锁)，4.0以上版本已经默认是这个
+# storageEngine(存储引擎)须是wiredTiger (支持文档级别的锁)，4.0以上版本已经默认是这个
 [mongo]
 # 连接地址(mongodb://user:password@localhost:27017/?authSource=admin)
 uri = "mongodb://localhost:27017/?appName=gin-admin"

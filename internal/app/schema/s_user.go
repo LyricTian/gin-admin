@@ -20,6 +20,10 @@ type User struct {
 	UserRoles UserRoles `json:"user_roles" binding:"required,gt=0"`    // 角色授权
 }
 
+func (a *User) String() string {
+	return util.JSONMarshalToString(a)
+}
+
 // CleanSecure 清理安全数据
 func (a *User) CleanSecure() *User {
 	a.Password = ""

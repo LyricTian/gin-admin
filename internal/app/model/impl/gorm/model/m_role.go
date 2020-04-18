@@ -94,7 +94,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 // Update 更新数据
 func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
-	result := entity.GetRoleDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
+	result := entity.GetRoleDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

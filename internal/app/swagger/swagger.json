@@ -5,14 +5,14 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "提供自动化送标服务、FacePipeline参数配置、在线调参等",
-        "title": "face-studio",
+        "description": "RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.",
+        "title": "gin-admin",
         "contact": {
-            "name": "NSTian",
-            "email": "nstian@aibee.com"
+            "name": "LyricTian",
+            "email": "tiannianshou@gmail.com"
         },
         "license": {},
-        "version": "1.0.0"
+        "version": "6.0.0-beta"
     },
     "basePath": "/",
     "paths": {

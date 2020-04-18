@@ -17,7 +17,7 @@ import (
 
 // 定义上下文中的键
 const (
-	prefix = "face-studio"
+	prefix = "gin-admin"
 	// UserIDKey 存储上下文中的键(用户ID)
 	UserIDKey = prefix + "/user-id"
 	// TraceIDKey 存储上下文中的键(跟踪ID)

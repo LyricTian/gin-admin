@@ -8,7 +8,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-const defaultKey = "GINADMIN"
+const defaultKey = "gin-admin"
 
 var defaultOptions = options{
 	tokenType:     "Bearer",

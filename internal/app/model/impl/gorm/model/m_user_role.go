@@ -84,7 +84,7 @@ func (a *UserRole) Create(ctx context.Context, item schema.UserRole) error {
 // Update 更新数据
 func (a *UserRole) Update(ctx context.Context, recordID string, item schema.UserRole) error {
 	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id").Updates(eitem)
+	result := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

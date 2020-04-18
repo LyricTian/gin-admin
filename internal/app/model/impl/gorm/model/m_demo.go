@@ -85,7 +85,7 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) error {
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
 	eitem := entity.SchemaDemo(item).ToDemo()
-	result := entity.GetDemoDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
+	result := entity.GetDemoDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

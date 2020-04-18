@@ -188,10 +188,6 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 		}
 	}
 
-	item.RecordID = oldItem.RecordID
-	item.Creator = oldItem.Creator
-	item.CreatedAt = oldItem.CreatedAt
-
 	if oldItem.ParentID != item.ParentID {
 		parentPath, err := a.getParentPath(ctx, item.ParentID)
 		if err != nil {
@@ -202,6 +198,9 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 		item.ParentPath = oldItem.ParentPath
 	}
 
+	item.RecordID = oldItem.RecordID
+	item.Creator = oldItem.Creator
+	item.CreatedAt = oldItem.CreatedAt
 	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		err := a.updateActions(ctx, recordID, oldItem.Actions, item.Actions)
 		if err != nil {

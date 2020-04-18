@@ -63,22 +63,6 @@ type Config struct {
 	Postgres     Postgres     `toml:"postgres"`
 	Sqlite3      Sqlite3      `toml:"sqlite3"`
 	Mongo        Mongo        `toml:"mongo"`
-	Cloud        struct {
-		Storage struct {
-			Default                 string `toml:"default"`
-			Retry                   int    `toml:"retry"`
-			BucketCreateIfNotExists bool   `toml:"bucket_create_if_not_exists"`
-			OSS                     struct {
-				Name     string `toml:"name"`
-				Endpoint string `toml:"endpoint"`
-				AK       string `toml:"ak"`
-				SK       string `toml:"sk"`
-			} `toml:"oss"`
-		} `toml:"storage"`
-	} `toml:"cloud"`
-	ModelConfig struct {
-		Bucket string `toml:"bucket"`
-	} `toml:"model_config"`
 }
 
 // IsDebugMode 是否是debug模式

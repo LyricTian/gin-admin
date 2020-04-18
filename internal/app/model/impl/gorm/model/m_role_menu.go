@@ -84,7 +84,7 @@ func (a *RoleMenu) Create(ctx context.Context, item schema.RoleMenu) error {
 // Update 更新数据
 func (a *RoleMenu) Update(ctx context.Context, recordID string, item schema.RoleMenu) error {
 	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
-	result := entity.GetRoleMenuDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id").Updates(eitem)
+	result := entity.GetRoleMenuDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

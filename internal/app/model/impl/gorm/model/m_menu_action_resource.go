@@ -46,7 +46,7 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 		db = db.Where("action_id IN(?)", subQuery)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
+	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByASC))
 	db = db.Order(ParseOrder(opt.OrderFields))
 
 	var list entity.MenuActionResources

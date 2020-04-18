@@ -413,12 +413,12 @@ definitions:
     type: object
 info:
   contact:
-    email: nstian@aibee.com
-    name: NSTian
-  description: 提供自动化送标服务、FacePipeline参数配置、在线调参等
+    email: tiannianshou@gmail.com
+    name: LyricTian
+  description: RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.
   license: {}
-  title: face-studio
-  version: 1.0.0
+  title: gin-admin
+  version: 6.0.0-beta
 paths:
   /api/v1/demos:
     get:

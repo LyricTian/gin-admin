@@ -19,8 +19,8 @@ var doc = `{
         "description": "{{.Description}}",
         "title": "{{.Title}}",
         "contact": {
-            "name": "NSTian",
-            "email": "nstian@aibee.com"
+            "name": "LyricTian",
+            "email": "tiannianshou@gmail.com"
         },
         "license": {},
         "version": "{{.Version}}"
@@ -2395,12 +2395,12 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "1.0.0",
+	Version:     "6.0.0-beta",
 	Host:        "",
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
-	Title:       "face-studio",
-	Description: "提供自动化送标服务、FacePipeline参数配置、在线调参等",
+	Title:       "gin-admin",
+	Description: "RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.",
 }
 
 type s struct{}

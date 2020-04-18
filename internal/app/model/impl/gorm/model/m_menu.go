@@ -100,7 +100,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 // Update 更新数据
 func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
-	result := entity.GetMenuDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id", "creator").Updates(eitem)
+	result := entity.GetMenuDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
