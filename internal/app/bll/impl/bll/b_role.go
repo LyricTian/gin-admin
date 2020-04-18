@@ -8,6 +8,7 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
 )
 
@@ -18,6 +19,7 @@ var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"), wire.Bind(new(bll.IRole),
 
 // Role 角色管理
 type Role struct {
+	Enforcer      *casbin.SyncedEnforcer
 	TransModel    model.ITrans
 	RoleModel     model.IRole
 	RoleMenuModel model.IRoleMenu
@@ -80,6 +82,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDRe
 	if err != nil {
 		return nil, err
 	}
+	LoadCasbinPolicy(ctx, a.Enforcer)
 	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
@@ -113,7 +116,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 	item.RecordID = oldItem.RecordID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
-	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
+	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		addRoleMenus, delRoleMenus := a.compareRoleMenus(ctx, oldItem.RoleMenus, item.RoleMenus)
 		for _, rmitem := range addRoleMenus {
 			rmitem.RecordID = util.NewRecordID()
@@ -133,6 +136,11 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 
 		return a.RoleModel.Update(ctx, recordID, item)
 	})
+	if err != nil {
+		return err
+	}
+	LoadCasbinPolicy(ctx, a.Enforcer)
+	return nil
 }
 
 func (a *Role) compareRoleMenus(ctx context.Context, oldRoleMenus, newRoleMenus schema.RoleMenus) (addList, delList schema.RoleMenus) {
@@ -172,7 +180,7 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 		return errors.New400Response("该角色已被赋予用户，不允许删除")
 	}
 
-	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
+	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		err := a.RoleMenuModel.DeleteByRoleID(ctx, recordID)
 		if err != nil {
 			return err
@@ -180,6 +188,12 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 
 		return a.RoleModel.Delete(ctx, recordID)
 	})
+	if err != nil {
+		return err
+	}
+
+	LoadCasbinPolicy(ctx, a.Enforcer)
+	return nil
 }
 
 // UpdateStatus 更新状态
@@ -191,5 +205,10 @@ func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) er
 		return errors.ErrNotFound
 	}
 
-	return a.RoleModel.UpdateStatus(ctx, recordID, status)
+	err = a.RoleModel.UpdateStatus(ctx, recordID, status)
+	if err != nil {
+		return err
+	}
+	LoadCasbinPolicy(ctx, a.Enforcer)
+	return nil
 }

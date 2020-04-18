@@ -37,7 +37,7 @@ func StructMapToStruct(s, ts interface{}) error {
 		if sf, ok := ss.FieldOk(field.Name()); ok {
 			err := field.Set2(sf.Value())
 			if err != nil {
-				fmt.Printf("[warning] StructMapToStruct set field [%s->%s] error: %s", field.Name(), sf.Name(), err.Error())
+				fmt.Printf("[warning] StructMapToStruct set field [%s->%s]: %s", field.Name(), sf.Name(), err.Error())
 			}
 		}
 		return nil

@@ -8,6 +8,7 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
 )
 
@@ -18,6 +19,7 @@ var UserSet = wire.NewSet(wire.Struct(new(User), "*"), wire.Bind(new(bll.IUser),
 
 // User 用户管理
 type User struct {
+	Enforcer      *casbin.SyncedEnforcer
 	TransModel    model.ITrans
 	UserModel     model.IUser
 	UserRoleModel model.IUserRole
@@ -100,6 +102,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDRe
 		return nil, err
 	}
 
+	LoadCasbinPolicy(ctx, a.Enforcer)
 	return schema.NewRecordIDResult(item.RecordID), nil
 }
 
@@ -142,7 +145,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 		item.Password = util.SHA1HashString(item.Password)
 	}
 
-	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
+	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		addUserRoles, delUserRoles := a.compareUserRoles(ctx, oldItem.UserRoles, item.UserRoles)
 		for _, rmitem := range addUserRoles {
 			rmitem.RecordID = util.NewRecordID()
@@ -162,6 +165,12 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 
 		return a.UserModel.Update(ctx, recordID, item)
 	})
+	if err != nil {
+		return err
+	}
+
+	LoadCasbinPolicy(ctx, a.Enforcer)
+	return nil
 }
 
 func (a *User) compareUserRoles(ctx context.Context, oldUserRoles, newUserRoles schema.UserRoles) (addList, delList schema.UserRoles) {
@@ -191,7 +200,7 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 		return errors.ErrNotFound
 	}
 
-	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
+	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		err := a.UserRoleModel.DeleteByUserID(ctx, recordID)
 		if err != nil {
 			return err
@@ -199,6 +208,12 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 
 		return a.UserModel.Delete(ctx, recordID)
 	})
+	if err != nil {
+		return err
+	}
+
+	LoadCasbinPolicy(ctx, a.Enforcer)
+	return nil
 }
 
 // UpdateStatus 更新状态
@@ -211,5 +226,11 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	}
 	oldItem.Status = status
 
-	return a.UserModel.UpdateStatus(ctx, recordID, status)
+	err = a.UserModel.UpdateStatus(ctx, recordID, status)
+	if err != nil {
+		return err
+	}
+
+	LoadCasbinPolicy(ctx, a.Enforcer)
+	return nil
 }

@@ -125,7 +125,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	initialize.InitCaptcha()
 
 	// 初始化依赖注入器
-	injector, injectorCleanFunc, err := initialize.InitInjector()
+	injector, injectorCleanFunc, err := initialize.BuildInjector()
 	if err != nil {
 		return nil, err
 	}

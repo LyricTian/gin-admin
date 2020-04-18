@@ -7,12 +7,13 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/api"
 	"github.com/LyricTian/gin-admin/internal/app/api/mock"
 	"github.com/LyricTian/gin-admin/internal/app/bll/impl/bll"
-
-	// mongoModel "github.com/LyricTian/gin-admin/internal/app/model/impl/mongo/model"
-	gormModel "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/model"
+	"github.com/LyricTian/gin-admin/internal/app/initialize/data"
 	"github.com/LyricTian/gin-admin/internal/app/module/adapter"
 	"github.com/LyricTian/gin-admin/internal/app/router"
 	"github.com/google/wire"
+
+	// mongoModel "github.com/LyricTian/gin-admin/internal/app/model/impl/mongo/model"
+	gormModel "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/model"
 )
 
 // BuildInjector 生成注入器
@@ -21,15 +22,17 @@ func BuildInjector() (*Injector, func(), error) {
 	wire.Build(
 		InitGormDB,
 		gormModel.ModelSet,
+		// InitMongoDB,
+		// mongoModel.ModelSet,
 		InitAuth,
+		InitCasbin,
+		InitGinEngine,
 		bll.BllSet,
 		api.APISet,
 		mock.MockSet,
 		router.RouterSet,
-		InitGinEngine,
 		adapter.CasbinAdapterSet,
-		InitCasbin,
-		MenuSet,
+		data.MenuSet,
 		InjectorSet,
 	)
 	return new(Injector), nil, nil

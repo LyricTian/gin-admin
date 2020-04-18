@@ -34,7 +34,7 @@ func init() {
 	config.C.Gorm.DBType = "sqlite3"
 
 	initialize.InitLogger()
-	injector, _, err := initialize.InitInjector()
+	injector, _, err := initialize.BuildInjector()
 	if err != nil {
 		panic(err)
 	}

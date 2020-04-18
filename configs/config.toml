@@ -33,9 +33,9 @@ debug = false
 # 模型配置文件(也可以启动服务时使用-m指定)
 model = ""
 # 是否启用定期自动加载策略
-auto_load = true
+auto_load = false
 # 定期自动加载策略时间间隔（单位秒）
-auto_load_internal = 30
+auto_load_internal = 60
 
 [log]
 # 日志级别(1:fatal 2:error,3:warn,4:info,5:debug)
