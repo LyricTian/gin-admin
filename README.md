@@ -1,7 +1,7 @@
 <h1 align="center">Gin Admin</h1>
 
 <div align="center">
- 基于 Gin + GORM + Casbin + Wire 实现的RBAC权限管理脚手架，目的是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
+ 基于 Gin + GORM/MONGO + Casbin + Wire 实现的RBAC权限管理脚手架，目的是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
 <br/>
 
 [![ReportCard][reportcard-image]][reportcard-url] [![GoDoc][godoc-image]][godoc-url] [![License][license-image]][license-url]
@@ -9,7 +9,7 @@
 </div>
 
 - [在线演示地址](http://gin-admin.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
-- [Swagger 文档地址](http://gin-admin.tiannianshou.com/swagger/)
+- [Swagger 文档地址](http://gin-admin.tiannianshou.com/swagger/index.html)
 
 ## 特性
 
@@ -22,8 +22,6 @@
 - 基于 `JWT` 的用户认证 -- 基于JWT的黑名单验证机制
 - 基于 `Swaggo` 自动生成 `Swagger` 文档
 - 基于 `net/http/httptest` 标准包实现了 API 的单元测试
-
-<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/v6.0/docs/screenshots/swagger.png" width="800" height="743" />
 
 ## 依赖工具
 
@@ -50,7 +48,30 @@ go get -u github.com/swaggo/swag/cmd/swag
 ```
 go get -v github.com/LyricTian/gin-admin/cmd/gin-admin
 cd $GOPATH/src/github.com/LyricTian/gin-admin
+# 使用AIR工具运行
 air
+# OR 基于Makefile运行
+make start
+# OR 使用go命令运行
+go run cmd/gin-adminn/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
+```
+
+## 生成`swagger`文档
+
+```
+# 基于Makefile
+make swagger
+# OR 使用swag命令
+swag init --generalInfo ./internal/app/swagger.go --output ./internal/app/swagger
+```
+
+## 重新生成依赖注入文件
+
+```
+# 基于Makefile
+make wire
+# OR 使用wire命令
+wire gen ./internal/app/initialize
 ```
 
 > 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/index.html](http://127.0.0.1:10088/swagger/index.html)
@@ -99,13 +120,14 @@ air
 
 ### 与作者对话
 
-> 该项目是利用业余时间进行开发的，开发思路主要是来源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，我非常期待！下面是我的微信二维码：
+> 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通（也可以畅聊技术梦想），我非常期待！下面是我的微信二维码（当然，如果此项目对您提供了帮助也可以请作者喝杯咖啡 (*￣︶￣)，作者不胜感激！！！ ）：
 
-<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/wechat.jpeg" width="256" height="256" />
+![wechat](http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg-thumb256)
+![we-pay](http://store.tiannianshou.com/screenshots/gin-admin/we-pay.png-thumb256)
 
 ### QQ 群：1409099
 
-<img src="https://raw.githubusercontent.com/LyricTian/gin-admin/master/docs/screenshots/qqgroup.jpeg" width="270" height="370" />
+![qqgroup](http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg-thumb256)
 
 ## MIT License
 
