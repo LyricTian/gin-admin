@@ -118,6 +118,10 @@ wire gen ./internal/app/initialize
 ├── scripts # 脚本目录
 ```
 
+## 前端工程
+
+- 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/LyricTian/gin-admin-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
+
 ## 互动交流
 
 ### 与作者对话
