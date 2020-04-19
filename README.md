@@ -8,8 +8,8 @@
 
 </div>
 
-- [在线演示地址](http://gin-admin.tiannianshou.com) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
-- [Swagger 文档地址](http://gin-admin.tiannianshou.com/swagger/index.html)
+- [在线演示地址](http://139.129.88.71:10088) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
+- [Swagger 文档地址](http://139.129.88.71:10088/swagger/index.html)
 
 ## 特性
 
@@ -45,6 +45,8 @@ go get -u github.com/swaggo/swag/cmd/swag
 
 ## 快速开始
 
+> 也可以使用国内源：https://gitee.com/lyric/gin-admin
+
 ```
 go get -v github.com/LyricTian/gin-admin/cmd/gin-admin
 cd $GOPATH/src/github.com/LyricTian/gin-admin
@@ -53,8 +55,10 @@ air
 # OR 基于Makefile运行
 make start
 # OR 使用go命令运行
-go run cmd/gin-adminn/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
+go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
 ```
+
+> 启动成功之后，可在浏览器中输入地址进行访问：[http://127.0.0.1:10088/swagger/index.html](http://127.0.0.1:10088/swagger/index.html)
 
 ## 生成`swagger`文档
 
@@ -73,8 +77,6 @@ make wire
 # OR 使用wire命令
 wire gen ./internal/app/initialize
 ```
-
-> 启动成功之后，可在浏览器中输入地址访问：[http://127.0.0.1:10088/swagger/index.html](http://127.0.0.1:10088/swagger/index.html)
 
 ## 项目结构概览
 
@@ -122,12 +124,14 @@ wire gen ./internal/app/initialize
 
 > 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通（也可以畅聊技术梦想），我非常期待！下面是我的微信二维码（当然，如果此项目对您提供了帮助也可以请作者喝杯咖啡 (*￣︶￣)，作者不胜感激！！！ ）：
 
-![wechat](http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg-thumb256)
-![we-pay](http://store.tiannianshou.com/screenshots/gin-admin/we-pay.png-thumb256)
+<div>
+<img src="http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg" width="256"alt="wechat" />
+<img src="http://store.tiannianshou.com/screenshots/gin-admin/we-pay.png" width="256" alt="we-pay" />
+</div>
 
 ### QQ 群：1409099
 
-![qqgroup](http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg-thumb256)
+<img src="http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg" width="256" alt="qqgroup" />
 
 ## MIT License
 
