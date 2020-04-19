@@ -126,7 +126,7 @@ wire gen ./internal/app/initialize
 
 ### 与作者对话
 
-> 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通（也可以畅聊技术梦想），我非常期待！下面是我的微信二维码（当然，如果此项目对您提供了帮助也可以请作者喝杯咖啡 (*￣︶￣)，作者不胜感激！！！ ）：
+> 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，一起探讨，畅聊技术人生，相互学习，一起进步。我非常期待！下面是我的微信二维码（如果此项目对您提供了帮助也可以请作者喝杯咖啡 (*￣︶￣)，聊表心意，一起星巴克「续杯」~嘿嘿 ）：
 
 <div>
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg" width="256"alt="wechat" />
@@ -136,6 +136,10 @@ wire gen ./internal/app/initialize
 ### QQ 群：1409099
 
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg" width="256" alt="qqgroup" />
+
+## 提供一对一服务
+
+> 另外，作者有6年以上的工作经验，对前后端技术都有些研究。我也非常乐意通过有偿的方式为大家提供一对一专项辅导，包括：gin-admin/golang/react/vue，帮助大家快速掌握和入门！
 
 ## MIT License
 
