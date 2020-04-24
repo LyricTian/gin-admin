@@ -110,6 +110,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	if v := o.MenuFile; v != "" {
 		config.C.Menu.Data = v
 	}
+	config.PrintWithJSON()
 
 	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", config.C.RunMode, o.Version, os.Getpid())
 

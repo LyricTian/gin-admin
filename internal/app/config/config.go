@@ -2,8 +2,11 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"sync"
+
+	"github.com/LyricTian/gin-admin/pkg/util"
 
 	"github.com/koding/multiconfig"
 )
@@ -15,21 +18,23 @@ var (
 )
 
 // MustLoad 加载配置
-func MustLoad(fpath string) {
+func MustLoad(fpaths ...string) {
 	once.Do(func() {
 		loaders := []multiconfig.Loader{
 			&multiconfig.TagLoader{},
 			&multiconfig.EnvironmentLoader{},
 		}
 
-		if strings.HasSuffix(fpath, "toml") {
-			loaders = append(loaders, &multiconfig.TOMLLoader{Path: fpath})
-		}
-		if strings.HasSuffix(fpath, "json") {
-			loaders = append(loaders, &multiconfig.JSONLoader{Path: fpath})
-		}
-		if strings.HasSuffix(fpath, "yaml") {
-			loaders = append(loaders, &multiconfig.YAMLLoader{Path: fpath})
+		for _, fpath := range fpaths {
+			if strings.HasSuffix(fpath, "toml") {
+				loaders = append(loaders, &multiconfig.TOMLLoader{Path: fpath})
+			}
+			if strings.HasSuffix(fpath, "json") {
+				loaders = append(loaders, &multiconfig.JSONLoader{Path: fpath})
+			}
+			if strings.HasSuffix(fpath, "yaml") {
+				loaders = append(loaders, &multiconfig.YAMLLoader{Path: fpath})
+			}
 		}
 
 		m := multiconfig.DefaultLoader{
@@ -40,29 +45,42 @@ func MustLoad(fpath string) {
 	})
 }
 
+// PrintWithJSON 基于JSON格式输出配置
+func PrintWithJSON() {
+	if C.PrintConfig {
+		b, err := util.JSONMarshalIndent(C, "", " ")
+		if err != nil {
+			os.Stdout.WriteString("[CONFIG] JSON marshal error: " + err.Error())
+			return
+		}
+		os.Stdout.WriteString(string(b))
+	}
+}
+
 // Config 配置参数
 type Config struct {
-	RunMode      string       `toml:"run_mode"`
-	WWW          string       `toml:"www"`
-	Swagger      bool         `toml:"swagger"`
-	HTTP         HTTP         `toml:"http"`
-	Menu         Menu         `toml:"menu"`
-	Casbin       Casbin       `toml:"casbin"`
-	Log          Log          `toml:"log"`
-	LogGormHook  LogGormHook  `toml:"log_gorm_hook"`
-	LogMongoHook LogMongoHook `toml:"log_mongo_hook"`
-	Root         Root         `toml:"root"`
-	JWTAuth      JWTAuth      `toml:"jwt_auth"`
-	Monitor      Monitor      `toml:"monitor"`
-	Captcha      Captcha      `toml:"captcha"`
-	RateLimiter  RateLimiter  `toml:"rate_limiter"`
-	CORS         CORS         `toml:"cors"`
-	Redis        Redis        `toml:"redis"`
-	Gorm         Gorm         `toml:"gorm"`
-	MySQL        MySQL        `toml:"mysql"`
-	Postgres     Postgres     `toml:"postgres"`
-	Sqlite3      Sqlite3      `toml:"sqlite3"`
-	Mongo        Mongo        `toml:"mongo"`
+	RunMode      string
+	WWW          string
+	Swagger      bool
+	PrintConfig  bool
+	HTTP         HTTP
+	Menu         Menu
+	Casbin       Casbin
+	Log          Log
+	LogGormHook  LogGormHook
+	LogMongoHook LogMongoHook
+	Root         Root
+	JWTAuth      JWTAuth
+	Monitor      Monitor
+	Captcha      Captcha
+	RateLimiter  RateLimiter
+	CORS         CORS
+	Redis        Redis
+	Gorm         Gorm
+	MySQL        MySQL
+	Postgres     Postgres
+	Sqlite3      Sqlite3
+	Mongo        Mongo
 }
 
 // IsDebugMode 是否是debug模式
@@ -72,17 +90,17 @@ func (c *Config) IsDebugMode() bool {
 
 // Menu 菜单配置参数
 type Menu struct {
-	Enable bool   `toml:"enable"`
-	Data   string `toml:"data"`
+	Enable bool
+	Data   string
 }
 
 // Casbin casbin配置参数
 type Casbin struct {
-	Enable           bool   `toml:"enable"`
-	Debug            bool   `toml:"debug"`
-	Model            string `toml:"model"`
-	AutoLoad         bool   `toml:"auto_load"`
-	AutoLoadInternal int    `toml:"auto_load_internal"`
+	Enable           bool
+	Debug            bool
+	Model            string
+	AutoLoad         bool
+	AutoLoadInternal int
 }
 
 // LogHook 日志钩子
@@ -100,117 +118,117 @@ func (h LogHook) IsMongo() bool {
 
 // Log 日志配置参数
 type Log struct {
-	Level         int     `toml:"level"`
-	Format        string  `toml:"format"`
-	Output        string  `toml:"output"`
-	OutputFile    string  `toml:"output_file"`
-	EnableHook    bool    `toml:"enable_hook"`
-	Hook          LogHook `toml:"hook"`
-	HookMaxThread int     `toml:"hook_max_thread"`
-	HookMaxBuffer int     `toml:"hook_max_buffer"`
+	Level         int
+	Format        string
+	Output        string
+	OutputFile    string
+	EnableHook    bool
+	Hook          LogHook
+	HookMaxThread int
+	HookMaxBuffer int
 }
 
 // LogGormHook 日志gorm钩子配置
 type LogGormHook struct {
-	DBType       string `toml:"db_type"`
-	MaxLifetime  int    `toml:"max_lifetime"`
-	MaxOpenConns int    `toml:"max_open_conns"`
-	MaxIdleConns int    `toml:"max_idle_conns"`
-	Table        string `toml:"table"`
+	DBType       string
+	MaxLifetime  int
+	MaxOpenConns int
+	MaxIdleConns int
+	Table        string
 }
 
 // LogMongoHook 日志mongo钩子配置
 type LogMongoHook struct {
-	Collection string `toml:"collection"`
+	Collection string
 }
 
 // Root root用户
 type Root struct {
-	UserName string `toml:"user_name"`
-	Password string `toml:"password"`
-	RealName string `toml:"real_name"`
+	UserName string
+	Password string
+	RealName string
 }
 
 // JWTAuth 用户认证
 type JWTAuth struct {
-	Enable        bool   `toml:"enable"`
-	SigningMethod string `toml:"signing_method"`
-	SigningKey    string `toml:"signing_key"`
-	Expired       int    `toml:"expired"`
-	Store         string `toml:"store"`
-	FilePath      string `toml:"file_path"`
-	RedisDB       int    `toml:"redis_db"`
-	RedisPrefix   string `toml:"redis_prefix"`
+	Enable        bool
+	SigningMethod string
+	SigningKey    string
+	Expired       int
+	Store         string
+	FilePath      string
+	RedisDB       int
+	RedisPrefix   string
 }
 
 // HTTP http配置参数
 type HTTP struct {
-	Host            string `toml:"host"`
-	Port            int    `toml:"port"`
-	CertFile        string `toml:"cert_file"`
-	KeyFile         string `toml:"key_file"`
-	ShutdownTimeout int    `toml:"shutdown_timeout"`
+	Host            string
+	Port            int
+	CertFile        string
+	KeyFile         string
+	ShutdownTimeout int
 }
 
 // Monitor 监控配置参数
 type Monitor struct {
-	Enable    bool   `toml:"enable"`
-	Addr      string `toml:"addr"`
-	ConfigDir string `toml:"config_dir"`
+	Enable    bool
+	Addr      string
+	ConfigDir string
 }
 
 // Captcha 图形验证码配置参数
 type Captcha struct {
-	Store       string `toml:"store"`
-	Length      int    `toml:"length"`
-	Width       int    `toml:"width"`
-	Height      int    `toml:"height"`
-	RedisDB     int    `toml:"redis_db"`
-	RedisPrefix string `toml:"redis_prefix"`
+	Store       string
+	Length      int
+	Width       int
+	Height      int
+	RedisDB     int
+	RedisPrefix string
 }
 
 // RateLimiter 请求频率限制配置参数
 type RateLimiter struct {
-	Enable  bool  `toml:"enable"`
-	Count   int64 `toml:"count"`
-	RedisDB int   `toml:"redis_db"`
+	Enable  bool
+	Count   int64
+	RedisDB int
 }
 
 // CORS 跨域请求配置参数
 type CORS struct {
-	Enable           bool     `toml:"enable"`
-	AllowOrigins     []string `toml:"allow_origins"`
-	AllowMethods     []string `toml:"allow_methods"`
-	AllowHeaders     []string `toml:"allow_headers"`
-	AllowCredentials bool     `toml:"allow_credentials"`
-	MaxAge           int      `toml:"max_age"`
+	Enable           bool
+	AllowOrigins     []string
+	AllowMethods     []string
+	AllowHeaders     []string
+	AllowCredentials bool
+	MaxAge           int
 }
 
 // Redis redis配置参数
 type Redis struct {
-	Addr     string `toml:"addr"`
-	Password string `toml:"password"`
+	Addr     string
+	Password string
 }
 
 // Gorm gorm配置参数
 type Gorm struct {
-	Debug             bool   `toml:"debug"`
-	DBType            string `toml:"db_type"`
-	MaxLifetime       int    `toml:"max_lifetime"`
-	MaxOpenConns      int    `toml:"max_open_conns"`
-	MaxIdleConns      int    `toml:"max_idle_conns"`
-	TablePrefix       string `toml:"table_prefix"`
-	EnableAutoMigrate bool   `toml:"enable_auto_migrate"`
+	Debug             bool
+	DBType            string
+	MaxLifetime       int
+	MaxOpenConns      int
+	MaxIdleConns      int
+	TablePrefix       string
+	EnableAutoMigrate bool
 }
 
 // MySQL mysql配置参数
 type MySQL struct {
-	Host       string `toml:"host"`
-	Port       int    `toml:"port"`
-	User       string `toml:"user"`
-	Password   string `toml:"password"`
-	DBName     string `toml:"db_name"`
-	Parameters string `toml:"parameters"`
+	Host       string
+	Port       int
+	User       string
+	Password   string
+	DBName     string
+	Parameters string
 }
 
 // DSN 数据库连接串
@@ -221,12 +239,12 @@ func (a MySQL) DSN() string {
 
 // Postgres postgres配置参数
 type Postgres struct {
-	Host     string `toml:"host"`
-	Port     int    `toml:"port"`
-	User     string `toml:"user"`
-	Password string `toml:"password"`
-	DBName   string `toml:"db_name"`
-	SSLMode  string `toml:"ssl_mode"`
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DBName   string
+	SSLMode  string
 }
 
 // DSN 数据库连接串
@@ -237,7 +255,7 @@ func (a Postgres) DSN() string {
 
 // Sqlite3 sqlite3配置参数
 type Sqlite3 struct {
-	Path string `toml:"path"`
+	Path string
 }
 
 // DSN 数据库连接串
@@ -247,8 +265,8 @@ func (a Sqlite3) DSN() string {
 
 // Mongo mongo配置参数
 type Mongo struct {
-	URI              string `toml:"uri"`
-	Database         string `toml:"database"`
-	Timeout          int    `toml:"timeout"`
-	CollectionPrefix string `toml:"collection_prefix"`
+	URI              string
+	Database         string
+	Timeout          int
+	CollectionPrefix string
 }

@@ -1,202 +1,205 @@
 # 运行模式(debug:调试,test:测试,release:正式)
-run_mode = "debug"
+RunMode = "debug"
 
 # 静态站点目录(也可以启动服务时使用-www指定)
-www = ""
+WWW = ""
 
 # 是否启用swagger
-swagger = true
+Swagger = true
 
-[http]
+# 启动时是否打印配置参数
+PrintConfig = true
+
+[HTTP]
 # http监听地址
-host = "0.0.0.0"
+Host = "0.0.0.0"
 # http监听端口
-port = 10088
+Port = 10088
 # 证书路径
-cert_file = ""
+CertFile = ""
 # 证书密钥
-key_file = ""
+KeyFile = ""
 # http优雅关闭等待超时时长(单位秒)
-shutdown_timeout = 30
+ShutdownTimeout = 30
 
-[menu]
+[Menu]
 # 使用启用初始化菜单数据
-enable = true
+Enable = true
 # 数据文件(json,也可以启动服务时使用-menu指定)
-data = ""
+Data = ""
 
-[casbin]
+[Casbin]
 # 是否启用casbin
-enable = true
+Enable = true
 # debug模式
-debug = false
+Debug = false
 # 模型配置文件(也可以启动服务时使用-m指定)
-model = ""
+Model = ""
 # 是否启用定期自动加载策略
-auto_load = false
+AutoLoad = false
 # 定期自动加载策略时间间隔（单位秒）
-auto_load_internal = 60
+AutoLoadInternal = 60
 
-[log]
+[Log]
 # 日志级别(1:fatal 2:error,3:warn,4:info,5:debug)
-level = 5
+Level = 5
 # 日志格式（支持输出格式：text/json）
-format = "text"
+Format = "text"
 # 日志输出(支持：stdout/stderr/file)
-output = "stdout"
+Output = "stdout"
 # 指定日志输出的文件路径
-output_file = "data/gin-admin.log"
+OutputFile = "data/gin-admin.log"
 # 是否启用日志钩子
-enable_hook = false
+EnableHook = false
 # 日志钩子(支持：gorm/mongo)
-hook = "gorm"
+Hook = "gorm"
 # 写入钩子的最大工作线程数量
-hook_max_thread = 1
+HookMaxThread = 1
 # 写入钩子的最大缓冲区数量
-hook_max_buffer = 512
+HookMaxBuffer = 512
 
-[log_gorm_hook]
+[LogGormHook]
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
-db_type = "sqlite3"
+DBType = "sqlite3"
 # 设置连接可以重用的最长时间(单位：秒)
-max_lifetime = 7200
+MaxLifetime = 7200
 # 设置数据库的最大打开连接数
-max_open_conns = 1
+MaxOpenConns = 1
 # 设置空闲连接池中的最大连接数
-max_idle_conns = 1
+MaxIdleConns = 1
 # 数据库表名
-table = "g_logger"
+Table = "g_logger"
 
-[log_mongo_hook]
+[LogMongoHook]
 # 数据库表名
-collection = "g_logger"
+Collection = "g_logger"
 
 # 服务监控(GOPS:https://github.com/google/gops)
-[monitor]
+[Monitor]
 # 是否启用
-enable = false
+Enable = false
 # HTTP的监听地址和端口
-addr = "127.0.0.1:16060"
+Addr = "127.0.0.1:16060"
 # 配置文件目录(为空则使用默认目录)
-config_dir = ""
+ConfigDir = ""
 
-[root]
+[Root]
 # 登录用户名
-user_name = "root"
+UserName = "root"
 # 登录密码
-password = "abc-123"
+Password = "abc-123"
 # 显示的真实姓名
-real_name = "超级管理员"
+RealName = "超级管理员"
 
 # redis配置信息
-[redis]
+[Redis]
 # 地址
-addr = "127.0.0.1:6379"
+Addr = "127.0.0.1:6379"
 # 密码
-password = ""
+Password = ""
 
-[jwt_auth]
+[JWTAuth]
 # 是否启用
-enable = true
+Enable = true
 # 签名方式(支持：HS512/HS384/HS512)
-signing_method = "HS512"
+SigningMethod = "HS512"
 # 签名key
-signing_key = "gin-admin"
+SigningKey = "gin-admin"
 # 过期时间（单位秒）
-expired = 7200
+Expired = 7200
 # 存储(支持：file/redis)
-store = "file"
+Store = "file"
 # 文件路径
-file_path = "data/jwt_auth.db"
+FilePath = "data/jwt_auth.db"
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
-redis_db = 10
+RedisDB = 10
 # 存储到redis数据库中的键名前缀
-redis_prefix = "auth_"
+RedisPrefix = "auth_"
 
-[captcha]
+[Captcha]
 # 存储方式(支持：memory/redis)
-store = "memory"
+Store = "memory"
 # 数字长度
-length = 4
+Length = 4
 # 图片宽度
-width = 400
+Width = 400
 # 图片高度
-height = 160
+Height = 160
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
-redis_db = 10
+RedisDB = 10
 # 存储到redis数据库中的键名前缀
-redis_prefix = "captcha_"
+RedisPrefix = "captcha_"
 
 # 请求频率限制(如果redis可用则使用redis，否则使用内存存储)
-[rate_limiter]
+[RateLimiter]
 # 是否启用
-enable = false
+Enable = false
 # 每分钟每个用户允许的最大请求数量
-count = 300
+Count = 300
 # redis数据库(如果存储方式是redis，则指定存储的数据库)
-redis_db = 10
+RedisDB = 10
 
-[cors]
+[CORS]
 # 是否启用
-enable = false
+Enable = false
 # 允许跨域请求的域名列表(*表示全部允许)
-allow_origins = ["*"]
+AllowOrigins = ["*"]
 # 允许跨域请求的请求方式列表
-allow_methods = ["GET","POST","PUT","DELETE","PATCH"]
+AllowMethods = ["GET","POST","PUT","DELETE","PATCH"]
 # 允许客户端与跨域请求一起使用的非简单标头的列表
-allow_headers = []
+AllowHeaders = []
 # 请求是否可以包含cookie，HTTP身份验证或客户端SSL证书等用户凭据
-allow_credentials = true
+AllowCredentials = true
 # 可以缓存预检请求结果的时间（以秒为单位）
-max_age = 7200
+MaxAge = 7200
 
-[gorm]
+[Gorm]
 # 是否开启调试模式
-debug = true
+Debug = true
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
-db_type = "sqlite3"
+DBType = "sqlite3"
 # 设置连接可以重用的最长时间(单位：秒)
-max_lifetime = 7200
+MaxLifetime = 7200
 # 设置数据库的最大打开连接数
-max_open_conns = 150
+MaxOpenConns = 150
 # 设置空闲连接池中的最大连接数
-max_idle_conns = 50
+MaxIdleConns = 50
 # 数据库表名前缀
-table_prefix = "g_"
+TablePrefix = "g_"
 # 是否启用自动映射数据库表结构
-enable_auto_migrate = true
+EnableAutoMigrate = true
 
-[mysql]
+[MySQL]
 # 连接地址
-host = "127.0.0.1"
+Host = "127.0.0.1"
 # 连接端口
-port= 3306
+Port= 3306
 # 用户名
-user = "root"
+User = "root"
 # 密码
-password = "123456"
+Password = "123456"
 # 数据库
-db_name = "gin-admin"
+DBName = "gin-admin"
 # 连接参数
-parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
+Parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
 
-[postgres]
+[Postgres]
 # 连接地址
-host = "127.0.0.1"
+Host = "127.0.0.1"
 # 连接端口
-port= 5432
+Port= 5432
 # 用户名
-user = "root"
+User = "root"
 # 密码
-password = "123456"
+Password = "123456"
 # 数据库
-db_name = "gin-admin"
+DBName = "gin-admin"
 # SSL模式
-ssl_mode = "disable"
+SSLMode = "disable"
 
-[sqlite3]
+[Sqlite3]
 # 数据库路径
-path = "data/gin-admin.db"
+Path = "data/gin-admin.db"
 
 # mongo需要满足以下条件：
 # 4.0以上版本
@@ -205,13 +208,13 @@ path = "data/gin-admin.db"
 #   replSetName: rs0
 # rs.initiate()
 # rs.status()
-# storageEngine(存储引擎)须是wiredTiger (支持文档级别的锁)，4.0以上版本已经默认是这个
-[mongo]
+# StorageEngine(存储引擎)须是wiredTiger (支持文档级别的锁)，4.0以上版本已经默认支持
+[Mongo]
 # 连接地址(mongodb://user:password@localhost:27017/?authSource=admin)
-uri = "mongodb://localhost:27017/?appName=gin-admin"
+URI = "mongodb://localhost:27017/?appName=gin-admin"
 # 数据库
-database = "gin-admin"
+Database = "gin-admin"
 # 连接超时(单位秒)
-timeout = 30
+Timeout = 30
 # 集合名前缀
-collection_prefix = "g_"
+CollectionPrefix = "g_"
