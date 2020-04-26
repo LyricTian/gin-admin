@@ -13,14 +13,14 @@
 
 ## 特性
 
-- 遵循 `RESTful API` 设计规范
+- 遵循 `RESTful API` 设计规范 & 基于接口的编程规范
 - 基于 `GIN` 框架，提供了丰富的中间件支持（JWTAuth、CORS、RequestLogger、RequestRateLimiter、TraceID、CasbinEnforce、Recover）
-- 基于 `Casbin` 的 RBAC 访问控制模型
+- 基于 `Casbin` 的 RBAC 访问控制模型 -- **权限控制可以细粒度到按钮 & 接口**
 - 基于 `GORM/Mongo` 的数据库存储 -- 存储层抽象了标准的外部业务层调用接口，内部采用封闭式实现（为后续切换数据存储提供了较大的便利）
 - 基于 `WIRE` 的依赖注入 -- 依赖注入本身的作用是解决了各个模块间层级依赖繁琐的初始化过程
 - 基于 `Logrus & Context` 实现了日志输出，通过结合 Context 实现了统一的 TraceID/UserID 等关键字段的输出(同时支持日志钩子写入到`Gorm/Mongo`)
 - 基于 `JWT` 的用户认证 -- 基于JWT的黑名单验证机制
-- 基于 `Swaggo` 自动生成 `Swagger` 文档
+- 基于 `Swaggo` 自动生成 `Swagger` 文档 -- 独立于接口的mock实现
 - 基于 `net/http/httptest` 标准包实现了 API 的单元测试
 
 ## 依赖工具

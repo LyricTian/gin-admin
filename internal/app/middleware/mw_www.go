@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -23,7 +22,7 @@ func WWWMiddleware(root string, skippers ...SkipperFunc) gin.HandlerFunc {
 			fpath = filepath.Join(root, "index.html")
 		}
 
-		http.ServeFile(c.Writer, c.Request, fpath)
+		c.File(fpath)
 		c.Abort()
 	}
 }

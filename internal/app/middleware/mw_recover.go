@@ -25,7 +25,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				stack := stack(3)
-				logger.StartSpan(ginplus.NewContext(c)).WithField("stack", string(stack)).Errorf("[panic]: %v", err)
+				logger.StartSpan(c.Request.Context()).WithField("stack", string(stack)).Errorf("[panic]: %v", err)
 				ginplus.ResError(c, errors.ErrInternalServer)
 			}
 		}()

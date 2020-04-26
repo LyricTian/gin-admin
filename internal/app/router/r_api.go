@@ -5,28 +5,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterAPI 注册/api路由
+// RegisterAPI register api group router
 func (a *Router) RegisterAPI(app *gin.Engine) {
 	g := app.Group("/api")
 
-	// 用户身份授权
 	g.Use(middleware.UserAuthMiddleware(a.Auth,
 		middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
 	))
 
-	// casbin权限校验中间件
 	g.Use(middleware.CasbinMiddleware(a.CasbinEnforcer,
 		middleware.AllowPathPrefixSkipper("/api/v1/pub"),
 	))
 
-	// 请求频率限制中间件
 	g.Use(middleware.RateLimiterMiddleware())
 
 	v1 := g.Group("/v1")
 	{
 		pub := v1.Group("/pub")
 		{
-			// 注册/api/v1/pub/login
 			gLogin := pub.Group("login")
 			{
 				gLogin.GET("captchaid", a.LoginAPI.GetCaptcha)
@@ -35,20 +31,15 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 				gLogin.POST("exit", a.LoginAPI.Logout)
 			}
 
-			// 注册/api/v1/pub/refresh-token
-			pub.POST("/refresh-token", a.LoginAPI.RefreshToken)
-
-			// 注册/api/v1/pub/current
 			gCurrent := pub.Group("current")
 			{
 				gCurrent.PUT("password", a.LoginAPI.UpdatePassword)
 				gCurrent.GET("user", a.LoginAPI.GetUserInfo)
 				gCurrent.GET("menutree", a.LoginAPI.QueryUserMenuTree)
 			}
-
+			pub.POST("/refresh-token", a.LoginAPI.RefreshToken)
 		}
 
-		// 注册/api/v1/demos
 		gDemo := v1.Group("demos")
 		{
 			gDemo.GET("", a.DemoAPI.Query)
@@ -60,7 +51,6 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 			gDemo.PATCH(":id/disable", a.DemoAPI.Disable)
 		}
 
-		// 注册/api/v1/menus
 		gMenu := v1.Group("menus")
 		{
 			gMenu.GET("", a.MenuAPI.Query)
@@ -73,7 +63,6 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 		}
 		v1.GET("/menus.tree", a.MenuAPI.QueryTree)
 
-		// 注册/api/v1/roles
 		gRole := v1.Group("roles")
 		{
 			gRole.GET("", a.RoleAPI.Query)
@@ -86,7 +75,6 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 		}
 		v1.GET("/roles.select", a.RoleAPI.QuerySelect)
 
-		// 注册/api/v1/users
 		gUser := v1.Group("users")
 		{
 			gUser.GET("", a.UserAPI.Query)

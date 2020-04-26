@@ -18,6 +18,7 @@ type Demo struct {
 
 // Query 查询数据
 func (a *Demo) Query(c *gin.Context) {
+	ctx := c.Request.Context()
 	var params schema.DemoQueryParam
 	if err := ginplus.ParseQuery(c, &params); err != nil {
 		ginplus.ResError(c, err)
@@ -25,17 +26,19 @@ func (a *Demo) Query(c *gin.Context) {
 	}
 
 	params.Pagination = true
-	result, err := a.DemoBll.Query(ginplus.NewContext(c), params)
+	result, err := a.DemoBll.Query(ctx, params)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
+
 	ginplus.ResPage(c, result.Data, result.PageResult)
 }
 
 // Get 查询指定数据
 func (a *Demo) Get(c *gin.Context) {
-	item, err := a.DemoBll.Get(ginplus.NewContext(c), c.Param("id"))
+	ctx := c.Request.Context()
+	item, err := a.DemoBll.Get(ctx, c.Param("id"))
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -45,6 +48,7 @@ func (a *Demo) Get(c *gin.Context) {
 
 // Create 创建数据
 func (a *Demo) Create(c *gin.Context) {
+	ctx := c.Request.Context()
 	var item schema.Demo
 	if err := ginplus.ParseJSON(c, &item); err != nil {
 		ginplus.ResError(c, err)
@@ -52,7 +56,7 @@ func (a *Demo) Create(c *gin.Context) {
 	}
 
 	item.Creator = ginplus.GetUserID(c)
-	result, err := a.DemoBll.Create(ginplus.NewContext(c), item)
+	result, err := a.DemoBll.Create(ctx, item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -62,13 +66,14 @@ func (a *Demo) Create(c *gin.Context) {
 
 // Update 更新数据
 func (a *Demo) Update(c *gin.Context) {
+	ctx := c.Request.Context()
 	var item schema.Demo
 	if err := ginplus.ParseJSON(c, &item); err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
 
-	err := a.DemoBll.Update(ginplus.NewContext(c), c.Param("id"), item)
+	err := a.DemoBll.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -78,7 +83,8 @@ func (a *Demo) Update(c *gin.Context) {
 
 // Delete 删除数据
 func (a *Demo) Delete(c *gin.Context) {
-	err := a.DemoBll.Delete(ginplus.NewContext(c), c.Param("id"))
+	ctx := c.Request.Context()
+	err := a.DemoBll.Delete(ctx, c.Param("id"))
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -88,7 +94,8 @@ func (a *Demo) Delete(c *gin.Context) {
 
 // Enable 启用数据
 func (a *Demo) Enable(c *gin.Context) {
-	err := a.DemoBll.UpdateStatus(ginplus.NewContext(c), c.Param("id"), 1)
+	ctx := c.Request.Context()
+	err := a.DemoBll.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -98,7 +105,8 @@ func (a *Demo) Enable(c *gin.Context) {
 
 // Disable 禁用数据
 func (a *Demo) Disable(c *gin.Context) {
-	err := a.DemoBll.UpdateStatus(ginplus.NewContext(c), c.Param("id"), 2)
+	ctx := c.Request.Context()
+	err := a.DemoBll.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return

@@ -62,7 +62,7 @@ func (a *Menu) QueryActions(ctx context.Context, recordID string) (schema.MenuAc
 	result, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
 		MenuID: recordID,
 	}, schema.MenuActionQueryOptions{
-		OrderFields: schema.NewOrderFields([]string{"code"}),
+		OrderFields: schema.NewOrderFieldWithKeys([]string{"code"}),
 	})
 	if err != nil {
 		return nil, err

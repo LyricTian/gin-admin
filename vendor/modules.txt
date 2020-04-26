@@ -5,20 +5,25 @@ github.com/Knetic/govaluate
 # github.com/KyleBanks/depth v1.2.1
 github.com/KyleBanks/depth
 # github.com/LyricTian/captcha v1.1.0
+## explicit
 github.com/LyricTian/captcha
 github.com/LyricTian/captcha/store
 # github.com/LyricTian/queue v1.2.0
+## explicit
 github.com/LyricTian/queue
 # github.com/LyricTian/structs v1.1.1
+## explicit
 github.com/LyricTian/structs
 # github.com/PuerkitoBio/purell v1.1.1
 github.com/PuerkitoBio/purell
 # github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
 github.com/PuerkitoBio/urlesc
 # github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+## explicit
 github.com/alecthomas/template
 github.com/alecthomas/template/parse
 # github.com/casbin/casbin/v2 v2.2.2
+## explicit
 github.com/casbin/casbin/v2
 github.com/casbin/casbin/v2/config
 github.com/casbin/casbin/v2/effect
@@ -35,16 +40,21 @@ github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
+## explicit
 github.com/dgrijalva/jwt-go
 # github.com/fatih/camelcase v1.0.0
+## explicit
 github.com/fatih/camelcase
 # github.com/fatih/structs v1.1.0
+## explicit
 github.com/fatih/structs
 # github.com/gin-contrib/cors v1.3.1
+## explicit
 github.com/gin-contrib/cors
 # github.com/gin-contrib/sse v0.1.0
 github.com/gin-contrib/sse
 # github.com/gin-gonic/gin v1.6.2
+## explicit
 github.com/gin-gonic/gin
 github.com/gin-gonic/gin/binding
 github.com/gin-gonic/gin/internal/bytesconv
@@ -66,6 +76,7 @@ github.com/go-playground/universal-translator
 # github.com/go-playground/validator/v10 v10.2.0
 github.com/go-playground/validator/v10
 # github.com/go-redis/redis v6.15.7+incompatible
+## explicit
 github.com/go-redis/redis
 github.com/go-redis/redis/internal
 github.com/go-redis/redis/internal/consistenthash
@@ -74,6 +85,7 @@ github.com/go-redis/redis/internal/pool
 github.com/go-redis/redis/internal/proto
 github.com/go-redis/redis/internal/util
 # github.com/go-redis/redis_rate v6.5.0+incompatible
+## explicit
 github.com/go-redis/redis_rate
 # github.com/go-sql-driver/mysql v1.4.1
 github.com/go-sql-driver/mysql
@@ -84,14 +96,18 @@ github.com/golang/protobuf/proto
 # github.com/golang/snappy v0.0.1
 github.com/golang/snappy
 # github.com/google/gops v0.3.7
+## explicit
 github.com/google/gops/agent
 github.com/google/gops/internal
 github.com/google/gops/signal
 # github.com/google/uuid v1.1.1
+## explicit
 github.com/google/uuid
 # github.com/google/wire v0.4.0
+## explicit
 github.com/google/wire
 # github.com/jinzhu/gorm v1.9.12
+## explicit
 github.com/jinzhu/gorm
 github.com/jinzhu/gorm/dialects/mysql
 github.com/jinzhu/gorm/dialects/postgres
@@ -99,6 +115,7 @@ github.com/jinzhu/gorm/dialects/sqlite
 # github.com/jinzhu/inflection v1.0.0
 github.com/jinzhu/inflection
 # github.com/json-iterator/go v1.1.9
+## explicit
 github.com/json-iterator/go
 # github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1
 github.com/kardianos/osext
@@ -109,6 +126,7 @@ github.com/klauspost/compress/snappy
 github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/koding/multiconfig v0.0.0-20171124222453-69c27309b2d7
+## explicit
 github.com/koding/multiconfig
 # github.com/konsorten/go-windows-terminal-sequences v1.0.2
 github.com/konsorten/go-windows-terminal-sequences
@@ -132,6 +150,7 @@ github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
 # github.com/pkg/errors v0.9.1
+## explicit
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
@@ -140,18 +159,23 @@ github.com/russross/blackfriday/v2
 # github.com/shurcooL/sanitized_anchor_name v1.0.0
 github.com/shurcooL/sanitized_anchor_name
 # github.com/sirupsen/logrus v1.5.0
+## explicit
 github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.5.1
+## explicit
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/require
 # github.com/swaggo/gin-swagger v1.2.0
+## explicit
 github.com/swaggo/gin-swagger
 github.com/swaggo/gin-swagger/swaggerFiles
 # github.com/swaggo/swag v1.6.5
+## explicit
 github.com/swaggo/swag
 # github.com/tidwall/btree v0.0.0-20191029221954-400434d76274
 github.com/tidwall/btree
 # github.com/tidwall/buntdb v1.1.2
+## explicit
 github.com/tidwall/buntdb
 # github.com/tidwall/gjson v1.3.4
 github.com/tidwall/gjson
@@ -169,12 +193,14 @@ github.com/tidwall/tinyqueue
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
 # github.com/urfave/cli/v2 v2.2.0
+## explicit
 github.com/urfave/cli/v2
 # github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
 github.com/xdg/scram
 # github.com/xdg/stringprep v0.0.0-20180714160509-73f8eece6fdc
 github.com/xdg/stringprep
 # go.mongodb.org/mongo-driver v1.3.1
+## explicit
 go.mongodb.org/mongo-driver/bson
 go.mongodb.org/mongo-driver/bson/bsoncodec
 go.mongodb.org/mongo-driver/bson/bsonoptions
@@ -224,8 +250,10 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
 # golang.org/x/time v0.0.0-20191024005414-555d28b269f0
+## explicit
 golang.org/x/time/rate
 # golang.org/x/tools v0.0.0-20191030062658-86caa796c7ab
+## explicit
 golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/buildutil
 golang.org/x/tools/go/internal/cgo
@@ -233,4 +261,5 @@ golang.org/x/tools/go/loader
 # google.golang.org/appengine v1.4.0
 google.golang.org/appengine/cloudsql
 # gopkg.in/yaml.v2 v2.2.8
+## explicit
 gopkg.in/yaml.v2

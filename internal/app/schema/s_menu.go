@@ -3,6 +3,8 @@ package schema
 import (
 	"strings"
 	"time"
+
+	"github.com/LyricTian/gin-admin/pkg/util"
 )
 
 // Menu 菜单对象
@@ -203,6 +205,9 @@ type MenuActions []*MenuAction
 func (a MenuActions) ToMap() map[string]*MenuAction {
 	m := make(map[string]*MenuAction)
 	for _, item := range a {
+		if item.RecordID == "" {
+			item.RecordID = util.NewRecordID()
+		}
 		m[item.RecordID] = item
 	}
 	return m
@@ -259,6 +264,9 @@ type MenuActionResources []*MenuActionResource
 func (a MenuActionResources) ToMap() map[string]*MenuActionResource {
 	m := make(map[string]*MenuActionResource)
 	for _, item := range a {
+		if item.RecordID == "" {
+			item.RecordID = util.NewRecordID()
+		}
 		m[item.RecordID] = item
 	}
 	return m

@@ -1,12 +1,10 @@
 package ginplus
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strings"
 
-	icontext "github.com/LyricTian/gin-admin/internal/app/context"
 	"github.com/LyricTian/gin-admin/internal/app/schema"
 	"github.com/LyricTian/gin-admin/pkg/errors"
 	"github.com/LyricTian/gin-admin/pkg/logger"
@@ -20,28 +18,9 @@ const (
 	prefix = "gin-admin"
 	// UserIDKey 存储上下文中的键(用户ID)
 	UserIDKey = prefix + "/user-id"
-	// TraceIDKey 存储上下文中的键(跟踪ID)
-	TraceIDKey = prefix + "/trace-id"
 	// ResBodyKey 存储上下文中的键(响应Body数据)
 	ResBodyKey = prefix + "/res-body"
 )
-
-// NewContext 封装上下文入口
-func NewContext(c *gin.Context) context.Context {
-	parent := context.Background()
-
-	if v := GetTraceID(c); v != "" {
-		parent = icontext.NewTraceID(parent, v)
-		parent = logger.NewTraceIDContext(parent, v)
-	}
-
-	if v := GetUserID(c); v != "" {
-		parent = icontext.NewUserID(parent, v)
-		parent = logger.NewUserIDContext(parent, v)
-	}
-
-	return parent
-}
 
 // GetToken 获取用户令牌
 func GetToken(c *gin.Context) string {
@@ -52,11 +31,6 @@ func GetToken(c *gin.Context) string {
 		token = auth[len(prefix):]
 	}
 	return token
-}
-
-// GetTraceID 获取追踪ID
-func GetTraceID(c *gin.Context) string {
-	return c.GetString(TraceIDKey)
 }
 
 // GetUserID 获取用户ID
@@ -130,6 +104,7 @@ func ResJSON(c *gin.Context, status int, v interface{}) {
 
 // ResError 响应错误
 func ResError(c *gin.Context, err error, status ...int) {
+	ctx := c.Request.Context()
 	var res *errors.ResponseError
 	if err != nil {
 		if e, ok := err.(*errors.ResponseError); ok {
@@ -147,9 +122,9 @@ func ResError(c *gin.Context, err error, status ...int) {
 
 	if err := res.ERR; err != nil {
 		if status := res.StatusCode; status >= 400 && status < 500 {
-			logger.StartSpan(NewContext(c)).Warnf(err.Error())
+			logger.StartSpan(ctx).Warnf(err.Error())
 		} else if status >= 500 {
-			span := logger.StartSpan(NewContext(c))
+			span := logger.StartSpan(ctx)
 			span = span.WithField("stack", fmt.Sprintf("%+v", err))
 			span.Errorf(err.Error())
 		}

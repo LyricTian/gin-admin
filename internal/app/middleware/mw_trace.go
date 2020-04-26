@@ -1,7 +1,8 @@
 package middleware
 
 import (
-	"github.com/LyricTian/gin-admin/internal/app/ginplus"
+	icontext "github.com/LyricTian/gin-admin/internal/app/context"
+	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/LyricTian/gin-admin/pkg/util"
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +20,11 @@ func TraceMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 		if traceID == "" {
 			traceID = util.NewTraceID()
 		}
-		c.Set(ginplus.TraceIDKey, traceID)
+
+		ctx := icontext.NewTraceID(c.Request.Context(), traceID)
+		ctx = logger.NewTraceIDContext(ctx, traceID)
+		c.Request = c.Request.WithContext(ctx)
+
 		c.Next()
 	}
 }

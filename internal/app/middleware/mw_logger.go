@@ -22,7 +22,7 @@ func LoggerMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 
 		p := c.Request.URL.Path
 		method := c.Request.Method
-		span := logger.StartSpan(ginplus.NewContext(c),
+		span := logger.StartSpan(c.Request.Context(),
 			logger.SetSpanTitle("访问日志"),
 			logger.SetSpanFuncName(JoinRouter(method, p)))
 

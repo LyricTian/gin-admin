@@ -155,7 +155,7 @@ MaxAge = 7200
 
 [Gorm]
 # 是否开启调试模式
-Debug = true
+Debug = false
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
 DBType = "sqlite3"
 # 设置连接可以重用的最长时间(单位：秒)

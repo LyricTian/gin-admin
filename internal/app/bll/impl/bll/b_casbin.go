@@ -3,6 +3,7 @@ package bll
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/pkg/logger"
 	"github.com/casbin/casbin/v2"
 )
@@ -28,6 +29,10 @@ func init() {
 
 // LoadCasbinPolicy 异步加载casbin权限策略
 func LoadCasbinPolicy(ctx context.Context, e *casbin.SyncedEnforcer) {
+	if !config.C.Casbin.Enable {
+		return
+	}
+
 	if len(chCasbinPolicy) > 0 {
 		logger.Infof(ctx, "The load casbin policy is already in the wait queue")
 		return

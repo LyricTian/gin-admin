@@ -1,6 +1,6 @@
 module github.com/LyricTian/gin-admin
 
-go 1.13
+go 1.14
 
 require (
 	github.com/LyricTian/captcha v1.1.0

@@ -53,7 +53,7 @@ func PrintWithJSON() {
 			os.Stdout.WriteString("[CONFIG] JSON marshal error: " + err.Error())
 			return
 		}
-		os.Stdout.WriteString(string(b))
+		os.Stdout.WriteString(string(b) + "\n")
 	}
 }
 

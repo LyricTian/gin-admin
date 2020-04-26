@@ -141,6 +141,10 @@ func (a *JWTAuth) DestroyToken(ctx context.Context, tokenString string) error {
 
 // ParseUserID 解析用户ID
 func (a *JWTAuth) ParseUserID(ctx context.Context, tokenString string) (string, error) {
+	if tokenString == "" {
+		return "", auth.ErrInvalidToken
+	}
+
 	claims, err := a.parseToken(tokenString)
 	if err != nil {
 		return "", err

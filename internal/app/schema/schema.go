@@ -81,10 +81,10 @@ const (
 	OrderByDESC OrderDirection = 2
 )
 
-// NewOrderFields 创建排序字段(默认升序排序)，可指定不同key的排序规则
+// NewOrderFieldWithKeys 创建排序字段(默认升序排序)，可指定不同key的排序规则
 // keys 需要排序的key
 // directions 排序规则，按照key的索引指定，索引默认从0开始
-func NewOrderFields(keys []string, directions ...map[int]OrderDirection) []*OrderField {
+func NewOrderFieldWithKeys(keys []string, directions ...map[int]OrderDirection) []*OrderField {
 	m := make(map[int]OrderDirection)
 	if len(directions) > 0 {
 		m = directions[0]
@@ -101,6 +101,11 @@ func NewOrderFields(keys []string, directions ...map[int]OrderDirection) []*Orde
 	}
 
 	return fields
+}
+
+// NewOrderFields 创建排序字段列表
+func NewOrderFields(orderFields ...*OrderField) []*OrderField {
+	return orderFields
 }
 
 // NewOrderField 创建排序字段

@@ -21,6 +21,7 @@ type User struct {
 
 // Query 查询数据
 func (a *User) Query(c *gin.Context) {
+	ctx := c.Request.Context()
 	var params schema.UserQueryParam
 	if err := ginplus.ParseQuery(c, &params); err != nil {
 		ginplus.ResError(c, err)
@@ -31,7 +32,7 @@ func (a *User) Query(c *gin.Context) {
 	}
 
 	params.Pagination = true
-	result, err := a.UserBll.QueryShow(ginplus.NewContext(c), params)
+	result, err := a.UserBll.QueryShow(ctx, params)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -41,7 +42,8 @@ func (a *User) Query(c *gin.Context) {
 
 // Get 查询指定数据
 func (a *User) Get(c *gin.Context) {
-	item, err := a.UserBll.Get(ginplus.NewContext(c), c.Param("id"))
+	ctx := c.Request.Context()
+	item, err := a.UserBll.Get(ctx, c.Param("id"))
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -51,6 +53,7 @@ func (a *User) Get(c *gin.Context) {
 
 // Create 创建数据
 func (a *User) Create(c *gin.Context) {
+	ctx := c.Request.Context()
 	var item schema.User
 	if err := ginplus.ParseJSON(c, &item); err != nil {
 		ginplus.ResError(c, err)
@@ -61,7 +64,7 @@ func (a *User) Create(c *gin.Context) {
 	}
 
 	item.Creator = ginplus.GetUserID(c)
-	result, err := a.UserBll.Create(ginplus.NewContext(c), item)
+	result, err := a.UserBll.Create(ctx, item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -71,13 +74,14 @@ func (a *User) Create(c *gin.Context) {
 
 // Update 更新数据
 func (a *User) Update(c *gin.Context) {
+	ctx := c.Request.Context()
 	var item schema.User
 	if err := ginplus.ParseJSON(c, &item); err != nil {
 		ginplus.ResError(c, err)
 		return
 	}
 
-	err := a.UserBll.Update(ginplus.NewContext(c), c.Param("id"), item)
+	err := a.UserBll.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -87,7 +91,8 @@ func (a *User) Update(c *gin.Context) {
 
 // Delete 删除数据
 func (a *User) Delete(c *gin.Context) {
-	err := a.UserBll.Delete(ginplus.NewContext(c), c.Param("id"))
+	ctx := c.Request.Context()
+	err := a.UserBll.Delete(ctx, c.Param("id"))
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -97,7 +102,8 @@ func (a *User) Delete(c *gin.Context) {
 
 // Enable 启用数据
 func (a *User) Enable(c *gin.Context) {
-	err := a.UserBll.UpdateStatus(ginplus.NewContext(c), c.Param("id"), 1)
+	ctx := c.Request.Context()
+	err := a.UserBll.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
@@ -107,7 +113,8 @@ func (a *User) Enable(c *gin.Context) {
 
 // Disable 禁用数据
 func (a *User) Disable(c *gin.Context) {
-	err := a.UserBll.UpdateStatus(ginplus.NewContext(c), c.Param("id"), 2)
+	ctx := c.Request.Context()
+	err := a.UserBll.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {
 		ginplus.ResError(c, err)
 		return
