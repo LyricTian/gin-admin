@@ -3,8 +3,6 @@ package schema
 import (
 	"strings"
 	"time"
-
-	"github.com/LyricTian/gin-admin/pkg/util"
 )
 
 // Menu 菜单对象
@@ -128,17 +126,17 @@ func (a Menus) FillMenuAction(mActions map[string]MenuActions) Menus {
 
 // MenuTree 菜单树
 type MenuTree struct {
-	RecordID   string      `json:"record_id"`          // 记录ID
-	Name       string      `json:"name"`               // 菜单名称
-	Icon       string      `json:"icon"`               // 菜单图标
-	Router     string      `json:"router"`             // 访问路由
-	ParentID   string      `json:"parent_id"`          // 父级ID
-	ParentPath string      `json:"parent_path"`        // 父级路径
-	Sequence   int         `json:"sequence"`           // 排序值
-	ShowStatus int         `json:"show_status"`        // 显示状态(1:显示 2:隐藏)
-	Status     int         `json:"status"`             // 状态(1:启用 2:禁用)
-	Actions    MenuActions `json:"actions"`            // 动作列表
-	Children   *MenuTrees  `json:"children,omitempty"` // 子级树
+	RecordID   string      `yaml:"-" json:"record_id"`                           // 记录ID
+	Name       string      `yaml:"name" json:"name"`                             // 菜单名称
+	Icon       string      `yaml:"icon" json:"icon"`                             // 菜单图标
+	Router     string      `yaml:"router,omitempty" json:"router"`               // 访问路由
+	ParentID   string      `yaml:"-" json:"parent_id"`                           // 父级ID
+	ParentPath string      `yaml:"-" json:"parent_path"`                         // 父级路径
+	Sequence   int         `yaml:"sequence" json:"sequence"`                     // 排序值
+	ShowStatus int         `yaml:"-" json:"show_status"`                         // 显示状态(1:显示 2:隐藏)
+	Status     int         `yaml:"-" json:"status"`                              // 状态(1:启用 2:禁用)
+	Actions    MenuActions `yaml:"actions,omitempty" json:"actions"`             // 动作列表
+	Children   *MenuTrees  `yaml:"children,omitempty" json:"children,omitempty"` // 子级树
 }
 
 // MenuTrees 菜单树列表
@@ -173,11 +171,11 @@ func (a MenuTrees) ToTree() MenuTrees {
 
 // MenuAction 菜单动作对象
 type MenuAction struct {
-	RecordID  string              `json:"record_id"`                  // 记录ID
-	MenuID    string              `json:"menu_id" binding:"required"` // 菜单ID
-	Code      string              `json:"code" binding:"required"`    // 动作编号
-	Name      string              `json:"name" binding:"required"`    // 动作名称
-	Resources MenuActionResources `json:"resources"`                  // 资源列表
+	RecordID  string              `yaml:"-" json:"record_id"`                  // 记录ID
+	MenuID    string              `yaml:"-" binding:"required" json:"menu_id"` // 菜单ID
+	Code      string              `yaml:"code" binding:"required" json:"code"` // 动作编号
+	Name      string              `yaml:"name" binding:"required" json:"name"` // 动作名称
+	Resources MenuActionResources `yaml:"resources" json:"resources"`          // 资源列表
 }
 
 // MenuActionQueryParam 查询条件
@@ -205,10 +203,7 @@ type MenuActions []*MenuAction
 func (a MenuActions) ToMap() map[string]*MenuAction {
 	m := make(map[string]*MenuAction)
 	for _, item := range a {
-		if item.RecordID == "" {
-			item.RecordID = util.NewRecordID()
-		}
-		m[item.RecordID] = item
+		m[item.Code] = item
 	}
 	return m
 }
@@ -233,10 +228,10 @@ func (a MenuActions) ToMenuIDMap() map[string]MenuActions {
 
 // MenuActionResource 菜单动作关联资源对象
 type MenuActionResource struct {
-	RecordID string `json:"record_id"`                 // 记录ID
-	ActionID string `json:"action_id"`                 // 菜单动作ID
-	Method   string `json:"method" binding:"required"` // 资源请求方式(支持正则)
-	Path     string `json:"path" binding:"required"`   // 资源请求路径（支持/:id匹配）
+	RecordID string `yaml:"-" json:"record_id"`                      // 记录ID
+	ActionID string `yaml:"-" json:"action_id"`                      // 菜单动作ID
+	Method   string `yaml:"method" binding:"required" json:"method"` // 资源请求方式(支持正则)
+	Path     string `yaml:"path" binding:"required" json:"path"`     // 资源请求路径（支持/:id匹配）
 }
 
 // MenuActionResourceQueryParam 查询条件
@@ -264,10 +259,7 @@ type MenuActionResources []*MenuActionResource
 func (a MenuActionResources) ToMap() map[string]*MenuActionResource {
 	m := make(map[string]*MenuActionResource)
 	for _, item := range a {
-		if item.RecordID == "" {
-			item.RecordID = util.NewRecordID()
-		}
-		m[item.RecordID] = item
+		m[item.Method+item.Path] = item
 	}
 	return m
 }

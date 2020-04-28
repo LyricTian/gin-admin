@@ -40,6 +40,7 @@ func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {
 		logger.Errorf(ctx, "Load casbin user policy error: %s", err.Error())
 		return err
 	}
+
 	return nil
 }
 
@@ -66,8 +67,8 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 	}
 	mMenuResources := menuResourceResult.Data.ToActionIDMap()
 
-	mcache := make(map[string]struct{})
 	for _, item := range roleResult.Data {
+		mcache := make(map[string]struct{})
 		if rms, ok := mRoleMenus[item.RecordID]; ok {
 			for _, actionID := range rms.ToActionIDs() {
 				if mrs, ok := mMenuResources[actionID]; ok {
@@ -96,21 +97,19 @@ func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model)
 	})
 	if err != nil {
 		return err
-	} else if len(userResult.Data) == 0 {
-		return nil
-	}
+	} else if len(userResult.Data) > 0 {
+		userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{})
+		if err != nil {
+			return err
+		}
 
-	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{})
-	if err != nil {
-		return err
-	}
-
-	mUserRoles := userRoleResult.Data.ToUserIDMap()
-	for _, uitem := range userResult.Data {
-		if urs, ok := mUserRoles[uitem.RecordID]; ok {
-			for _, ur := range urs {
-				line := fmt.Sprintf("g,%s,%s", ur.UserID, ur.RoleID)
-				persist.LoadPolicyLine(line, m)
+		mUserRoles := userRoleResult.Data.ToUserIDMap()
+		for _, uitem := range userResult.Data {
+			if urs, ok := mUserRoles[uitem.RecordID]; ok {
+				for _, ur := range urs {
+					line := fmt.Sprintf("g,%s,%s", ur.UserID, ur.RoleID)
+					persist.LoadPolicyLine(line, m)
+				}
 			}
 		}
 	}

@@ -188,6 +188,10 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 		}
 	}
 
+	item.RecordID = oldItem.RecordID
+	item.Creator = oldItem.Creator
+	item.CreatedAt = oldItem.CreatedAt
+
 	if oldItem.ParentID != item.ParentID {
 		parentPath, err := a.getParentPath(ctx, item.ParentID)
 		if err != nil {
@@ -198,9 +202,6 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 		item.ParentPath = oldItem.ParentPath
 	}
 
-	item.RecordID = oldItem.RecordID
-	item.Creator = oldItem.Creator
-	item.CreatedAt = oldItem.CreatedAt
 	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		err := a.updateActions(ctx, recordID, oldItem.Actions, item.Actions)
 		if err != nil {
@@ -239,19 +240,22 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 
 	mOldItems := oldItems.ToMap()
 	for _, item := range updateActions {
-		oitem := mOldItems[item.RecordID]
-		if item.Code != oitem.Code || item.Name != oitem.Name {
-			err := a.MenuActionModel.Update(ctx, item.RecordID, *item)
+		oitem := mOldItems[item.Code]
+		// 只更新动作名称
+		if item.Name != oitem.Name {
+			oitem.Name = item.Name
+			err := a.MenuActionModel.Update(ctx, item.RecordID, *oitem)
 			if err != nil {
 				return err
 			}
 		}
 
-		addResources, delResources, updateResources := a.compareResources(ctx, oitem.Resources, item.Resources)
-		for _, aitem := range addResources {
-			aitem.RecordID = util.NewRecordID()
-			aitem.ActionID = item.RecordID
-			err := a.MenuActionResourceModel.Create(ctx, *aitem)
+		// 计算需要更新的资源配置（只包括新增和删除的，更新的不关心）
+		addResources, delResources := a.compareResources(ctx, oitem.Resources, item.Resources)
+		for _, aritem := range addResources {
+			aritem.RecordID = util.NewRecordID()
+			aritem.ActionID = oitem.RecordID
+			err := a.MenuActionResourceModel.Create(ctx, *aritem)
 			if err != nil {
 				return err
 			}
@@ -259,19 +263,6 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 
 		for _, ditem := range delResources {
 			err := a.MenuActionResourceModel.Delete(ctx, ditem.RecordID)
-			if err != nil {
-				return err
-			}
-		}
-
-		mOldResources := oitem.Resources.ToMap()
-		for _, uitem := range updateResources {
-			uoitem := mOldResources[uitem.RecordID]
-			if uoitem.Method == uitem.Method && uoitem.Path == uitem.Path {
-				continue
-			}
-
-			err := a.MenuActionResourceModel.Update(ctx, uitem.RecordID, *uitem)
 			if err != nil {
 				return err
 			}
@@ -302,13 +293,12 @@ func (a *Menu) compareActions(ctx context.Context, oldActions, newActions schema
 }
 
 // 对比资源列表
-func (a *Menu) compareResources(ctx context.Context, oldResources, newResources schema.MenuActionResources) (addList, delList, updateList schema.MenuActionResources) {
+func (a *Menu) compareResources(ctx context.Context, oldResources, newResources schema.MenuActionResources) (addList, delList schema.MenuActionResources) {
 	mOldResources := oldResources.ToMap()
 	mNewResources := newResources.ToMap()
 
 	for k, item := range mNewResources {
 		if _, ok := mOldResources[k]; ok {
-			updateList = append(updateList, item)
 			delete(mOldResources, k)
 			continue
 		}
