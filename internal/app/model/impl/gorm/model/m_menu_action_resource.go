@@ -39,11 +39,11 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 			Where("deleted_at is null").
 			Where("menu_id=?", v).
 			Select("record_id").SubQuery()
-		db = db.Where("action_id IN(?)", subQuery)
+		db = db.Where("action_id IN ?", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {
-		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN(?)", v).Select("record_id").SubQuery()
-		db = db.Where("action_id IN(?)", subQuery)
+		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN ?", v).Select("record_id").SubQuery()
+		db = db.Where("action_id IN ?", subQuery)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByASC))
@@ -117,7 +117,7 @@ func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID stri
 // DeleteByMenuID 根据菜单ID删除数据
 func (a *MenuActionResource) DeleteByMenuID(ctx context.Context, menuID string) error {
 	subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id=?", menuID).Select("record_id").SubQuery()
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN(?)", subQuery).Delete(entity.MenuAction{})
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN ?", subQuery).Delete(entity.MenuAction{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

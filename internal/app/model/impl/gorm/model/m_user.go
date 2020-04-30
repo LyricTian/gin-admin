@@ -44,7 +44,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 		subQuery := entity.GetUserRoleDB(ctx, a.DB).
 			Select("user_id").
 			Where("deleted_at is null").
-			Where("role_id IN(?)", v).
+			Where("role_id IN ?", v).
 			SubQuery()
 		db = db.Where("record_id IN ?", subQuery)
 	}

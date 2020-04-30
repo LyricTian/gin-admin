@@ -38,7 +38,7 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 		db = db.Where("user_id=?", v)
 	}
 	if v := params.UserIDs; len(v) > 0 {
-		db = db.Where("user_id IN(?)", v)
+		db = db.Where("user_id IN ?", v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))

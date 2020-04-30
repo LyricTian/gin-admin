@@ -35,7 +35,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 
 	db := entity.GetRoleDB(ctx, a.DB)
 	if v := params.RecordIDs; len(v) > 0 {
-		db = db.Where("record_id IN(?)", v)
+		db = db.Where("record_id IN ?", v)
 	}
 	if v := params.Name; v != "" {
 		db = db.Where("name=?", v)

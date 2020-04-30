@@ -61,8 +61,6 @@ func (a *Menu) Get(ctx context.Context, recordID string, opts ...schema.MenuQuer
 func (a *Menu) QueryActions(ctx context.Context, recordID string) (schema.MenuActions, error) {
 	result, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
 		MenuID: recordID,
-	}, schema.MenuActionQueryOptions{
-		OrderFields: schema.NewOrderFieldWithKeys([]string{"code"}),
 	})
 	if err != nil {
 		return nil, err
@@ -76,6 +74,7 @@ func (a *Menu) QueryActions(ctx context.Context, recordID string) (schema.MenuAc
 	if err != nil {
 		return nil, err
 	}
+
 	result.Data.FillResources(resourceResult.Data.ToActionIDMap())
 
 	return result.Data, nil

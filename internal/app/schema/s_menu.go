@@ -3,6 +3,8 @@ package schema
 import (
 	"strings"
 	"time"
+
+	"github.com/LyricTian/gin-admin/pkg/util"
 )
 
 // Menu 菜单对象
@@ -21,6 +23,10 @@ type Menu struct {
 	CreatedAt  time.Time   `json:"created_at"`                                 // 创建时间
 	UpdatedAt  time.Time   `json:"updated_at"`                                 // 更新时间
 	Actions    MenuActions `json:"actions"`                                    // 动作列表
+}
+
+func (a *Menu) String() string {
+	return util.JSONMarshalToString(a)
 }
 
 // MenuQueryParam 查询条件
@@ -171,11 +177,11 @@ func (a MenuTrees) ToTree() MenuTrees {
 
 // MenuAction 菜单动作对象
 type MenuAction struct {
-	RecordID  string              `yaml:"-" json:"record_id"`                  // 记录ID
-	MenuID    string              `yaml:"-" binding:"required" json:"menu_id"` // 菜单ID
-	Code      string              `yaml:"code" binding:"required" json:"code"` // 动作编号
-	Name      string              `yaml:"name" binding:"required" json:"name"` // 动作名称
-	Resources MenuActionResources `yaml:"resources" json:"resources"`          // 资源列表
+	RecordID  string              `yaml:"-" json:"record_id"`                   // 记录ID
+	MenuID    string              `yaml:"-" binding:"required" json:"menu_id"`  // 菜单ID
+	Code      string              `yaml:"code" binding:"required" json:"code"`  // 动作编号
+	Name      string              `yaml:"name" binding:"required" json:"name"`  // 动作名称
+	Resources MenuActionResources `yaml:"resources,omitempty" json:"resources"` // 资源列表
 }
 
 // MenuActionQueryParam 查询条件
