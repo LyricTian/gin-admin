@@ -75,6 +75,7 @@ type Config struct {
 	Captcha      Captcha
 	RateLimiter  RateLimiter
 	CORS         CORS
+	GZIP         GZIP
 	Redis        Redis
 	Gorm         Gorm
 	MySQL        MySQL
@@ -202,6 +203,13 @@ type CORS struct {
 	AllowHeaders     []string
 	AllowCredentials bool
 	MaxAge           int
+}
+
+// GZIP gzip压缩
+type GZIP struct {
+	Enable             bool
+	ExcludedExtentions []string
+	ExcludedPaths      []string
 }
 
 // Redis redis配置参数

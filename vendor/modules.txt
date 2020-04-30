@@ -8,6 +8,9 @@ github.com/KyleBanks/depth
 ## explicit
 github.com/LyricTian/captcha
 github.com/LyricTian/captcha/store
+# github.com/LyricTian/gzip v0.1.1
+## explicit
+github.com/LyricTian/gzip
 # github.com/LyricTian/queue v1.2.0
 ## explicit
 github.com/LyricTian/queue

@@ -4,6 +4,7 @@ import (
 	"github.com/LyricTian/gin-admin/internal/app/config"
 	"github.com/LyricTian/gin-admin/internal/app/middleware"
 	"github.com/LyricTian/gin-admin/internal/app/router"
+	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
@@ -31,6 +32,14 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 	// 跨域请求
 	if config.C.CORS.Enable {
 		app.Use(middleware.CORSMiddleware())
+	}
+
+	// gzip压缩
+	if config.C.GZIP.Enable {
+		app.Use(gzip.Gzip(gzip.BestCompression,
+			gzip.WithExcludedExtensions(config.C.GZIP.ExcludedExtentions),
+			gzip.WithExcludedPaths(config.C.GZIP.ExcludedPaths),
+		))
 	}
 
 	// 注册路由

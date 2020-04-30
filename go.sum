@@ -6,6 +6,8 @@ github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/LyricTian/captcha v1.1.0 h1:/fwwOn0Qv0HqfQPMvVgvgOBMYINuaDr0sSBGylQK5YA=
 github.com/LyricTian/captcha v1.1.0/go.mod h1:/B+rAY8altkYP05+rMShopIisuw+dk2hU3LfX0bT6fY=
+github.com/LyricTian/gzip v0.1.1 h1:R8lzUek+tFN4frAXNWOhIKoJaLyFLVOnogBJMBMj9xY=
+github.com/LyricTian/gzip v0.1.1/go.mod h1:JT7ISZwfIQvoUG2Z/RFjTQA7vBObrGAi9OLXTA+Vycs=
 github.com/LyricTian/queue v1.2.0 h1:OaEiS5D5dQOMFyvvrq11o0uJdAMXDf5nRJggVDFEonY=
 github.com/LyricTian/queue v1.2.0/go.mod h1:CMJcrjcVYLOqN2FnVpXqYJzITcDJNdlq7VLkPXyhduw=
 github.com/LyricTian/structs v1.1.1 h1:Bn+/o3WgFavzNxXAb+V2xrPsAghda/xXZ6epPkt9a/0=

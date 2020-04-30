@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/LyricTian/captcha v1.1.0
+	github.com/LyricTian/gzip v0.1.1
 	github.com/LyricTian/queue v1.2.0
 	github.com/LyricTian/structs v1.1.1
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751

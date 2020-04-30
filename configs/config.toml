@@ -153,6 +153,14 @@ AllowCredentials = true
 # 可以缓存预检请求结果的时间（以秒为单位）
 MaxAge = 7200
 
+[GZIP]
+# 是否启用
+Enable = false
+# 排除的文件扩展名
+ExcludedExtentions = [".png",".gif",".jpeg",".jpg"]
+# 排除的请求路径
+ExcludedPaths = []
+
 [Gorm]
 # 是否开启调试模式
 Debug = false
