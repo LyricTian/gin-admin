@@ -38,7 +38,7 @@ func (a *RoleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 		db = db.Where("role_id=?", v)
 	}
 	if v := params.RoleIDs; len(v) > 0 {
-		db = db.Where("role_id IN ?", v)
+		db = db.Where("role_id IN (?)", v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))

@@ -42,7 +42,7 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 		db = db.Where("action_id IN ?", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {
-		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN ?", v).Select("record_id").SubQuery()
+		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN (?)", v).Select("record_id").SubQuery()
 		db = db.Where("action_id IN ?", subQuery)
 	}
 

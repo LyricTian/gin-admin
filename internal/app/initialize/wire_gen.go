@@ -55,16 +55,16 @@ func BuildInjector() (*Injector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	demo := &model.Demo{
+	demo := &mock.Demo{}
+	modelDemo := &model.Demo{
 		DB: db,
 	}
 	bllDemo := &bll.Demo{
-		DemoModel: demo,
+		DemoModel: modelDemo,
 	}
 	apiDemo := &api.Demo{
 		DemoBll: bllDemo,
 	}
-	mockDemo := &mock.Demo{}
 	menu := &model.Menu{
 		DB: db,
 	}
@@ -83,7 +83,6 @@ func BuildInjector() (*Injector, func(), error) {
 	apiLogin := &api.Login{
 		LoginBll: login,
 	}
-	mockLogin := &mock.Login{}
 	trans := &model.Trans{
 		DB: db,
 	}
@@ -96,7 +95,6 @@ func BuildInjector() (*Injector, func(), error) {
 	apiMenu := &api.Menu{
 		MenuBll: bllMenu,
 	}
-	mockMenu := &mock.Menu{}
 	bllRole := &bll.Role{
 		Enforcer:      syncedEnforcer,
 		TransModel:    trans,
@@ -107,7 +105,6 @@ func BuildInjector() (*Injector, func(), error) {
 	apiRole := &api.Role{
 		RoleBll: bllRole,
 	}
-	mockRole := &mock.Role{}
 	bllUser := &bll.User{
 		Enforcer:      syncedEnforcer,
 		TransModel:    trans,
@@ -118,20 +115,15 @@ func BuildInjector() (*Injector, func(), error) {
 	apiUser := &api.User{
 		UserBll: bllUser,
 	}
-	mockUser := &mock.User{}
 	routerRouter := &router.Router{
 		Auth:           auther,
 		CasbinEnforcer: syncedEnforcer,
+		DemoMock:       demo,
 		DemoAPI:        apiDemo,
-		DemoMock:       mockDemo,
 		LoginAPI:       apiLogin,
-		LoginMock:      mockLogin,
 		MenuAPI:        apiMenu,
-		MenuMock:       mockMenu,
 		RoleAPI:        apiRole,
-		RoleMock:       mockRole,
 		UserAPI:        apiUser,
-		UserMock:       mockUser,
 	}
 	engine := InitGinEngine(routerRouter)
 	dataMenu := &data.Menu{

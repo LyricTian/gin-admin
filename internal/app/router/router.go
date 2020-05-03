@@ -24,16 +24,12 @@ type IRouter interface {
 type Router struct {
 	Auth           auth.Auther
 	CasbinEnforcer *casbin.SyncedEnforcer
-	DemoAPI        *api.Demo
 	DemoMock       *mock.Demo
+	DemoAPI        *api.Demo
 	LoginAPI       *api.Login
-	LoginMock      *mock.Login
 	MenuAPI        *api.Menu
-	MenuMock       *mock.Menu
 	RoleAPI        *api.Role
-	RoleMock       *mock.Role
 	UserAPI        *api.User
-	UserMock       *mock.User
 }
 
 // Register 注册路由
