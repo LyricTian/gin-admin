@@ -84,7 +84,7 @@ func (a *MenuAction) Create(ctx context.Context, item schema.MenuAction) error {
 // Update 更新数据
 func (a *MenuAction) Update(ctx context.Context, recordID string, item schema.MenuAction) error {
 	eitem := entity.SchemaMenuAction(item).ToMenuAction()
-	result := entity.GetMenuActionDB(ctx, a.DB).Where("record_id=?", recordID).Omit("record_id").Updates(eitem)
+	result := entity.GetMenuActionDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
