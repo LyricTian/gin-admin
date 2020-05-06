@@ -137,9 +137,9 @@ wire gen ./internal/app/initialize
 
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg" width="256" alt="qqgroup" />
 
-## 提供一对一服务
+## 付费支持
 
-> 另外，作者有6年以上的工作经验，对前后端技术都有些研究。我也非常乐意通过有偿的方式为大家提供一对一专项辅导，包括：gin-admin/golang/react/vue，帮助大家快速掌握和入门！
+> **该框架本身的结构逻辑和实现细节点还是蛮多的，作者认为能够熟练应用此框架并快速产出作品还是需要一个摸索的阶段的。因而，作者原意贡献个人休闲娱乐时间，为大家提供服务！帮助大家快速掌握此框架，并如何使用gin-admin-cli快速产出功能模块，以1*10的效率完成业务模块的开发。当然，在开发业务期间，遇到任何技术上的难题，作者将全心全力协助解决！再次感谢您的支持！作者会不断优化和改进此框架，更好的服务于大家！**
 
 ## MIT License
 
