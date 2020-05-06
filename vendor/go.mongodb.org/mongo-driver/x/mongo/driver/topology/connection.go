@@ -96,13 +96,16 @@ func (c *connection) connect(ctx context.Context) {
 	ctx, c.cancelConnectContext = context.WithCancel(ctx)
 	close(c.connectContextMade)
 
+	// Assign the result of DialContext to a temporary net.Conn to ensure that c.nc is not set in an error case.
 	var err error
-	c.nc, err = c.config.dialer.DialContext(ctx, c.addr.Network(), c.addr.String())
+	var tempNc net.Conn
+	tempNc, err = c.config.dialer.DialContext(ctx, c.addr.Network(), c.addr.String())
 	if err != nil {
 		atomic.StoreInt32(&c.connected, disconnected)
 		c.connectErr = ConnectionError{Wrapped: err, init: true}
 		return
 	}
+	c.nc = tempNc
 
 	if c.config.tlsConfig != nil {
 		tlsConfig := c.config.tlsConfig.Clone()
@@ -290,23 +293,26 @@ func (c *connection) close() error {
 	if atomic.LoadInt32(&c.connected) != connected {
 		return nil
 	}
-	if c.pool == nil {
-		var err error
 
-		if c.nc != nil {
-			err = c.nc.Close()
-		}
-		atomic.StoreInt32(&c.connected, disconnected)
-		return err
+	var err error
+	if c.nc != nil {
+		err = c.nc.Close()
 	}
-	return c.pool.closeConnection(c)
+	atomic.StoreInt32(&c.connected, disconnected)
+
+	if c.pool != nil {
+		_ = c.pool.removeConnection(c)
+	}
+	return err
 }
 
 func (c *connection) expired() bool {
 	now := time.Now()
-	idleDeadline, ok := c.idleDeadline.Load().(time.Time)
-	if ok && now.After(idleDeadline) {
-		return true
+	if c.idleTimeout > 0 {
+		idleDeadline, ok := c.idleDeadline.Load().(time.Time)
+		if ok && now.After(idleDeadline) {
+			return true
+		}
 	}
 
 	if !c.lifetimeDeadline.IsZero() && now.After(c.lifetimeDeadline) {

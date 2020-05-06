@@ -293,7 +293,25 @@ func (coll *Collection) insert(ctx context.Context, documents []interface{},
 	}
 	op = op.Retry(retry)
 
-	return result, op.Execute(ctx)
+	err = op.Execute(ctx)
+	wce, ok := err.(driver.WriteCommandError)
+	if !ok {
+		return result, err
+	}
+
+	// remove the ids that had writeErrors from result
+	for i, we := range wce.WriteErrors {
+		// i indexes have been removed before the current error, so the index is we.Index-i
+		idIndex := int(we.Index) - i
+		// if the insert is ordered, nothing after the error was inserted
+		if imo.Ordered == nil || *imo.Ordered {
+			result = result[:idIndex]
+			break
+		}
+		result = append(result[:idIndex], result[idIndex+1:]...)
+	}
+
+	return result, err
 }
 
 // InsertOne executes an insert command to insert a single document into the collection.
@@ -367,6 +385,7 @@ func (coll *Collection) InsertMany(ctx context.Context, documents []interface{},
 			nil,
 		})
 	}
+
 	return imResult, BulkWriteException{
 		WriteErrors:       bwErrors,
 		WriteConcernError: writeException.WriteConcernError,
@@ -753,8 +772,24 @@ func aggregate(a aggregateParams) (*Cursor, error) {
 		Crypt:          a.client.crypt,
 	}
 
-	op := operation.NewAggregate(pipelineArr).Session(sess).WriteConcern(wc).ReadConcern(rc).ReadPreference(a.readPreference).CommandMonitor(a.client.monitor).
-		ServerSelector(selector).ClusterClock(a.client.clock).Database(a.db).Collection(a.col).Deployment(a.client.deployment).Crypt(a.client.crypt)
+	op := operation.NewAggregate(pipelineArr).
+		Session(sess).
+		WriteConcern(wc).
+		ReadConcern(rc).
+		CommandMonitor(a.client.monitor).
+		ServerSelector(selector).
+		ClusterClock(a.client.clock).
+		Database(a.db).
+		Collection(a.col).
+		Deployment(a.client.deployment).
+		Crypt(a.client.crypt)
+	if !hasOutputStage {
+		// Only pass the user-specified read preference if the aggregation doesn't have a $out or $merge stage.
+		// Otherwise, the read preference could be forwarded to a mongos, which would error if the aggregation were
+		// executed against a non-primary node.
+		op.ReadPreference(a.readPreference)
+	}
+
 	if ao.AllowDiskUse != nil {
 		op.AllowDiskUse(*ao.AllowDiskUse)
 	}
@@ -1518,6 +1553,7 @@ func (coll *Collection) Watch(ctx context.Context, pipeline interface{},
 		streamType:     CollectionStream,
 		collectionName: coll.Name(),
 		databaseName:   coll.db.Name(),
+		crypt:          coll.client.crypt,
 	}
 	return newChangeStream(ctx, csConfig, pipeline, opts...)
 }

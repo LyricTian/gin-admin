@@ -303,7 +303,13 @@ func (e *Enforcer) SavePolicy() error {
 		return err
 	}
 	if e.watcher != nil {
-		return e.watcher.Update()
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForSavePolicy(e.model)
+		} else {
+			err = e.watcher.Update()
+		}
+		return err
 	}
 	return nil
 }
@@ -319,7 +325,7 @@ func (e *Enforcer) EnableLog(enable bool) {
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
-func (e *Enforcer) EnableAutoNotifyWatcher(enable bool)  {
+func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
 }
 
@@ -344,10 +350,10 @@ func (e *Enforcer) BuildRoleLinks() error {
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
+func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err error) {
 	defer func() {
-		if err := recover(); err != nil {
-			fmt.Errorf("panic: %v", err)
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v", r)
 		}
 	}()
 
@@ -371,9 +377,15 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
 	} else {
 		expString = matcher
 	}
-	expression, err := govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
-	if err != nil {
-		return false, err
+
+	var expression *govaluate.EvaluableExpression
+	hasEval := util.HasEval(expString)
+
+	if !hasEval {
+		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
@@ -415,6 +427,25 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
 			}
 
 			parameters.pVals = pvals
+
+			if hasEval {
+				ruleNames := util.GetEvalValue(expString)
+				var expWithRule = expString
+				for _, ruleName := range ruleNames {
+					if j, ok := parameters.pTokens[ruleName]; ok {
+						rule := util.EscapeAssertion(pvals[j])
+						expWithRule = util.ReplaceEval(expWithRule, rule)
+					} else {
+						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
+					}
+
+					expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
+					if err != nil {
+						return false, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
+					}
+				}
+
+			}
 
 			result, err := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)
