@@ -44,7 +44,7 @@ go get -u github.com/swaggo/swag/cmd/swag
 - [Casbin](https://casbin.org/) -- An authorization library that supports access control models like ACL, RBAC, ABAC in Golang
 - [Wire](https://github.com/google/wire) -- Compile-time Dependency Injection for Go
 
-## 快速开始（或者使用[gin-admin-cli](https://github.com/LyricTian/gin-admin/v6-cli)）
+## 快速开始（或者使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)）
 
 > 也可以使用国内源：https://gitee.com/lyric/gin-admin
 
@@ -80,49 +80,9 @@ make wire
 wire gen ./internal/app/initialize
 ```
 
-## 项目结构概览
-
-```
-├── cmd
-│   └── gin-admin # 主服务（程序入口）
-├── configs # 配置文件目录(包含运行配置参数及casbin模型配置)
-├── docs # 文档目录
-├── internal # 内部代码模块
-│   └── app # 内部应用模块入口
-│       ├── api # API控制器模块
-│       │   └── mock # API Mock模块(包括swagger的注释描述)
-│       ├── bll # 业务逻辑模块接口
-│       │   └── impl
-│       │       └── bll # 业务逻辑模块接口的实现
-│       ├── config # 配置参数(与config.toml一一映射)
-│       ├── context # 统一上下文模块
-│       ├── ginplus # gin的扩展模块
-│       ├── initialize # 初始化模块（提供依赖模块的初始化函数及依赖注入的初始化）
-│       ├── middleware # gin中间件模块
-│       ├── model # 存储层模块接口
-│       │   └── impl
-│       │       └── gorm
-│       │           ├── entity # 与数据库表及字段的映射实体
-│       │           └── model # 存储层模块接口的gorm实现
-│       │       └── mongo
-│       │           ├── entity # 与数据库表及字段的映射实体
-│       │           └── model # 存储层模块接口的mongo实现
-│       ├── module # 内部模块间依赖的公共模块
-│       ├── router # gin的路由模块
-│       ├── schema # 提供Request/Response的对象模块
-│       ├── swagger # swagger配置及自动生成的文件
-│       └── test # API的单元测试
-├── pkg # 公共模块
-│   ├── auth # JWT认证模块
-│   ├── errors # 统一错误处理模块
-│   ├── logger # 日志模块
-│   └── util # 工具库模块
-├── scripts # 脚本目录
-```
-
 ## 前端工程
 
-- 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/LyricTian/gin-admin/v6-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
+- 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/LyricTian/gin-admin-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
 
 ## 互动交流
 
@@ -147,9 +107,9 @@ wire gen ./internal/app/initialize
 
     Copyright (c) 2020 Lyric
 
-[reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin/v6
-[reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin/v6
-[godoc-url]: https://godoc.org/github.com/LyricTian/gin-admin/v6
-[godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin/v6?status.svg
+[reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
+[reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
+[godoc-url]: https://godoc.org/github.com/LyricTian/gin-admin
+[godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin?status.svg
 [license-url]: http://opensource.org/licenses/MIT
 [license-image]: https://img.shields.io/npm/l/express.svg
