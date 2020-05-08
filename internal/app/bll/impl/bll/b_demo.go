@@ -3,11 +3,11 @@ package bll
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/internal/app/bll"
-	"github.com/LyricTian/gin-admin/internal/app/model"
-	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/LyricTian/gin-admin/v6/internal/app/bll"
+	"github.com/LyricTian/gin-admin/v6/internal/app/model"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/pkg/errors"
+	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/google/wire"
 )
 

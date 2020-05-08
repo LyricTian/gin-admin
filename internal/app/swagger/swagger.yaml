@@ -418,7 +418,7 @@ info:
   description: RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.
   license: {}
   title: gin-admin
-  version: 6.0.0
+  version: 6.1.0
 paths:
   /api/v1/demos:
     get:

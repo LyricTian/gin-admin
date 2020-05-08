@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/LyricTian/gin-admin/internal/app/model"
-	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/logger"
+	"github.com/LyricTian/gin-admin/v6/internal/app/model"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/pkg/logger"
 	casbinModel "github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/google/wire"

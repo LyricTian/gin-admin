@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/pkg/logger"
-	loggerhook "github.com/LyricTian/gin-admin/pkg/logger/hook"
-	loggergormhook "github.com/LyricTian/gin-admin/pkg/logger/hook/gorm"
-	loggermongohook "github.com/LyricTian/gin-admin/pkg/logger/hook/mongo"
+	"github.com/LyricTian/gin-admin/v6/internal/app/config"
+	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	loggerhook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook"
+	loggergormhook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook/gorm"
+	loggermongohook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook/mongo"
 )
 
 // InitLogger 初始化日志模块

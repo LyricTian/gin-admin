@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	icontext "github.com/LyricTian/gin-admin/internal/app/context"
-	"github.com/LyricTian/gin-admin/internal/app/schema"
+	icontext "github.com/LyricTian/gin-admin/v6/internal/app/context"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 	"github.com/jinzhu/gorm"
 )
 

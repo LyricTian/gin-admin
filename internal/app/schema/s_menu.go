@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/LyricTian/gin-admin/v6/pkg/util"
 )
 
 // Menu 菜单对象

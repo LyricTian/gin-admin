@@ -19,9 +19,10 @@
 - 基于 `GORM/Mongo` 的数据库存储 -- 存储层抽象了标准的外部业务层调用接口，内部采用封闭式实现（为后续切换数据存储提供了较大的便利）
 - 基于 `WIRE` 的依赖注入 -- 依赖注入本身的作用是解决了各个模块间层级依赖繁琐的初始化过程
 - 基于 `Logrus & Context` 实现了日志输出，通过结合 Context 实现了统一的 TraceID/UserID 等关键字段的输出(同时支持日志钩子写入到`Gorm/Mongo`)
-- 基于 `JWT` 的用户认证 -- 基于JWT的黑名单验证机制
-- 基于 `Swaggo` 自动生成 `Swagger` 文档 -- 独立于接口的mock实现
+- 基于 `JWT` 的用户认证 -- 基于 JWT 的黑名单验证机制
+- 基于 `Swaggo` 自动生成 `Swagger` 文档 -- 独立于接口的 mock 实现
 - 基于 `net/http/httptest` 标准包实现了 API 的单元测试
+- 基于 `go mod` 的依赖管理(国内源可使用：<https://goproxy.cn/>)
 
 ## 依赖工具
 
@@ -43,13 +44,14 @@ go get -u github.com/swaggo/swag/cmd/swag
 - [Casbin](https://casbin.org/) -- An authorization library that supports access control models like ACL, RBAC, ABAC in Golang
 - [Wire](https://github.com/google/wire) -- Compile-time Dependency Injection for Go
 
-## 快速开始（或者使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)）
+## 快速开始（或者使用[gin-admin-cli](https://github.com/LyricTian/gin-admin/v6-cli)）
 
 > 也可以使用国内源：https://gitee.com/lyric/gin-admin
 
 ```
-go get -v github.com/LyricTian/gin-admin/cmd/gin-admin
-cd $GOPATH/src/github.com/LyricTian/gin-admin
+git clone https://github.com/LyricTian/gin-admin.git
+cd gin-admin
+go mod download
 # 使用AIR工具运行
 air
 # OR 基于Makefile运行
@@ -120,13 +122,13 @@ wire gen ./internal/app/initialize
 
 ## 前端工程
 
-- 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/LyricTian/gin-admin-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
+- 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/LyricTian/gin-admin/v6-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
 
 ## 互动交流
 
 ### 与作者对话
 
-> 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，一起探讨，畅聊技术人生，相互学习，一起进步。我非常期待！下面是我的微信二维码（如果此项目对您提供了帮助也可以请作者喝杯咖啡 (*￣︶￣)，聊表心意，一起星巴克「续杯」~嘿嘿 ）：
+> 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，一起探讨，畅聊技术人生，相互学习，一起进步。我非常期待！下面是我的微信二维码（如果此项目对您提供了帮助也可以请作者喝杯咖啡 (\*￣︶￣)，聊表心意，一起星巴克「续杯」~嘿嘿 ）：
 
 <div>
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg" width="256"alt="wechat" />
@@ -139,15 +141,15 @@ wire gen ./internal/app/initialize
 
 ## 付费支持
 
-> **该框架本身的结构逻辑和实现细节点还是蛮多的，作者认为能够熟练应用此框架并快速产出作品还是需要一个摸索的阶段的。因而，作者原意贡献个人休闲娱乐时间，为大家提供服务！帮助大家快速掌握此框架，并如何使用gin-admin-cli快速产出功能模块，以1*10的效率完成业务模块的开发。当然，在开发业务期间，遇到任何技术上的难题，作者将全心全力协助解决！再次感谢您的支持！作者会不断优化和改进此框架，更好的服务于大家！**
+> **该框架本身的结构逻辑和实现细节点还是蛮多的，作者认为能够熟练应用此框架并快速产出作品还是需要一个摸索的阶段的。因而，作者原意贡献个人休闲娱乐时间，为大家提供服务！帮助大家快速掌握此框架，并如何使用 gin-admin-cli 快速产出功能模块，以 1\*10 的效率完成业务模块的开发。当然，在开发业务期间，遇到任何技术上的难题，作者将全心全力协助解决！再次感谢您的支持！作者会不断优化和改进此框架，更好的服务于大家！**
 
 ## MIT License
 
     Copyright (c) 2020 Lyric
 
-[reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
-[reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
-[godoc-url]: https://godoc.org/github.com/LyricTian/gin-admin
-[godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin?status.svg
+[reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin/v6
+[reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin/v6
+[godoc-url]: https://godoc.org/github.com/LyricTian/gin-admin/v6
+[godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin/v6?status.svg
 [license-url]: http://opensource.org/licenses/MIT
 [license-image]: https://img.shields.io/npm/l/express.svg

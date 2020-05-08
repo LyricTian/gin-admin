@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 )
 
 // ILogin 登录业务逻辑接口

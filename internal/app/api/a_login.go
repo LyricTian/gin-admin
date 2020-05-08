@@ -2,12 +2,12 @@ package api
 
 import (
 	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/gin-admin/internal/app/bll"
-	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/ginplus"
-	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/errors"
-	"github.com/LyricTian/gin-admin/pkg/logger"
+	"github.com/LyricTian/gin-admin/v6/internal/app/bll"
+	"github.com/LyricTian/gin-admin/v6/internal/app/config"
+	"github.com/LyricTian/gin-admin/v6/internal/app/ginplus"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/pkg/errors"
+	"github.com/LyricTian/gin-admin/v6/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 )

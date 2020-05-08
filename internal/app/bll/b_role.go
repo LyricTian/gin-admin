@@ -3,7 +3,7 @@ package bll
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 )
 
 // IRole 角色管理业务逻辑接口

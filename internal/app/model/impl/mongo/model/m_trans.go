@@ -3,9 +3,9 @@ package model
 import (
 	"context"
 
-	icontext "github.com/LyricTian/gin-admin/internal/app/context"
-	"github.com/LyricTian/gin-admin/internal/app/model"
-	"github.com/LyricTian/gin-admin/pkg/errors"
+	icontext "github.com/LyricTian/gin-admin/v6/internal/app/context"
+	"github.com/LyricTian/gin-admin/v6/internal/app/model"
+	"github.com/LyricTian/gin-admin/v6/pkg/errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/mongo"
 )

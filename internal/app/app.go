@@ -8,12 +8,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/initialize"
-	"github.com/LyricTian/gin-admin/pkg/logger"
+	"github.com/LyricTian/gin-admin/v6/internal/app/config"
+	"github.com/LyricTian/gin-admin/v6/internal/app/initialize"
+	"github.com/LyricTian/gin-admin/v6/pkg/logger"
 
 	// 引入swagger
-	_ "github.com/LyricTian/gin-admin/internal/app/swagger"
+	_ "github.com/LyricTian/gin-admin/v6/internal/app/swagger"
 )
 
 type options struct {
