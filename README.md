@@ -48,16 +48,15 @@ go get -u github.com/swaggo/swag/cmd/swag
 
 > 也可以使用国内源：https://gitee.com/lyric/gin-admin
 
-```
-git clone https://github.com/LyricTian/gin-admin.git
-cd gin-admin
-go mod download
+```bash
+$ go get -u -v github.com/LyricTian/gin-admin/v6/cmd/gin-admin
+$ cd $GOPATH/src/github.com/LyricTian/gin-admin
 # 使用AIR工具运行
-air
+$ air
 # OR 基于Makefile运行
-make start
+$ make start
 # OR 使用go命令运行
-go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
+$ go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
 ```
 
 > 启动成功之后，可在浏览器中输入地址进行访问：[http://127.0.0.1:10088/swagger/index.html](http://127.0.0.1:10088/swagger/index.html)
