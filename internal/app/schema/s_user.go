@@ -1,10 +1,28 @@
 package schema
 
 import (
+	"context"
 	"time"
 
+	"github.com/LyricTian/gin-admin/v6/internal/app/config"
 	"github.com/LyricTian/gin-admin/v6/pkg/util"
 )
+
+// GetRootUser 获取root用户
+func GetRootUser() *User {
+	user := config.C.Root
+	return &User{
+		RecordID: user.UserName,
+		UserName: user.UserName,
+		RealName: user.RealName,
+		Password: util.MD5HashString(user.Password),
+	}
+}
+
+// CheckIsRootUser 检查是否是root用户
+func CheckIsRootUser(ctx context.Context, userID string) bool {
+	return GetRootUser().RecordID == userID
+}
 
 // User 用户对象
 type User struct {

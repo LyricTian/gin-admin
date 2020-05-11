@@ -11,7 +11,7 @@ import (
 
 // GetRoleCollection 获取Role存储
 func GetRoleCollection(ctx context.Context, cli *mongo.Client) *mongo.Collection {
-	return getCollection(ctx, cli, Role{})
+	return GetCollection(ctx, cli, Role{})
 }
 
 // SchemaRole 角色对象
@@ -32,10 +32,6 @@ type Role struct {
 	Memo     string `bson:"memo"`     // 备注
 	Status   int    `bson:"status"`   // 状态(1:启用 2:禁用)
 	Creator  string `bson:"creator"`  // 创建者
-}
-
-func (a Role) String() string {
-	return toString(a)
 }
 
 // CollectionName 集合名

@@ -11,6 +11,7 @@ import (
 	loggerhook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook"
 	loggergormhook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook/gorm"
 	loggermongohook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook/mongo"
+	"github.com/sirupsen/logrus"
 )
 
 // InitLogger 初始化日志模块
@@ -43,6 +44,16 @@ func InitLogger() (func(), error) {
 
 	var hook *loggerhook.Hook
 	if c.EnableHook {
+
+		var hookLevels []logrus.Level
+		for _, lvl := range c.HookLevels {
+			plvl, err := logrus.ParseLevel(lvl)
+			if err != nil {
+				return nil, err
+			}
+			hookLevels = append(hookLevels, plvl)
+		}
+
 		switch {
 		case c.Hook.IsGorm():
 			hc := config.C.LogGormHook
@@ -69,6 +80,7 @@ func InitLogger() (func(), error) {
 			}),
 				loggerhook.SetMaxWorkers(c.HookMaxThread),
 				loggerhook.SetMaxQueues(c.HookMaxBuffer),
+				loggerhook.SetLevels(hookLevels...),
 			)
 			logger.AddHook(h)
 			hook = h
@@ -81,6 +93,7 @@ func InitLogger() (func(), error) {
 			}),
 				loggerhook.SetMaxWorkers(c.HookMaxThread),
 				loggerhook.SetMaxQueues(c.HookMaxBuffer),
+				loggerhook.SetLevels(hookLevels...),
 			)
 			logger.AddHook(h)
 			hook = h

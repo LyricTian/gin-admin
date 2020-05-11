@@ -107,7 +107,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDRe
 }
 
 func (a *User) checkUserName(ctx context.Context, item schema.User) error {
-	if item.UserName == GetRootUser().UserName {
+	if item.UserName == schema.GetRootUser().UserName {
 		return errors.New400Response("用户名不合法")
 	}
 

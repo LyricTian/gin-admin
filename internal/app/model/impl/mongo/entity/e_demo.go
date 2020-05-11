@@ -11,7 +11,7 @@ import (
 
 // GetDemoCollection 获取demo存储
 func GetDemoCollection(ctx context.Context, cli *mongo.Client) *mongo.Collection {
-	return getCollection(ctx, cli, Demo{})
+	return GetCollection(ctx, cli, Demo{})
 }
 
 // SchemaDemo demo对象
@@ -32,10 +32,6 @@ type Demo struct {
 	Memo    string `bson:"memo"`    // 备注
 	Status  int    `bson:"status"`  // 状态(1:启用 2:停用)
 	Creator string `bson:"creator"` // 创建者
-}
-
-func (a Demo) String() string {
-	return toString(a)
 }
 
 // CollectionName 集合名

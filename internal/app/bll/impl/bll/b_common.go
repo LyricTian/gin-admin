@@ -3,28 +3,9 @@ package bll
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	icontext "github.com/LyricTian/gin-admin/v6/internal/app/context"
+	"github.com/LyricTian/gin-admin/v6/internal/app/icontext"
 	"github.com/LyricTian/gin-admin/v6/internal/app/model"
-	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
 )
-
-// GetRootUser 获取root用户
-func GetRootUser() *schema.User {
-	user := config.C.Root
-	return &schema.User{
-		RecordID: user.UserName,
-		UserName: user.UserName,
-		RealName: user.RealName,
-		Password: util.MD5HashString(user.Password),
-	}
-}
-
-// CheckIsRootUser 检查是否是root用户
-func CheckIsRootUser(ctx context.Context, userID string) bool {
-	return GetRootUser().RecordID == userID
-}
 
 // TransFunc 定义事务执行函数
 type TransFunc func(context.Context) error

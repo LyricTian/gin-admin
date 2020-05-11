@@ -11,7 +11,7 @@ import (
 
 // GetUserCollection 获取User存储
 func GetUserCollection(ctx context.Context, cli *mongo.Client) *mongo.Collection {
-	return getCollection(ctx, cli, User{})
+	return GetCollection(ctx, cli, User{})
 }
 
 // SchemaUser 用户对象
@@ -34,10 +34,6 @@ type User struct {
 	Phone    string `bson:"phone"`     // 手机号
 	Status   int    `bson:"status"`    // 状态(1:启用 2:停用)
 	Creator  string `bson:"creator"`   // 创建者
-}
-
-func (a User) String() string {
-	return toString(a)
 }
 
 // CollectionName 集合名

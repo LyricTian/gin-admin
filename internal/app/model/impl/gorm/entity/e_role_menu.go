@@ -10,7 +10,7 @@ import (
 
 // GetRoleMenuDB 角色菜单
 func GetRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return getDBWithModel(ctx, defDB, new(RoleMenu))
+	return GetDBWithModel(ctx, defDB, new(RoleMenu))
 }
 
 // SchemaRoleMenu 角色菜单
@@ -29,10 +29,6 @@ type RoleMenu struct {
 	RoleID   string `gorm:"column:role_id;size:36;index;default:'';not null;"`   // 角色ID
 	MenuID   string `gorm:"column:menu_id;size:36;index;default:'';not null;"`   // 菜单ID
 	ActionID string `gorm:"column:action_id;size:36;index;default:'';not null;"` // 动作ID
-}
-
-func (a RoleMenu) String() string {
-	return toString(a)
 }
 
 // TableName 表名

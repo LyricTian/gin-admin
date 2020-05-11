@@ -7,9 +7,7 @@ package initialize
 
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/api"
-	"github.com/LyricTian/gin-admin/v6/internal/app/api/mock"
 	"github.com/LyricTian/gin-admin/v6/internal/app/bll/impl/bll"
-	"github.com/LyricTian/gin-admin/v6/internal/app/initialize/data"
 	"github.com/LyricTian/gin-admin/v6/internal/app/model/impl/gorm/model"
 	"github.com/LyricTian/gin-admin/v6/internal/app/module/adapter"
 	"github.com/LyricTian/gin-admin/v6/internal/app/router"
@@ -55,12 +53,11 @@ func BuildInjector() (*Injector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	demo := &mock.Demo{}
-	modelDemo := &model.Demo{
+	demo := &model.Demo{
 		DB: db,
 	}
 	bllDemo := &bll.Demo{
-		DemoModel: modelDemo,
+		DemoModel: demo,
 	}
 	apiDemo := &api.Demo{
 		DemoBll: bllDemo,
@@ -118,7 +115,6 @@ func BuildInjector() (*Injector, func(), error) {
 	routerRouter := &router.Router{
 		Auth:           auther,
 		CasbinEnforcer: syncedEnforcer,
-		DemoMock:       demo,
 		DemoAPI:        apiDemo,
 		LoginAPI:       apiLogin,
 		MenuAPI:        apiMenu,
@@ -126,15 +122,11 @@ func BuildInjector() (*Injector, func(), error) {
 		UserAPI:        apiUser,
 	}
 	engine := InitGinEngine(routerRouter)
-	dataMenu := &data.Menu{
-		TransModel: trans,
-		MenuBll:    bllMenu,
-	}
 	injector := &Injector{
 		Engine:         engine,
 		Auth:           auther,
 		CasbinEnforcer: syncedEnforcer,
-		Menu:           dataMenu,
+		MenuBll:        bllMenu,
 	}
 	return injector, func() {
 		cleanup3()

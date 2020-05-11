@@ -123,6 +123,7 @@ type Log struct {
 	Output        string
 	OutputFile    string
 	EnableHook    bool
+	HookLevels    []string
 	Hook          LogHook
 	HookMaxThread int
 	HookMaxBuffer int

@@ -10,7 +10,7 @@ import (
 
 // GetDemoDB 获取demo存储
 func GetDemoDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return getDBWithModel(ctx, defDB, new(Demo))
+	return GetDBWithModel(ctx, defDB, new(Demo))
 }
 
 // SchemaDemo demo对象
@@ -31,10 +31,6 @@ type Demo struct {
 	Memo    *string `gorm:"column:memo;size:200;"`                           // 备注
 	Status  int     `gorm:"column:status;index;default:0;not null;"`         // 状态(1:启用 2:停用)
 	Creator string  `gorm:"column:creator;size:36;"`                         // 创建者
-}
-
-func (a Demo) String() string {
-	return toString(a)
 }
 
 // TableName 表名

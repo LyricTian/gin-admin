@@ -11,7 +11,7 @@ import (
 
 // GetUserRoleCollection 获取UserRole存储
 func GetUserRoleCollection(ctx context.Context, cli *mongo.Client) *mongo.Collection {
-	return getCollection(ctx, cli, UserRole{})
+	return GetCollection(ctx, cli, UserRole{})
 }
 
 // SchemaUserRole 用户角色

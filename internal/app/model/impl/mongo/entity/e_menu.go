@@ -11,7 +11,7 @@ import (
 
 // GetMenuCollection 获取Menu存储
 func GetMenuCollection(ctx context.Context, cli *mongo.Client) *mongo.Collection {
-	return getCollection(ctx, cli, Menu{})
+	return GetCollection(ctx, cli, Menu{})
 }
 
 // SchemaMenu 菜单对象
@@ -37,10 +37,6 @@ type Menu struct {
 	Status     int    `bson:"status"`      // 状态(1:启用 2:禁用)
 	Memo       string `bson:"memo"`        // 备注
 	Creator    string `bson:"creator"`     // 创建人
-}
-
-func (a Menu) String() string {
-	return toString(a)
 }
 
 // CollectionName 集合名

@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/api"
-	"github.com/LyricTian/gin-admin/v6/internal/app/api/mock"
 	"github.com/LyricTian/gin-admin/v6/pkg/auth"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,6 @@ type IRouter interface {
 type Router struct {
 	Auth           auth.Auther
 	CasbinEnforcer *casbin.SyncedEnforcer
-	DemoMock       *mock.Demo
 	DemoAPI        *api.Demo
 	LoginAPI       *api.Login
 	MenuAPI        *api.Menu

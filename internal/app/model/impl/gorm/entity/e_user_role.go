@@ -10,7 +10,7 @@ import (
 
 // GetUserRoleDB 获取用户角色关联存储
 func GetUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return getDBWithModel(ctx, defDB, new(UserRole))
+	return GetDBWithModel(ctx, defDB, new(UserRole))
 }
 
 // SchemaUserRole 用户角色

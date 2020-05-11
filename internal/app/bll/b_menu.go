@@ -8,6 +8,8 @@ import (
 
 // IMenu 菜单管理业务逻辑接口
 type IMenu interface {
+	// 初始化菜单数据
+	InitData(ctx context.Context, dataFile string) error
 	// 查询数据
 	Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error)
 	// 查询指定数据

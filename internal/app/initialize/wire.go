@@ -5,9 +5,8 @@ package initialize
 
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/api"
-	"github.com/LyricTian/gin-admin/v6/internal/app/api/mock"
+	// "github.com/LyricTian/gin-admin/v6/internal/app/api/mock"
 	"github.com/LyricTian/gin-admin/v6/internal/app/bll/impl/bll"
-	"github.com/LyricTian/gin-admin/v6/internal/app/initialize/data"
 	"github.com/LyricTian/gin-admin/v6/internal/app/module/adapter"
 	"github.com/LyricTian/gin-admin/v6/internal/app/router"
 	"github.com/google/wire"
@@ -29,10 +28,9 @@ func BuildInjector() (*Injector, func(), error) {
 		InitGinEngine,
 		bll.BllSet,
 		api.APISet,
-		mock.MockSet,
+		// mock.MockSet,
 		router.RouterSet,
 		adapter.CasbinAdapterSet,
-		data.MenuSet,
 		InjectorSet,
 	)
 	return new(Injector), nil, nil

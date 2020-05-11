@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	icontext "github.com/LyricTian/gin-admin/v6/internal/app/context"
 	"github.com/LyricTian/gin-admin/v6/internal/app/ginplus"
+	"github.com/LyricTian/gin-admin/v6/internal/app/icontext"
 	"github.com/LyricTian/gin-admin/v6/pkg/auth"
 	"github.com/LyricTian/gin-admin/v6/pkg/errors"
 	"github.com/LyricTian/gin-admin/v6/pkg/logger"

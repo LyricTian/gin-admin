@@ -2,6 +2,7 @@ package bll
 
 import (
 	"context"
+	"os"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/bll"
 	"github.com/LyricTian/gin-admin/v6/internal/app/model"
@@ -22,6 +23,74 @@ type Menu struct {
 	MenuModel               model.IMenu
 	MenuActionModel         model.IMenuAction
 	MenuActionResourceModel model.IMenuActionResource
+}
+
+// InitData 初始化菜单数据
+func (a *Menu) InitData(ctx context.Context, dataFile string) error {
+	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		PaginationParam: schema.PaginationParam{OnlyCount: true},
+	})
+	if err != nil {
+		return err
+	} else if result.PageResult.Total > 0 {
+		// 如果存在则不进行初始化
+		return nil
+	}
+
+	data, err := a.readData(dataFile)
+	if err != nil {
+		return err
+	}
+
+	return a.createMenus(ctx, "", data)
+}
+
+func (a *Menu) readData(name string) (schema.MenuTrees, error) {
+	file, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var data schema.MenuTrees
+	d := util.YAMLNewDecoder(file)
+	d.SetStrict(true)
+	err = d.Decode(&data)
+	return data, err
+}
+
+func (a *Menu) createMenus(ctx context.Context, parentID string, list schema.MenuTrees) error {
+	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
+		for _, item := range list {
+			sitem := schema.Menu{
+				Name:       item.Name,
+				Sequence:   item.Sequence,
+				Icon:       item.Icon,
+				Router:     item.Router,
+				ParentID:   parentID,
+				Status:     1,
+				ShowStatus: 1,
+				Actions:    item.Actions,
+			}
+			if v := item.ShowStatus; v > 0 {
+				sitem.ShowStatus = v
+			}
+
+			nsitem, err := a.Create(ctx, sitem)
+			if err != nil {
+				return err
+			}
+
+			if item.Children != nil && len(*item.Children) > 0 {
+				err := a.createMenus(ctx, nsitem.RecordID, *item.Children)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
 }
 
 // Query 查询数据

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -25,7 +24,7 @@ func (Model) CollectionName(name string) string {
 }
 
 // CreateIndexes 创建索引
-func (Model) CreateIndexes(ctx context.Context, cli *mongo.Client, m collectioner, indexes []mongo.IndexModel) error {
+func (Model) CreateIndexes(ctx context.Context, cli *mongo.Client, m Collectioner, indexes []mongo.IndexModel) error {
 	models := []mongo.IndexModel{
 		{Keys: bson.M{"created_at": 1}},
 		{Keys: bson.M{"updated_at": 1}},
@@ -34,18 +33,16 @@ func (Model) CreateIndexes(ctx context.Context, cli *mongo.Client, m collectione
 	if len(indexes) > 0 {
 		models = append(models, indexes...)
 	}
-	_, err := getCollection(ctx, cli, m).Indexes().CreateMany(ctx, models)
+	_, err := GetCollection(ctx, cli, m).Indexes().CreateMany(ctx, models)
 	return err
 }
 
-func toString(v interface{}) string {
-	return util.JSONMarshalToString(v)
-}
-
-type collectioner interface {
+// Collectioner ...
+type Collectioner interface {
 	CollectionName() string
 }
 
-func getCollection(ctx context.Context, cli *mongo.Client, m collectioner) *mongo.Collection {
+// GetCollection ...
+func GetCollection(ctx context.Context, cli *mongo.Client, m Collectioner) *mongo.Collection {
 	return cli.Database(config.C.Mongo.Database).Collection(m.CollectionName())
 }

@@ -32,29 +32,20 @@ func StructMapToStruct(s, ts interface{}) error {
 	}
 
 	ss, tss := structs.New(s), structs.New(ts)
-
-	var setValue = func(field *structs.Field) error {
-		if sf, ok := ss.FieldOk(field.Name()); ok {
-			err := field.Set2(sf.Value())
-			if err != nil {
-				fmt.Printf("[warning] StructMapToStruct set field [%s->%s]: %s", field.Name(), sf.Name(), err.Error())
-			}
-		}
-		return nil
-	}
-
-	for _, field := range tss.Fields() {
-		if !field.IsExported() {
+	for _, tfield := range tss.Fields() {
+		if !tfield.IsExported() {
 			continue
 		}
 
-		if field.IsEmbedded() && field.Kind() == reflect.Struct {
-			for _, field := range field.Fields() {
-				setValue(field)
+		if tfield.IsEmbedded() && tfield.Kind() == reflect.Struct {
+			for _, tefield := range tfield.Fields() {
+				if f, ok := ss.FieldOk(tefield.Name()); ok && !f.IsZero() {
+					tefield.Set2(f.Value())
+				}
 			}
-			continue
+		} else if f, ok := ss.FieldOk(tfield.Name()); ok && !f.IsZero() {
+			tfield.Set2(f.Value())
 		}
-		setValue(field)
 	}
 
 	return nil

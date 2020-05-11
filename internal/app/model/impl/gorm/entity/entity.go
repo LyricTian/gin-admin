@@ -6,8 +6,7 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	icontext "github.com/LyricTian/gin-admin/v6/internal/app/context"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
+	"github.com/LyricTian/gin-admin/v6/internal/app/icontext"
 	"github.com/jinzhu/gorm"
 )
 
@@ -25,11 +24,8 @@ func (Model) TableName(name string) string {
 	return fmt.Sprintf("%s%s", config.C.Gorm.TablePrefix, name)
 }
 
-func toString(v interface{}) string {
-	return util.JSONMarshalToString(v)
-}
-
-func getDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+// GetDB ...
+func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	trans, ok := icontext.FromTrans(ctx)
 	if ok && !icontext.FromNoTrans(ctx) {
 		db, ok := trans.(*gorm.DB)
@@ -46,8 +42,9 @@ func getDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return defDB
 }
 
-func getDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB {
-	db := getDB(ctx, defDB)
+// GetDBWithModel ...
+func GetDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB {
+	db := GetDB(ctx, defDB)
 
 	type tabler interface {
 		TableName() string

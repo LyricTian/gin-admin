@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	icontext "github.com/LyricTian/gin-admin/v6/internal/app/context"
+	"github.com/LyricTian/gin-admin/v6/internal/app/icontext"
 	"github.com/LyricTian/gin-admin/v6/pkg/logger"
 	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/gin-gonic/gin"

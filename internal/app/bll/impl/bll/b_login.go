@@ -60,7 +60,7 @@ func (a *Login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID
 // Verify 登录验证
 func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
 	// 检查是否是超级用户
-	root := GetRootUser()
+	root := schema.GetRootUser()
 	if userName == root.UserName && root.Password == password {
 		return root, nil
 	}
@@ -122,8 +122,8 @@ func (a *Login) checkAndGetUser(ctx context.Context, userID string) (*schema.Use
 
 // GetLoginInfo 获取当前用户登录信息
 func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error) {
-	if isRoot := CheckIsRootUser(ctx, userID); isRoot {
-		root := GetRootUser()
+	if isRoot := schema.CheckIsRootUser(ctx, userID); isRoot {
+		root := schema.GetRootUser()
 		loginInfo := &schema.UserLoginInfo{
 			UserName: root.UserName,
 			RealName: root.RealName,
@@ -165,7 +165,7 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 
 // QueryUserMenuTree 查询当前用户的权限菜单树
 func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.MenuTrees, error) {
-	isRoot := CheckIsRootUser(ctx, userID)
+	isRoot := schema.CheckIsRootUser(ctx, userID)
 	// 如果是root用户，则查询所有显示的菜单树
 	if isRoot {
 		result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
@@ -242,7 +242,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 
 // UpdatePassword 更新当前用户登录密码
 func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {
-	if CheckIsRootUser(ctx, userID) {
+	if schema.CheckIsRootUser(ctx, userID) {
 		return errors.New400Response("root用户不允许更新密码")
 	}
 

@@ -122,6 +122,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 
 	// 初始化服务运行监控
 	initialize.InitMonitor(ctx)
+
 	// 初始化图形验证码
 	initialize.InitCaptcha()
 
@@ -132,9 +133,11 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	}
 
 	// 初始化菜单数据
-	err = injector.Menu.Load()
-	if err != nil {
-		return nil, err
+	if config.C.Menu.Enable && config.C.Menu.Data != "" {
+		err = injector.MenuBll.InitData(ctx, config.C.Menu.Data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// 初始化HTTP服务
