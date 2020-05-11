@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/bll"
+	"github.com/LyricTian/gin-admin/v6/internal/app/iutil"
 	"github.com/LyricTian/gin-admin/v6/internal/app/model"
 	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v6/pkg/errors"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
 )
@@ -67,10 +67,10 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDRe
 		return nil, err
 	}
 
-	item.RecordID = util.NewRecordID()
+	item.RecordID = iutil.NewID()
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		for _, rmItem := range item.RoleMenus {
-			rmItem.RecordID = util.NewRecordID()
+			rmItem.RecordID = iutil.NewID()
 			rmItem.RoleID = item.RecordID
 			err := a.RoleMenuModel.Create(ctx, *rmItem)
 			if err != nil {
@@ -119,7 +119,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		addRoleMenus, delRoleMenus := a.compareRoleMenus(ctx, oldItem.RoleMenus, item.RoleMenus)
 		for _, rmitem := range addRoleMenus {
-			rmitem.RecordID = util.NewRecordID()
+			rmitem.RecordID = iutil.NewID()
 			rmitem.RoleID = recordID
 			err := a.RoleMenuModel.Create(ctx, *rmitem)
 			if err != nil {

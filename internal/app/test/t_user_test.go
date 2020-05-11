@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/pkg/unique"
 	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +18,7 @@ func TestUser(t *testing.T) {
 
 	// post /menus
 	addMenuItem := &schema.Menu{
-		Name:       util.MustUUID(),
+		Name:       unique.MustUUID().String(),
 		ShowStatus: 1,
 		Status:     1,
 	}
@@ -29,7 +30,7 @@ func TestUser(t *testing.T) {
 
 	// post /roles
 	addRoleItem := &schema.Role{
-		Name:   util.MustUUID(),
+		Name:   unique.MustUUID().String(),
 		Status: 1,
 		RoleMenus: schema.RoleMenus{
 			&schema.RoleMenu{
@@ -45,8 +46,8 @@ func TestUser(t *testing.T) {
 
 	// post /users
 	addItem := &schema.User{
-		UserName: util.MustUUID(),
-		RealName: util.MustUUID(),
+		UserName: unique.MustUUID().String(),
+		RealName: unique.MustUUID().String(),
 		Status:   1,
 		Password: util.MD5HashString("test"),
 		UserRoles: schema.UserRoles{
@@ -73,7 +74,7 @@ func TestUser(t *testing.T) {
 
 	// put /users/:id
 	putItem := getItem
-	putItem.UserName = util.MustUUID()
+	putItem.UserName = unique.MustUUID().String()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.RecordID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)

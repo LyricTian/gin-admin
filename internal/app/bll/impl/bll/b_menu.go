@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/bll"
+	"github.com/LyricTian/gin-admin/v6/internal/app/iutil"
 	"github.com/LyricTian/gin-admin/v6/internal/app/model"
 	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v6/pkg/errors"
@@ -176,7 +177,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.RecordIDRe
 		return nil, err
 	}
 	item.ParentPath = parentPath
-	item.RecordID = util.NewRecordID()
+	item.RecordID = iutil.NewID()
 
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		err := a.createActions(ctx, item.RecordID, item.Actions)
@@ -196,7 +197,7 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.RecordIDRe
 // 创建动作数据
 func (a *Menu) createActions(ctx context.Context, menuID string, items schema.MenuActions) error {
 	for _, item := range items {
-		item.RecordID = util.NewRecordID()
+		item.RecordID = iutil.NewID()
 		item.MenuID = menuID
 		err := a.MenuActionModel.Create(ctx, *item)
 		if err != nil {
@@ -204,7 +205,7 @@ func (a *Menu) createActions(ctx context.Context, menuID string, items schema.Me
 		}
 
 		for _, ritem := range item.Resources {
-			ritem.RecordID = util.NewRecordID()
+			ritem.RecordID = iutil.NewID()
 			ritem.ActionID = item.RecordID
 			err := a.MenuActionResourceModel.Create(ctx, *ritem)
 			if err != nil {
@@ -321,7 +322,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		// 计算需要更新的资源配置（只包括新增和删除的，更新的不关心）
 		addResources, delResources := a.compareResources(ctx, oitem.Resources, item.Resources)
 		for _, aritem := range addResources {
-			aritem.RecordID = util.NewRecordID()
+			aritem.RecordID = iutil.NewID()
 			aritem.ActionID = oitem.RecordID
 			err := a.MenuActionResourceModel.Create(ctx, *aritem)
 			if err != nil {

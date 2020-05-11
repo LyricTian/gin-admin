@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/bll"
+	"github.com/LyricTian/gin-admin/v6/internal/app/iutil"
 	"github.com/LyricTian/gin-admin/v6/internal/app/model"
 	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v6/pkg/errors"
@@ -85,10 +86,10 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDRe
 	}
 
 	item.Password = util.SHA1HashString(item.Password)
-	item.RecordID = util.NewRecordID()
+	item.RecordID = iutil.NewID()
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		for _, urItem := range item.UserRoles {
-			urItem.RecordID = util.NewRecordID()
+			urItem.RecordID = iutil.NewID()
 			urItem.UserID = item.RecordID
 			err := a.UserRoleModel.Create(ctx, *urItem)
 			if err != nil {
@@ -149,7 +150,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		addUserRoles, delUserRoles := a.compareUserRoles(ctx, oldItem.UserRoles, item.UserRoles)
 		for _, rmitem := range addUserRoles {
-			rmitem.RecordID = util.NewRecordID()
+			rmitem.RecordID = iutil.NewID()
 			rmitem.UserID = recordID
 			err := a.UserRoleModel.Create(ctx, *rmitem)
 			if err != nil {

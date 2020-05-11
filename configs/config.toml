@@ -228,3 +228,14 @@ Database = "gin-admin"
 Timeout = 30
 # 集合名前缀
 CollectionPrefix = "g_"
+
+[UniqueID]
+# 唯一ID类型(支持：uuid/object/snowflake)
+Type = "snowflake"
+
+# https://github.com/twitter-archive/snowflake
+[UniqueID.Snowflake]
+# 节点标识(0-1023)
+Node = 1
+# 开始时间戳(2020-01-02 15:04:05)
+Epoch = 1577977445000

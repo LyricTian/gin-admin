@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/bll"
+	"github.com/LyricTian/gin-admin/v6/internal/app/iutil"
 	"github.com/LyricTian/gin-admin/v6/internal/app/model"
 	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v6/pkg/errors"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/google/wire"
 )
 
@@ -61,7 +61,7 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.RecordIDRe
 		return nil, err
 	}
 
-	item.RecordID = util.NewRecordID()
+	item.RecordID = iutil.NewID()
 	err = a.DemoModel.Create(ctx, item)
 	if err != nil {
 		return nil, err

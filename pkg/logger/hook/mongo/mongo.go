@@ -7,6 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/v6/pkg/logger"
 	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -56,7 +57,7 @@ type Hook struct {
 // Exec 执行日志写入
 func (h *Hook) Exec(entry *logrus.Entry) error {
 	item := &LogItem{
-		ID:        util.NewRecordID(),
+		ID:        primitive.NewObjectID().Hex(),
 		Level:     entry.Level.String(),
 		Message:   entry.Message,
 		CreatedAt: entry.Time,

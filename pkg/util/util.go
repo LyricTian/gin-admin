@@ -20,11 +20,6 @@ func NewTraceID() string {
 		time.Now().Format("2006.01.02.15.04.05.999999"))
 }
 
-// NewRecordID 创建记录ID
-func NewRecordID() string {
-	return NewObjectID().Hex()
-}
-
 // StructMapToStruct 结构体映射
 func StructMapToStruct(s, ts interface{}) error {
 	if !structs.IsStruct(s) || !structs.IsStruct(ts) {

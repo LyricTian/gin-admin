@@ -81,6 +81,13 @@ type Config struct {
 	Postgres     Postgres
 	Sqlite3      Sqlite3
 	Mongo        Mongo
+	UniqueID     struct {
+		Type      string
+		Snowflake struct {
+			Node  int64
+			Epoch int64
+		}
+	}
 }
 
 // IsDebugMode 是否是debug模式
