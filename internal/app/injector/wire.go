@@ -1,7 +1,7 @@
 // +build wireinject
 // The build tag makes sure the stub is not built in the final build.
 
-package initialize
+package injector
 
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/api"

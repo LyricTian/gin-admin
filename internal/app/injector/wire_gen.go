@@ -3,7 +3,7 @@
 //go:generate wire
 //+build !wireinject
 
-package initialize
+package injector
 
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/api"

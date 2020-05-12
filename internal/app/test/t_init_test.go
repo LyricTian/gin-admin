@@ -10,7 +10,7 @@ import (
 	"net/url"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	"github.com/LyricTian/gin-admin/v6/internal/app/initialize"
+	"github.com/LyricTian/gin-admin/v6/internal/app/injector"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,8 +34,7 @@ func init() {
 	config.C.Gorm.Debug = false
 	config.C.Gorm.DBType = "sqlite3"
 
-	initialize.InitLogger()
-	injector, _, err := initialize.BuildInjector()
+	injector, _, err := injector.BuildInjector()
 	if err != nil {
 		panic(err)
 	}

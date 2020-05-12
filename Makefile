@@ -19,7 +19,7 @@ swagger:
 	swag init --generalInfo ./internal/app/swagger.go --output ./internal/app/swagger
 
 wire:
-	wire gen ./internal/app/initialize
+	wire gen ./internal/app/injector
 
 test:
 	@go test -v ./internal/app/test

@@ -1,4 +1,4 @@
-package initialize
+package injector
 
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/config"
@@ -52,7 +52,7 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 
 	// 静态站点
 	if dir := config.C.WWW; dir != "" {
-		app.Use(middleware.WWWMiddleware(dir))
+		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(prefixes...)))
 	}
 
 	return app

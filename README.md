@@ -76,7 +76,7 @@ swag init --generalInfo ./internal/app/swagger.go --output ./internal/app/swagge
 # 基于Makefile
 make wire
 # OR 使用wire命令
-wire gen ./internal/app/initialize
+wire gen ./internal/app/injector
 ```
 
 ## 前端工程
