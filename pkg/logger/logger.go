@@ -2,7 +2,10 @@ package logger
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -22,7 +25,16 @@ type TraceIDFunc func() string
 var (
 	version     string
 	traceIDFunc TraceIDFunc
+	pid         = os.Getpid()
 )
+
+func init() {
+	traceIDFunc = func() string {
+		return fmt.Sprintf("trace-id-%d-%s",
+			os.Getpid(),
+			time.Now().Format("2006.01.02.15.04.05.999999"))
+	}
+}
 
 // Logger 定义日志别名
 type Logger = logrus.Logger
@@ -70,13 +82,6 @@ func AddHook(hook Hook) {
 	logrus.AddHook(hook)
 }
 
-func getTraceID() string {
-	if traceIDFunc != nil {
-		return traceIDFunc()
-	}
-	return ""
-}
-
 type (
 	traceIDContextKey struct{}
 	userIDContextKey  struct{}
@@ -95,7 +100,7 @@ func FromTraceIDContext(ctx context.Context) string {
 			return s
 		}
 	}
-	return getTraceID()
+	return traceIDFunc()
 }
 
 // NewUserIDContext 创建用户ID上下文

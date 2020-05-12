@@ -1,24 +1,10 @@
 package util
 
 import (
-	"fmt"
-	"os"
 	"reflect"
-	"time"
 
 	"github.com/LyricTian/structs"
 )
-
-var (
-	pid = os.Getpid()
-)
-
-// NewTraceID 创建追踪ID
-func NewTraceID() string {
-	return fmt.Sprintf("trace-id-%d-%s",
-		pid,
-		time.Now().Format("2006.01.02.15.04.05.999999"))
-}
 
 // StructMapToStruct 结构体映射
 func StructMapToStruct(s, ts interface{}) error {

@@ -17,6 +17,8 @@ import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/injector"
 	"github.com/LyricTian/gin-admin/v6/internal/app/iutil"
 	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	"github.com/LyricTian/gin-admin/v6/pkg/trace"
+	"github.com/LyricTian/gin-admin/v6/pkg/unique"
 	"github.com/go-redis/redis"
 	"github.com/google/gops/agent"
 
@@ -90,6 +92,16 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	config.PrintWithJSON()
 
 	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", config.C.RunMode, o.Version, os.Getpid())
+
+	// 初始化 snowflake node
+	err := unique.SetSnowflakeNode(config.C.UniqueID.Snowflake.Node, config.C.UniqueID.Snowflake.Epoch)
+	if err != nil {
+		return nil, err
+	}
+
+	trace.SetIDFunc(func() string {
+		return unique.NewSnowflakeID().String()
+	})
 
 	// 初始化日志模块
 	loggerCleanFunc, err := InitLogger()

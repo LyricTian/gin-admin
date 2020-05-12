@@ -3,7 +3,6 @@ package iutil
 import (
 	"github.com/LyricTian/gin-admin/v6/internal/app/config"
 	"github.com/LyricTian/gin-admin/v6/pkg/unique"
-	"github.com/bwmarrin/snowflake"
 )
 
 var idFunc = func() string {
@@ -22,13 +21,8 @@ func InitID() {
 			return unique.NewObjectID().Hex()
 		}
 	default:
-		snowflake.Epoch = config.C.UniqueID.Snowflake.Epoch
-		node, err := snowflake.NewNode(config.C.UniqueID.Snowflake.Node)
-		if err != nil {
-			panic(err)
-		}
 		idFunc = func() string {
-			return node.Generate().String()
+			return unique.NewSnowflakeID().String()
 		}
 	}
 }

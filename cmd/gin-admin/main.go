@@ -6,22 +6,20 @@ import (
 
 	"github.com/LyricTian/gin-admin/v6/internal/app"
 	"github.com/LyricTian/gin-admin/v6/pkg/logger"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/urfave/cli/v2"
 )
 
 // VERSION 版本号，可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "6.2.0"
+var VERSION = "6.2.1"
 
 func main() {
 	logger.SetVersion(VERSION)
-	logger.SetTraceIDFunc(util.NewTraceID)
-	ctx := logger.NewTraceIDContext(context.Background(), util.NewTraceID())
+	ctx := logger.NewTraceIDContext(context.Background(), "main")
 
 	app := cli.NewApp()
 	app.Name = "gin-admin"
 	app.Version = VERSION
-	app.Usage = "RBAC scaffolding based on Gin + Gorm/Mongo + Casbin + Wire."
+	app.Usage = "RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE."
 	app.Commands = []*cli.Command{
 		newWebCmd(ctx),
 	}
