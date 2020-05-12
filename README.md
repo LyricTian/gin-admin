@@ -23,6 +23,7 @@
 - 基于 `Swaggo` 自动生成 `Swagger` 文档 -- 独立于接口的 mock 实现
 - 基于 `net/http/httptest` 标准包实现了 API 的单元测试
 - 基于 `go mod` 的依赖管理(国内源可使用：<https://goproxy.cn/>)
+- 基于 `snowflake` 生成唯一ID
 
 ## 依赖工具
 
