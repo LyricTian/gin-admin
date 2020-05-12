@@ -9,7 +9,7 @@ import (
 
 // Menu 菜单对象
 type Menu struct {
-	RecordID   string      `json:"record_id"`                                  // 记录ID
+	ID         string      `json:"id"`                                         // 唯一标识
 	Name       string      `json:"name" binding:"required"`                    // 菜单名称
 	Sequence   int         `json:"sequence"`                                   // 排序值
 	Icon       string      `json:"icon"`                                       // 菜单图标
@@ -32,7 +32,7 @@ func (a *Menu) String() string {
 // MenuQueryParam 查询条件
 type MenuQueryParam struct {
 	PaginationParam
-	RecordIDs        []string `form:"-"`          // 记录ID列表
+	IDs              []string `form:"-"`          // 唯一标识列表
 	Name             string   `form:"-"`          // 菜单名称
 	PrefixParentPath string   `form:"-"`          // 父级路径(前缀模糊查询)
 	QueryValue       string   `form:"queryValue"` // 模糊查询
@@ -71,18 +71,18 @@ func (a Menus) Swap(i, j int) {
 func (a Menus) ToMap() map[string]*Menu {
 	m := make(map[string]*Menu)
 	for _, item := range a {
-		m[item.RecordID] = item
+		m[item.ID] = item
 	}
 	return m
 }
 
-// SplitParentRecordIDs 拆分父级路径的记录ID列表
-func (a Menus) SplitParentRecordIDs() []string {
+// SplitParentIDs 拆分父级路径的唯一标识列表
+func (a Menus) SplitParentIDs() []string {
 	idList := make([]string, 0, len(a))
 	mIDList := make(map[string]struct{})
 
 	for _, item := range a {
-		if _, ok := mIDList[item.RecordID]; ok || item.ParentPath == "" {
+		if _, ok := mIDList[item.ID]; ok || item.ParentPath == "" {
 			continue
 		}
 
@@ -103,7 +103,7 @@ func (a Menus) ToTree() MenuTrees {
 	list := make(MenuTrees, len(a))
 	for i, item := range a {
 		list[i] = &MenuTree{
-			RecordID:   item.RecordID,
+			ID:         item.ID,
 			Name:       item.Name,
 			Icon:       item.Icon,
 			Router:     item.Router,
@@ -121,7 +121,7 @@ func (a Menus) ToTree() MenuTrees {
 // FillMenuAction 填充菜单动作列表
 func (a Menus) FillMenuAction(mActions map[string]MenuActions) Menus {
 	for _, item := range a {
-		if v, ok := mActions[item.RecordID]; ok {
+		if v, ok := mActions[item.ID]; ok {
 			item.Actions = v
 		}
 	}
@@ -132,7 +132,7 @@ func (a Menus) FillMenuAction(mActions map[string]MenuActions) Menus {
 
 // MenuTree 菜单树
 type MenuTree struct {
-	RecordID   string      `yaml:"-" json:"record_id"`                           // 记录ID
+	ID         string      `yaml:"-" json:"id"`                                  // 唯一标识
 	Name       string      `yaml:"name" json:"name"`                             // 菜单名称
 	Icon       string      `yaml:"icon" json:"icon"`                             // 菜单图标
 	Router     string      `yaml:"router,omitempty" json:"router"`               // 访问路由
@@ -152,7 +152,7 @@ type MenuTrees []*MenuTree
 func (a MenuTrees) ToTree() MenuTrees {
 	mi := make(map[string]*MenuTree)
 	for _, item := range a {
-		mi[item.RecordID] = item
+		mi[item.ID] = item
 	}
 
 	var list MenuTrees
@@ -177,7 +177,7 @@ func (a MenuTrees) ToTree() MenuTrees {
 
 // MenuAction 菜单动作对象
 type MenuAction struct {
-	RecordID  string              `yaml:"-" json:"record_id"`                   // 记录ID
+	ID        string              `yaml:"-" json:"id"`                          // 唯一标识
 	MenuID    string              `yaml:"-" binding:"required" json:"menu_id"`  // 菜单ID
 	Code      string              `yaml:"code" binding:"required" json:"code"`  // 动作编号
 	Name      string              `yaml:"name" binding:"required" json:"name"`  // 动作名称
@@ -187,8 +187,8 @@ type MenuAction struct {
 // MenuActionQueryParam 查询条件
 type MenuActionQueryParam struct {
 	PaginationParam
-	MenuID    string   // 菜单ID
-	RecordIDs []string // 记录ID列表
+	MenuID string   // 菜单ID
+	IDs    []string // 唯一标识列表
 }
 
 // MenuActionQueryOptions 查询可选参数项
@@ -217,7 +217,7 @@ func (a MenuActions) ToMap() map[string]*MenuAction {
 // FillResources 填充资源数据
 func (a MenuActions) FillResources(mResources map[string]MenuActionResources) {
 	for i, item := range a {
-		a[i].Resources = mResources[item.RecordID]
+		a[i].Resources = mResources[item.ID]
 	}
 }
 
@@ -234,7 +234,7 @@ func (a MenuActions) ToMenuIDMap() map[string]MenuActions {
 
 // MenuActionResource 菜单动作关联资源对象
 type MenuActionResource struct {
-	RecordID string `yaml:"-" json:"record_id"`                      // 记录ID
+	ID       string `yaml:"-" json:"id"`                             // 唯一标识
 	ActionID string `yaml:"-" json:"action_id"`                      // 菜单动作ID
 	Method   string `yaml:"method" binding:"required" json:"method"` // 资源请求方式(支持正则)
 	Path     string `yaml:"path" binding:"required" json:"path"`     // 资源请求路径（支持/:id匹配）

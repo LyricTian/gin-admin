@@ -55,19 +55,19 @@ func (a *Demo) checkCode(ctx context.Context, code string) error {
 }
 
 // Create 创建数据
-func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.RecordIDResult, error) {
+func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.IDResult, error) {
 	err := a.checkCode(ctx, item.Code)
 	if err != nil {
 		return nil, err
 	}
 
-	item.RecordID = iutil.NewID()
+	item.ID = iutil.NewID()
 	err = a.DemoModel.Create(ctx, item)
 	if err != nil {
 		return nil, err
 	}
 
-	return schema.NewRecordIDResult(item.RecordID), nil
+	return schema.NewIDResult(item.ID), nil
 }
 
 // Update 更新数据
@@ -82,7 +82,7 @@ func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) er
 			return err
 		}
 	}
-	item.RecordID = oldItem.RecordID
+	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
 

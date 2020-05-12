@@ -23,12 +23,12 @@ func TestDemo(t *testing.T) {
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
-	var addItemRes ResRecordID
+	var addItemRes ResID
 	err = parseReader(w.Body, &addItemRes)
 	assert.Nil(t, err)
 
 	// get /demos/:id
-	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.RecordID))
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.ID))
 	assert.Equal(t, 200, w.Code)
 	var getItem schema.Demo
 	err = parseReader(w.Body, &getItem)
@@ -36,12 +36,12 @@ func TestDemo(t *testing.T) {
 	assert.Equal(t, addItem.Code, getItem.Code)
 	assert.Equal(t, addItem.Name, getItem.Name)
 	assert.Equal(t, addItem.Status, getItem.Status)
-	assert.NotEmpty(t, getItem.RecordID)
+	assert.NotEmpty(t, getItem.ID)
 
 	// put /demos/:id
 	putItem := getItem
 	putItem.Name = unique.MustUUID().String()
-	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.RecordID))
+	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
@@ -54,12 +54,12 @@ func TestDemo(t *testing.T) {
 	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, len(pageItems), 1)
 	if len(pageItems) > 0 {
-		assert.Equal(t, putItem.RecordID, pageItems[0].RecordID)
+		assert.Equal(t, putItem.ID, pageItems[0].ID)
 		assert.Equal(t, putItem.Name, pageItems[0].Name)
 	}
 
 	// delete /demos/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.RecordID))
+	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)

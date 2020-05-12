@@ -12,7 +12,7 @@ import (
 func GetRootUser() *User {
 	user := config.C.Root
 	return &User{
-		RecordID: user.UserName,
+		ID:       user.UserName,
 		UserName: user.UserName,
 		RealName: user.RealName,
 		Password: util.MD5HashString(user.Password),
@@ -21,12 +21,12 @@ func GetRootUser() *User {
 
 // CheckIsRootUser 检查是否是root用户
 func CheckIsRootUser(ctx context.Context, userID string) bool {
-	return GetRootUser().RecordID == userID
+	return GetRootUser().ID == userID
 }
 
 // User 用户对象
 type User struct {
-	RecordID  string    `json:"record_id"`                             // 记录ID
+	ID        string    `json:"id"`                                    // 唯一标识
 	UserName  string    `json:"user_name" binding:"required"`          // 用户名
 	RealName  string    `json:"real_name" binding:"required"`          // 真实姓名
 	Password  string    `json:"password"`                              // 密码
@@ -79,11 +79,11 @@ func (a UserQueryResult) ToShowResult(mUserRoles map[string]UserRoles, mRoles ma
 // Users 用户对象列表
 type Users []*User
 
-// ToRecordIDs 转换为记录ID列表
-func (a Users) ToRecordIDs() []string {
+// ToIDs 转换为唯一标识列表
+func (a Users) ToIDs() []string {
 	idList := make([]string, len(a))
 	for i, item := range a {
-		idList[i] = item.RecordID
+		idList[i] = item.ID
 	}
 	return idList
 }
@@ -94,7 +94,7 @@ func (a Users) ToUserShows(mUserRoles map[string]UserRoles, mRoles map[string]*R
 	for i, item := range a {
 		showItem := new(UserShow)
 		util.StructMapToStruct(item, showItem)
-		for _, roleID := range mUserRoles[item.RecordID].ToRoleIDs() {
+		for _, roleID := range mUserRoles[item.ID].ToRoleIDs() {
 			if v, ok := mRoles[roleID]; ok {
 				showItem.Roles = append(showItem.Roles, v)
 			}
@@ -109,9 +109,9 @@ func (a Users) ToUserShows(mUserRoles map[string]UserRoles, mRoles map[string]*R
 
 // UserRole 用户角色
 type UserRole struct {
-	RecordID string `json:"record_id"` // 记录ID
-	UserID   string `json:"user_id"`   // 用户ID
-	RoleID   string `json:"role_id"`   // 角色ID
+	ID     string `json:"id"`      // 唯一标识
+	UserID string `json:"user_id"` // 用户ID
+	RoleID string `json:"role_id"` // 角色ID
 }
 
 // UserRoleQueryParam 查询条件
@@ -166,7 +166,7 @@ func (a UserRoles) ToUserIDMap() map[string]UserRoles {
 
 // UserShow 用户显示项
 type UserShow struct {
-	RecordID  string    `json:"record_id"`  // 记录ID
+	ID        string    `json:"id"`         // 唯一标识
 	UserName  string    `json:"user_name"`  // 用户名
 	RealName  string    `json:"real_name"`  // 真实姓名
 	Phone     string    `json:"phone"`      // 手机号

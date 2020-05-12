@@ -83,7 +83,7 @@ func (a *Menu) createMenus(ctx context.Context, parentID string, list schema.Men
 			}
 
 			if item.Children != nil && len(*item.Children) > 0 {
-				err := a.createMenus(ctx, nsitem.RecordID, *item.Children)
+				err := a.createMenus(ctx, nsitem.ID, *item.Children)
 				if err != nil {
 					return err
 				}
@@ -167,7 +167,7 @@ func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
 }
 
 // Create 创建数据
-func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.RecordIDResult, error) {
+func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error) {
 	if err := a.checkName(ctx, item); err != nil {
 		return nil, err
 	}
@@ -177,10 +177,10 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.RecordIDRe
 		return nil, err
 	}
 	item.ParentPath = parentPath
-	item.RecordID = iutil.NewID()
+	item.ID = iutil.NewID()
 
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
-		err := a.createActions(ctx, item.RecordID, item.Actions)
+		err := a.createActions(ctx, item.ID, item.Actions)
 		if err != nil {
 			return err
 		}
@@ -191,13 +191,13 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.RecordIDRe
 		return nil, err
 	}
 
-	return schema.NewRecordIDResult(item.RecordID), nil
+	return schema.NewIDResult(item.ID), nil
 }
 
 // 创建动作数据
 func (a *Menu) createActions(ctx context.Context, menuID string, items schema.MenuActions) error {
 	for _, item := range items {
-		item.RecordID = iutil.NewID()
+		item.ID = iutil.NewID()
 		item.MenuID = menuID
 		err := a.MenuActionModel.Create(ctx, *item)
 		if err != nil {
@@ -205,8 +205,8 @@ func (a *Menu) createActions(ctx context.Context, menuID string, items schema.Me
 		}
 
 		for _, ritem := range item.Resources {
-			ritem.RecordID = iutil.NewID()
-			ritem.ActionID = item.RecordID
+			ritem.ID = iutil.NewID()
+			ritem.ActionID = item.ID
 			err := a.MenuActionResourceModel.Create(ctx, *ritem)
 			if err != nil {
 				return err
@@ -230,7 +230,7 @@ func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, erro
 		return "", errors.ErrInvalidParent
 	}
 
-	return a.joinParentPath(pitem.ParentPath, pitem.RecordID), nil
+	return a.joinParentPath(pitem.ParentPath, pitem.ID), nil
 }
 
 func (a *Menu) joinParentPath(parent, id string) string {
@@ -257,7 +257,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 		}
 	}
 
-	item.RecordID = oldItem.RecordID
+	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
 
@@ -296,12 +296,12 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 	}
 
 	for _, item := range delActions {
-		err := a.MenuActionModel.Delete(ctx, item.RecordID)
+		err := a.MenuActionModel.Delete(ctx, item.ID)
 		if err != nil {
 			return err
 		}
 
-		err = a.MenuActionResourceModel.DeleteByActionID(ctx, item.RecordID)
+		err = a.MenuActionResourceModel.DeleteByActionID(ctx, item.ID)
 		if err != nil {
 			return err
 		}
@@ -313,7 +313,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		// 只更新动作名称
 		if item.Name != oitem.Name {
 			oitem.Name = item.Name
-			err := a.MenuActionModel.Update(ctx, item.RecordID, *oitem)
+			err := a.MenuActionModel.Update(ctx, item.ID, *oitem)
 			if err != nil {
 				return err
 			}
@@ -322,8 +322,8 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		// 计算需要更新的资源配置（只包括新增和删除的，更新的不关心）
 		addResources, delResources := a.compareResources(ctx, oitem.Resources, item.Resources)
 		for _, aritem := range addResources {
-			aritem.RecordID = iutil.NewID()
-			aritem.ActionID = oitem.RecordID
+			aritem.ID = iutil.NewID()
+			aritem.ActionID = oitem.ID
 			err := a.MenuActionResourceModel.Create(ctx, *aritem)
 			if err != nil {
 				return err
@@ -331,7 +331,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		}
 
 		for _, ditem := range delResources {
-			err := a.MenuActionResourceModel.Delete(ctx, ditem.RecordID)
+			err := a.MenuActionResourceModel.Delete(ctx, ditem.ID)
 			if err != nil {
 				return err
 			}
@@ -386,7 +386,7 @@ func (a *Menu) updateChildParentPath(ctx context.Context, oldItem, newItem schem
 		return nil
 	}
 
-	opath := a.joinParentPath(oldItem.ParentPath, oldItem.RecordID)
+	opath := a.joinParentPath(oldItem.ParentPath, oldItem.ID)
 	result, err := a.MenuModel.Query(NewNoTrans(ctx), schema.MenuQueryParam{
 		PrefixParentPath: opath,
 	})
@@ -394,9 +394,9 @@ func (a *Menu) updateChildParentPath(ctx context.Context, oldItem, newItem schem
 		return err
 	}
 
-	npath := a.joinParentPath(newItem.ParentPath, newItem.RecordID)
+	npath := a.joinParentPath(newItem.ParentPath, newItem.ID)
 	for _, menu := range result.Data {
-		err = a.MenuModel.UpdateParentPath(ctx, menu.RecordID, npath+menu.ParentPath[len(opath):])
+		err = a.MenuModel.UpdateParentPath(ctx, menu.ID, npath+menu.ParentPath[len(opath):])
 		if err != nil {
 			return err
 		}

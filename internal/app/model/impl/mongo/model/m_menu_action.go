@@ -41,7 +41,7 @@ func (a *MenuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 	if v := params.MenuID; v != "" {
 		filter = append(filter, Filter("menu_id", v))
 	}
-	if v := params.RecordIDs; len(v) > 0 {
+	if v := params.IDs; len(v) > 0 {
 		filter = append(filter, Filter("_id", bson.M{"$in": v}))
 	}
 

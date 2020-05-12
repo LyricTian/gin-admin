@@ -74,7 +74,7 @@ func (a *Login) Login(c *gin.Context) {
 		return
 	}
 
-	userID := user.RecordID
+	userID := user.ID
 	// 将用户ID放入上下文
 	ginplus.SetUserID(c, userID)
 

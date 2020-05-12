@@ -122,14 +122,14 @@ type OrderField struct {
 	Direction OrderDirection // 排序方向
 }
 
-// NewRecordIDResult 创建响应记录ID实例
-func NewRecordIDResult(recordID string) *RecordIDResult {
-	return &RecordIDResult{
-		RecordID: recordID,
+// NewIDResult 创建响应唯一标识实例
+func NewIDResult(recordID string) *IDResult {
+	return &IDResult{
+		ID: recordID,
 	}
 }
 
-// RecordIDResult 响应记录ID
-type RecordIDResult struct {
-	RecordID string `json:"record_id"`
+// IDResult 响应唯一标识
+type IDResult struct {
+	ID string `json:"id"`
 }

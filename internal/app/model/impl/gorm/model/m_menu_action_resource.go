@@ -38,11 +38,11 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 		subQuery := entity.GetMenuActionDB(ctx, a.DB).
 			Where("deleted_at is null").
 			Where("menu_id=?", v).
-			Select("record_id").SubQuery()
+			Select("id").SubQuery()
 		db = db.Where("action_id IN ?", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {
-		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN (?)", v).Select("record_id").SubQuery()
+		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN (?)", v).Select("id").SubQuery()
 		db = db.Where("action_id IN ?", subQuery)
 	}
 
@@ -64,7 +64,7 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 
 // Get 查询指定数据
 func (a *MenuActionResource) Get(ctx context.Context, recordID string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error) {
-	db := entity.GetMenuActionResourceDB(ctx, a.DB).Where("record_id=?", recordID)
+	db := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", recordID)
 	var item entity.MenuActionResource
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -89,7 +89,7 @@ func (a *MenuActionResource) Create(ctx context.Context, item schema.MenuActionR
 // Update 更新数据
 func (a *MenuActionResource) Update(ctx context.Context, recordID string, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -98,7 +98,7 @@ func (a *MenuActionResource) Update(ctx context.Context, recordID string, item s
 
 // Delete 删除数据
 func (a *MenuActionResource) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.MenuActionResource{})
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.MenuActionResource{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -116,7 +116,7 @@ func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID stri
 
 // DeleteByMenuID 根据菜单ID删除数据
 func (a *MenuActionResource) DeleteByMenuID(ctx context.Context, menuID string) error {
-	subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id=?", menuID).Select("record_id").SubQuery()
+	subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id=?", menuID).Select("id").SubQuery()
 	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN ?", subQuery).Delete(entity.MenuAction{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)

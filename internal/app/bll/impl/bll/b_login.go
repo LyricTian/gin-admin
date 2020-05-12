@@ -137,7 +137,7 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 	}
 
 	info := &schema.UserLoginInfo{
-		UserID:   user.RecordID,
+		UserID:   user.ID,
 		UserName: user.UserName,
 		RealName: user.RealName,
 	}
@@ -151,8 +151,8 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 
 	if roleIDs := userRoleResult.Data.ToRoleIDs(); len(roleIDs) > 0 {
 		roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-			RecordIDs: roleIDs,
-			Status:    1,
+			IDs:    roleIDs,
+			Status: 1,
 		})
 		if err != nil {
 			return nil, err
@@ -203,8 +203,8 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	}
 
 	menuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-		RecordIDs: roleMenuResult.Data.ToMenuIDs(),
-		Status:    1,
+		IDs:    roleMenuResult.Data.ToMenuIDs(),
+		Status: 1,
 	})
 	if err != nil {
 		return nil, err
@@ -213,16 +213,16 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	}
 
 	mData := menuResult.Data.ToMap()
-	var qRecordIDs []string
-	for _, pid := range menuResult.Data.SplitParentRecordIDs() {
+	var qIDs []string
+	for _, pid := range menuResult.Data.SplitParentIDs() {
 		if _, ok := mData[pid]; !ok {
-			qRecordIDs = append(qRecordIDs, pid)
+			qIDs = append(qIDs, pid)
 		}
 	}
 
-	if len(qRecordIDs) > 0 {
+	if len(qIDs) > 0 {
 		pmenuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-			RecordIDs: menuResult.Data.SplitParentRecordIDs(),
+			IDs: menuResult.Data.SplitParentIDs(),
 		})
 		if err != nil {
 			return nil, err
@@ -232,7 +232,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 
 	sort.Sort(menuResult.Data)
 	menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
-		RecordIDs: roleMenuResult.Data.ToActionIDs(),
+		IDs: roleMenuResult.Data.ToActionIDs(),
 	})
 	if err != nil {
 		return nil, err

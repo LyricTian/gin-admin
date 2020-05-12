@@ -69,7 +69,7 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 
 	for _, item := range roleResult.Data {
 		mcache := make(map[string]struct{})
-		if rms, ok := mRoleMenus[item.RecordID]; ok {
+		if rms, ok := mRoleMenus[item.ID]; ok {
 			for _, actionID := range rms.ToActionIDs() {
 				if mrs, ok := mMenuResources[actionID]; ok {
 					for _, mr := range mrs {
@@ -79,7 +79,7 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 							continue
 						}
 						mcache[mr.Path+mr.Method] = struct{}{}
-						line := fmt.Sprintf("p,%s,%s,%s", item.RecordID, mr.Path, mr.Method)
+						line := fmt.Sprintf("p,%s,%s,%s", item.ID, mr.Path, mr.Method)
 						persist.LoadPolicyLine(line, m)
 					}
 				}
@@ -105,7 +105,7 @@ func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model)
 
 		mUserRoles := userRoleResult.Data.ToUserIDMap()
 		for _, uitem := range userResult.Data {
-			if urs, ok := mUserRoles[uitem.RecordID]; ok {
+			if urs, ok := mUserRoles[uitem.ID]; ok {
 				for _, ur := range urs {
 					line := fmt.Sprintf("g,%s,%s", ur.UserID, ur.RoleID)
 					persist.LoadPolicyLine(line, m)

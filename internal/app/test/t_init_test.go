@@ -41,9 +41,9 @@ func init() {
 	engine = injector.Engine
 }
 
-// ResRecordID 响应记录ID
-type ResRecordID struct {
-	RecordID string `json:"record_id,omitempty"`
+// ResID 响应唯一标识
+type ResID struct {
+	ID string `json:"id,omitempty"`
 }
 
 func toReader(v interface{}) io.Reader {

@@ -39,7 +39,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 
 	c := entity.GetMenuCollection(ctx, a.Client)
 	filter := DefaultFilter(ctx)
-	if v := params.RecordIDs; len(v) > 0 {
+	if v := params.IDs; len(v) > 0 {
 		filter = append(filter, Filter("_id", bson.M{"$in": v}))
 	}
 	if v := params.Name; v != "" {

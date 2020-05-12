@@ -59,7 +59,7 @@ func (a *RoleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 
 // Get 查询指定数据
 func (a *RoleMenu) Get(ctx context.Context, recordID string, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenu, error) {
-	db := entity.GetRoleMenuDB(ctx, a.DB).Where("record_id=?", recordID)
+	db := entity.GetRoleMenuDB(ctx, a.DB).Where("id=?", recordID)
 	var item entity.RoleMenu
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -84,7 +84,7 @@ func (a *RoleMenu) Create(ctx context.Context, item schema.RoleMenu) error {
 // Update 更新数据
 func (a *RoleMenu) Update(ctx context.Context, recordID string, item schema.RoleMenu) error {
 	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
-	result := entity.GetRoleMenuDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
+	result := entity.GetRoleMenuDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -93,7 +93,7 @@ func (a *RoleMenu) Update(ctx context.Context, recordID string, item schema.Role
 
 // Delete 删除数据
 func (a *RoleMenu) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetRoleMenuDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.RoleMenu{})
+	result := entity.GetRoleMenuDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.RoleMenu{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

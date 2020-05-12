@@ -59,7 +59,7 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 
 // Get 查询指定数据
 func (a *UserRole) Get(ctx context.Context, recordID string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
-	db := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID)
+	db := entity.GetUserRoleDB(ctx, a.DB).Where("id=?", recordID)
 	var item entity.UserRole
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -84,7 +84,7 @@ func (a *UserRole) Create(ctx context.Context, item schema.UserRole) error {
 // Update 更新数据
 func (a *UserRole) Update(ctx context.Context, recordID string, item schema.UserRole) error {
 	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
+	result := entity.GetUserRoleDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -93,7 +93,7 @@ func (a *UserRole) Update(ctx context.Context, recordID string, item schema.User
 
 // Delete 删除数据
 func (a *UserRole) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetUserRoleDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.UserRole{})
+	result := entity.GetUserRoleDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.UserRole{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

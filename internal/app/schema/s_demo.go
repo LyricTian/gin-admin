@@ -4,7 +4,7 @@ import "time"
 
 // Demo 示例对象
 type Demo struct {
-	RecordID  string    `json:"record_id"`                             // 记录ID
+	ID        string    `json:"id"`                                    // 唯一标识
 	Code      string    `json:"code" binding:"required"`               // 编号
 	Name      string    `json:"name" binding:"required"`               // 名称
 	Memo      string    `json:"memo"`                                  // 备注

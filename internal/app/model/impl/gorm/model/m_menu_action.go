@@ -37,8 +37,8 @@ func (a *MenuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 	if v := params.MenuID; v != "" {
 		db = db.Where("menu_id=?", v)
 	}
-	if v := params.RecordIDs; len(v) > 0 {
-		db = db.Where("record_id IN (?)", v)
+	if v := params.IDs; len(v) > 0 {
+		db = db.Where("id IN (?)", v)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByASC))
@@ -59,7 +59,7 @@ func (a *MenuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 
 // Get 查询指定数据
 func (a *MenuAction) Get(ctx context.Context, recordID string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error) {
-	db := entity.GetMenuActionDB(ctx, a.DB).Where("record_id=?", recordID)
+	db := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", recordID)
 	var item entity.MenuAction
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -84,7 +84,7 @@ func (a *MenuAction) Create(ctx context.Context, item schema.MenuAction) error {
 // Update 更新数据
 func (a *MenuAction) Update(ctx context.Context, recordID string, item schema.MenuAction) error {
 	eitem := entity.SchemaMenuAction(item).ToMenuAction()
-	result := entity.GetMenuActionDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
+	result := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -93,7 +93,7 @@ func (a *MenuAction) Update(ctx context.Context, recordID string, item schema.Me
 
 // Delete 删除数据
 func (a *MenuAction) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetMenuActionDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.MenuAction{})
+	result := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.MenuAction{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

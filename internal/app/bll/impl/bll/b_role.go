@@ -61,17 +61,17 @@ func (a *Role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMe
 }
 
 // Create 创建数据
-func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDResult, error) {
+func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.IDResult, error) {
 	err := a.checkName(ctx, item)
 	if err != nil {
 		return nil, err
 	}
 
-	item.RecordID = iutil.NewID()
+	item.ID = iutil.NewID()
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		for _, rmItem := range item.RoleMenus {
-			rmItem.RecordID = iutil.NewID()
-			rmItem.RoleID = item.RecordID
+			rmItem.ID = iutil.NewID()
+			rmItem.RoleID = item.ID
 			err := a.RoleMenuModel.Create(ctx, *rmItem)
 			if err != nil {
 				return err
@@ -83,7 +83,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.RecordIDRe
 		return nil, err
 	}
 	LoadCasbinPolicy(ctx, a.Enforcer)
-	return schema.NewRecordIDResult(item.RecordID), nil
+	return schema.NewIDResult(item.ID), nil
 }
 
 func (a *Role) checkName(ctx context.Context, item schema.Role) error {
@@ -113,13 +113,13 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 		}
 	}
 
-	item.RecordID = oldItem.RecordID
+	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		addRoleMenus, delRoleMenus := a.compareRoleMenus(ctx, oldItem.RoleMenus, item.RoleMenus)
 		for _, rmitem := range addRoleMenus {
-			rmitem.RecordID = iutil.NewID()
+			rmitem.ID = iutil.NewID()
 			rmitem.RoleID = recordID
 			err := a.RoleMenuModel.Create(ctx, *rmitem)
 			if err != nil {
@@ -128,7 +128,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 		}
 
 		for _, rmitem := range delRoleMenus {
-			err := a.RoleMenuModel.Delete(ctx, rmitem.RecordID)
+			err := a.RoleMenuModel.Delete(ctx, rmitem.ID)
 			if err != nil {
 				return err
 			}

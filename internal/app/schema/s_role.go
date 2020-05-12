@@ -4,7 +4,7 @@ import "time"
 
 // Role 角色对象
 type Role struct {
-	RecordID  string    `json:"record_id"`                             // 记录ID
+	ID        string    `json:"id"`                                    // 唯一标识
 	Name      string    `json:"name" binding:"required"`               // 角色名称
 	Sequence  int       `json:"sequence"`                              // 排序值
 	Memo      string    `json:"memo"`                                  // 备注
@@ -18,7 +18,7 @@ type Role struct {
 // RoleQueryParam 查询条件
 type RoleQueryParam struct {
 	PaginationParam
-	RecordIDs  []string `form:"-"`          // 记录ID列表
+	IDs        []string `form:"-"`          // 唯一标识列表
 	Name       string   `form:"-"`          // 角色名称
 	QueryValue string   `form:"queryValue"` // 模糊查询
 	UserID     string   `form:"-"`          // 用户ID
@@ -52,7 +52,7 @@ func (a Roles) ToNames() []string {
 func (a Roles) ToMap() map[string]*Role {
 	m := make(map[string]*Role)
 	for _, item := range a {
-		m[item.RecordID] = item
+		m[item.ID] = item
 	}
 	return m
 }
@@ -61,7 +61,7 @@ func (a Roles) ToMap() map[string]*Role {
 
 // RoleMenu 角色菜单对象
 type RoleMenu struct {
-	RecordID string `json:"record_id"`                    // 记录ID
+	ID       string `json:"id"`                           // 唯一标识
 	RoleID   string `json:"role_id" binding:"required"`   // 角色ID
 	MenuID   string `json:"menu_id" binding:"required"`   // 菜单ID
 	ActionID string `json:"action_id" binding:"required"` // 动作ID

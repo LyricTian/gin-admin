@@ -46,7 +46,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 			Where("deleted_at is null").
 			Where("role_id IN (?)", v).
 			SubQuery()
-		db = db.Where("record_id IN ?", subQuery)
+		db = db.Where("id IN ?", subQuery)
 	}
 	if v := params.QueryValue; v != "" {
 		v = "%" + v + "%"
@@ -72,7 +72,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 // Get 查询指定数据
 func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	var item entity.User
-	ok, err := FindOne(ctx, entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID), &item)
+	ok, err := FindOne(ctx, entity.GetUserDB(ctx, a.DB).Where("id=?", recordID), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -95,7 +95,7 @@ func (a *User) Create(ctx context.Context, item schema.User) error {
 // Update 更新数据
 func (a *User) Update(ctx context.Context, recordID string, item schema.User) error {
 	eitem := entity.SchemaUser(item).ToUser()
-	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
+	result := entity.GetUserDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -104,7 +104,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 
 // Delete 删除数据
 func (a *User) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.User{})
+	result := entity.GetUserDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.User{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -113,7 +113,7 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 
 // UpdateStatus 更新状态
 func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Update("status", status)
+	result := entity.GetUserDB(ctx, a.DB).Where("id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -122,7 +122,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 
 // UpdatePassword 更新密码
 func (a *User) UpdatePassword(ctx context.Context, recordID, password string) error {
-	result := entity.GetUserDB(ctx, a.DB).Where("record_id=?", recordID).Update("password", password)
+	result := entity.GetUserDB(ctx, a.DB).Where("id=?", recordID).Update("password", password)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

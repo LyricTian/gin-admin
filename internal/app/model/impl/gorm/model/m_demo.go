@@ -60,7 +60,7 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 
 // Get 查询指定数据
 func (a *Demo) Get(ctx context.Context, recordID string, opts ...schema.DemoQueryOptions) (*schema.Demo, error) {
-	db := entity.GetDemoDB(ctx, a.DB).Where("record_id=?", recordID)
+	db := entity.GetDemoDB(ctx, a.DB).Where("id=?", recordID)
 	var item entity.Demo
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -85,7 +85,7 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) error {
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
 	eitem := entity.SchemaDemo(item).ToDemo()
-	result := entity.GetDemoDB(ctx, a.DB).Where("record_id=?", recordID).Updates(eitem)
+	result := entity.GetDemoDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -94,7 +94,7 @@ func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) er
 
 // Delete 删除数据
 func (a *Demo) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetDemoDB(ctx, a.DB).Where("record_id=?", recordID).Delete(entity.Demo{})
+	result := entity.GetDemoDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.Demo{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -103,7 +103,7 @@ func (a *Demo) Delete(ctx context.Context, recordID string) error {
 
 // UpdateStatus 更新状态
 func (a *Demo) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	result := entity.GetDemoDB(ctx, a.DB).Where("record_id=?", recordID).Update("status", status)
+	result := entity.GetDemoDB(ctx, a.DB).Where("id=?", recordID).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

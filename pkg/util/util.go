@@ -34,11 +34,11 @@ func StructMapToStruct(s, ts interface{}) error {
 
 		if tfield.IsEmbedded() && tfield.Kind() == reflect.Struct {
 			for _, tefield := range tfield.Fields() {
-				if f, ok := ss.FieldOk(tefield.Name()); ok && !f.IsZero() {
+				if f, ok := ss.FieldOk(tefield.Name()); ok {
 					tefield.Set2(f.Value())
 				}
 			}
-		} else if f, ok := ss.FieldOk(tfield.Name()); ok && !f.IsZero() {
+		} else if f, ok := ss.FieldOk(tfield.Name()); ok {
 			tfield.Set2(f.Value())
 		}
 	}

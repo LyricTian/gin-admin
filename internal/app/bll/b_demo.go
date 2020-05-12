@@ -13,7 +13,7 @@ type IDemo interface {
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.DemoQueryOptions) (*schema.Demo, error)
 	// 创建数据
-	Create(ctx context.Context, item schema.Demo) (*schema.RecordIDResult, error)
+	Create(ctx context.Context, item schema.Demo) (*schema.IDResult, error)
 	// 更新数据
 	Update(ctx context.Context, recordID string, item schema.Demo) error
 	// 删除数据

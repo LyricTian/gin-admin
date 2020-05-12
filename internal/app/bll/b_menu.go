@@ -15,7 +15,7 @@ type IMenu interface {
 	// 查询指定数据
 	Get(ctx context.Context, recordID string, opts ...schema.MenuQueryOptions) (*schema.Menu, error)
 	// 创建数据
-	Create(ctx context.Context, item schema.Menu) (*schema.RecordIDResult, error)
+	Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error)
 	// 更新数据
 	Update(ctx context.Context, recordID string, item schema.Menu) error
 	// 删除数据

@@ -24,7 +24,7 @@ func TestUser(t *testing.T) {
 	}
 	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/menus", addMenuItem))
 	assert.Equal(t, 200, w.Code)
-	var addMenuItemRes ResRecordID
+	var addMenuItemRes ResID
 	err = parseReader(w.Body, &addMenuItemRes)
 	assert.Nil(t, err)
 
@@ -34,13 +34,13 @@ func TestUser(t *testing.T) {
 		Status: 1,
 		RoleMenus: schema.RoleMenus{
 			&schema.RoleMenu{
-				MenuID: addMenuItemRes.RecordID,
+				MenuID: addMenuItemRes.ID,
 			},
 		},
 	}
 	engine.ServeHTTP(w, newPostRequest(apiPrefix+"v1/roles", addRoleItem))
 	assert.Equal(t, 200, w.Code)
-	var addRoleItemRes ResRecordID
+	var addRoleItemRes ResID
 	err = parseReader(w.Body, &addRoleItemRes)
 	assert.Nil(t, err)
 
@@ -52,30 +52,30 @@ func TestUser(t *testing.T) {
 		Password: util.MD5HashString("test"),
 		UserRoles: schema.UserRoles{
 			&schema.UserRole{
-				RoleID: addRoleItemRes.RecordID,
+				RoleID: addRoleItemRes.ID,
 			},
 		},
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
 	assert.Equal(t, 200, w.Code)
-	var addItemRes ResRecordID
+	var addItemRes ResID
 	err = parseReader(w.Body, &addItemRes)
 	assert.Nil(t, err)
 
 	// get /users/:id
-	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.RecordID))
+	engine.ServeHTTP(w, newGetRequest("%s/%s", nil, router, addItemRes.ID))
 	assert.Equal(t, 200, w.Code)
 	var getItem schema.User
 	err = parseReader(w.Body, &getItem)
 	assert.Nil(t, err)
 	assert.Equal(t, addItem.UserName, getItem.UserName)
 	assert.Equal(t, addItem.Status, getItem.Status)
-	assert.NotEmpty(t, getItem.RecordID)
+	assert.NotEmpty(t, getItem.ID)
 
 	// put /users/:id
 	putItem := getItem
 	putItem.UserName = unique.MustUUID().String()
-	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.RecordID))
+	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
@@ -88,24 +88,24 @@ func TestUser(t *testing.T) {
 	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, len(pageItems), 1)
 	if len(pageItems) > 0 {
-		assert.Equal(t, putItem.RecordID, pageItems[0].RecordID)
+		assert.Equal(t, putItem.ID, pageItems[0].ID)
 		assert.Equal(t, putItem.UserName, pageItems[0].UserName)
 	}
 
 	// delete /users/:id
-	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.RecordID))
+	engine.ServeHTTP(w, newDeleteRequest("%s/%s", router, addItemRes.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
 
 	// delete /roles/:id
-	engine.ServeHTTP(w, newDeleteRequest(apiPrefix+"v1/roles/%s", addRoleItemRes.RecordID))
+	engine.ServeHTTP(w, newDeleteRequest(apiPrefix+"v1/roles/%s", addRoleItemRes.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)
 
 	// delete /menus/:id
-	engine.ServeHTTP(w, newDeleteRequest(apiPrefix+"v1/menus/%s", addMenuItemRes.RecordID))
+	engine.ServeHTTP(w, newDeleteRequest(apiPrefix+"v1/menus/%s", addMenuItemRes.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)
 	assert.Nil(t, err)

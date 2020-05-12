@@ -12,8 +12,7 @@ import (
 
 // Model base model
 type Model struct {
-	ID        uint       `gorm:"column:id;primary_key;auto_increment;"`
-	RecordID  string     `gorm:"column:record_id;size:36;index;default:'';not null;"`
+	ID        string     `gorm:"column:id;primary_key;size:36;"`
 	CreatedAt time.Time  `gorm:"column:created_at;index;"`
 	UpdatedAt time.Time  `gorm:"column:updated_at;index;"`
 	DeletedAt *time.Time `gorm:"column:deleted_at;index;"`

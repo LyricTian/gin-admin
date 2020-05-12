@@ -70,37 +70,6 @@ func SetVersion(s string) Option {
 	}
 }
 
-// Run 运行服务
-func Run(ctx context.Context, opts ...Option) error {
-	var state int32 = 1
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	cleanFunc, err := Init(ctx, opts...)
-	if err != nil {
-		return err
-	}
-
-EXIT:
-	for {
-		sig := <-sc
-		logger.Printf(ctx, "接收到信号[%s]", sig.String())
-		switch sig {
-		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-			atomic.CompareAndSwapInt32(&state, 1, 0)
-			break EXIT
-		case syscall.SIGHUP:
-		default:
-			break EXIT
-		}
-	}
-
-	cleanFunc()
-	logger.Printf(ctx, "服务退出")
-	time.Sleep(time.Second)
-	os.Exit(int(atomic.LoadInt32(&state)))
-	return nil
-}
-
 // Init 应用初始化
 func Init(ctx context.Context, opts ...Option) (func(), error) {
 	var o options
@@ -219,4 +188,35 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 			logger.Errorf(ctx, err.Error())
 		}
 	}
+}
+
+// Run 运行服务
+func Run(ctx context.Context, opts ...Option) error {
+	var state int32 = 1
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	cleanFunc, err := Init(ctx, opts...)
+	if err != nil {
+		return err
+	}
+
+EXIT:
+	for {
+		sig := <-sc
+		logger.Printf(ctx, "接收到信号[%s]", sig.String())
+		switch sig {
+		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			atomic.CompareAndSwapInt32(&state, 1, 0)
+			break EXIT
+		case syscall.SIGHUP:
+		default:
+			break EXIT
+		}
+	}
+
+	cleanFunc()
+	logger.Printf(ctx, "服务退出")
+	time.Sleep(time.Second)
+	os.Exit(int(atomic.LoadInt32(&state)))
+	return nil
 }

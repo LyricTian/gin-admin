@@ -42,14 +42,14 @@ func (a *User) QueryShow(ctx context.Context, params schema.UserQueryParam, opts
 	}
 
 	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
-		UserIDs: result.Data.ToRecordIDs(),
+		UserIDs: result.Data.ToIDs(),
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
-		RecordIDs: userRoleResult.Data.ToRoleIDs(),
+		IDs: userRoleResult.Data.ToRoleIDs(),
 	})
 	if err != nil {
 		return nil, err
@@ -79,18 +79,18 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 }
 
 // Create 创建数据
-func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDResult, error) {
+func (a *User) Create(ctx context.Context, item schema.User) (*schema.IDResult, error) {
 	err := a.checkUserName(ctx, item)
 	if err != nil {
 		return nil, err
 	}
 
 	item.Password = util.SHA1HashString(item.Password)
-	item.RecordID = iutil.NewID()
+	item.ID = iutil.NewID()
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		for _, urItem := range item.UserRoles {
-			urItem.RecordID = iutil.NewID()
-			urItem.UserID = item.RecordID
+			urItem.ID = iutil.NewID()
+			urItem.UserID = item.ID
 			err := a.UserRoleModel.Create(ctx, *urItem)
 			if err != nil {
 				return err
@@ -104,7 +104,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.RecordIDRe
 	}
 
 	LoadCasbinPolicy(ctx, a.Enforcer)
-	return schema.NewRecordIDResult(item.RecordID), nil
+	return schema.NewIDResult(item.ID), nil
 }
 
 func (a *User) checkUserName(ctx context.Context, item schema.User) error {
@@ -144,13 +144,13 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 		item.Password = oldItem.Password
 	}
 
-	item.RecordID = oldItem.RecordID
+	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
 		addUserRoles, delUserRoles := a.compareUserRoles(ctx, oldItem.UserRoles, item.UserRoles)
 		for _, rmitem := range addUserRoles {
-			rmitem.RecordID = iutil.NewID()
+			rmitem.ID = iutil.NewID()
 			rmitem.UserID = recordID
 			err := a.UserRoleModel.Create(ctx, *rmitem)
 			if err != nil {
@@ -159,7 +159,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 		}
 
 		for _, rmitem := range delUserRoles {
-			err := a.UserRoleModel.Delete(ctx, rmitem.RecordID)
+			err := a.UserRoleModel.Delete(ctx, rmitem.ID)
 			if err != nil {
 				return err
 			}

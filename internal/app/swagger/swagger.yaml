@@ -11,14 +11,14 @@ definitions:
       creator:
         description: 创建者
         type: string
+      id:
+        description: 唯一标识
+        type: string
       memo:
         description: 备注
         type: string
       name:
         description: 名称
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       status:
         description: 状态(1:启用 2:停用)
@@ -46,6 +46,11 @@ definitions:
         $ref: '#/definitions/schema.ErrorItem'
         description: 错误项
         type: object
+    type: object
+  schema.IDResult:
+    properties:
+      id:
+        type: string
     type: object
   schema.LoginCaptcha:
     properties:
@@ -100,6 +105,9 @@ definitions:
       icon:
         description: 菜单图标
         type: string
+      id:
+        description: 唯一标识
+        type: string
       memo:
         description: 备注
         type: string
@@ -111,9 +119,6 @@ definitions:
         type: string
       parent_path:
         description: 父级路径
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       router:
         description: 访问路由
@@ -140,14 +145,14 @@ definitions:
       code:
         description: 动作编号
         type: string
+      id:
+        description: 唯一标识
+        type: string
       menu_id:
         description: 菜单ID
         type: string
       name:
         description: 动作名称
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       resources:
         $ref: '#/definitions/schema.MenuActionResources'
@@ -163,14 +168,14 @@ definitions:
       action_id:
         description: 菜单动作ID
         type: string
+      id:
+        description: 唯一标识
+        type: string
       method:
         description: 资源请求方式(支持正则)
         type: string
       path:
         description: 资源请求路径（支持/:id匹配）
-        type: string
-      record_id:
-        description: 记录ID
         type: string
     required:
     - method
@@ -197,6 +202,9 @@ definitions:
       icon:
         description: 菜单图标
         type: string
+      id:
+        description: 唯一标识
+        type: string
       name:
         description: 菜单名称
         type: string
@@ -205,9 +213,6 @@ definitions:
         type: string
       parent_path:
         description: 父级路径
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       router:
         description: 访问路由
@@ -226,11 +231,6 @@ definitions:
     items:
       $ref: '#/definitions/schema.MenuTree'
     type: array
-  schema.RecordIDResult:
-    properties:
-      record_id:
-        type: string
-    type: object
   schema.Role:
     properties:
       created_at:
@@ -239,14 +239,14 @@ definitions:
       creator:
         description: 创建者
         type: string
+      id:
+        description: 唯一标识
+        type: string
       memo:
         description: 备注
         type: string
       name:
         description: 角色名称
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       role_menus:
         $ref: '#/definitions/schema.RoleMenus'
@@ -271,11 +271,11 @@ definitions:
       action_id:
         description: 动作ID
         type: string
+      id:
+        description: 唯一标识
+        type: string
       menu_id:
         description: 菜单ID
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       role_id:
         description: 角色ID
@@ -322,6 +322,9 @@ definitions:
       email:
         description: 邮箱
         type: string
+      id:
+        description: 唯一标识
+        type: string
       password:
         description: 密码
         type: string
@@ -330,9 +333,6 @@ definitions:
         type: string
       real_name:
         description: 真实姓名
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       status:
         description: 用户状态(1:启用 2:停用)
@@ -368,8 +368,8 @@ definitions:
     type: object
   schema.UserRole:
     properties:
-      record_id:
-        description: 记录ID
+      id:
+        description: 唯一标识
         type: string
       role_id:
         description: 角色ID
@@ -390,14 +390,14 @@ definitions:
       email:
         description: 邮箱
         type: string
+      id:
+        description: 唯一标识
+        type: string
       phone:
         description: 手机号
         type: string
       real_name:
         description: 真实姓名
-        type: string
-      record_id:
-        description: 记录ID
         type: string
       roles:
         description: 授权角色列表
@@ -477,7 +477,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.RecordIDResult'
+            $ref: '#/definitions/schema.IDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
@@ -500,7 +500,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -527,7 +527,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -558,7 +558,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -596,7 +596,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -624,7 +624,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -714,7 +714,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.RecordIDResult'
+            $ref: '#/definitions/schema.IDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
@@ -770,7 +770,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -797,7 +797,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -828,7 +828,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -866,7 +866,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -894,7 +894,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1151,7 +1151,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.RecordIDResult'
+            $ref: '#/definitions/schema.IDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
@@ -1211,7 +1211,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1238,7 +1238,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1269,7 +1269,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1307,7 +1307,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1335,7 +1335,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1421,7 +1421,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.RecordIDResult'
+            $ref: '#/definitions/schema.IDResult'
         "400":
           description: '{error:{code:0,message:无效的请求参数}}'
           schema:
@@ -1444,7 +1444,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1471,7 +1471,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1502,7 +1502,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1540,7 +1540,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true
@@ -1568,7 +1568,7 @@ paths:
         in: header
         name: Authorization
         type: string
-      - description: 记录ID
+      - description: 唯一标识
         in: path
         name: id
         required: true

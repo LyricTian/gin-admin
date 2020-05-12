@@ -114,7 +114,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.RecordIDResult"
+                            "$ref": "#/definitions/schema.IDResult"
                         }
                     },
                     "400": {
@@ -153,7 +153,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -200,7 +200,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -256,7 +256,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -299,7 +299,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -342,7 +342,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -474,7 +474,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.RecordIDResult"
+                            "$ref": "#/definitions/schema.IDResult"
                         }
                     },
                     "400": {
@@ -564,7 +564,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -611,7 +611,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -667,7 +667,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -710,7 +710,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -753,7 +753,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1146,7 +1146,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.RecordIDResult"
+                            "$ref": "#/definitions/schema.IDResult"
                         }
                     },
                     "400": {
@@ -1242,7 +1242,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1289,7 +1289,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1345,7 +1345,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1388,7 +1388,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1431,7 +1431,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1557,7 +1557,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schema.RecordIDResult"
+                            "$ref": "#/definitions/schema.IDResult"
                         }
                     },
                     "400": {
@@ -1596,7 +1596,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1643,7 +1643,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1699,7 +1699,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1742,7 +1742,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1785,7 +1785,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "记录ID",
+                        "description": "唯一标识",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1835,16 +1835,16 @@ var doc = `{
                     "description": "创建者",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "memo": {
                     "description": "备注",
                     "type": "string"
                 },
                 "name": {
                     "description": "名称",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "status": {
@@ -1877,6 +1877,14 @@ var doc = `{
                     "description": "错误项",
                     "type": "object",
                     "$ref": "#/definitions/schema.ErrorItem"
+                }
+            }
+        },
+        "schema.IDResult": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
                 }
             }
         },
@@ -1958,6 +1966,10 @@ var doc = `{
                     "description": "菜单图标",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "memo": {
                     "description": "备注",
                     "type": "string"
@@ -1972,10 +1984,6 @@ var doc = `{
                 },
                 "parent_path": {
                     "description": "父级路径",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "router": {
@@ -2012,16 +2020,16 @@ var doc = `{
                     "description": "动作编号",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "menu_id": {
                     "description": "菜单ID",
                     "type": "string"
                 },
                 "name": {
                     "description": "动作名称",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "resources": {
@@ -2042,16 +2050,16 @@ var doc = `{
                     "description": "菜单动作ID",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "method": {
                     "description": "资源请求方式(支持正则)",
                     "type": "string"
                 },
                 "path": {
                     "description": "资源请求路径（支持/:id匹配）",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 }
             }
@@ -2085,6 +2093,10 @@ var doc = `{
                     "description": "菜单图标",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "name": {
                     "description": "菜单名称",
                     "type": "string"
@@ -2095,10 +2107,6 @@ var doc = `{
                 },
                 "parent_path": {
                     "description": "父级路径",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "router": {
@@ -2125,14 +2133,6 @@ var doc = `{
                 "$ref": "#/definitions/schema.MenuTree"
             }
         },
-        "schema.RecordIDResult": {
-            "type": "object",
-            "properties": {
-                "record_id": {
-                    "type": "string"
-                }
-            }
-        },
         "schema.Role": {
             "type": "object",
             "required": [
@@ -2149,16 +2149,16 @@ var doc = `{
                     "description": "创建者",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "memo": {
                     "description": "备注",
                     "type": "string"
                 },
                 "name": {
                     "description": "角色名称",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "role_menus": {
@@ -2192,12 +2192,12 @@ var doc = `{
                     "description": "动作ID",
                     "type": "string"
                 },
-                "menu_id": {
-                    "description": "菜单ID",
+                "id": {
+                    "description": "唯一标识",
                     "type": "string"
                 },
-                "record_id": {
-                    "description": "记录ID",
+                "menu_id": {
+                    "description": "菜单ID",
                     "type": "string"
                 },
                 "role_id": {
@@ -2265,6 +2265,10 @@ var doc = `{
                     "description": "邮箱",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "password": {
                     "description": "密码",
                     "type": "string"
@@ -2275,10 +2279,6 @@ var doc = `{
                 },
                 "real_name": {
                     "description": "真实姓名",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "status": {
@@ -2321,8 +2321,8 @@ var doc = `{
         "schema.UserRole": {
             "type": "object",
             "properties": {
-                "record_id": {
-                    "description": "记录ID",
+                "id": {
+                    "description": "唯一标识",
                     "type": "string"
                 },
                 "role_id": {
@@ -2352,16 +2352,16 @@ var doc = `{
                     "description": "邮箱",
                     "type": "string"
                 },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "phone": {
                     "description": "手机号",
                     "type": "string"
                 },
                 "real_name": {
                     "description": "真实姓名",
-                    "type": "string"
-                },
-                "record_id": {
-                    "description": "记录ID",
                     "type": "string"
                 },
                 "roles": {
