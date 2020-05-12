@@ -69,9 +69,9 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 }
 
 // Get 查询指定数据
-func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
+func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	var role entity.Role
-	ok, err := FindOne(ctx, entity.GetRoleDB(ctx, a.DB).Where("id=?", recordID), &role)
+	ok, err := FindOne(ctx, entity.GetRoleDB(ctx, a.DB).Where("id=?", id), &role)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -92,9 +92,9 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 }
 
 // Update 更新数据
-func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) error {
+func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
-	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
+	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -102,8 +102,8 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 }
 
 // Delete 删除数据
-func (a *Role) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.Role{})
+func (a *Role) Delete(ctx context.Context, id string) error {
+	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Delete(entity.Role{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -111,8 +111,8 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 }
 
 // UpdateStatus 更新状态
-func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", recordID).Update("status", status)
+func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
+	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Update("status", status)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

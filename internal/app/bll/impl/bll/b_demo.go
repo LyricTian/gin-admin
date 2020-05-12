@@ -27,8 +27,8 @@ func (a *Demo) Query(ctx context.Context, params schema.DemoQueryParam, opts ...
 }
 
 // Get 查询指定数据
-func (a *Demo) Get(ctx context.Context, recordID string, opts ...schema.DemoQueryOptions) (*schema.Demo, error) {
-	item, err := a.DemoModel.Get(ctx, recordID, opts...)
+func (a *Demo) Get(ctx context.Context, id string, opts ...schema.DemoQueryOptions) (*schema.Demo, error) {
+	item, err := a.DemoModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
 	} else if item == nil {
@@ -71,8 +71,8 @@ func (a *Demo) Create(ctx context.Context, item schema.Demo) (*schema.IDResult, 
 }
 
 // Update 更新数据
-func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) error {
-	oldItem, err := a.DemoModel.Get(ctx, recordID)
+func (a *Demo) Update(ctx context.Context, id string, item schema.Demo) error {
+	oldItem, err := a.DemoModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -86,29 +86,29 @@ func (a *Demo) Update(ctx context.Context, recordID string, item schema.Demo) er
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
 
-	return a.DemoModel.Update(ctx, recordID, item)
+	return a.DemoModel.Update(ctx, id, item)
 }
 
 // Delete 删除数据
-func (a *Demo) Delete(ctx context.Context, recordID string) error {
-	oldItem, err := a.DemoModel.Get(ctx, recordID)
+func (a *Demo) Delete(ctx context.Context, id string) error {
+	oldItem, err := a.DemoModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
-	return a.DemoModel.Delete(ctx, recordID)
+	return a.DemoModel.Delete(ctx, id)
 }
 
 // UpdateStatus 更新状态
-func (a *Demo) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	oldItem, err := a.DemoModel.Get(ctx, recordID)
+func (a *Demo) UpdateStatus(ctx context.Context, id string, status int) error {
+	oldItem, err := a.DemoModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
-	return a.DemoModel.UpdateStatus(ctx, recordID, status)
+	return a.DemoModel.UpdateStatus(ctx, id, status)
 }

@@ -58,8 +58,8 @@ func (a *MenuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 }
 
 // Get 查询指定数据
-func (a *MenuAction) Get(ctx context.Context, recordID string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error) {
-	db := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", recordID)
+func (a *MenuAction) Get(ctx context.Context, id string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error) {
+	db := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", id)
 	var item entity.MenuAction
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -82,9 +82,9 @@ func (a *MenuAction) Create(ctx context.Context, item schema.MenuAction) error {
 }
 
 // Update 更新数据
-func (a *MenuAction) Update(ctx context.Context, recordID string, item schema.MenuAction) error {
+func (a *MenuAction) Update(ctx context.Context, id string, item schema.MenuAction) error {
 	eitem := entity.SchemaMenuAction(item).ToMenuAction()
-	result := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
+	result := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -92,8 +92,8 @@ func (a *MenuAction) Update(ctx context.Context, recordID string, item schema.Me
 }
 
 // Delete 删除数据
-func (a *MenuAction) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.MenuAction{})
+func (a *MenuAction) Delete(ctx context.Context, id string) error {
+	result := entity.GetMenuActionDB(ctx, a.DB).Where("id=?", id).Delete(entity.MenuAction{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

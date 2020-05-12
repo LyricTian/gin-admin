@@ -32,15 +32,15 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 }
 
 // Get 查询指定数据
-func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
-	item, err := a.RoleModel.Get(ctx, recordID, opts...)
+func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
+	item, err := a.RoleModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
 	} else if item == nil {
 		return nil, errors.ErrNotFound
 	}
 
-	roleMenus, err := a.QueryRoleMenus(ctx, recordID)
+	roleMenus, err := a.QueryRoleMenus(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +100,8 @@ func (a *Role) checkName(ctx context.Context, item schema.Role) error {
 }
 
 // Update 更新数据
-func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) error {
-	oldItem, err := a.Get(ctx, recordID)
+func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
+	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -120,7 +120,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 		addRoleMenus, delRoleMenus := a.compareRoleMenus(ctx, oldItem.RoleMenus, item.RoleMenus)
 		for _, rmitem := range addRoleMenus {
 			rmitem.ID = iutil.NewID()
-			rmitem.RoleID = recordID
+			rmitem.RoleID = id
 			err := a.RoleMenuModel.Create(ctx, *rmitem)
 			if err != nil {
 				return err
@@ -134,7 +134,7 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 			}
 		}
 
-		return a.RoleModel.Update(ctx, recordID, item)
+		return a.RoleModel.Update(ctx, id, item)
 	})
 	if err != nil {
 		return err
@@ -162,8 +162,8 @@ func (a *Role) compareRoleMenus(ctx context.Context, oldRoleMenus, newRoleMenus 
 }
 
 // Delete 删除数据
-func (a *Role) Delete(ctx context.Context, recordID string) error {
-	oldItem, err := a.RoleModel.Get(ctx, recordID)
+func (a *Role) Delete(ctx context.Context, id string) error {
+	oldItem, err := a.RoleModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -172,7 +172,7 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 
 	userResult, err := a.UserModel.Query(ctx, schema.UserQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
-		RoleIDs:         []string{recordID},
+		RoleIDs:         []string{id},
 	})
 	if err != nil {
 		return err
@@ -181,12 +181,12 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 	}
 
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
-		err := a.RoleMenuModel.DeleteByRoleID(ctx, recordID)
+		err := a.RoleMenuModel.DeleteByRoleID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		return a.RoleModel.Delete(ctx, recordID)
+		return a.RoleModel.Delete(ctx, id)
 	})
 	if err != nil {
 		return err
@@ -197,15 +197,15 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 }
 
 // UpdateStatus 更新状态
-func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	oldItem, err := a.RoleModel.Get(ctx, recordID)
+func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
+	oldItem, err := a.RoleModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
-	err = a.RoleModel.UpdateStatus(ctx, recordID, status)
+	err = a.RoleModel.UpdateStatus(ctx, id, status)
 	if err != nil {
 		return err
 	}

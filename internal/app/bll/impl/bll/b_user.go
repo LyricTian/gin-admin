@@ -59,8 +59,8 @@ func (a *User) QueryShow(ctx context.Context, params schema.UserQueryParam, opts
 }
 
 // Get 查询指定数据
-func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error) {
-	item, err := a.UserModel.Get(ctx, recordID, opts...)
+func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
+	item, err := a.UserModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
 	} else if item == nil {
@@ -68,7 +68,7 @@ func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQuer
 	}
 
 	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
-		UserID: recordID,
+		UserID: id,
 	})
 	if err != nil {
 		return nil, err
@@ -125,8 +125,8 @@ func (a *User) checkUserName(ctx context.Context, item schema.User) error {
 }
 
 // Update 更新数据
-func (a *User) Update(ctx context.Context, recordID string, item schema.User) error {
-	oldItem, err := a.Get(ctx, recordID)
+func (a *User) Update(ctx context.Context, id string, item schema.User) error {
+	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -151,7 +151,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 		addUserRoles, delUserRoles := a.compareUserRoles(ctx, oldItem.UserRoles, item.UserRoles)
 		for _, rmitem := range addUserRoles {
 			rmitem.ID = iutil.NewID()
-			rmitem.UserID = recordID
+			rmitem.UserID = id
 			err := a.UserRoleModel.Create(ctx, *rmitem)
 			if err != nil {
 				return err
@@ -165,7 +165,7 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 			}
 		}
 
-		return a.UserModel.Update(ctx, recordID, item)
+		return a.UserModel.Update(ctx, id, item)
 	})
 	if err != nil {
 		return err
@@ -194,8 +194,8 @@ func (a *User) compareUserRoles(ctx context.Context, oldUserRoles, newUserRoles 
 }
 
 // Delete 删除数据
-func (a *User) Delete(ctx context.Context, recordID string) error {
-	oldItem, err := a.UserModel.Get(ctx, recordID)
+func (a *User) Delete(ctx context.Context, id string) error {
+	oldItem, err := a.UserModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -203,12 +203,12 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 	}
 
 	err = ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
-		err := a.UserRoleModel.DeleteByUserID(ctx, recordID)
+		err := a.UserRoleModel.DeleteByUserID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		return a.UserModel.Delete(ctx, recordID)
+		return a.UserModel.Delete(ctx, id)
 	})
 	if err != nil {
 		return err
@@ -219,8 +219,8 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 }
 
 // UpdateStatus 更新状态
-func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	oldItem, err := a.UserModel.Get(ctx, recordID)
+func (a *User) UpdateStatus(ctx context.Context, id string, status int) error {
+	oldItem, err := a.UserModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -228,7 +228,7 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 	}
 	oldItem.Status = status
 
-	err = a.UserModel.UpdateStatus(ctx, recordID, status)
+	err = a.UserModel.UpdateStatus(ctx, id, status)
 	if err != nil {
 		return err
 	}

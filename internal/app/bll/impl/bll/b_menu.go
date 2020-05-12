@@ -110,15 +110,15 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 }
 
 // Get 查询指定数据
-func (a *Menu) Get(ctx context.Context, recordID string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
-	item, err := a.MenuModel.Get(ctx, recordID, opts...)
+func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
+	item, err := a.MenuModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
 	} else if item == nil {
 		return nil, errors.ErrNotFound
 	}
 
-	actions, err := a.QueryActions(ctx, recordID)
+	actions, err := a.QueryActions(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -128,9 +128,9 @@ func (a *Menu) Get(ctx context.Context, recordID string, opts ...schema.MenuQuer
 }
 
 // QueryActions 查询动作数据
-func (a *Menu) QueryActions(ctx context.Context, recordID string) (schema.MenuActions, error) {
+func (a *Menu) QueryActions(ctx context.Context, id string) (schema.MenuActions, error) {
 	result, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
-		MenuID: recordID,
+		MenuID: id,
 	})
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (a *Menu) QueryActions(ctx context.Context, recordID string) (schema.MenuAc
 	}
 
 	resourceResult, err := a.MenuActionResourceModel.Query(ctx, schema.MenuActionResourceQueryParam{
-		MenuID: recordID,
+		MenuID: id,
 	})
 	if err != nil {
 		return nil, err
@@ -241,12 +241,12 @@ func (a *Menu) joinParentPath(parent, id string) string {
 }
 
 // Update 更新数据
-func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) error {
-	if recordID == item.ParentID {
+func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
+	if id == item.ParentID {
 		return errors.ErrInvalidParent
 	}
 
-	oldItem, err := a.Get(ctx, recordID)
+	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -272,7 +272,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 	}
 
 	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
-		err := a.updateActions(ctx, recordID, oldItem.Actions, item.Actions)
+		err := a.updateActions(ctx, id, oldItem.Actions, item.Actions)
 		if err != nil {
 			return err
 		}
@@ -282,7 +282,7 @@ func (a *Menu) Update(ctx context.Context, recordID string, item schema.Menu) er
 			return err
 		}
 
-		return a.MenuModel.Update(ctx, recordID, item)
+		return a.MenuModel.Update(ctx, id, item)
 	})
 }
 
@@ -405,8 +405,8 @@ func (a *Menu) updateChildParentPath(ctx context.Context, oldItem, newItem schem
 }
 
 // Delete 删除数据
-func (a *Menu) Delete(ctx context.Context, recordID string) error {
-	oldItem, err := a.MenuModel.Get(ctx, recordID)
+func (a *Menu) Delete(ctx context.Context, id string) error {
+	oldItem, err := a.MenuModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
@@ -415,7 +415,7 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 
 	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
-		ParentID:        &recordID,
+		ParentID:        &id,
 	})
 	if err != nil {
 		return err
@@ -424,28 +424,28 @@ func (a *Menu) Delete(ctx context.Context, recordID string) error {
 	}
 
 	return ExecTrans(ctx, a.TransModel, func(ctx context.Context) error {
-		err = a.MenuActionResourceModel.DeleteByMenuID(ctx, recordID)
+		err = a.MenuActionResourceModel.DeleteByMenuID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		err := a.MenuActionModel.DeleteByMenuID(ctx, recordID)
+		err := a.MenuActionModel.DeleteByMenuID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		return a.MenuModel.Delete(ctx, recordID)
+		return a.MenuModel.Delete(ctx, id)
 	})
 }
 
 // UpdateStatus 更新状态
-func (a *Menu) UpdateStatus(ctx context.Context, recordID string, status int) error {
-	oldItem, err := a.MenuModel.Get(ctx, recordID)
+func (a *Menu) UpdateStatus(ctx context.Context, id string, status int) error {
+	oldItem, err := a.MenuModel.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
-	return a.MenuModel.UpdateStatus(ctx, recordID, status)
+	return a.MenuModel.UpdateStatus(ctx, id, status)
 }

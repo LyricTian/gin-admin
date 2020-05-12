@@ -77,9 +77,9 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 }
 
 // Get 查询指定数据
-func (a *Role) Get(ctx context.Context, recordID string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
+func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	c := entity.GetRoleCollection(ctx, a.Client)
-	filter := DefaultFilter(ctx, Filter("_id", recordID))
+	filter := DefaultFilter(ctx, Filter("_id", id))
 	var item entity.Role
 	ok, err := FindOne(ctx, c, filter, &item)
 	if err != nil {
@@ -105,11 +105,11 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 }
 
 // Update 更新数据
-func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) error {
+func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetRoleCollection(ctx, a.Client)
-	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), eitem)
+	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -117,9 +117,9 @@ func (a *Role) Update(ctx context.Context, recordID string, item schema.Role) er
 }
 
 // Delete 删除数据
-func (a *Role) Delete(ctx context.Context, recordID string) error {
+func (a *Role) Delete(ctx context.Context, id string) error {
 	c := entity.GetRoleCollection(ctx, a.Client)
-	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)))
+	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -127,9 +127,9 @@ func (a *Role) Delete(ctx context.Context, recordID string) error {
 }
 
 // UpdateStatus 更新状态
-func (a *Role) UpdateStatus(ctx context.Context, recordID string, status int) error {
+func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
 	c := entity.GetRoleCollection(ctx, a.Client)
-	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), bson.M{"status": status})
+	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", id)), bson.M{"status": status})
 	if err != nil {
 		return errors.WithStack(err)
 	}

@@ -11,13 +11,13 @@ type IMenuActionResource interface {
 	// 查询数据
 	Query(ctx context.Context, params schema.MenuActionResourceQueryParam, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResourceQueryResult, error)
 	// 查询指定数据
-	Get(ctx context.Context, recordID string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error)
+	Get(ctx context.Context, id string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error)
 	// 创建数据
 	Create(ctx context.Context, item schema.MenuActionResource) error
 	// 更新数据
-	Update(ctx context.Context, recordID string, item schema.MenuActionResource) error
+	Update(ctx context.Context, id string, item schema.MenuActionResource) error
 	// 删除数据
-	Delete(ctx context.Context, recordID string) error
+	Delete(ctx context.Context, id string) error
 	// 根据动作ID删除数据
 	DeleteByActionID(ctx context.Context, actionID string) error
 	// 根据菜单ID删除数据

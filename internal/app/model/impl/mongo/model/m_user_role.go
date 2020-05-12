@@ -61,9 +61,9 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 }
 
 // Get 查询指定数据
-func (a *UserRole) Get(ctx context.Context, recordID string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
+func (a *UserRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
 	c := entity.GetUserRoleCollection(ctx, a.Client)
-	filter := DefaultFilter(ctx, Filter("_id", recordID))
+	filter := DefaultFilter(ctx, Filter("_id", id))
 	var item entity.UserRole
 	ok, err := FindOne(ctx, c, filter, &item)
 	if err != nil {
@@ -89,11 +89,11 @@ func (a *UserRole) Create(ctx context.Context, item schema.UserRole) error {
 }
 
 // Update 更新数据
-func (a *UserRole) Update(ctx context.Context, recordID string, item schema.UserRole) error {
+func (a *UserRole) Update(ctx context.Context, id string, item schema.UserRole) error {
 	eitem := entity.SchemaUserRole(item).ToUserRole()
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetUserRoleCollection(ctx, a.Client)
-	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), eitem)
+	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -101,9 +101,9 @@ func (a *UserRole) Update(ctx context.Context, recordID string, item schema.User
 }
 
 // Delete 删除数据
-func (a *UserRole) Delete(ctx context.Context, recordID string) error {
+func (a *UserRole) Delete(ctx context.Context, id string) error {
 	c := entity.GetUserRoleCollection(ctx, a.Client)
-	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)))
+	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
 	if err != nil {
 		return errors.WithStack(err)
 	}

@@ -61,9 +61,9 @@ func (a *MenuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 }
 
 // Get 查询指定数据
-func (a *MenuAction) Get(ctx context.Context, recordID string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error) {
+func (a *MenuAction) Get(ctx context.Context, id string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error) {
 	c := entity.GetMenuActionCollection(ctx, a.Client)
-	filter := DefaultFilter(ctx, Filter("_id", recordID))
+	filter := DefaultFilter(ctx, Filter("_id", id))
 	var item entity.MenuAction
 	ok, err := FindOne(ctx, c, filter, &item)
 	if err != nil {
@@ -89,11 +89,11 @@ func (a *MenuAction) Create(ctx context.Context, item schema.MenuAction) error {
 }
 
 // Update 更新数据
-func (a *MenuAction) Update(ctx context.Context, recordID string, item schema.MenuAction) error {
+func (a *MenuAction) Update(ctx context.Context, id string, item schema.MenuAction) error {
 	eitem := entity.SchemaMenuAction(item).ToMenuAction()
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetMenuActionCollection(ctx, a.Client)
-	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), eitem)
+	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -101,9 +101,9 @@ func (a *MenuAction) Update(ctx context.Context, recordID string, item schema.Me
 }
 
 // Delete 删除数据
-func (a *MenuAction) Delete(ctx context.Context, recordID string) error {
+func (a *MenuAction) Delete(ctx context.Context, id string) error {
 	c := entity.GetMenuActionCollection(ctx, a.Client)
-	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)))
+	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
 	if err != nil {
 		return errors.WithStack(err)
 	}

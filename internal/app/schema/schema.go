@@ -123,9 +123,9 @@ type OrderField struct {
 }
 
 // NewIDResult 创建响应唯一标识实例
-func NewIDResult(recordID string) *IDResult {
+func NewIDResult(id string) *IDResult {
 	return &IDResult{
-		ID: recordID,
+		ID: id,
 	}
 }
 

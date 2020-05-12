@@ -63,8 +63,8 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 }
 
 // Get 查询指定数据
-func (a *MenuActionResource) Get(ctx context.Context, recordID string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error) {
-	db := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", recordID)
+func (a *MenuActionResource) Get(ctx context.Context, id string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error) {
+	db := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", id)
 	var item entity.MenuActionResource
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
@@ -87,9 +87,9 @@ func (a *MenuActionResource) Create(ctx context.Context, item schema.MenuActionR
 }
 
 // Update 更新数据
-func (a *MenuActionResource) Update(ctx context.Context, recordID string, item schema.MenuActionResource) error {
+func (a *MenuActionResource) Update(ctx context.Context, id string, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", recordID).Updates(eitem)
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}
@@ -97,8 +97,8 @@ func (a *MenuActionResource) Update(ctx context.Context, recordID string, item s
 }
 
 // Delete 删除数据
-func (a *MenuActionResource) Delete(ctx context.Context, recordID string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", recordID).Delete(entity.MenuActionResource{})
+func (a *MenuActionResource) Delete(ctx context.Context, id string) error {
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", id).Delete(entity.MenuActionResource{})
 	if err := result.Error; err != nil {
 		return errors.WithStack(err)
 	}

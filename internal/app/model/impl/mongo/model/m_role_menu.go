@@ -61,9 +61,9 @@ func (a *RoleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 }
 
 // Get 查询指定数据
-func (a *RoleMenu) Get(ctx context.Context, recordID string, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenu, error) {
+func (a *RoleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenu, error) {
 	c := entity.GetRoleMenuCollection(ctx, a.Client)
-	filter := DefaultFilter(ctx, Filter("_id", recordID))
+	filter := DefaultFilter(ctx, Filter("_id", id))
 	var item entity.RoleMenu
 	ok, err := FindOne(ctx, c, filter, &item)
 	if err != nil {
@@ -89,11 +89,11 @@ func (a *RoleMenu) Create(ctx context.Context, item schema.RoleMenu) error {
 }
 
 // Update 更新数据
-func (a *RoleMenu) Update(ctx context.Context, recordID string, item schema.RoleMenu) error {
+func (a *RoleMenu) Update(ctx context.Context, id string, item schema.RoleMenu) error {
 	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetRoleMenuCollection(ctx, a.Client)
-	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), eitem)
+	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -101,9 +101,9 @@ func (a *RoleMenu) Update(ctx context.Context, recordID string, item schema.Role
 }
 
 // Delete 删除数据
-func (a *RoleMenu) Delete(ctx context.Context, recordID string) error {
+func (a *RoleMenu) Delete(ctx context.Context, id string) error {
 	c := entity.GetRoleMenuCollection(ctx, a.Client)
-	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)))
+	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
 	if err != nil {
 		return errors.WithStack(err)
 	}

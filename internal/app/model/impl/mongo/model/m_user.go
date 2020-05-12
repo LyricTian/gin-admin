@@ -75,9 +75,9 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 }
 
 // Get 查询指定数据
-func (a *User) Get(ctx context.Context, recordID string, opts ...schema.UserQueryOptions) (*schema.User, error) {
+func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	c := entity.GetUserCollection(ctx, a.Client)
-	filter := DefaultFilter(ctx, Filter("_id", recordID))
+	filter := DefaultFilter(ctx, Filter("_id", id))
 	var item entity.User
 	ok, err := FindOne(ctx, c, filter, &item)
 	if err != nil {
@@ -103,11 +103,11 @@ func (a *User) Create(ctx context.Context, item schema.User) error {
 }
 
 // Update 更新数据
-func (a *User) Update(ctx context.Context, recordID string, item schema.User) error {
+func (a *User) Update(ctx context.Context, id string, item schema.User) error {
 	eitem := entity.SchemaUser(item).ToUser()
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetUserCollection(ctx, a.Client)
-	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), eitem)
+	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -115,9 +115,9 @@ func (a *User) Update(ctx context.Context, recordID string, item schema.User) er
 }
 
 // Delete 删除数据
-func (a *User) Delete(ctx context.Context, recordID string) error {
+func (a *User) Delete(ctx context.Context, id string) error {
 	c := entity.GetUserCollection(ctx, a.Client)
-	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)))
+	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -125,9 +125,9 @@ func (a *User) Delete(ctx context.Context, recordID string) error {
 }
 
 // UpdateStatus 更新状态
-func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) error {
+func (a *User) UpdateStatus(ctx context.Context, id string, status int) error {
 	c := entity.GetUserCollection(ctx, a.Client)
-	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), bson.M{"status": status})
+	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", id)), bson.M{"status": status})
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -135,9 +135,9 @@ func (a *User) UpdateStatus(ctx context.Context, recordID string, status int) er
 }
 
 // UpdatePassword 更新密码
-func (a *User) UpdatePassword(ctx context.Context, recordID, password string) error {
+func (a *User) UpdatePassword(ctx context.Context, id, password string) error {
 	c := entity.GetUserCollection(ctx, a.Client)
-	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", recordID)), bson.M{"password": password})
+	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", id)), bson.M{"password": password})
 	if err != nil {
 		return errors.WithStack(err)
 	}
