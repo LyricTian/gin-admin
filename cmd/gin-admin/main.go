@@ -10,9 +10,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// VERSION 版本号，
-// 可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "6.1.0"
+// VERSION 版本号，可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
+var VERSION = "6.2.0"
 
 func main() {
 	logger.SetVersion(VERSION)
@@ -22,7 +21,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "gin-admin"
 	app.Version = VERSION
-	app.Usage = "RBAC scaffolding based on Gin + Gorm + Casbin + Wire."
+	app.Usage = "RBAC scaffolding based on Gin + Gorm/Mongo + Casbin + Wire."
 	app.Commands = []*cli.Command{
 		newWebCmd(ctx),
 	}
