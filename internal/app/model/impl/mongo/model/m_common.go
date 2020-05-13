@@ -62,8 +62,13 @@ func FindPage(ctx context.Context, c *mongo.Collection, pp schema.PaginationPara
 	if len(opts) > 0 {
 		opt = opts[0]
 	}
-	opt.SetSkip(int64((current - 1) * pageSize))
-	opt.SetLimit(int64(pageSize))
+
+	if current > 0 && pageSize > 0 {
+		opt.SetSkip(int64((current - 1) * pageSize))
+		opt.SetLimit(int64(pageSize))
+	} else if pageSize > 0 {
+		opt.SetLimit(int64(pageSize))
+	}
 
 	cursor, err := c.Find(ctx, filter, opt)
 	if err != nil {
