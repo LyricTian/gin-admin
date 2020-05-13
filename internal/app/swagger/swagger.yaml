@@ -418,15 +418,11 @@ info:
   description: RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.
   license: {}
   title: gin-admin
-  version: 6.3.0
+  version: 6.3.1
 paths:
   /api/v1/demos:
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - default: 1
         description: 分页索引
         in: query
@@ -458,15 +454,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询数据
       tags:
       - Demo
     post:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 创建数据
         in: body
         name: body
@@ -490,16 +484,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 创建数据
       tags:
       - Demo
   /api/v1/demos/{id}:
     delete:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -518,15 +510,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 删除数据
       tags:
       - Demo
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -549,15 +539,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询指定数据
       tags:
       - Demo
     put:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -586,16 +574,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 更新数据
       tags:
       - Demo
   /api/v1/demos/{id}/disable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -614,16 +600,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 禁用数据
       tags:
       - Demo
   /api/v1/demos/{id}/enable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -642,16 +626,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 启用数据
       tags:
       - Demo
   /api/v1/menus:
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - default: 1
         description: 分页索引
         in: query
@@ -695,15 +677,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询数据
       tags:
       - 菜单管理
     post:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 创建数据
         in: body
         name: body
@@ -727,16 +707,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 创建数据
       tags:
       - 菜单管理
   /api/v1/menus.tree:
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 状态(1:启用 2:禁用)
         in: query
         name: status
@@ -760,16 +738,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询菜单树
       tags:
       - 菜单管理
   /api/v1/menus/{id}:
     delete:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -788,15 +764,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 删除数据
       tags:
       - 菜单管理
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -819,15 +793,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询指定数据
       tags:
       - 菜单管理
     put:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -856,16 +828,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 更新数据
       tags:
       - 菜单管理
   /api/v1/menus/{id}/disable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -884,16 +854,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 禁用数据
       tags:
       - 菜单管理
   /api/v1/menus/{id}/enable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -912,16 +880,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 启用数据
       tags:
       - 菜单管理
   /api/v1/pub/current/menutree:
     get:
-      parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       responses:
         "200":
           description: 查询结果：{list:菜单树}
@@ -935,16 +900,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询当前用户菜单树
       tags:
       - 登录管理
   /api/v1/pub/current/password:
     put:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 请求参数
         in: body
         name: body
@@ -968,16 +931,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 更新个人密码
       tags:
       - 登录管理
   /api/v1/pub/current/user:
     get:
-      parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       responses:
         "200":
           description: OK
@@ -991,6 +951,8 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 获取当前用户信息
       tags:
       - 登录管理
@@ -1069,11 +1031,6 @@ paths:
       - 登录管理
   /api/v1/pub/refresh-token:
     post:
-      parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       responses:
         "200":
           description: OK
@@ -1087,16 +1044,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 刷新令牌
       tags:
       - 登录管理
   /api/v1/roles:
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - default: 1
         description: 分页索引
         in: query
@@ -1132,15 +1087,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询数据
       tags:
       - 角色管理
     post:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 创建数据
         in: body
         name: body
@@ -1164,16 +1117,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 创建数据
       tags:
       - 角色管理
   /api/v1/roles.select:
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 查询值
         in: query
         name: queryValue
@@ -1201,16 +1152,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询选择数据
       tags:
       - 角色管理
   /api/v1/roles/{id}:
     delete:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1229,15 +1178,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 删除数据
       tags:
       - 角色管理
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1260,15 +1207,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询指定数据
       tags:
       - 角色管理
     put:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1297,16 +1242,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 更新数据
       tags:
       - 角色管理
   /api/v1/roles/{id}/disable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1325,16 +1268,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 禁用数据
       tags:
       - 角色管理
   /api/v1/roles/{id}/enable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1353,16 +1294,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 启用数据
       tags:
       - 角色管理
   /api/v1/users:
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - default: 1
         description: 分页索引
         in: query
@@ -1402,15 +1341,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询数据
       tags:
       - 用户管理
     post:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 创建数据
         in: body
         name: body
@@ -1434,16 +1371,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 创建数据
       tags:
       - 用户管理
   /api/v1/users/{id}:
     delete:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1462,15 +1397,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 删除数据
       tags:
       - 用户管理
     get:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1493,15 +1426,13 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 查询指定数据
       tags:
       - 用户管理
     put:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1530,16 +1461,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 更新数据
       tags:
       - 用户管理
   /api/v1/users/{id}/disable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1558,16 +1487,14 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 禁用数据
       tags:
       - 用户管理
   /api/v1/users/{id}/enable:
     patch:
       parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       - description: 唯一标识
         in: path
         name: id
@@ -1586,10 +1513,17 @@ paths:
           description: '{error:{code:0,message:服务器错误}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
       summary: 启用数据
       tags:
       - 用户管理
 schemes:
 - http
 - https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

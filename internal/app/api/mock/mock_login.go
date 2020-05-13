@@ -55,7 +55,7 @@ func (a *Login) Logout(c *gin.Context) {
 // RefreshToken 刷新令牌
 // @Tags 登录管理
 // @Summary 刷新令牌
-// @Param Authorization header string false "Bearer 用户令牌"
+// @Security ApiKeyAuth
 // @Success 200 {object} schema.LoginTokenInfo
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
@@ -66,7 +66,7 @@ func (a *Login) RefreshToken(c *gin.Context) {
 // GetUserInfo 获取当前用户信息
 // @Tags 登录管理
 // @Summary 获取当前用户信息
-// @Param Authorization header string false "Bearer 用户令牌"
+// @Security ApiKeyAuth
 // @Success 200 {object} schema.UserLoginInfo
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
@@ -77,7 +77,7 @@ func (a *Login) GetUserInfo(c *gin.Context) {
 // QueryUserMenuTree 查询当前用户菜单树
 // @Tags 登录管理
 // @Summary 查询当前用户菜单树
-// @Param Authorization header string false "Bearer 用户令牌"
+// @Security ApiKeyAuth
 // @Success 200 {object} schema.Menu "查询结果：{list:菜单树}"
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
@@ -88,7 +88,7 @@ func (a *Login) QueryUserMenuTree(c *gin.Context) {
 // UpdatePassword 更新个人密码
 // @Tags 登录管理
 // @Summary 更新个人密码
-// @Param Authorization header string false "Bearer 用户令牌"
+// @Security ApiKeyAuth
 // @Param body body schema.UpdatePasswordParam true "请求参数"
 // @Success 200 {object} schema.StatusResult "{status:OK}"
 // @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"

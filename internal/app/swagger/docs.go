@@ -30,17 +30,16 @@ var doc = `{
     "paths": {
         "/api/v1/demos": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Demo"
                 ],
                 "summary": "查询数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "integer",
                         "default": 1,
@@ -89,17 +88,16 @@ var doc = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Demo"
                 ],
                 "summary": "创建数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "description": "创建数据",
                         "name": "body",
@@ -140,17 +138,16 @@ var doc = `{
         },
         "/api/v1/demos/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Demo"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -187,17 +184,16 @@ var doc = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Demo"
                 ],
                 "summary": "更新数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -243,17 +239,16 @@ var doc = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Demo"
                 ],
                 "summary": "删除数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -286,17 +281,16 @@ var doc = `{
         },
         "/api/v1/demos/{id}/disable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Demo"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -329,17 +323,16 @@ var doc = `{
         },
         "/api/v1/demos/{id}/enable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Demo"
                 ],
                 "summary": "启用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -372,17 +365,16 @@ var doc = `{
         },
         "/api/v1/menus": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "查询数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "integer",
                         "default": 1,
@@ -449,17 +441,16 @@ var doc = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "创建数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "description": "创建数据",
                         "name": "body",
@@ -500,17 +491,16 @@ var doc = `{
         },
         "/api/v1/menus.tree": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "查询菜单树",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "integer",
                         "description": "状态(1:启用 2:禁用)",
@@ -551,17 +541,16 @@ var doc = `{
         },
         "/api/v1/menus/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -598,17 +587,16 @@ var doc = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "更新数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -654,17 +642,16 @@ var doc = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "删除数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -697,17 +684,16 @@ var doc = `{
         },
         "/api/v1/menus/{id}/disable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -740,17 +726,16 @@ var doc = `{
         },
         "/api/v1/menus/{id}/enable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "菜单管理"
                 ],
                 "summary": "启用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -783,18 +768,15 @@ var doc = `{
         },
         "/api/v1/pub/current/menutree": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "登录管理"
                 ],
                 "summary": "查询当前用户菜单树",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "查询结果：{list:菜单树}",
@@ -819,17 +801,16 @@ var doc = `{
         },
         "/api/v1/pub/current/password": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "登录管理"
                 ],
                 "summary": "更新个人密码",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "description": "请求参数",
                         "name": "body",
@@ -870,18 +851,15 @@ var doc = `{
         },
         "/api/v1/pub/current/user": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "登录管理"
                 ],
                 "summary": "获取当前用户信息",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1020,18 +998,15 @@ var doc = `{
         },
         "/api/v1/pub/refresh-token": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "登录管理"
                 ],
                 "summary": "刷新令牌",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1056,17 +1031,16 @@ var doc = `{
         },
         "/api/v1/roles": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "查询数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "integer",
                         "default": 1,
@@ -1121,17 +1095,16 @@ var doc = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "创建数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "description": "创建数据",
                         "name": "body",
@@ -1172,17 +1145,16 @@ var doc = `{
         },
         "/api/v1/roles.select": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "查询选择数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "查询值",
@@ -1229,17 +1201,16 @@ var doc = `{
         },
         "/api/v1/roles/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1276,17 +1247,16 @@ var doc = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "更新数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1332,17 +1302,16 @@ var doc = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "删除数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1375,17 +1344,16 @@ var doc = `{
         },
         "/api/v1/roles/{id}/disable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1418,17 +1386,16 @@ var doc = `{
         },
         "/api/v1/roles/{id}/enable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "角色管理"
                 ],
                 "summary": "启用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1461,17 +1428,16 @@ var doc = `{
         },
         "/api/v1/users": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "用户管理"
                 ],
                 "summary": "查询数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "integer",
                         "default": 1,
@@ -1532,17 +1498,16 @@ var doc = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "用户管理"
                 ],
                 "summary": "创建数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "description": "创建数据",
                         "name": "body",
@@ -1583,17 +1548,16 @@ var doc = `{
         },
         "/api/v1/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "用户管理"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1630,17 +1594,16 @@ var doc = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "用户管理"
                 ],
                 "summary": "更新数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1686,17 +1649,16 @@ var doc = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "用户管理"
                 ],
                 "summary": "删除数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1729,17 +1691,16 @@ var doc = `{
         },
         "/api/v1/users/{id}/disable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "用户管理"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -1772,17 +1733,16 @@ var doc = `{
         },
         "/api/v1/users/{id}/enable": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "用户管理"
                 ],
                 "summary": "启用数据",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
                     {
                         "type": "string",
                         "description": "唯一标识",
@@ -2381,6 +2341,13 @@ var doc = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -2395,7 +2362,7 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "6.3.0",
+	Version:     "6.3.1",
 	Host:        "",
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
