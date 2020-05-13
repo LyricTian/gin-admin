@@ -53,19 +53,13 @@ type PaginationParam struct {
 
 // GetCurrent 获取当前页
 func (a PaginationParam) GetCurrent() uint {
-	current := a.Current
-	if current == 0 {
-		current = 1
-	}
-	return current
+	return a.Current
 }
 
 // GetPageSize 获取页大小
 func (a PaginationParam) GetPageSize() uint {
 	pageSize := a.PageSize
-	if pageSize == 0 {
-		pageSize = 10
-	} else if pageSize > 100 {
+	if pageSize > 100 {
 		pageSize = 100
 	}
 	return pageSize
