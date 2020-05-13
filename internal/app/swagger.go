@@ -10,7 +10,7 @@ Package app 生成swagger文档
 package app
 
 // @title gin-admin
-// @version 6.2.1
+// @version 6.3.0
 // @description RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.
 // @schemes http https
 // @basePath /

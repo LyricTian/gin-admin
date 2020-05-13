@@ -1,7 +1,7 @@
 <h1 align="center">Gin Admin</h1>
 
 <div align="center">
- 基于 Gin + Gorm/Mongo + Casbin + Wire 实现的RBAC权限管理脚手架，目的是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
+ 基于 GIN + GORM/MONGO + CASBIN + WIRE 实现的RBAC权限管理脚手架，目的是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
 <br/>
 
 [![ReportCard][reportcard-image]][reportcard-url] [![GoDoc][godoc-image]][godoc-url] [![License][license-image]][license-url]
