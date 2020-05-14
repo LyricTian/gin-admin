@@ -1,5 +1,7 @@
 package errors
 
+import "fmt"
+
 // ResponseError 定义响应错误
 type ResponseError struct {
 	Code       int    // 错误码
@@ -24,54 +26,42 @@ func UnWrapResponse(err error) *ResponseError {
 }
 
 // WrapResponse 包装响应错误
-func WrapResponse(err error, code int, msg string, status ...int) error {
+func WrapResponse(err error, code, statusCode int, msg string, args ...interface{}) error {
 	res := &ResponseError{
-		Code:    code,
-		Message: msg,
-		ERR:     err,
-	}
-	if len(status) > 0 {
-		res.StatusCode = status[0]
+		Code:       code,
+		Message:    fmt.Sprintf(msg, args...),
+		ERR:        err,
+		StatusCode: statusCode,
 	}
 	return res
 }
 
 // Wrap400Response 包装错误码为400的响应错误
-func Wrap400Response(err error, msg ...string) error {
-	m := "请求发生错误"
-	if len(msg) > 0 {
-		m = msg[0]
-	}
-	return WrapResponse(err, 400, m, 400)
+func Wrap400Response(err error, msg string, args ...interface{}) error {
+	return WrapResponse(err, 400, 400, msg, args...)
 }
 
 // Wrap500Response 包装错误码为500的响应错误
-func Wrap500Response(err error, msg ...string) error {
-	m := "服务器发生错误"
-	if len(msg) > 0 {
-		m = msg[0]
-	}
-	return WrapResponse(err, 500, m, 500)
+func Wrap500Response(err error, msg string, args ...interface{}) error {
+	return WrapResponse(err, 500, 500, msg, args...)
 }
 
 // NewResponse 创建响应错误
-func NewResponse(code int, msg string, status ...int) error {
+func NewResponse(code, statusCode int, msg string, args ...interface{}) error {
 	res := &ResponseError{
-		Code:    code,
-		Message: msg,
-	}
-	if len(status) > 0 {
-		res.StatusCode = status[0]
+		Code:       code,
+		Message:    fmt.Sprintf(msg, args...),
+		StatusCode: statusCode,
 	}
 	return res
 }
 
 // New400Response 创建错误码为400的响应错误
-func New400Response(msg string) error {
-	return NewResponse(400, msg, 400)
+func New400Response(msg string, args ...interface{}) error {
+	return NewResponse(400, 400, msg, args...)
 }
 
 // New500Response 创建错误码为500的响应错误
-func New500Response(msg string) error {
-	return NewResponse(500, msg, 500)
+func New500Response(msg string, args ...interface{}) error {
+	return NewResponse(500, 500, msg, args...)
 }

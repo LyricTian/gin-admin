@@ -110,7 +110,7 @@ func ResError(c *gin.Context, err error, status ...int) {
 		if e, ok := err.(*errors.ResponseError); ok {
 			res = e
 		} else {
-			res = errors.UnWrapResponse(errors.Wrap500Response(err))
+			res = errors.UnWrapResponse(errors.Wrap500Response(err, "服务器错误"))
 		}
 	} else {
 		res = errors.UnWrapResponse(errors.ErrInternalServer)
