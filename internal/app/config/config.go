@@ -171,11 +171,12 @@ type JWTAuth struct {
 
 // HTTP http配置参数
 type HTTP struct {
-	Host            string
-	Port            int
-	CertFile        string
-	KeyFile         string
-	ShutdownTimeout int
+	Host             string
+	Port             int
+	CertFile         string
+	KeyFile          string
+	ShutdownTimeout  int
+	MaxContentLength int64
 }
 
 // Monitor 监控配置参数

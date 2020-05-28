@@ -15,11 +15,11 @@ import (
 
 // 定义上下文中的键
 const (
-	prefix = "gin-admin"
-	// UserIDKey 存储上下文中的键(用户ID)
-	UserIDKey = prefix + "/user-id"
-	// ResBodyKey 存储上下文中的键(响应Body数据)
-	ResBodyKey = prefix + "/res-body"
+	prefix           = "gin-admin"
+	UserIDKey        = prefix + "/user-id"
+	ReqBodyKey       = prefix + "/req-body"
+	ResBodyKey       = prefix + "/res-body"
+	LoggerReqBodyKey = prefix + "/logger-req-body"
 )
 
 // GetToken 获取用户令牌

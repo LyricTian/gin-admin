@@ -20,21 +20,24 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 
 	prefixes := r.Prefixes()
 
-	// 跟踪ID
+	// Trace ID
 	app.Use(middleware.TraceMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
 
-	// 访问日志
+	// Copy body
+	app.Use(middleware.CopyBodyMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
+
+	// Access logger
 	app.Use(middleware.LoggerMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
 
-	// 崩溃恢复
+	// Recover
 	app.Use(middleware.RecoveryMiddleware())
 
-	// 跨域请求
+	// CORS
 	if config.C.CORS.Enable {
 		app.Use(middleware.CORSMiddleware())
 	}
 
-	// gzip压缩
+	// GZIP
 	if config.C.GZIP.Enable {
 		app.Use(gzip.Gzip(gzip.BestCompression,
 			gzip.WithExcludedExtensions(config.C.GZIP.ExcludedExtentions),
@@ -42,15 +45,15 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 		))
 	}
 
-	// 注册路由
+	// Router register
 	r.Register(app)
 
-	// swagger文档
+	// Swagger
 	if config.C.Swagger {
 		app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
-	// 静态站点
+	// Website
 	if dir := config.C.WWW; dir != "" {
 		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(prefixes...)))
 	}
