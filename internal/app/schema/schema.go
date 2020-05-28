@@ -45,10 +45,10 @@ type PaginationResult struct {
 
 // PaginationParam 分页查询条件
 type PaginationParam struct {
-	Pagination bool `form:"-"`        // 是否使用分页查询
-	OnlyCount  bool `form:"-"`        // 是否仅查询count
-	Current    uint `form:"current"`  // 当前页
-	PageSize   uint `form:"pageSize"` // 页大小
+	Pagination bool `form:"-"`                                     // 是否使用分页查询
+	OnlyCount  bool `form:"-"`                                     // 是否仅查询count
+	Current    uint `form:"current,default=1"`                     // 当前页
+	PageSize   uint `form:"pageSize,default=10" binding:"max=100"` // 页大小
 }
 
 // GetCurrent 获取当前页
@@ -59,7 +59,7 @@ func (a PaginationParam) GetCurrent() uint {
 // GetPageSize 获取页大小
 func (a PaginationParam) GetPageSize() uint {
 	pageSize := a.PageSize
-	if pageSize > 100 {
+	if a.PageSize == 0 {
 		pageSize = 100
 	}
 	return pageSize
