@@ -43,6 +43,16 @@ func SetUserID(c *gin.Context, userID string) {
 	c.Set(UserIDKey, userID)
 }
 
+// GetBody Get request body
+func GetBody(c *gin.Context) []byte {
+	if v, ok := c.Get(ReqBodyKey); ok {
+		if b, ok := v.([]byte); ok {
+			return b
+		}
+	}
+	return nil
+}
+
 // ParseJSON 解析请求JSON
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
@@ -124,9 +134,7 @@ func ResError(c *gin.Context, err error, status ...int) {
 		if status := res.StatusCode; status >= 400 && status < 500 {
 			logger.StartSpan(ctx).Warnf(err.Error())
 		} else if status >= 500 {
-			span := logger.StartSpan(ctx)
-			span = span.WithField("stack", fmt.Sprintf("%+v", err))
-			span.Errorf(err.Error())
+			logger.ErrorStack(ctx, err)
 		}
 	}
 

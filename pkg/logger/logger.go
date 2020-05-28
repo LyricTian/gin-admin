@@ -17,6 +17,7 @@ const (
 	SpanTitleKey    = "span_title"
 	SpanFunctionKey = "span_function"
 	VersionKey      = "version"
+	StackKey        = "stack"
 )
 
 // TraceIDFunc 定义获取跟踪ID的函数
@@ -83,18 +84,18 @@ func AddHook(hook Hook) {
 }
 
 type (
-	traceIDContextKey struct{}
-	userIDContextKey  struct{}
+	traceIDKey struct{}
+	userIDKey  struct{}
 )
 
 // NewTraceIDContext 创建跟踪ID上下文
 func NewTraceIDContext(ctx context.Context, traceID string) context.Context {
-	return context.WithValue(ctx, traceIDContextKey{}, traceID)
+	return context.WithValue(ctx, traceIDKey{}, traceID)
 }
 
 // FromTraceIDContext 从上下文中获取跟踪ID
 func FromTraceIDContext(ctx context.Context) string {
-	v := ctx.Value(traceIDContextKey{})
+	v := ctx.Value(traceIDKey{})
 	if v != nil {
 		if s, ok := v.(string); ok {
 			return s
@@ -105,12 +106,12 @@ func FromTraceIDContext(ctx context.Context) string {
 
 // NewUserIDContext 创建用户ID上下文
 func NewUserIDContext(ctx context.Context, userID string) context.Context {
-	return context.WithValue(ctx, userIDContextKey{}, userID)
+	return context.WithValue(ctx, userIDKey{}, userID)
 }
 
 // FromUserIDContext 从上下文中获取用户ID
 func FromUserIDContext(ctx context.Context) string {
-	v := ctx.Value(userIDContextKey{})
+	v := ctx.Value(userIDKey{})
 	if v != nil {
 		if s, ok := v.(string); ok {
 			return s
@@ -199,6 +200,11 @@ func Errorf(ctx context.Context, format string, args ...interface{}) {
 // Fatalf 写入重大错误日志
 func Fatalf(ctx context.Context, format string, args ...interface{}) {
 	StartSpan(ctx).Fatalf(format, args...)
+}
+
+// ErrorStack 输出错误栈
+func ErrorStack(ctx context.Context, err error) {
+	StartSpan(ctx).WithField(StackKey, fmt.Sprintf("%+v", err)).Errorf(err.Error())
 }
 
 func newEntry(entry *logrus.Entry) *Entry {

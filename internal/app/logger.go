@@ -44,7 +44,6 @@ func InitLogger() (func(), error) {
 
 	var hook *loggerhook.Hook
 	if c.EnableHook {
-
 		var hookLevels []logrus.Level
 		for _, lvl := range c.HookLevels {
 			plvl, err := logrus.ParseLevel(lvl)
