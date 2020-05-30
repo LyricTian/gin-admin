@@ -45,7 +45,7 @@ go get -u github.com/swaggo/swag/cmd/swag
 - [Casbin](https://casbin.org/) -- An authorization library that supports access control models like ACL, RBAC, ABAC in Golang
 - [Wire](https://github.com/google/wire) -- Compile-time Dependency Injection for Go
 
-## 快速开始（或者使用[gin-admin-cli](https://github.com/LyricTian/gin-admin-cli)）
+## 快速开始（或者使用[gin-admin-cli](https://github.com/gin-admin/gin-admin-cli)）
 
 > 也可以使用国内源：https://gitee.com/lyric/gin-admin
 
@@ -82,7 +82,7 @@ wire gen ./internal/app/injector
 
 ## 前端工程
 
-- 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/LyricTian/gin-admin-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
+- 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/gin-admin/gin-admin-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
 
 ## 互动交流
 
