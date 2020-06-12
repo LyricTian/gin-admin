@@ -151,13 +151,11 @@ func (a *JWTAuth) ParseUserID(ctx context.Context, tokenString string) (string, 
 	}
 
 	err = a.callStore(func(store Storer) error {
-		exists, err := store.Check(ctx, tokenString)
-		if err != nil {
+		if exists, err := store.Check(ctx, tokenString); err != nil {
 			return err
-		} else if exists {
+		} else if !exists {
 			return auth.ErrInvalidToken
 		}
-		return nil
 	})
 	if err != nil {
 		return "", err
