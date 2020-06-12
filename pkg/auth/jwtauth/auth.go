@@ -156,6 +156,7 @@ func (a *JWTAuth) ParseUserID(ctx context.Context, tokenString string) (string, 
 		} else if !exists {
 			return auth.ErrInvalidToken
 		}
+		return nil
 	})
 	if err != nil {
 		return "", err
