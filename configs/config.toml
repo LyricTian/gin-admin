@@ -15,14 +15,28 @@ PrintConfig = true
 Host = "0.0.0.0"
 # http监听端口
 Port = 10088
-# 证书路径
-CertFile = ""
-# 证书密钥
-KeyFile = ""
 # http优雅关闭等待超时时长(单位秒)
 ShutdownTimeout = 30
 # 允许的最大内容长度(64M)
 MaxContentLength = 67108864
+
+# 证书 a.com
+[[HTTP.Certificates]]
+# 启用证书
+Enable = false
+# 证书路径
+CertFile = "/srv/cert/letsencript/a.com/fullchain.pem"
+# 证书密钥
+KeyFile = "/srv/cert/letsencript/a.com/privkey.pem"
+
+# 证书 b.com
+[[HTTP.Certificates]]
+# 启用证书
+Enable = false
+# 证书路径
+CertFile = "/srv/cert/letsencript/b.com/fullchain.pem"
+# 证书密钥
+KeyFile = "/srv/cert/letsencript/b.com/privkey.pem"
 
 [Menu]
 # 使用启用初始化菜单数据

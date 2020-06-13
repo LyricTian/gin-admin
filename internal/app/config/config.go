@@ -173,8 +173,7 @@ type JWTAuth struct {
 type HTTP struct {
 	Host             string
 	Port             int
-	CertFile         string
-	KeyFile          string
+	Certificates     []map[string]interface{}
 	ShutdownTimeout  int
 	MaxContentLength int64
 }

@@ -167,15 +167,56 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 
 	go func() {
 		logger.Printf(ctx, "HTTP server is running at %s.", addr)
-		var err error
-		if cfg.CertFile != "" && cfg.KeyFile != "" {
-			srv.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
-			err = srv.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
+		var (
+			err       error
+			enableTLS bool
+			tlsConfig tls.Config
+		)
+		if l := len(cfg.Certificates); l > 0 {
+			tlsConfig.Certificates = make([]tls.Certificate, l)
+			for index, cert := range cfg.Certificates {
+				enable, ok := cert["Enable"].(bool)
+				if !ok || !enable {
+					continue
+				}
+
+				certFile, ok := cert["CertFile"].(string)
+				if !ok || certFile == "" {
+					panic("CertFile错误")
+				}
+				keyFile, ok := cert["KeyFile"].(string)
+				if !ok || keyFile == "" {
+					panic("KeyFile错误")
+				}
+				tlsConfig.Certificates[index], err = tls.LoadX509KeyPair(
+					certFile,
+					keyFile,
+				)
+				if err != nil {
+					panic(err)
+				}
+
+				enableTLS = true
+			}
+		}
+
+		if enableTLS {
+			tlsConfig.MinVersion = tls.VersionTLS12
+			tlsConfig.BuildNameToCertificate()
+			srv.TLSConfig = &tlsConfig
+			listener, err := tls.Listen("tcp", addr, &tlsConfig)
+			if err != nil {
+				panic(err)
+			}
+			err = srv.Serve(listener)
+			if err != nil {
+				panic(err)
+			}
 		} else {
 			err = srv.ListenAndServe()
-		}
-		if err != nil && err != http.ErrServerClosed {
-			panic(err)
+			if err != nil && err != http.ErrServerClosed {
+				panic(err)
+			}
 		}
 	}()
 
