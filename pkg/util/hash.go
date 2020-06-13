@@ -9,7 +9,7 @@ import (
 // MD5Hash MD5哈希值
 func MD5Hash(b []byte) string {
 	h := md5.New()
-	h.Write(b)
+	_, _ = h.Write(b)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
@@ -21,7 +21,7 @@ func MD5HashString(s string) string {
 // SHA1Hash SHA1哈希值
 func SHA1Hash(b []byte) string {
 	h := sha1.New()
-	h.Write(b)
+	_, _ = h.Write(b)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 

@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"github.com/LyricTian/gin-admin/internal/app/ginplus"
-	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/LyricTian/gin-admin/v6/internal/app/icontext"
+	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	"github.com/LyricTian/gin-admin/v6/pkg/trace"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,12 +15,17 @@ func TraceMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 			return
 		}
 
-		// 优先从请求头中获取请求ID，如果没有则使用UUID
+		// 优先从请求头中获取请求ID
 		traceID := c.GetHeader("X-Request-Id")
 		if traceID == "" {
-			traceID = util.NewTraceID()
+			traceID = trace.NewID()
 		}
-		c.Set(ginplus.TraceIDKey, traceID)
+
+		ctx := icontext.NewTraceID(c.Request.Context(), traceID)
+		ctx = logger.NewTraceIDContext(ctx, traceID)
+		c.Request = c.Request.WithContext(ctx)
+		c.Writer.Header().Set("X-Trace-Id", traceID)
+
 		c.Next()
 	}
 }

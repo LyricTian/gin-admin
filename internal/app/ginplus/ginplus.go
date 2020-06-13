@@ -1,47 +1,26 @@
 package ginplus
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strings"
 
-	icontext "github.com/LyricTian/gin-admin/internal/app/context"
-	"github.com/LyricTian/gin-admin/internal/app/errors"
-	"github.com/LyricTian/gin-admin/internal/app/schema"
-	"github.com/LyricTian/gin-admin/pkg/logger"
-	"github.com/LyricTian/gin-admin/pkg/util"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/pkg/errors"
+	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	"github.com/LyricTian/gin-admin/v6/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
 
 // 定义上下文中的键
 const (
-	prefix = "gin-admin"
-	// UserIDKey 存储上下文中的键(用户ID)
-	UserIDKey = prefix + "/user-id"
-	// TraceIDKey 存储上下文中的键(跟踪ID)
-	TraceIDKey = prefix + "/trace-id"
-	// ResBodyKey 存储上下文中的键(响应Body数据)
-	ResBodyKey = prefix + "/res-body"
+	prefix           = "gin-admin"
+	UserIDKey        = prefix + "/user-id"
+	ReqBodyKey       = prefix + "/req-body"
+	ResBodyKey       = prefix + "/res-body"
+	LoggerReqBodyKey = prefix + "/logger-req-body"
 )
-
-// NewContext 封装上下文入口
-func NewContext(c *gin.Context) context.Context {
-	parent := context.Background()
-
-	if v := GetTraceID(c); v != "" {
-		parent = icontext.NewTraceID(parent, v)
-		parent = logger.NewTraceIDContext(parent, GetTraceID(c))
-	}
-
-	if v := GetUserID(c); v != "" {
-		parent = icontext.NewUserID(parent, v)
-		parent = logger.NewUserIDContext(parent, v)
-	}
-
-	return parent
-}
 
 // GetToken 获取用户令牌
 func GetToken(c *gin.Context) string {
@@ -54,44 +33,6 @@ func GetToken(c *gin.Context) string {
 	return token
 }
 
-// GetPageIndex 获取分页的页索引
-func GetPageIndex(c *gin.Context) int {
-	defaultVal := 1
-	if v := c.Query("current"); v != "" {
-		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
-			return iv
-		}
-	}
-	return defaultVal
-}
-
-// GetPageSize 获取分页的页大小(最大50)
-func GetPageSize(c *gin.Context) int {
-	defaultVal := 10
-	if v := c.Query("pageSize"); v != "" {
-		if iv := util.S(v).DefaultInt(defaultVal); iv > 0 {
-			if iv > 50 {
-				iv = 50
-			}
-			return iv
-		}
-	}
-	return defaultVal
-}
-
-// GetPaginationParam 获取分页查询参数
-func GetPaginationParam(c *gin.Context) *schema.PaginationParam {
-	return &schema.PaginationParam{
-		PageIndex: GetPageIndex(c),
-		PageSize:  GetPageSize(c),
-	}
-}
-
-// GetTraceID 获取追踪ID
-func GetTraceID(c *gin.Context) string {
-	return c.GetString(TraceIDKey)
-}
-
 // GetUserID 获取用户ID
 func GetUserID(c *gin.Context) string {
 	return c.GetString(UserIDKey)
@@ -102,10 +43,20 @@ func SetUserID(c *gin.Context, userID string) {
 	c.Set(UserIDKey, userID)
 }
 
+// GetBody Get request body
+func GetBody(c *gin.Context) []byte {
+	if v, ok := c.Get(ReqBodyKey); ok {
+		if b, ok := v.([]byte); ok {
+			return b
+		}
+	}
+	return nil
+}
+
 // ParseJSON 解析请求JSON
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
-		return errors.Wrap400Response(err, "解析请求参数发生错误")
+		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
 	}
 	return nil
 }
@@ -113,7 +64,7 @@ func ParseJSON(c *gin.Context, obj interface{}) error {
 // ParseQuery 解析Query参数
 func ParseQuery(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindQuery(obj); err != nil {
-		return errors.Wrap400Response(err, "解析请求参数发生错误")
+		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
 	}
 	return nil
 }
@@ -121,35 +72,28 @@ func ParseQuery(c *gin.Context, obj interface{}) error {
 // ParseForm 解析Form请求
 func ParseForm(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindWith(obj, binding.Form); err != nil {
-		return errors.Wrap400Response(err, "解析请求参数发生错误")
+		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
 	}
 	return nil
 }
 
-// ResPage 响应分页数据
-func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
-	list := schema.HTTPList{
-		List: v,
-		Pagination: &schema.HTTPPagination{
-			Current:  GetPageIndex(c),
-			PageSize: GetPageSize(c),
-		},
-	}
-	if pr != nil {
-		list.Pagination.Total = pr.Total
-	}
-
-	ResSuccess(c, list)
+// ResOK 响应OK
+func ResOK(c *gin.Context) {
+	ResSuccess(c, schema.StatusResult{Status: schema.OKStatus})
 }
 
 // ResList 响应列表数据
 func ResList(c *gin.Context, v interface{}) {
-	ResSuccess(c, schema.HTTPList{List: v})
+	ResSuccess(c, schema.ListResult{List: v})
 }
 
-// ResOK 响应OK
-func ResOK(c *gin.Context) {
-	ResSuccess(c, schema.HTTPStatus{Status: schema.OKStatusText.String()})
+// ResPage 响应分页数据
+func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
+	list := schema.ListResult{
+		List:       v,
+		Pagination: pr,
+	}
+	ResSuccess(c, list)
 }
 
 // ResSuccess 响应成功
@@ -170,12 +114,13 @@ func ResJSON(c *gin.Context, status int, v interface{}) {
 
 // ResError 响应错误
 func ResError(c *gin.Context, err error, status ...int) {
+	ctx := c.Request.Context()
 	var res *errors.ResponseError
 	if err != nil {
 		if e, ok := err.(*errors.ResponseError); ok {
 			res = e
 		} else {
-			res = errors.UnWrapResponse(errors.Wrap500Response(err))
+			res = errors.UnWrapResponse(errors.Wrap500Response(err, "服务器错误"))
 		}
 	} else {
 		res = errors.UnWrapResponse(errors.ErrInternalServer)
@@ -187,17 +132,15 @@ func ResError(c *gin.Context, err error, status ...int) {
 
 	if err := res.ERR; err != nil {
 		if status := res.StatusCode; status >= 400 && status < 500 {
-			logger.StartSpan(NewContext(c)).Warnf(err.Error())
+			logger.StartSpan(ctx).Warnf(err.Error())
 		} else if status >= 500 {
-			span := logger.StartSpan(NewContext(c))
-			span = span.WithField("stack", fmt.Sprintf("%+v", err))
-			span.Errorf(err.Error())
+			logger.ErrorStack(ctx, err)
 		}
 	}
 
-	eitem := schema.HTTPErrorItem{
+	eitem := schema.ErrorItem{
 		Code:    res.Code,
 		Message: res.Message,
 	}
-	ResJSON(c, res.StatusCode, schema.HTTPError{Error: eitem})
+	ResJSON(c, res.StatusCode, schema.ErrorResult{Error: eitem})
 }

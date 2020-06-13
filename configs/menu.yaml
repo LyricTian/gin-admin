@@ -1,0 +1,168 @@
+---
+# 菜单配置初始化(服务启动时会进行数据检查，如果存在则不再初始化)
+- name: 首页
+  icon: dashboard
+  router: "/dashboard"
+  sequence: 9
+- name: DEMO
+  icon: tag
+  router: "/example/demo"
+  sequence: 8
+  actions:
+    - code: add
+      name: 新增
+      resources:
+        - method: POST
+          path: "/api/v1/demos"
+    - code: edit
+      name: 编辑
+      resources:
+        - method: GET
+          path: "/api/v1/demos/:id"
+        - method: PUT
+          path: "/api/v1/demos/:id"
+    - code: del
+      name: 删除
+      resources:
+        - method: DELETE
+          path: "/api/v1/demos/:id"
+    - code: query
+      name: 查询
+      resources:
+        - method: GET
+          path: "/api/v1/demos"
+    - code: disable
+      name: 禁用
+      resources:
+        - method: PATCH
+          path: "/api/v1/demos/:id/disable"
+    - code: enable
+      name: 启用
+      resources:
+        - method: PATCH
+          path: "/api/v1/demos/:id/enable"
+- name: 系统管理
+  icon: setting
+  sequence: 7
+  children:
+    - name: 菜单管理
+      icon: solution
+      router: "/system/menu"
+      sequence: 9
+      actions:
+        - code: add
+          name: 新增
+          resources:
+            - method: POST
+              path: "/api/v1/menus"
+        - code: edit
+          name: 编辑
+          resources:
+            - method: GET
+              path: "/api/v1/menus/:id"
+            - method: PUT
+              path: "/api/v1/menus/:id"
+        - code: del
+          name: 删除
+          resources:
+            - method: DELETE
+              path: "/api/v1/menus/:id"
+        - code: query
+          name: 查询
+          resources:
+            - method: GET
+              path: "/api/v1/menus"
+            - method: GET
+              path: "/api/v1/menus.tree"
+        - code: disable
+          name: 禁用
+          resources:
+            - method: PATCH
+              path: "/api/v1/menus/:id/disable"
+        - code: enable
+          name: 启用
+          resources:
+            - method: PATCH
+              path: "/api/v1/menus/:id/enable"
+    - name: 角色管理
+      icon: audit
+      router: "/system/role"
+      sequence: 8
+      actions:
+        - code: add
+          name: 新增
+          resources:
+            - method: GET
+              path: "/api/v1/menus.tree"
+            - method: POST
+              path: "/api/v1/roles"
+        - code: edit
+          name: 编辑
+          resources:
+            - method: GET
+              path: "/api/v1/menus.tree"
+            - method: GET
+              path: "/api/v1/roles/:id"
+            - method: PUT
+              path: "/api/v1/roles/:id"
+        - code: del
+          name: 删除
+          resources:
+            - method: DELETE
+              path: "/api/v1/roles/:id"
+        - code: query
+          name: 查询
+          resources:
+            - method: GET
+              path: "/api/v1/roles"
+        - code: disable
+          name: 禁用
+          resources:
+            - method: PATCH
+              path: "/api/v1/roles/:id/disable"
+        - code: enable
+          name: 启用
+          resources:
+            - method: PATCH
+              path: "/api/v1/roles/:id/enable"
+    - name: 用户管理
+      icon: user
+      router: "/system/user"
+      sequence: 7
+      actions:
+        - code: add
+          name: 新增
+          resources:
+            - method: GET
+              path: "/api/v1/roles.select"
+            - method: POST
+              path: "/api/v1/users"
+        - code: edit
+          name: 编辑
+          resources:
+            - method: GET
+              path: "/api/v1/roles.select"
+            - method: GET
+              path: "/api/v1/users/:id"
+            - method: PUT
+              path: "/api/v1/users/:id"
+        - code: del
+          name: 删除
+          resources:
+            - method: DELETE
+              path: "/api/v1/users/:id"
+        - code: query
+          name: 查询
+          resources:
+            - method: GET
+              path: "/api/v1/users"
+        - code: disable
+          name: 禁用
+          resources:
+            - method: PATCH
+              path: "/api/v1/users/:id/disable"
+        - code: enable
+          name: 启用
+          resources:
+            - method: PATCH
+              path: "/api/v1/users/:id/enable"

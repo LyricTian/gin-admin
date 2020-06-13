@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/LyricTian/gin-admin/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
 )
 
 // ILogin 登录业务逻辑接口
@@ -22,7 +22,7 @@ type ILogin interface {
 	// 获取用户登录信息
 	GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error)
 	// 查询用户的权限菜单树
-	QueryUserMenuTree(ctx context.Context, userID string) ([]*schema.MenuTree, error)
+	QueryUserMenuTree(ctx context.Context, userID string) (schema.MenuTrees, error)
 	// 更新用户登录密码
 	UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error
 }

@@ -1,44 +1,61 @@
-module github.com/LyricTian/gin-admin
-
-require (
-	github.com/BurntSushi/toml v0.3.1
-	github.com/LyricTian/captcha v0.0.0-20190614104510-11aff818cbf4
-	github.com/LyricTian/queue v0.0.0-20180917141405-8f19abe7fd77
-	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/casbin/casbin/v2 v2.1.1
-	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0 // indirect
-	github.com/dgrijalva/jwt-go v0.0.0-20180719211823-0b96aaa70776
-	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
-	github.com/gin-contrib/cors v0.0.0-20190101123304-5e7acb10687f
-	github.com/gin-gonic/gin v1.4.0
-	github.com/go-redis/redis v0.0.0-20190609092923-f8704e4b6b43
-	github.com/go-redis/redis_rate v0.0.0-20180123081253-b7ae80ece379
-	github.com/go-sql-driver/mysql v0.0.0-20170512152933-382e13d099fc // indirect
-	github.com/gofrs/uuid v3.2.0+incompatible // indirect
-	github.com/google/gops v0.3.6
-	github.com/google/uuid v0.0.0-20190416172445-c2e93f3ae59f
-	github.com/jinzhu/gorm v0.0.0-20190102133208-9f1a7f535111
-	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
-	github.com/jinzhu/now v1.0.1 // indirect
-	github.com/json-iterator/go v1.1.6
-	github.com/lib/pq v0.0.0-20170117205633-67c3f2a8884c // indirect
-	github.com/mattn/go-isatty v0.0.10 // indirect
-	github.com/mattn/go-sqlite3 v1.11.0 // indirect
-	github.com/pkg/errors v0.8.1
-	github.com/sirupsen/logrus v1.4.0
-	github.com/stretchr/testify v1.4.0
-	github.com/swaggo/swag v1.6.3
-	github.com/tidwall/btree v0.0.0-20170113224114-9876f1454cf0 // indirect
-	github.com/tidwall/buntdb v1.1.0
-	github.com/tidwall/gjson v0.0.0-20180429151328-3cd3a1192327 // indirect
-	github.com/tidwall/grect v0.0.0-20161006141115-ba9a043346eb // indirect
-	github.com/tidwall/match v1.0.0 // indirect
-	github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e // indirect
-	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
-	go.uber.org/dig v1.8.0
-	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
-	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
-	gopkg.in/yaml.v2 v2.2.4 // indirect
-)
+module github.com/LyricTian/gin-admin/v6
 
 go 1.13
+
+require (
+	github.com/LyricTian/captcha v1.1.0
+	github.com/LyricTian/gzip v0.1.1
+	github.com/LyricTian/queue v1.2.0
+	github.com/LyricTian/structs v1.1.1
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/bwmarrin/snowflake v0.3.0
+	github.com/casbin/casbin/v2 v2.4.1
+	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/fatih/camelcase v1.0.0 // indirect
+	github.com/fatih/structs v1.1.0 // indirect
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-gonic/gin v1.6.3
+	github.com/go-openapi/spec v0.19.7 // indirect
+	github.com/go-openapi/swag v0.19.9 // indirect
+	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/go-redis/redis_rate v6.5.0+incompatible
+	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/golang/protobuf v1.4.1 // indirect
+	github.com/google/gops v0.3.8
+	github.com/google/uuid v1.1.1
+	github.com/google/wire v0.4.0
+	github.com/jinzhu/gorm v1.9.12
+	github.com/jinzhu/now v1.1.1 // indirect
+	github.com/json-iterator/go v1.1.9
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
+	github.com/klauspost/compress v1.10.5 // indirect
+	github.com/koding/multiconfig v0.0.0-20171124222453-69c27309b2d7
+	github.com/kr/text v0.2.0 // indirect
+	github.com/lib/pq v1.5.2 // indirect
+	github.com/mailru/easyjson v0.7.1 // indirect
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
+	github.com/onsi/ginkgo v1.12.0 // indirect
+	github.com/onsi/gomega v1.10.0 // indirect
+	github.com/pkg/errors v0.9.1
+	github.com/sirupsen/logrus v1.6.0
+	github.com/stretchr/testify v1.5.1
+	github.com/swaggo/gin-swagger v1.2.0
+	github.com/swaggo/swag v1.6.5
+	github.com/tidwall/buntdb v1.1.2
+	github.com/tidwall/gjson v1.6.0 // indirect
+	github.com/tidwall/pretty v1.0.1 // indirect
+	github.com/urfave/cli/v2 v2.2.0
+	go.mongodb.org/mongo-driver v1.3.3
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
+	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
+	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
+	golang.org/x/sys v0.0.0-20200509044756-6aff5f38e54f // indirect
+	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1
+	golang.org/x/tools v0.0.0-20200511202723-1762287ae9dd // indirect
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
+	gopkg.in/yaml.v2 v2.2.8
+)

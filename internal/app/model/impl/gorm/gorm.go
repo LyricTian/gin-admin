@@ -1,14 +1,14 @@
 package gorm
 
 import (
+	"context"
+	"strings"
 	"time"
 
-	"github.com/LyricTian/gin-admin/internal/app/config"
-	"github.com/LyricTian/gin-admin/internal/app/model"
-	"github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/entity"
-	imodel "github.com/LyricTian/gin-admin/internal/app/model/impl/gorm/internal/model"
+	"github.com/LyricTian/gin-admin/v6/internal/app/config"
+	"github.com/LyricTian/gin-admin/v6/internal/app/model/impl/gorm/entity"
+	"github.com/LyricTian/gin-admin/v6/pkg/logger"
 	"github.com/jinzhu/gorm"
-	"go.uber.org/dig"
 
 	// gorm存储注入
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -27,66 +27,48 @@ type Config struct {
 }
 
 // NewDB 创建DB实例
-func NewDB(c *Config) (*gorm.DB, error) {
+func NewDB(c *Config) (*gorm.DB, func(), error) {
 	db, err := gorm.Open(c.DBType, c.DSN)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if c.Debug {
 		db = db.Debug()
 	}
 
+	cleanFunc := func() {
+		err := db.Close()
+		if err != nil {
+			logger.Errorf(context.Background(), "Gorm db close error: %s", err.Error())
+		}
+	}
+
 	err = db.DB().Ping()
 	if err != nil {
-		return nil, err
+		return nil, cleanFunc, err
 	}
 
 	db.DB().SetMaxIdleConns(c.MaxIdleConns)
 	db.DB().SetMaxOpenConns(c.MaxOpenConns)
 	db.DB().SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
-	return db, nil
-}
-
-// SetTablePrefix 设定表名前缀
-func SetTablePrefix(prefix string) {
-	entity.SetTablePrefix(prefix)
+	return db, cleanFunc, nil
 }
 
 // AutoMigrate 自动映射数据表
 func AutoMigrate(db *gorm.DB) error {
-	if dbType := config.Global().Gorm.DBType; dbType == "mysql" {
+	if dbType := config.C.Gorm.DBType; strings.ToLower(dbType) == "mysql" {
 		db = db.Set("gorm:table_options", "ENGINE=InnoDB")
 	}
 
 	return db.AutoMigrate(
 		new(entity.Demo),
-		new(entity.User),
-		new(entity.UserRole),
-		new(entity.Role),
-		new(entity.RoleMenu),
-		new(entity.Menu),
 		new(entity.MenuAction),
-		new(entity.MenuResource),
+		new(entity.MenuActionResource),
+		new(entity.Menu),
+		new(entity.RoleMenu),
+		new(entity.Role),
+		new(entity.UserRole),
+		new(entity.User),
 	).Error
-}
-
-// Inject 注入gorm实现
-// 使用方式：
-//   container := dig.New()
-//   Inject(container)
-//   container.Invoke(func(foo IDemo) {
-//   })
-func Inject(container *dig.Container) error {
-	_ = container.Provide(imodel.NewTrans)
-	_ = container.Provide(func(m *imodel.Trans) model.ITrans { return m })
-	_ = container.Provide(imodel.NewDemo)
-	_ = container.Provide(func(m *imodel.Demo) model.IDemo { return m })
-	_ = container.Provide(imodel.NewMenu)
-	_ = container.Provide(func(m *imodel.Menu) model.IMenu { return m })
-	_ = container.Provide(imodel.NewRole)
-	_ = container.Provide(func(m *imodel.Role) model.IRole { return m })
-	_ = container.Provide(imodel.NewUser)
-	_ = container.Provide(func(m *imodel.User) model.IUser { return m })
-	return nil
 }
