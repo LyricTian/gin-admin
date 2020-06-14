@@ -209,14 +209,11 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 				panic(err)
 			}
 			err = srv.Serve(listener)
-			if err != nil {
-				panic(err)
-			}
 		} else {
 			err = srv.ListenAndServe()
-			if err != nil && err != http.ErrServerClosed {
-				panic(err)
-			}
+		}
+		if err != nil && err != http.ErrServerClosed {
+			panic(err)
 		}
 	}()
 
