@@ -159,13 +159,13 @@ RedisDB = 10
 
 [CORS]
 # 是否启用
-Enable = true
+Enable = false
 # 允许跨域请求的域名列表(*表示全部允许)
 AllowOrigins = ["*"]
 # 允许跨域请求的请求方式列表
 AllowMethods = ["GET","POST","PUT","DELETE","PATCH"]
 # 允许客户端与跨域请求一起使用的非简单标头的列表
-AllowHeaders = ["DNT","X-Mx-ReqToken","Keep-Alive","User-Agent","X-Requested-With","If-Modified-Since","Cache-Control","Content-Type","Authorization"]
+AllowHeaders = []
 # 请求是否可以包含cookie，HTTP身份验证或客户端SSL证书等用户凭据
 AllowCredentials = true
 # 可以缓存预检请求结果的时间（以秒为单位）
