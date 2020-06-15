@@ -12,7 +12,7 @@ all: start
 build:
 	@go build -ldflags "-w -s" -o $(SERVER_BIN) ./cmd/${APP}
 
-start: 
+start:
 	go run cmd/${APP}/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
 
 swagger:
@@ -22,7 +22,7 @@ wire:
 	wire gen ./internal/app/injector
 
 test:
-	@go test -v ./internal/app/test
+	@go test -v $(shell go list ./...)
 
 clean:
 	rm -rf data release $(SERVER_BIN) ./internal/app/test/data ./cmd/${APP}/data
