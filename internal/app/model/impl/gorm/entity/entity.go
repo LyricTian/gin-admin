@@ -43,14 +43,5 @@ func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 
 // GetDBWithModel ...
 func GetDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB {
-	db := GetDB(ctx, defDB)
-
-	type tabler interface {
-		TableName() string
-	}
-
-	if t, ok := m.(tabler); ok {
-		return db.Table(t.TableName())
-	}
-	return db.Model(m)
+	return GetDB(ctx, defDB).Model(m)
 }
