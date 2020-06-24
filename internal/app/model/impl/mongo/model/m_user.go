@@ -96,10 +96,7 @@ func (a *User) Create(ctx context.Context, item schema.User) error {
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetUserCollection(ctx, a.Client)
 	err := Insert(ctx, c, eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Update 更新数据
@@ -108,38 +105,26 @@ func (a *User) Update(ctx context.Context, id string, item schema.User) error {
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetUserCollection(ctx, a.Client)
 	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Delete 删除数据
 func (a *User) Delete(ctx context.Context, id string) error {
 	c := entity.GetUserCollection(ctx, a.Client)
 	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // UpdateStatus 更新状态
 func (a *User) UpdateStatus(ctx context.Context, id string, status int) error {
 	c := entity.GetUserCollection(ctx, a.Client)
 	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", id)), bson.M{"status": status})
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // UpdatePassword 更新密码
 func (a *User) UpdatePassword(ctx context.Context, id, password string) error {
 	c := entity.GetUserCollection(ctx, a.Client)
 	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", id)), bson.M{"password": password})
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }

@@ -75,36 +75,24 @@ func (a *RoleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQu
 func (a *RoleMenu) Create(ctx context.Context, item schema.RoleMenu) error {
 	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
 	result := entity.GetRoleMenuDB(ctx, a.DB).Create(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Update 更新数据
 func (a *RoleMenu) Update(ctx context.Context, id string, item schema.RoleMenu) error {
 	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
 	result := entity.GetRoleMenuDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Delete 删除数据
 func (a *RoleMenu) Delete(ctx context.Context, id string) error {
 	result := entity.GetRoleMenuDB(ctx, a.DB).Where("id=?", id).Delete(entity.RoleMenu{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // DeleteByRoleID 根据角色ID删除数据
 func (a *RoleMenu) DeleteByRoleID(ctx context.Context, roleID string) error {
 	result := entity.GetRoleMenuDB(ctx, a.DB).Where("role_id=?", roleID).Delete(entity.RoleMenu{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }

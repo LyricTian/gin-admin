@@ -82,10 +82,7 @@ func (a *UserRole) Create(ctx context.Context, item schema.UserRole) error {
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetUserRoleCollection(ctx, a.Client)
 	err := Insert(ctx, c, eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Update 更新数据
@@ -94,28 +91,19 @@ func (a *UserRole) Update(ctx context.Context, id string, item schema.UserRole) 
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetUserRoleCollection(ctx, a.Client)
 	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Delete 删除数据
 func (a *UserRole) Delete(ctx context.Context, id string) error {
 	c := entity.GetUserRoleCollection(ctx, a.Client)
 	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // DeleteByUserID 根据用户ID删除数据
 func (a *UserRole) DeleteByUserID(ctx context.Context, userID string) error {
 	c := entity.GetUserRoleCollection(ctx, a.Client)
 	err := DeleteMany(ctx, c, DefaultFilter(ctx, Filter("user_id", userID)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }

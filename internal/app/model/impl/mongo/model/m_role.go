@@ -98,10 +98,7 @@ func (a *Role) Create(ctx context.Context, item schema.Role) error {
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetRoleCollection(ctx, a.Client)
 	err := Insert(ctx, c, eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Update 更新数据
@@ -110,28 +107,19 @@ func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetRoleCollection(ctx, a.Client)
 	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, id string) error {
 	c := entity.GetRoleCollection(ctx, a.Client)
 	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // UpdateStatus 更新状态
 func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
 	c := entity.GetRoleCollection(ctx, a.Client)
 	err := UpdateFields(ctx, c, DefaultFilter(ctx, Filter("_id", id)), bson.M{"status": status})
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }

@@ -80,46 +80,31 @@ func (a *MenuActionResource) Get(ctx context.Context, id string, opts ...schema.
 func (a *MenuActionResource) Create(ctx context.Context, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
 	result := entity.GetMenuActionResourceDB(ctx, a.DB).Create(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Update 更新数据
 func (a *MenuActionResource) Update(ctx context.Context, id string, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
 	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Delete 删除数据
 func (a *MenuActionResource) Delete(ctx context.Context, id string) error {
 	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("id=?", id).Delete(entity.MenuActionResource{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // DeleteByActionID 根据动作ID删除数据
 func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id =?", actionID).Delete(entity.MenuAction{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id =?", actionID).Delete(entity.MenuActionResource{})
+	return errors.WithStack(result.Error)
 }
 
 // DeleteByMenuID 根据菜单ID删除数据
 func (a *MenuActionResource) DeleteByMenuID(ctx context.Context, menuID string) error {
 	subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id=?", menuID).Select("id").SubQuery()
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN ?", subQuery).Delete(entity.MenuAction{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN ?", subQuery).Delete(entity.MenuActionResource{})
+	return errors.WithStack(result.Error)
 }

@@ -86,45 +86,30 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 func (a *User) Create(ctx context.Context, item schema.User) error {
 	sitem := entity.SchemaUser(item)
 	result := entity.GetUserDB(ctx, a.DB).Create(sitem.ToUser())
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Update 更新数据
 func (a *User) Update(ctx context.Context, id string, item schema.User) error {
 	eitem := entity.SchemaUser(item).ToUser()
 	result := entity.GetUserDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Delete 删除数据
 func (a *User) Delete(ctx context.Context, id string) error {
 	result := entity.GetUserDB(ctx, a.DB).Where("id=?", id).Delete(entity.User{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // UpdateStatus 更新状态
 func (a *User) UpdateStatus(ctx context.Context, id string, status int) error {
 	result := entity.GetUserDB(ctx, a.DB).Where("id=?", id).Update("status", status)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // UpdatePassword 更新密码
 func (a *User) UpdatePassword(ctx context.Context, id, password string) error {
 	result := entity.GetUserDB(ctx, a.DB).Where("id=?", id).Update("password", password)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }

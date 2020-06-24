@@ -82,10 +82,7 @@ func (a *RoleMenu) Create(ctx context.Context, item schema.RoleMenu) error {
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetRoleMenuCollection(ctx, a.Client)
 	err := Insert(ctx, c, eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Update 更新数据
@@ -94,28 +91,19 @@ func (a *RoleMenu) Update(ctx context.Context, id string, item schema.RoleMenu) 
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetRoleMenuCollection(ctx, a.Client)
 	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Delete 删除数据
 func (a *RoleMenu) Delete(ctx context.Context, id string) error {
 	c := entity.GetRoleMenuCollection(ctx, a.Client)
 	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // DeleteByRoleID 根据角色ID删除数据
 func (a *RoleMenu) DeleteByRoleID(ctx context.Context, roleID string) error {
 	c := entity.GetRoleMenuCollection(ctx, a.Client)
 	err := DeleteMany(ctx, c, DefaultFilter(ctx, Filter("role_id", roleID)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }

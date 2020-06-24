@@ -86,10 +86,7 @@ func (a *MenuActionResource) Create(ctx context.Context, item schema.MenuActionR
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetMenuActionResourceCollection(ctx, a.Client)
 	err := Insert(ctx, c, eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Update 更新数据
@@ -98,30 +95,21 @@ func (a *MenuActionResource) Update(ctx context.Context, id string, item schema.
 	eitem.UpdatedAt = time.Now()
 	c := entity.GetMenuActionResourceCollection(ctx, a.Client)
 	err := Update(ctx, c, DefaultFilter(ctx, Filter("_id", id)), eitem)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // Delete 删除数据
 func (a *MenuActionResource) Delete(ctx context.Context, id string) error {
 	c := entity.GetMenuActionResourceCollection(ctx, a.Client)
 	err := Delete(ctx, c, DefaultFilter(ctx, Filter("_id", id)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // DeleteByActionID 根据动作ID删除数据
 func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID string) error {
 	c := entity.GetMenuActionResourceCollection(ctx, a.Client)
 	err := DeleteMany(ctx, c, DefaultFilter(ctx, Filter("action_id", actionID)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 // DeleteByMenuID 根据菜单ID删除数据
@@ -133,10 +121,7 @@ func (a *MenuActionResource) DeleteByMenuID(ctx context.Context, menuID string) 
 
 	c := entity.GetMenuActionResourceCollection(ctx, a.Client)
 	err = DeleteMany(ctx, c, DefaultFilter(ctx, Filter("action_id", bson.M{"$in": actionIDs})))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(err)
 }
 
 func (a *MenuActionResource) queryActionIDs(ctx context.Context, menuIDs ...string) ([]interface{}, error) {

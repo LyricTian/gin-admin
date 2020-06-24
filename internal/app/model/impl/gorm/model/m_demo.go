@@ -76,36 +76,24 @@ func (a *Demo) Get(ctx context.Context, id string, opts ...schema.DemoQueryOptio
 func (a *Demo) Create(ctx context.Context, item schema.Demo) error {
 	eitem := entity.SchemaDemo(item).ToDemo()
 	result := entity.GetDemoDB(ctx, a.DB).Create(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Update 更新数据
 func (a *Demo) Update(ctx context.Context, id string, item schema.Demo) error {
 	eitem := entity.SchemaDemo(item).ToDemo()
 	result := entity.GetDemoDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Delete 删除数据
 func (a *Demo) Delete(ctx context.Context, id string) error {
 	result := entity.GetDemoDB(ctx, a.DB).Where("id=?", id).Delete(entity.Demo{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // UpdateStatus 更新状态
 func (a *Demo) UpdateStatus(ctx context.Context, id string, status int) error {
 	result := entity.GetDemoDB(ctx, a.DB).Where("id=?", id).Update("status", status)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }

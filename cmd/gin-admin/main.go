@@ -10,7 +10,7 @@ import (
 )
 
 // VERSION 版本号，可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "6.3.1"
+var VERSION = "6.3.2"
 
 func main() {
 	logger.SetVersion(VERSION)

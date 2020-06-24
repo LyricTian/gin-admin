@@ -85,36 +85,24 @@ func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 func (a *Role) Create(ctx context.Context, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
 	result := entity.GetRoleDB(ctx, a.DB).Create(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Update 更新数据
 func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
 	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Delete 删除数据
 func (a *Role) Delete(ctx context.Context, id string) error {
 	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Delete(entity.Role{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // UpdateStatus 更新状态
 func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
 	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Update("status", status)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }

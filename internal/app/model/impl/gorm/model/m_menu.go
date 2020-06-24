@@ -91,45 +91,30 @@ func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
 	result := entity.GetMenuDB(ctx, a.DB).Create(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Update 更新数据
 func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
 	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // UpdateParentPath 更新父级路径
 func (a *Menu) UpdateParentPath(ctx context.Context, id, parentPath string) error {
 	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Update("parent_path", parentPath)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // Delete 删除数据
 func (a *Menu) Delete(ctx context.Context, id string) error {
 	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Delete(entity.Menu{})
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
 
 // UpdateStatus 更新状态
 func (a *Menu) UpdateStatus(ctx context.Context, id string, status int) error {
 	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Update("status", status)
-	if err := result.Error; err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return errors.WithStack(result.Error)
 }
