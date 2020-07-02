@@ -6,7 +6,6 @@ require (
 	github.com/LyricTian/captcha v1.1.0
 	github.com/LyricTian/gzip v0.1.1
 	github.com/LyricTian/queue v1.2.0
-	github.com/LyricTian/structs v1.1.1
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin/v2 v2.4.1
@@ -27,6 +26,7 @@ require (
 	github.com/google/gops v0.3.8
 	github.com/google/uuid v1.1.1
 	github.com/google/wire v0.4.0
+	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a
 	github.com/jinzhu/gorm v1.9.12
 	github.com/jinzhu/now v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.9
