@@ -200,7 +200,7 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 
 		if len(certificates) > 0 {
 			tlsConfig.Certificates = certificates
-			if v := config.C.HTTP.VersionTLS; v >= 1.0 && v <= 1.0 {
+			if v := config.C.HTTP.VersionTLS; v >= 1.0 && v <= 1.3 {
 				tlsConfig.MinVersion = uint16(tls.VersionTLS10 + int(v*10-10))
 			} else {
 				tlsConfig.MinVersion = tls.VersionTLS12
