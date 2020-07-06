@@ -19,6 +19,9 @@ Port = 10088
 ShutdownTimeout = 30
 # 允许的最大内容长度(64M)
 MaxContentLength = 67108864
+# TLS 最低版本  1.0 - 1.3
+# IE 浏览器 和 Windows部分程序，默认只支持的1.1协议，请留意
+VersionTLS = 1.1
 
 # 证书 a.com
 [[HTTP.Certificates]]

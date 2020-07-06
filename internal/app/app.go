@@ -169,39 +169,42 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 		logger.Printf(ctx, "HTTP server is running at %s.", addr)
 		var (
 			err       error
-			enableTLS bool
 			tlsConfig tls.Config
+			certificates []tls.Certificate
 		)
-		if l := len(cfg.Certificates); l > 0 {
-			tlsConfig.Certificates = make([]tls.Certificate, l)
-			for index, cert := range cfg.Certificates {
-				enable, ok := cert["Enable"].(bool)
-				if !ok || !enable {
-					continue
-				}
 
-				certFile, ok := cert["CertFile"].(string)
-				if !ok || certFile == "" {
-					panic("CertFile错误")
-				}
-				keyFile, ok := cert["KeyFile"].(string)
-				if !ok || keyFile == "" {
-					panic("KeyFile错误")
-				}
-				tlsConfig.Certificates[index], err = tls.LoadX509KeyPair(
-					certFile,
-					keyFile,
-				)
-				if err != nil {
-					panic(err)
-				}
-
-				enableTLS = true
+		for _, cert := range cfg.Certificates {
+			enable, ok := cert["Enable"].(bool)
+			if !ok || !enable {
+				continue
 			}
+
+			certFile, ok := cert["CertFile"].(string)
+			if !ok || certFile == "" {
+				panic("CertFile错误")
+			}
+			keyFile, ok := cert["KeyFile"].(string)
+			if !ok || keyFile == "" {
+				panic("KeyFile错误")
+			}
+			certificate, err := tls.LoadX509KeyPair(
+				certFile,
+				keyFile,
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			certificates = append(certificates, certificate)
 		}
 
-		if enableTLS {
-			tlsConfig.MinVersion = tls.VersionTLS12
+		if len(certificates) > 0 {
+			tlsConfig.Certificates = certificates
+			if v := config.C.HTTP.VersionTLS; v >= 1.0 && v <= 1.0 {
+				tlsConfig.MinVersion = uint16(tls.VersionTLS10 + int(v*10-10))
+			} else {
+				tlsConfig.MinVersion = tls.VersionTLS12
+			}
 			tlsConfig.BuildNameToCertificate()
 			srv.TLSConfig = &tlsConfig
 			listener, err := tls.Listen("tcp", addr, &tlsConfig)

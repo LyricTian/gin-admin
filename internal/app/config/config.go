@@ -176,6 +176,7 @@ type HTTP struct {
 	Certificates     []map[string]interface{}
 	ShutdownTimeout  int
 	MaxContentLength int64
+	VersionTLS       float64
 }
 
 // Monitor 监控配置参数
