@@ -101,7 +101,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	}
 
 	// 初始化服务运行监控
-	InitMonitor(ctx)
+	monitorCleanFunc := InitMonitor(ctx)
 
 	// 初始化图形验证码
 	InitCaptcha()
@@ -126,6 +126,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	return func() {
 		httpServerCleanFunc()
 		injectorCleanFunc()
+		monitorCleanFunc()
 		loggerCleanFunc()
 	}, nil
 }
@@ -144,13 +145,19 @@ func InitCaptcha() {
 }
 
 // InitMonitor 初始化服务监控
-func InitMonitor(ctx context.Context) {
+func InitMonitor(ctx context.Context) func() {
 	if c := config.C.Monitor; c.Enable {
-		err := agent.Listen(agent.Options{Addr: c.Addr, ConfigDir: c.ConfigDir, ShutdownCleanup: true})
+		// ShutdownCleanup set false to prevent automatically closes on os.Interrupt
+		// and close agent manually before service shutting down
+		err := agent.Listen(agent.Options{Addr: c.Addr, ConfigDir: c.ConfigDir, ShutdownCleanup: false})
 		if err != nil {
 			logger.Errorf(ctx, "Agent monitor error: %s", err.Error())
 		}
+		return func() {
+			agent.Close()
+		}
 	}
+	return func() {}
 }
 
 // InitHTTPServer 初始化http服务
