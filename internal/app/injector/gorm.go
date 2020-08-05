@@ -51,5 +51,6 @@ func NewGormDB() (*gorm.DB, func(), error) {
 		MaxIdleConns: cfg.Gorm.MaxIdleConns,
 		MaxLifetime:  cfg.Gorm.MaxLifetime,
 		MaxOpenConns: cfg.Gorm.MaxOpenConns,
+		TablePrefix:  cfg.Gorm.TablePrefix,
 	})
 }

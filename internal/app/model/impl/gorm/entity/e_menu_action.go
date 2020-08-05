@@ -31,11 +31,6 @@ type MenuAction struct {
 	Name   string `gorm:"column:name;size:100;default:'';not null;"`         // 动作名称
 }
 
-// TableName 表名
-func (a MenuAction) TableName() string {
-	return a.Model.TableName("menu_action")
-}
-
 // ToSchemaMenuAction 转换为菜单动作对象
 func (a MenuAction) ToSchemaMenuAction() *schema.MenuAction {
 	item := new(schema.MenuAction)

@@ -38,11 +38,6 @@ type Menu struct {
 	Creator    string  `gorm:"column:creator;size:36;"`                        // 创建人
 }
 
-// TableName 表名
-func (a Menu) TableName() string {
-	return a.Model.TableName("menu")
-}
-
 // ToSchemaMenu 转换为菜单对象
 func (a Menu) ToSchemaMenu() *schema.Menu {
 	item := new(schema.Menu)

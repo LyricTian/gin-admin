@@ -33,11 +33,6 @@ type Role struct {
 	Creator  string  `gorm:"column:creator;size:36;"`                         // 创建者
 }
 
-// TableName 表名
-func (a Role) TableName() string {
-	return a.Model.TableName("role")
-}
-
 // ToSchemaRole 转换为角色对象
 func (a Role) ToSchemaRole() *schema.Role {
 	item := new(schema.Role)

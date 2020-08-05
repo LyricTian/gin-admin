@@ -31,11 +31,6 @@ type RoleMenu struct {
 	ActionID string `gorm:"column:action_id;size:36;index;default:'';not null;"` // 动作ID
 }
 
-// TableName 表名
-func (a RoleMenu) TableName() string {
-	return a.Model.TableName("role_menu")
-}
-
 // ToSchemaRoleMenu 转换为角色菜单对象
 func (a RoleMenu) ToSchemaRoleMenu() *schema.RoleMenu {
 	item := new(schema.RoleMenu)

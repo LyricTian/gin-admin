@@ -30,11 +30,6 @@ type UserRole struct {
 	RoleID string `gorm:"column:role_id;size:36;index;default:'';not null;"` // 角色内码
 }
 
-// TableName 表名
-func (a UserRole) TableName() string {
-	return a.Model.TableName("user_role")
-}
-
 // ToSchemaUserRole 转换为用户角色对象
 func (a UserRole) ToSchemaUserRole() *schema.UserRole {
 	item := new(schema.UserRole)
