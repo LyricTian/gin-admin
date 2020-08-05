@@ -173,10 +173,10 @@ type JWTAuth struct {
 type HTTP struct {
 	Host             string
 	Port             int
-	CertFile         string
-	KeyFile          string
+	Certificates     []map[string]interface{}
 	ShutdownTimeout  int
 	MaxContentLength int64
+	VersionTLS       float64
 }
 
 // Monitor 监控配置参数
