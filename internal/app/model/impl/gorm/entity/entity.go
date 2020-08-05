@@ -17,11 +17,6 @@ type Model struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;index;"`
 }
 
-// TableName table name
-//func (Model) TableName(name string) string {
-//	return fmt.Sprintf("%s%s", config.C.Gorm.TablePrefix, name)
-//}
-
 // GetDB ...
 func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	trans, ok := icontext.FromTrans(ctx)
