@@ -24,10 +24,14 @@ type Config struct {
 	MaxLifetime  int
 	MaxOpenConns int
 	MaxIdleConns int
+	TablePrefix  string
 }
 
 // NewDB 创建DB实例
 func NewDB(c *Config) (*gorm.DB, func(), error) {
+	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
+		return c.TablePrefix + defaultTableName
+	}
 	db, err := gorm.Open(c.DBType, c.DSN)
 	if err != nil {
 		return nil, nil, err
@@ -49,6 +53,7 @@ func NewDB(c *Config) (*gorm.DB, func(), error) {
 		return nil, cleanFunc, err
 	}
 
+	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(c.MaxIdleConns)
 	db.DB().SetMaxOpenConns(c.MaxOpenConns)
 	db.DB().SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)

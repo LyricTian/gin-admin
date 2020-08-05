@@ -33,11 +33,6 @@ type Demo struct {
 	Creator string  `gorm:"column:creator;size:36;"`                         // 创建者
 }
 
-// TableName 表名
-func (a Demo) TableName() string {
-	return a.Model.TableName("demo")
-}
-
 // ToSchemaDemo 转换为demo对象
 func (a Demo) ToSchemaDemo() *schema.Demo {
 	item := new(schema.Demo)

@@ -13,8 +13,9 @@ const (
 
 func TestStore(t *testing.T) {
 	store := NewStore(&Config{
-		Addr: addr,
-		DB:   1,
+		Addr:      addr,
+		DB:        1,
+		KeyPrefix: "prefix",
 	})
 
 	defer store.Close()
@@ -28,6 +29,7 @@ func TestStore(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, true, b)
 
-	err = store.Delete(ctx, key)
+	b, err = store.Delete(ctx, key)
 	assert.Nil(t, err)
+	assert.Equal(t, true, b)
 }

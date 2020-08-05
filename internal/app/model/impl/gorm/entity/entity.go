@@ -2,7 +2,6 @@ package entity
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/LyricTian/gin-admin/v6/internal/app/config"
@@ -16,11 +15,6 @@ type Model struct {
 	CreatedAt time.Time  `gorm:"column:created_at;index;"`
 	UpdatedAt time.Time  `gorm:"column:updated_at;index;"`
 	DeletedAt *time.Time `gorm:"column:deleted_at;index;"`
-}
-
-// TableName table name
-func (Model) TableName(name string) string {
-	return fmt.Sprintf("%s%s", config.C.Gorm.TablePrefix, name)
 }
 
 // GetDB ...

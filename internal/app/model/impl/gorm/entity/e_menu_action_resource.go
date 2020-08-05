@@ -31,11 +31,6 @@ type MenuActionResource struct {
 	Path     string `gorm:"column:path;size:100;default:'';not null;"`           // 资源请求路径（支持/:id匹配）
 }
 
-// TableName 表名
-func (a MenuActionResource) TableName() string {
-	return a.Model.TableName("menu_action_resource")
-}
-
 // ToSchemaMenuActionResource 转换为菜单动作关联资源对象
 func (a MenuActionResource) ToSchemaMenuActionResource() *schema.MenuActionResource {
 	item := new(schema.MenuActionResource)

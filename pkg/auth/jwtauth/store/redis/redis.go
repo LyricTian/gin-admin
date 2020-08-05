@@ -72,12 +72,12 @@ func (s *Store) Set(ctx context.Context, tokenString string, expiration time.Dur
 }
 
 // Delete ...
-func (s *Store) Delete(ctx context.Context, tokenString string) error {
-	cmd := s.cli.Del(tokenString)
+func (s *Store) Delete(ctx context.Context, tokenString string) (bool, error) {
+	cmd := s.cli.Del(s.wrapperKey(tokenString))
 	if err := cmd.Err(); err != nil {
-		return err
+		return false, err
 	}
-	return nil
+	return cmd.Val() > 0, nil
 }
 
 // Check ...

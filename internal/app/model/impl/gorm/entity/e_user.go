@@ -35,11 +35,6 @@ type User struct {
 	Creator  string  `gorm:"column:creator;size:36;"`                             // 创建者
 }
 
-// TableName 表名
-func (a User) TableName() string {
-	return a.Model.TableName("user")
-}
-
 // ToSchemaUser 转换为用户对象
 func (a User) ToSchemaUser() *schema.User {
 	item := new(schema.User)
