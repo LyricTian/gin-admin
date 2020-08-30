@@ -19,7 +19,7 @@ type Demo struct {
 // @Param current query int true "分页索引" default(1)
 // @Param pageSize query int true "分页大小" default(10)
 // @Param queryValue query string false "查询值"
-// @Success 200 {array} schema.Demo "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
+// @Success 200 {object} schema.ListResult{list=[]schema.Demo} "查询结果"
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/demos [get]

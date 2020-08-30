@@ -21,7 +21,7 @@ type Menu struct{}
 // @Param status query int false "状态(1:启用 2:禁用)"
 // @Param showStatus query int false "显示状态(1:显示 2:隐藏)"
 // @Param parentID query string false "父级ID"
-// @Success 200 {array} schema.Menu "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}"
+// @Success 200 {object} schema.ListResult{list=[]schema.Menu} "查询结果"
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus [get]
@@ -34,7 +34,7 @@ func (a *Menu) Query(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param status query int false "状态(1:启用 2:禁用)"
 // @Param parentID query string false "父级ID"
-// @Success 200 {array} schema.MenuTree "查询结果：{list:列表数据}"
+// @Success 200 {object} schema.ListResult{list=[]schema.MenuTree} "查询结果"
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/menus.tree [get]

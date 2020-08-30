@@ -78,7 +78,7 @@ func (a *Login) GetUserInfo(c *gin.Context) {
 // @Tags 登录管理
 // @Summary 查询当前用户菜单树
 // @Security ApiKeyAuth
-// @Success 200 {object} schema.Menu "查询结果：{list:菜单树}"
+// @Success 200 {object} schema.ListResult{list=[]schema.MenuTree} "查询结果"
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/current/menutree [get]

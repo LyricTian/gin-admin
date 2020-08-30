@@ -65,12 +65,24 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}",
+                        "description": "查询结果",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schema.Demo"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/schema.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.Demo"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -418,12 +430,24 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}",
+                        "description": "查询结果",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schema.Menu"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/schema.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.Menu"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -516,12 +540,24 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "查询结果：{list:列表数据}",
+                        "description": "查询结果",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schema.MenuTree"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/schema.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.MenuTree"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -779,9 +815,24 @@ var doc = `{
                 "summary": "查询当前用户菜单树",
                 "responses": {
                     "200": {
-                        "description": "查询结果：{list:菜单树}",
+                        "description": "查询结果",
                         "schema": {
-                            "$ref": "#/definitions/schema.Menu"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/schema.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.MenuTree"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1072,12 +1123,24 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}",
+                        "description": "查询结果",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schema.Role"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/schema.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.Role"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1170,12 +1233,24 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "查询结果：{list:角色列表}",
+                        "description": "查询结果",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schema.Role"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/schema.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.Role"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1475,12 +1550,24 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "查询结果：{list:列表数据,pagination:{current:页索引,pageSize:页大小,total:总数量}}",
+                        "description": "查询结果",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schema.UserShow"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/schema.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.UserShow"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1848,6 +1935,18 @@ var doc = `{
                 }
             }
         },
+        "schema.ListResult": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "object"
+                },
+                "pagination": {
+                    "type": "object",
+                    "$ref": "#/definitions/schema.PaginationResult"
+                }
+            }
+        },
         "schema.LoginCaptcha": {
             "type": "object",
             "properties": {
@@ -2091,6 +2190,20 @@ var doc = `{
             "type": "array",
             "items": {
                 "$ref": "#/definitions/schema.MenuTree"
+            }
+        },
+        "schema.PaginationResult": {
+            "type": "object",
+            "properties": {
+                "current": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
             }
         },
         "schema.Role": {
