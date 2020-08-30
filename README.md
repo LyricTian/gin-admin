@@ -109,7 +109,7 @@ wire gen ./internal/app
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
-[godoc-url]: https://godoc.org/github.com/LyricTian/gin-admin
+[godoc-url]: https://pkg.go.dev/github.com/LyricTian/gin-admin/v7
 [godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin?status.svg
 [license-url]: http://opensource.org/licenses/MIT
 [license-image]: https://img.shields.io/npm/l/express.svg
