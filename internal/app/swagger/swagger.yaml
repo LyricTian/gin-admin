@@ -415,10 +415,10 @@ info:
   contact:
     email: tiannianshou@gmail.com
     name: LyricTian
-  description: RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.
+  description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
   license: {}
   title: gin-admin
-  version: 6.3.1
+  version: 7.0.0
 paths:
   /api/v1/demos:
     get:

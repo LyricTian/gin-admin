@@ -2362,12 +2362,12 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "6.3.1",
+	Version:     "7.0.0",
 	Host:        "",
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
 	Title:       "gin-admin",
-	Description: "RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.",
+	Description: "RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.",
 }
 
 type s struct{}

@@ -4,8 +4,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v6/pkg/unique"
+	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,8 +17,8 @@ func TestDemo(t *testing.T) {
 
 	// post /demos
 	addItem := &schema.Demo{
-		Code:   unique.MustUUID().String(),
-		Name:   unique.MustUUID().String(),
+		Code:   uuid.MustUUID().String(),
+		Name:   uuid.MustUUID().String(),
 		Status: 1,
 	}
 	engine.ServeHTTP(w, newPostRequest(router, addItem))
@@ -40,7 +40,7 @@ func TestDemo(t *testing.T) {
 
 	// put /demos/:id
 	putItem := getItem
-	putItem.Name = unique.MustUUID().String()
+	putItem.Name = uuid.MustUUID().String()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)

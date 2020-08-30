@@ -4,22 +4,22 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/ginplus"
-	"github.com/LyricTian/gin-admin/v6/pkg/errors"
+	"github.com/LyricTian/gin-admin/v7/internal/app/ginx"
+	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
 // NoMethodHandler 未找到请求方法的处理函数
 func NoMethodHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ginplus.ResError(c, errors.ErrMethodNotAllow)
+		ginx.ResError(c, errors.ErrMethodNotAllow)
 	}
 }
 
 // NoRouteHandler 未找到请求路由的处理函数
 func NoRouteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ginplus.ResError(c, errors.ErrNotFound)
+		ginx.ResError(c, errors.ErrNotFound)
 	}
 }
 

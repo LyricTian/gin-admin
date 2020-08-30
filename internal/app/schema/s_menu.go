@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/json"
 )
 
 // Menu 菜单对象
@@ -26,7 +26,7 @@ type Menu struct {
 }
 
 func (a *Menu) String() string {
-	return util.JSONMarshalToString(a)
+	return json.MarshalToString(a)
 }
 
 // MenuQueryParam 查询条件

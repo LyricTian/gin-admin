@@ -4,8 +4,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v6/pkg/unique"
+	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +17,7 @@ func TestRole(t *testing.T) {
 
 	// post /menus
 	addMenuItem := &schema.Menu{
-		Name:       unique.MustUUID().String(),
+		Name:       uuid.MustUUID().String(),
 		ShowStatus: 1,
 		Status:     1,
 	}
@@ -29,7 +29,7 @@ func TestRole(t *testing.T) {
 
 	// post /roles
 	addItem := &schema.Role{
-		Name:   unique.MustUUID().String(),
+		Name:   uuid.MustUUID().String(),
 		Status: 1,
 		RoleMenus: schema.RoleMenus{
 			&schema.RoleMenu{
@@ -55,7 +55,7 @@ func TestRole(t *testing.T) {
 
 	// put /roles/:id
 	putItem := getItem
-	putItem.Name = unique.MustUUID().String()
+	putItem.Name = uuid.MustUUID().String()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)

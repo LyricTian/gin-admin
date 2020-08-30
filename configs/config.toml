@@ -23,6 +23,8 @@ KeyFile = ""
 ShutdownTimeout = 30
 # 允许的最大内容长度(64M)
 MaxContentLength = 67108864
+# 允许输出的最大日志长度
+MaxLoggerLength = 4096
 
 [Menu]
 # 使用启用初始化菜单数据
@@ -43,7 +45,7 @@ AutoLoad = false
 AutoLoadInternal = 60
 
 [Log]
-# 日志级别(1:fatal 2:error,3:warn,4:info,5:debug)
+# 日志级别(1:fatal 2:error,3:warn,4:info,5:debug,6:trace)
 Level = 5
 # 日志格式（支持输出格式：text/json）
 Format = "text"
@@ -212,32 +214,3 @@ SSLMode = "disable"
 [Sqlite3]
 # 数据库路径
 Path = "data/gin-admin.db"
-
-# mongo需要满足以下条件：
-# 4.0以上版本
-# 安装后以replication set（复本集）模式启动；
-# replication:
-#   replSetName: rs0
-# rs.initiate()
-# rs.status()
-# StorageEngine(存储引擎)须是wiredTiger (支持文档级别的锁)，4.0以上版本已经默认支持
-[Mongo]
-# 连接地址(mongodb://user:password@localhost:27017/?authSource=admin)
-URI = "mongodb://localhost:27017/?appName=gin-admin"
-# 数据库
-Database = "gin-admin"
-# 连接超时(单位秒)
-Timeout = 30
-# 集合名前缀
-CollectionPrefix = "g_"
-
-[UniqueID]
-# 唯一ID类型(支持：uuid/object/snowflake)
-Type = "snowflake"
-
-# https://github.com/twitter-archive/snowflake
-[UniqueID.Snowflake]
-# 节点标识(0-1023)
-Node = 1
-# 开始时间戳(2020-01-02 15:04:05)
-Epoch = 1577977445000

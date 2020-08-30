@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/json"
 	"github.com/koding/multiconfig"
 )
 
@@ -47,7 +47,7 @@ func MustLoad(fpaths ...string) {
 // PrintWithJSON 基于JSON格式输出配置
 func PrintWithJSON() {
 	if C.PrintConfig {
-		b, err := util.JSONMarshalIndent(C, "", " ")
+		b, err := json.MarshalIndent(C, "", " ")
 		if err != nil {
 			os.Stdout.WriteString("[CONFIG] JSON marshal error: " + err.Error())
 			return
@@ -80,14 +80,6 @@ type Config struct {
 	MySQL        MySQL
 	Postgres     Postgres
 	Sqlite3      Sqlite3
-	Mongo        Mongo
-	UniqueID     struct {
-		Type      string
-		Snowflake struct {
-			Node  int64
-			Epoch int64
-		}
-	}
 }
 
 // IsDebugMode 是否是debug模式
@@ -177,6 +169,7 @@ type HTTP struct {
 	KeyFile          string
 	ShutdownTimeout  int
 	MaxContentLength int64
+	MaxLoggerLength  int `default:"4096"`
 }
 
 // Monitor 监控配置参数
@@ -277,12 +270,4 @@ type Sqlite3 struct {
 // DSN 数据库连接串
 func (a Sqlite3) DSN() string {
 	return a.Path
-}
-
-// Mongo mongo配置参数
-type Mongo struct {
-	URI              string
-	Database         string
-	Timeout          int
-	CollectionPrefix string
 }

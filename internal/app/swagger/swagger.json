@@ -5,14 +5,14 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "RBAC scaffolding based on GIN + GORM/MONGO + CASBIN + WIRE.",
+        "description": "RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.",
         "title": "gin-admin",
         "contact": {
             "name": "LyricTian",
             "email": "tiannianshou@gmail.com"
         },
         "license": {},
-        "version": "6.3.1"
+        "version": "7.0.0"
     },
     "basePath": "/",
     "paths": {

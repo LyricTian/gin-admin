@@ -1,18 +1,18 @@
 package middleware
 
 import (
-	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	"github.com/LyricTian/gin-admin/v6/internal/app/ginplus"
-	"github.com/LyricTian/gin-admin/v6/internal/app/icontext"
-	"github.com/LyricTian/gin-admin/v6/pkg/auth"
-	"github.com/LyricTian/gin-admin/v6/pkg/errors"
-	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	"github.com/LyricTian/gin-admin/v7/internal/app/config"
+	"github.com/LyricTian/gin-admin/v7/internal/app/contextx"
+	"github.com/LyricTian/gin-admin/v7/internal/app/ginx"
+	"github.com/LyricTian/gin-admin/v7/pkg/auth"
+	"github.com/LyricTian/gin-admin/v7/pkg/errors"
+	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func wrapUserAuthContext(c *gin.Context, userID string) {
-	ginplus.SetUserID(c, userID)
-	ctx := icontext.NewUserID(c.Request.Context(), userID)
+	ginx.SetUserID(c, userID)
+	ctx := contextx.NewUserID(c.Request.Context(), userID)
 	ctx = logger.NewUserIDContext(ctx, userID)
 	c.Request = c.Request.WithContext(ctx)
 }
@@ -32,7 +32,7 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 			return
 		}
 
-		userID, err := a.ParseUserID(c.Request.Context(), ginplus.GetToken(c))
+		userID, err := a.ParseUserID(c.Request.Context(), ginx.GetToken(c))
 		if err != nil {
 			if err == auth.ErrInvalidToken {
 				if config.C.IsDebugMode() {
@@ -40,10 +40,10 @@ func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc 
 					c.Next()
 					return
 				}
-				ginplus.ResError(c, errors.ErrInvalidToken)
+				ginx.ResError(c, errors.ErrInvalidToken)
 				return
 			}
-			ginplus.ResError(c, errors.WithStack(err))
+			ginx.ResError(c, errors.WithStack(err))
 			return
 		}
 

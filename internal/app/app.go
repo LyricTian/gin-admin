@@ -7,21 +7,18 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync/atomic"
 	"syscall"
 	"time"
 
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/captcha/store"
-	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	"github.com/LyricTian/gin-admin/v6/internal/app/injector"
-	"github.com/LyricTian/gin-admin/v6/internal/app/iutil"
-	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	"github.com/LyricTian/gin-admin/v7/internal/app/config"
+	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	"github.com/go-redis/redis"
 	"github.com/google/gops/agent"
 
 	// 引入swagger
-	_ "github.com/LyricTian/gin-admin/v6/internal/app/swagger"
+	_ "github.com/LyricTian/gin-admin/v7/internal/app/swagger"
 )
 
 type options struct {
@@ -89,10 +86,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	}
 	config.PrintWithJSON()
 
-	logger.Printf(ctx, "服务启动，运行模式：%s，版本号：%s，进程号：%d", config.C.RunMode, o.Version, os.Getpid())
-
-	// Initialize unique id
-	iutil.InitID()
+	logger.WithContext(ctx).Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.C.RunMode, o.Version, os.Getpid())
 
 	// 初始化日志模块
 	loggerCleanFunc, err := InitLogger()
@@ -107,7 +101,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	InitCaptcha()
 
 	// 初始化依赖注入器
-	injector, injectorCleanFunc, err := injector.BuildInjector()
+	injector, injectorCleanFunc, err := BuildInjector()
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +145,7 @@ func InitMonitor(ctx context.Context) func() {
 		// and close agent manually before service shutting down
 		err := agent.Listen(agent.Options{Addr: c.Addr, ConfigDir: c.ConfigDir, ShutdownCleanup: false})
 		if err != nil {
-			logger.Errorf(ctx, "Agent monitor error: %s", err.Error())
+			logger.WithContext(ctx).Errorf("Agent monitor error: %s", err.Error())
 		}
 		return func() {
 			agent.Close()
@@ -173,7 +167,8 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 	}
 
 	go func() {
-		logger.Printf(ctx, "HTTP server is running at %s.", addr)
+		logger.WithContext(ctx).Printf("HTTP server is running at %s.", addr)
+
 		var err error
 		if cfg.CertFile != "" && cfg.KeyFile != "" {
 			srv.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
@@ -184,6 +179,7 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 		if err != nil && err != http.ErrServerClosed {
 			panic(err)
 		}
+
 	}()
 
 	return func() {
@@ -192,14 +188,14 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 
 		srv.SetKeepAlivesEnabled(false)
 		if err := srv.Shutdown(ctx); err != nil {
-			logger.Errorf(ctx, err.Error())
+			logger.WithContext(ctx).Errorf(err.Error())
 		}
 	}
 }
 
 // Run 运行服务
 func Run(ctx context.Context, opts ...Option) error {
-	var state int32 = 1
+	state := 1
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	cleanFunc, err := Init(ctx, opts...)
@@ -210,10 +206,10 @@ func Run(ctx context.Context, opts ...Option) error {
 EXIT:
 	for {
 		sig := <-sc
-		logger.Printf(ctx, "接收到信号[%s]", sig.String())
+		logger.WithContext(ctx).Infof("接收到信号[%s]", sig.String())
 		switch sig {
 		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-			atomic.CompareAndSwapInt32(&state, 1, 0)
+			state = 0
 			break EXIT
 		case syscall.SIGHUP:
 		default:
@@ -222,8 +218,8 @@ EXIT:
 	}
 
 	cleanFunc()
-	logger.Printf(ctx, "服务退出")
+	logger.WithContext(ctx).Infof("服务退出")
 	time.Sleep(time.Second)
-	os.Exit(int(atomic.LoadInt32(&state)))
+	os.Exit(state)
 	return nil
 }

@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/v6/internal/app/middleware"
+	"github.com/LyricTian/gin-admin/v7/internal/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 

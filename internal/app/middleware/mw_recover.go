@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"runtime"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/ginplus"
-	"github.com/LyricTian/gin-admin/v6/pkg/errors"
-	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	"github.com/LyricTian/gin-admin/v7/internal/app/ginx"
+	"github.com/LyricTian/gin-admin/v7/pkg/errors"
+	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,8 +25,8 @@ func RecoveryMiddleware() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				stack := stack(3)
-				logger.StartSpan(c.Request.Context()).WithField("stack", string(stack)).Errorf("[panic]: %v", err)
-				ginplus.ResError(c, errors.ErrInternalServer)
+				logger.WithContext(c.Request.Context()).WithField(logger.StackKey, string(stack)).Errorf("[panic]: %v", err)
+				ginx.ResError(c, errors.ErrInternalServer)
 			}
 		}()
 		c.Next()

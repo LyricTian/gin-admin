@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	"github.com/LyricTian/gin-admin/v6/internal/app/ginplus"
-	"github.com/LyricTian/gin-admin/v6/pkg/errors"
+	"github.com/LyricTian/gin-admin/v7/internal/app/config"
+	"github.com/LyricTian/gin-admin/v7/internal/app/ginx"
+	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/go-redis/redis_rate"
@@ -38,7 +38,7 @@ func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 			return
 		}
 
-		userID := ginplus.GetUserID(c)
+		userID := ginx.GetUserID(c)
 		if userID != "" {
 			limit := cfg.Count
 			rate, delay, allowed := limiter.AllowMinute(userID, limit)
@@ -48,7 +48,7 @@ func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 				h.Set("X-RateLimit-Remaining", strconv.FormatInt(limit-rate, 10))
 				delaySec := int64(delay / time.Second)
 				h.Set("X-RateLimit-Delay", strconv.FormatInt(delaySec, 10))
-				ginplus.ResError(c, errors.ErrTooManyRequests)
+				ginx.ResError(c, errors.ErrTooManyRequests)
 				return
 			}
 		}

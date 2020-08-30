@@ -4,9 +4,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v6/pkg/unique"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
+	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/hash"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +18,7 @@ func TestUser(t *testing.T) {
 
 	// post /menus
 	addMenuItem := &schema.Menu{
-		Name:       unique.MustUUID().String(),
+		Name:       uuid.MustUUID().String(),
 		ShowStatus: 1,
 		Status:     1,
 	}
@@ -30,7 +30,7 @@ func TestUser(t *testing.T) {
 
 	// post /roles
 	addRoleItem := &schema.Role{
-		Name:   unique.MustUUID().String(),
+		Name:   uuid.MustUUID().String(),
 		Status: 1,
 		RoleMenus: schema.RoleMenus{
 			&schema.RoleMenu{
@@ -46,10 +46,10 @@ func TestUser(t *testing.T) {
 
 	// post /users
 	addItem := &schema.User{
-		UserName: unique.MustUUID().String(),
-		RealName: unique.MustUUID().String(),
+		UserName: uuid.MustUUID().String(),
+		RealName: uuid.MustUUID().String(),
 		Status:   1,
-		Password: util.MD5HashString("test"),
+		Password: hash.MD5String("test"),
 		UserRoles: schema.UserRoles{
 			&schema.UserRole{
 				RoleID: addRoleItemRes.ID,
@@ -74,7 +74,7 @@ func TestUser(t *testing.T) {
 
 	// put /users/:id
 	putItem := getItem
-	putItem.UserName = unique.MustUUID().String()
+	putItem.UserName = uuid.MustUUID().String()
 	engine.ServeHTTP(w, newPutRequest("%s/%s", putItem, router, getItem.ID))
 	assert.Equal(t, 200, w.Code)
 	err = parseOK(w.Body)

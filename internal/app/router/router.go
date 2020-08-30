@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/LyricTian/gin-admin/v6/internal/app/api"
-	"github.com/LyricTian/gin-admin/v6/pkg/auth"
+	"github.com/LyricTian/gin-admin/v7/internal/app/api"
+	"github.com/LyricTian/gin-admin/v7/pkg/auth"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"

@@ -4,8 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	"github.com/LyricTian/gin-admin/v6/pkg/util"
+	"github.com/LyricTian/gin-admin/v7/internal/app/config"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/hash"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/json"
+	"github.com/LyricTian/gin-admin/v7/pkg/util/structure"
 )
 
 // GetRootUser 获取root用户
@@ -15,7 +17,7 @@ func GetRootUser() *User {
 		ID:       user.UserName,
 		UserName: user.UserName,
 		RealName: user.RealName,
-		Password: util.MD5HashString(user.Password),
+		Password: hash.MD5String(user.Password),
 	}
 }
 
@@ -39,7 +41,7 @@ type User struct {
 }
 
 func (a *User) String() string {
-	return util.JSONMarshalToString(a)
+	return json.MarshalToString(a)
 }
 
 // CleanSecure 清理安全数据
@@ -93,7 +95,7 @@ func (a Users) ToUserShows(mUserRoles map[string]UserRoles, mRoles map[string]*R
 	list := make(UserShows, len(a))
 	for i, item := range a {
 		showItem := new(UserShow)
-		util.StructMapToStruct(item, showItem)
+		structure.Copy(item, showItem)
 		for _, roleID := range mUserRoles[item.ID].ToRoleIDs() {
 			if v, ok := mRoles[roleID]; ok {
 				showItem.Roles = append(showItem.Roles, v)

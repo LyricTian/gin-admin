@@ -4,13 +4,11 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"time"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/config"
-	"github.com/LyricTian/gin-admin/v6/pkg/logger"
-	loggerhook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook"
-	loggergormhook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook/gorm"
-	loggermongohook "github.com/LyricTian/gin-admin/v6/pkg/logger/hook/mongo"
+	"github.com/LyricTian/gin-admin/v7/internal/app/config"
+	"github.com/LyricTian/gin-admin/v7/pkg/logger"
+	loggerhook "github.com/LyricTian/gin-admin/v7/pkg/logger/hook"
+	loggergormhook "github.com/LyricTian/gin-admin/v7/pkg/logger/hook/gorm"
 	"github.com/sirupsen/logrus"
 )
 
@@ -76,19 +74,6 @@ func InitLogger() (func(), error) {
 				MaxOpenConns: hc.MaxOpenConns,
 				MaxIdleConns: hc.MaxIdleConns,
 				TableName:    hc.Table,
-			}),
-				loggerhook.SetMaxWorkers(c.HookMaxThread),
-				loggerhook.SetMaxQueues(c.HookMaxBuffer),
-				loggerhook.SetLevels(hookLevels...),
-			)
-			logger.AddHook(h)
-			hook = h
-		case c.Hook.IsMongo():
-			h := loggerhook.New(loggermongohook.New(&loggermongohook.Config{
-				URI:        config.C.Mongo.URI,
-				Database:   config.C.Mongo.Database,
-				Timeout:    time.Duration(config.C.Mongo.Timeout) * time.Second,
-				Collection: config.C.LogMongoHook.Collection,
 			}),
 				loggerhook.SetMaxWorkers(c.HookMaxThread),
 				loggerhook.SetMaxQueues(c.HookMaxBuffer),

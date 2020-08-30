@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/LyricTian/gin-admin/v6/internal/app/model"
-	"github.com/LyricTian/gin-admin/v6/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v6/pkg/logger"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	casbinModel "github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/google/wire"
@@ -19,11 +19,11 @@ var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"), wire.Bi
 
 // CasbinAdapter casbin适配器
 type CasbinAdapter struct {
-	RoleModel         model.IRole
-	RoleMenuModel     model.IRoleMenu
-	MenuResourceModel model.IMenuActionResource
-	UserModel         model.IUser
-	UserRoleModel     model.IUserRole
+	RoleModel         *model.Role
+	RoleMenuModel     *model.RoleMenu
+	MenuResourceModel *model.MenuActionResource
+	UserModel         *model.User
+	UserRoleModel     *model.UserRole
 }
 
 // LoadPolicy loads all policy rules from the storage.
@@ -31,13 +31,13 @@ func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {
 	ctx := context.Background()
 	err := a.loadRolePolicy(ctx, model)
 	if err != nil {
-		logger.Errorf(ctx, "Load casbin role policy error: %s", err.Error())
+		logger.WithContext(ctx).Errorf("Load casbin role policy error: %s", err.Error())
 		return err
 	}
 
 	err = a.loadUserPolicy(ctx, model)
 	if err != nil {
-		logger.Errorf(ctx, "Load casbin user policy error: %s", err.Error())
+		logger.WithContext(ctx).Errorf("Load casbin user policy error: %s", err.Error())
 		return err
 	}
 
