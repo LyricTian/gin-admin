@@ -29,30 +29,25 @@ func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 
 // WrapPageQuery 包装带有分页的查询
 func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (*schema.PaginationResult, error) {
-	var (
-		count int
-		err   error
-	)
-
 	if pp.OnlyCount {
-		err = db.Count(&count).Error
-	} else if pp.Pagination {
-		count, err = FindPage(ctx, db, pp, out)
-	} else {
-		current, pageSize := pp.GetCurrent(), pp.GetPageSize()
-		if current > 0 && pageSize > 0 {
-			db = db.Offset((current - 1) * pageSize).Limit(pageSize)
-		} else if pageSize > 0 {
-			db = db.Limit(pageSize)
+		var count int
+		err := db.Count(&count).Error
+		if err != nil {
+			return nil, err
 		}
-		err = db.Find(out).Error
+		return &schema.PaginationResult{Total: count}, nil
+	} else if !pp.Pagination {
+		err := db.Find(out).Error
+		return nil, err
 	}
+
+	total, err := FindPage(ctx, db, pp, out)
 	if err != nil {
 		return nil, err
 	}
 
 	return &schema.PaginationResult{
-		Total:    count,
+		Total:    total,
 		Current:  pp.GetCurrent(),
 		PageSize: pp.GetPageSize(),
 	}, nil
