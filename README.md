@@ -71,7 +71,7 @@ $ go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.c
 make swagger
 
 # OR 使用swag命令
-swag init --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
+swag init --generalInfo ./cmd/gin-admin/main.go --output ./internal/app/swagger
 ```
 
 ## 重新生成依赖注入文件
