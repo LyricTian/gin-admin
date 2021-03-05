@@ -8,9 +8,6 @@
 
 </div>
 
-- [在线演示地址](http://139.129.88.71:10088) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
-- [Swagger 文档地址](http://139.129.88.71:10088/swagger/index.html)
-
 ## 特性
 
 - 遵循 `RESTful API` 设计规范 & 基于接口的编程规范
@@ -90,22 +87,12 @@ wire gen ./internal/app
 
 ## 互动交流
 
-### 与作者对话
-
-> 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，一起探讨，畅聊技术人生，相互学习，一起进步。我非常期待！下面是我的微信二维码（如果此项目对您提供了帮助也可以请作者喝杯咖啡 (\*￣︶￣)，聊表心意，一起星巴克「续杯」~嘿嘿 ）：
-
-<div>
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg" width="256"alt="wechat" />
-<img src="http://store.tiannianshou.com/screenshots/gin-admin/we-pay.png" width="256" alt="we-pay" />
-</div>
-
-### QQ 群：1409099
-
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg" width="256" alt="qqgroup" />
 
 ## MIT License
 
-    Copyright (c) 2020 Lyric
+    Copyright (c) 2021 Lyric
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
