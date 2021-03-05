@@ -87,8 +87,10 @@ wire gen ./internal/app
 
 ## 互动交流
 
+<div>
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg" width="256"alt="wechat" />
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg" width="256" alt="qqgroup" />
+</div>
 
 ## MIT License
 
