@@ -210,16 +210,17 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	}
 
 	mData := menuResult.Data.ToMap()
+	// 获取授权菜单的父级菜单，判断哪些父级菜单不在之前的授权菜单中，存放于qIDs切片
 	var qIDs []string
 	for _, pid := range menuResult.Data.SplitParentIDs() {
 		if _, ok := mData[pid]; !ok {
 			qIDs = append(qIDs, pid)
 		}
 	}
-
+	// 获取这些差异的父级菜单的信息，补充到menuResult.Data中
 	if len(qIDs) > 0 {
 		pmenuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
-			IDs: menuResult.Data.SplitParentIDs(),
+			IDs: qIDs,
 		})
 		if err != nil {
 			return nil, err
