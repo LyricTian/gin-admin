@@ -22,7 +22,6 @@ var doc = `{
             "name": "LyricTian",
             "email": "tiannianshou@gmail.com"
         },
-        "license": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -1922,7 +1921,6 @@ var doc = `{
             "properties": {
                 "error": {
                     "description": "错误项",
-                    "type": "object",
                     "$ref": "#/definitions/schema.ErrorItem"
                 }
             }
@@ -1942,7 +1940,6 @@ var doc = `{
                     "type": "object"
                 },
                 "pagination": {
-                    "type": "object",
                     "$ref": "#/definitions/schema.PaginationResult"
                 }
             }
@@ -2010,8 +2007,10 @@ var doc = `{
             "properties": {
                 "actions": {
                     "description": "动作列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActions"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuAction"
+                    }
                 },
                 "created_at": {
                     "description": "创建时间",
@@ -2093,8 +2092,10 @@ var doc = `{
                 },
                 "resources": {
                     "description": "资源列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActionResources"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuActionResource"
+                    }
                 }
             }
         },
@@ -2123,30 +2124,22 @@ var doc = `{
                 }
             }
         },
-        "schema.MenuActionResources": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.MenuActionResource"
-            }
-        },
-        "schema.MenuActions": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.MenuAction"
-            }
-        },
         "schema.MenuTree": {
             "type": "object",
             "properties": {
                 "actions": {
                     "description": "动作列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActions"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuAction"
+                    }
                 },
                 "children": {
                     "description": "子级树",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuTrees"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuTree"
+                    }
                 },
                 "icon": {
                     "description": "菜单图标",
@@ -2184,12 +2177,6 @@ var doc = `{
                     "description": "状态(1:启用 2:禁用)",
                     "type": "integer"
                 }
-            }
-        },
-        "schema.MenuTrees": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.MenuTree"
             }
         },
         "schema.PaginationResult": {
@@ -2236,8 +2223,10 @@ var doc = `{
                 },
                 "role_menus": {
                     "description": "角色菜单列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.RoleMenus"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.RoleMenu"
+                    }
                 },
                 "sequence": {
                     "description": "排序值",
@@ -2277,18 +2266,6 @@ var doc = `{
                     "description": "角色ID",
                     "type": "string"
                 }
-            }
-        },
-        "schema.RoleMenus": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.RoleMenu"
-            }
-        },
-        "schema.Roles": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.Role"
             }
         },
         "schema.StatusResult": {
@@ -2364,8 +2341,10 @@ var doc = `{
                 },
                 "user_roles": {
                     "description": "角色授权",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.UserRoles"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.UserRole"
+                    }
                 }
             }
         },
@@ -2378,8 +2357,10 @@ var doc = `{
                 },
                 "roles": {
                     "description": "角色列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.Roles"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Role"
+                    }
                 },
                 "user_id": {
                     "description": "用户ID",
@@ -2406,12 +2387,6 @@ var doc = `{
                     "description": "用户ID",
                     "type": "string"
                 }
-            }
-        },
-        "schema.UserRoles": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.UserRole"
             }
         },
         "schema.UserShow": {

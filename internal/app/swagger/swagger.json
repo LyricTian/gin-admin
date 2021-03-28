@@ -11,7 +11,6 @@
             "name": "LyricTian",
             "email": "tiannianshou@gmail.com"
         },
-        "license": {},
         "version": "7.0.0"
     },
     "basePath": "/",
@@ -1910,7 +1909,6 @@
             "properties": {
                 "error": {
                     "description": "错误项",
-                    "type": "object",
                     "$ref": "#/definitions/schema.ErrorItem"
                 }
             }
@@ -1930,7 +1928,6 @@
                     "type": "object"
                 },
                 "pagination": {
-                    "type": "object",
                     "$ref": "#/definitions/schema.PaginationResult"
                 }
             }
@@ -1998,8 +1995,10 @@
             "properties": {
                 "actions": {
                     "description": "动作列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActions"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuAction"
+                    }
                 },
                 "created_at": {
                     "description": "创建时间",
@@ -2081,8 +2080,10 @@
                 },
                 "resources": {
                     "description": "资源列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActionResources"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuActionResource"
+                    }
                 }
             }
         },
@@ -2111,30 +2112,22 @@
                 }
             }
         },
-        "schema.MenuActionResources": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.MenuActionResource"
-            }
-        },
-        "schema.MenuActions": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.MenuAction"
-            }
-        },
         "schema.MenuTree": {
             "type": "object",
             "properties": {
                 "actions": {
                     "description": "动作列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuActions"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuAction"
+                    }
                 },
                 "children": {
                     "description": "子级树",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.MenuTrees"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuTree"
+                    }
                 },
                 "icon": {
                     "description": "菜单图标",
@@ -2172,12 +2165,6 @@
                     "description": "状态(1:启用 2:禁用)",
                     "type": "integer"
                 }
-            }
-        },
-        "schema.MenuTrees": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.MenuTree"
             }
         },
         "schema.PaginationResult": {
@@ -2224,8 +2211,10 @@
                 },
                 "role_menus": {
                     "description": "角色菜单列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.RoleMenus"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.RoleMenu"
+                    }
                 },
                 "sequence": {
                     "description": "排序值",
@@ -2265,18 +2254,6 @@
                     "description": "角色ID",
                     "type": "string"
                 }
-            }
-        },
-        "schema.RoleMenus": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.RoleMenu"
-            }
-        },
-        "schema.Roles": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.Role"
             }
         },
         "schema.StatusResult": {
@@ -2352,8 +2329,10 @@
                 },
                 "user_roles": {
                     "description": "角色授权",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.UserRoles"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.UserRole"
+                    }
                 }
             }
         },
@@ -2366,8 +2345,10 @@
                 },
                 "roles": {
                     "description": "角色列表",
-                    "type": "object",
-                    "$ref": "#/definitions/schema.Roles"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Role"
+                    }
                 },
                 "user_id": {
                     "description": "用户ID",
@@ -2394,12 +2375,6 @@
                     "description": "用户ID",
                     "type": "string"
                 }
-            }
-        },
-        "schema.UserRoles": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/schema.UserRole"
             }
         },
         "schema.UserShow": {

@@ -18,16 +18,16 @@ build:
 	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN) ./cmd/${APP}
 
 start:
-	go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" ./cmd/${APP}/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
+	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" ./cmd/${APP}/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
 
 swagger:
-	swag init --parseDependency --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
+	@swag init --parseDependency --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
 
 wire:
-	wire gen ./internal/app
+	@wire gen ./internal/app
 
 test:
-	@go test -v $(shell go list ./...)
+	cd ./internal/app/test && go test -v
 
 clean:
 	rm -rf data release $(SERVER_BIN) internal/app/test/data cmd/${APP}/data

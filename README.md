@@ -63,17 +63,17 @@ $ go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.c
 
 ## 生成`swagger`文档
 
-```
+```bash
 # 基于Makefile
 make swagger
 
 # OR 使用swag命令
-swag init --generalInfo ./cmd/gin-admin/main.go --output ./internal/app/swagger
+swag init --parseDependency --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
 ```
 
 ## 重新生成依赖注入文件
 
-```
+```bash
 # 基于Makefile
 make wire
 
@@ -81,9 +81,69 @@ make wire
 wire gen ./internal/app
 ```
 
+## [gin-admin-cli](https://github.com/gin-admin/gin-admin-cli) 工具使用
+
+### 创建项目
+
+```bash
+gin-admin-cli new -d test-gin-admin -p test-gin-admin -m
+```
+
+### 快速生成业务模块
+
+#### 创建模板 task.yaml
+
+```bash
+name: Task
+comment: 任务管理
+fields:
+  - name: Code
+    type: string
+    comment: 任务编号
+    required: true
+    binding_options: ""
+    gorm_options: "size:50;index;"
+  - name: Name
+    type: string
+    comment: 任务名称
+    required: true
+    binding_options: ""
+    gorm_options: "size:50;index;"
+  - name: Memo
+    type: string
+    comment: 任务备注
+    required: false
+    binding_options: ""
+    gorm_options: "size:1024;"
+```
+
+#### 执行生成命令并运行
+
+```bash
+cd test-gin-admin
+gin-admin-cli g -d . -p test-gin-admin -f ./task.yaml
+
+# 生成 swagger
+make swagger
+
+# 生成依赖项
+make wire
+
+# 运行服务
+make start
+```
+
 ## 前端工程
 
 - 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/gin-admin/gin-admin-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
+
+## Questions
+
+### OSX 下基于 `sqlite3` 运行出现：`'stdlib.h' file not found`
+
+```bash
+export CGO_ENABLED=1; export CC=gcc; go get -v -x github.com/mattn/go-sqlite3
+```
 
 ## 互动交流
 
