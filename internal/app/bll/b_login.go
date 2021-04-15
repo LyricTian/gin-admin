@@ -6,7 +6,7 @@ import (
 	"sort"
 
 	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/service"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/auth"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
@@ -20,12 +20,12 @@ var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
 // Login 登录管理
 type Login struct {
 	Auth            auth.Auther
-	UserModel       *model.User
-	UserRoleModel   *model.UserRole
-	RoleModel       *model.Role
-	RoleMenuModel   *model.RoleMenu
-	MenuModel       *model.Menu
-	MenuActionModel *model.MenuAction
+	UserModel       *service.User
+	UserRoleModel   *service.UserRole
+	RoleModel       *service.Role
+	RoleMenuModel   *service.RoleMenu
+	MenuModel       *service.Menu
+	MenuActionModel *service.MenuAction
 }
 
 // GetCaptcha 获取图形验证码信息
