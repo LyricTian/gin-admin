@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/service"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	casbinModel "github.com/casbin/casbin/v2/model"
@@ -19,11 +19,11 @@ var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"), wire.Bi
 
 // CasbinAdapter casbin适配器
 type CasbinAdapter struct {
-	RoleModel         *model.Role
-	RoleMenuModel     *model.RoleMenu
-	MenuResourceModel *model.MenuActionResource
-	UserModel         *model.User
-	UserRoleModel     *model.UserRole
+	RoleModel         *service.Role
+	RoleMenuModel     *service.RoleMenu
+	MenuResourceModel *service.MenuActionResource
+	UserModel         *service.User
+	UserRoleModel     *service.UserRole
 }
 
 // LoadPolicy loads all policy rules from the storage.

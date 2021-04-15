@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/LyricTian/gin-admin/v7/internal/app/contextx"
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/service"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/LyricTian/gin-admin/v7/pkg/util/uuid"
@@ -18,10 +18,10 @@ var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
 
 // Menu 菜单管理
 type Menu struct {
-	TransModel              *model.Trans
-	MenuModel               *model.Menu
-	MenuActionModel         *model.MenuAction
-	MenuActionResourceModel *model.MenuActionResource
+	TransModel              *service.Trans
+	MenuModel               *service.Menu
+	MenuActionModel         *service.MenuAction
+	MenuActionResourceModel *service.MenuActionResource
 }
 
 // InitData 初始化菜单数据

@@ -3,7 +3,7 @@ package bll
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/service"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/LyricTian/gin-admin/v7/pkg/util/uuid"
@@ -17,10 +17,10 @@ var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
 // Role 角色管理
 type Role struct {
 	Enforcer      *casbin.SyncedEnforcer
-	TransModel    *model.Trans
-	RoleModel     *model.Role
-	RoleMenuModel *model.RoleMenu
-	UserModel     *model.User
+	TransModel    *service.Trans
+	RoleModel     *service.Role
+	RoleMenuModel *service.RoleMenu
+	UserModel     *service.User
 }
 
 // Query 查询数据

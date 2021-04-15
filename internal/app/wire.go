@@ -11,7 +11,7 @@ import (
 	"github.com/LyricTian/gin-admin/v7/internal/app/router"
 	"github.com/google/wire"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/service"
 )
 
 // BuildInjector 生成注入器
@@ -19,7 +19,7 @@ func BuildInjector() (*Injector, func(), error) {
 	wire.Build(
 		// mock.MockSet,
 		InitGormDB,
-		model.ModelSet,
+		service.ServiceSet,
 		InitAuth,
 		InitCasbin,
 		InitGinEngine,
