@@ -1,6 +1,7 @@
 package gormx
 
 import (
+	"gorm.io/gorm/schema"
 	"strings"
 	"time"
 
@@ -23,6 +24,10 @@ type Config struct {
 // NewDB 创建DB实例
 func NewDB(c *Config) (*gorm.DB, func(), error) {
 	db, err := gorm.Open(*c.Dialector, &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: c.TablePrefix,
+			SingularTable: true,
+		},
 		DisableForeignKeyConstraintWhenMigrating: true,
 		SkipDefaultTransaction:                   true,
 	})
@@ -49,7 +54,6 @@ func NewDB(c *Config) (*gorm.DB, func(), error) {
 		return nil, cleanFunc, err
 	}
 
-//	db.SingularTable(true)
 	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
 	sqlDB.SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
