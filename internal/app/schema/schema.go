@@ -38,26 +38,26 @@ type ListResult struct {
 
 // PaginationResult 分页查询结果
 type PaginationResult struct {
-	Total    int  `json:"total"`
-	Current  uint `json:"current"`
-	PageSize uint `json:"pageSize"`
+	Total    int64  `json:"total"`
+	Current  int    `json:"current"`
+	PageSize int    `json:"pageSize"`
 }
 
 // PaginationParam 分页查询条件
 type PaginationParam struct {
 	Pagination bool `form:"-"`                                     // 是否使用分页查询
 	OnlyCount  bool `form:"-"`                                     // 是否仅查询count
-	Current    uint `form:"current,default=1"`                     // 当前页
-	PageSize   uint `form:"pageSize,default=10" binding:"max=100"` // 页大小
+	Current    int  `form:"current,default=1"`                     // 当前页
+	PageSize   int  `form:"pageSize,default=10" binding:"max=100"` // 页大小
 }
 
 // GetCurrent 获取当前页
-func (a PaginationParam) GetCurrent() uint {
+func (a PaginationParam) GetCurrent() int {
 	return a.Current
 }
 
 // GetPageSize 获取页大小
-func (a PaginationParam) GetPageSize() uint {
+func (a PaginationParam) GetPageSize() int {
 	pageSize := a.PageSize
 	if a.PageSize == 0 {
 		pageSize = 100

@@ -5,7 +5,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/v7/internal/app/config"
 	"github.com/LyricTian/gin-admin/v7/internal/app/contextx"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // GetDB ...

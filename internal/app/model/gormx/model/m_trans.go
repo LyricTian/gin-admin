@@ -5,7 +5,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/v7/internal/app/contextx"
 	"github.com/google/wire"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // TransSet 注入Trans

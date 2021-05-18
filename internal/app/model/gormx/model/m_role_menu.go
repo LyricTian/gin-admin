@@ -7,7 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/google/wire"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // RoleMenuSet 注入RoleMenu

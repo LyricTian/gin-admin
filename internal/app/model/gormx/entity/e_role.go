@@ -6,7 +6,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/util/structure"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // GetRoleDB 获取角色存储

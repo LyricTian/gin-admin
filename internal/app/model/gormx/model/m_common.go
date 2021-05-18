@@ -7,7 +7,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/v7/internal/app/contextx"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // TransFunc 定义事务执行函数
@@ -30,7 +30,7 @@ func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 // WrapPageQuery 包装带有分页的查询
 func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (*schema.PaginationResult, error) {
 	if pp.OnlyCount {
-		var count int
+		var count int64
 		err := db.Count(&count).Error
 		if err != nil {
 			return nil, err
@@ -54,8 +54,8 @@ func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, 
 }
 
 // FindPage 查询分页数据
-func FindPage(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (int, error) {
-	var count int
+func FindPage(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (int64, error) {
+	var count int64
 	err := db.Count(&count).Error
 	if err != nil {
 		return 0, err
@@ -88,7 +88,7 @@ func FindOne(ctx context.Context, db *gorm.DB, out interface{}) (bool, error) {
 
 // Check 检查数据是否存在
 func Check(ctx context.Context, db *gorm.DB) (bool, error) {
-	var count int
+	var count int64
 	result := db.Count(&count)
 	if err := result.Error; err != nil {
 		return false, err

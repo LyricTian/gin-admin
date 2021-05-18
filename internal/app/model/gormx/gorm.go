@@ -7,19 +7,13 @@ import (
 	"github.com/LyricTian/gin-admin/v7/internal/app/config"
 	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/entity"
 	"github.com/LyricTian/gin-admin/v7/pkg/logger"
-	"github.com/jinzhu/gorm"
-
-	// gorm存储注入
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/gorm"
 )
 
 // Config 配置参数
 type Config struct {
 	Debug        bool
-	DBType       string
-	DSN          string
+	Dialector    *gorm.Dialector
 	MaxLifetime  int
 	MaxOpenConns int
 	MaxIdleConns int
@@ -28,11 +22,10 @@ type Config struct {
 
 // NewDB 创建DB实例
 func NewDB(c *Config) (*gorm.DB, func(), error) {
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return c.TablePrefix + defaultTableName
-	}
-
-	db, err := gorm.Open(c.DBType, c.DSN)
+	db, err := gorm.Open(*c.Dialector, &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		SkipDefaultTransaction:                   true,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -40,23 +33,26 @@ func NewDB(c *Config) (*gorm.DB, func(), error) {
 	if c.Debug {
 		db = db.Debug()
 	}
-
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, nil, err
+	}
 	cleanFunc := func() {
-		err := db.Close()
+		err := sqlDB.Close()
 		if err != nil {
 			logger.Errorf("Gorm db close error: %s", err.Error())
 		}
 	}
 
-	err = db.DB().Ping()
+	err = sqlDB.Ping()
 	if err != nil {
 		return nil, cleanFunc, err
 	}
 
-	db.SingularTable(true)
-	db.DB().SetMaxIdleConns(c.MaxIdleConns)
-	db.DB().SetMaxOpenConns(c.MaxOpenConns)
-	db.DB().SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
+//	db.SingularTable(true)
+	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
 	return db, cleanFunc, nil
 }
 
@@ -75,5 +71,5 @@ func AutoMigrate(db *gorm.DB) error {
 		new(entity.Role),
 		new(entity.UserRole),
 		new(entity.User),
-	).Error
+	)
 }

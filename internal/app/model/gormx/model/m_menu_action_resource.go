@@ -7,7 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/google/wire"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // MenuActionResourceSet 注入MenuActionResource
@@ -32,14 +32,16 @@ func (a *MenuActionResource) Query(ctx context.Context, params schema.MenuAction
 
 	db := entity.GetMenuActionResourceDB(ctx, a.DB)
 	if v := params.MenuID; v != "" {
+		results := entity.MenuActions{}
 		subQuery := entity.GetMenuActionDB(ctx, a.DB).
 			Where("menu_id=?", v).
-			Select("id").SubQuery()
-		db = db.Where("action_id IN ?", subQuery)
+			Select("id").Find(&results)
+		db = db.Where("action_id IN (?)", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {
-		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN (?)", v).Select("id").SubQuery()
-		db = db.Where("action_id IN ?", subQuery)
+		results := entity.MenuActions{}
+		subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id IN (?)", v).Select("id").Find(&results)
+		db = db.Where("action_id IN (?)", subQuery)
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByASC))
@@ -100,7 +102,8 @@ func (a *MenuActionResource) DeleteByActionID(ctx context.Context, actionID stri
 
 // DeleteByMenuID 根据菜单ID删除数据
 func (a *MenuActionResource) DeleteByMenuID(ctx context.Context, menuID string) error {
-	subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id=?", menuID).Select("id").SubQuery()
-	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN ?", subQuery).Delete(entity.MenuActionResource{})
+	results := entity.MenuActions{}
+	subQuery := entity.GetMenuActionDB(ctx, a.DB).Where("menu_id=?", menuID).Select("id").Find(&results)
+	result := entity.GetMenuActionResourceDB(ctx, a.DB).Where("action_id IN (?)", subQuery).Delete(entity.MenuActionResource{})
 	return errors.WithStack(result.Error)
 }
