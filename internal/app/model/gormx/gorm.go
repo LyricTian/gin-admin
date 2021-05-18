@@ -23,13 +23,13 @@ type Config struct {
 
 // NewDB 创建DB实例
 func NewDB(c *Config) (*gorm.DB, func(), error) {
-	db, err := gorm.Open(*c.Dialector, &gorm.Config{
+	db, err := gorm.Open(*c.Dialector, &gorm.Config{ // https://gorm.io/zh_CN/docs/gorm_config.html
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: c.TablePrefix,
-			SingularTable: true,
+			TablePrefix:   c.TablePrefix, // 全局表前缀
+			SingularTable: true,          // 禁用表名复数
 		},
-		DisableForeignKeyConstraintWhenMigrating: true,
-		SkipDefaultTransaction:                   true,
+		DisableForeignKeyConstraintWhenMigrating: true, // 禁用自动创建外键约束
+		SkipDefaultTransaction:                   true, // 跳过默认事务
 	})
 	if err != nil {
 		return nil, nil, err
@@ -49,10 +49,11 @@ func NewDB(c *Config) (*gorm.DB, func(), error) {
 		}
 	}
 
-	err = sqlDB.Ping()
-	if err != nil {
-		return nil, cleanFunc, err
-	}
+	//在完成初始化后，GORMV2 会自动ping数据库以检查数据库的可用性，以下代码注释
+	//err = sqlDB.Ping()
+	//if err != nil {
+	//	return nil, cleanFunc, err
+	//}
 
 	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
