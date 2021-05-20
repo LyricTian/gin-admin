@@ -5,16 +5,15 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v7/pkg/logger"
-	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 var tableName string
 
 // Config 配置参数
 type Config struct {
-	DBType       string
-	DSN          string
+	Dialector    *gorm.Dialector
 	MaxLifetime  int
 	MaxOpenConns int
 	MaxIdleConns int
@@ -25,14 +24,20 @@ type Config struct {
 func New(c *Config) *Hook {
 	tableName = c.TableName
 
-	db, err := gorm.Open(c.DBType, c.DSN)
+	db, err := gorm.Open(*c.Dialector, &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		SkipDefaultTransaction:                   true,
+	})
 	if err != nil {
 		panic(err)
 	}
-
-	db.DB().SetMaxIdleConns(c.MaxIdleConns)
-	db.DB().SetMaxOpenConns(c.MaxOpenConns)
-	db.DB().SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
 
 	db.AutoMigrate(new(LogItem))
 	return &Hook{
@@ -85,7 +90,11 @@ func (h *Hook) Exec(entry *logrus.Entry) error {
 
 // Close 关闭钩子
 func (h *Hook) Close() error {
-	return h.db.Close()
+	sqlDB, err := h.db.DB()
+	if err != nil {
+		panic(err)
+	}
+	return sqlDB.Close()
 }
 
 // LogItem 存储日志项

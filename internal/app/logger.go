@@ -2,6 +2,10 @@ package app
 
 import (
 	"errors"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"os"
 	"path/filepath"
 
@@ -56,20 +60,23 @@ func InitLogger() (func(), error) {
 			hc := config.C.LogGormHook
 
 			var dsn string
+			var dialector gorm.Dialector
 			switch hc.DBType {
 			case "mysql":
 				dsn = config.C.MySQL.DSN()
+				dialector = mysql.Open(dsn)
 			case "sqlite3":
 				dsn = config.C.Sqlite3.DSN()
+				dialector = sqlite.Open(dsn)
 			case "postgres":
 				dsn = config.C.Postgres.DSN()
+				dialector = postgres.Open(dsn)
 			default:
 				return nil, errors.New("unknown db")
 			}
 
 			h := loggerhook.New(loggergormhook.New(&loggergormhook.Config{
-				DBType:       hc.DBType,
-				DSN:          dsn,
+				Dialector:    &dialector,
 				MaxLifetime:  hc.MaxLifetime,
 				MaxOpenConns: hc.MaxOpenConns,
 				MaxIdleConns: hc.MaxIdleConns,

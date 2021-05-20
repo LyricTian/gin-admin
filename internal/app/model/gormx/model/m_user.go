@@ -7,7 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/google/wire"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // UserSet 注入User
@@ -38,11 +38,11 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 		db = db.Where("status=?", v)
 	}
 	if v := params.RoleIDs; len(v) > 0 {
+		r := entity.UserRoles{}
 		subQuery := entity.GetUserRoleDB(ctx, a.DB).
 			Select("user_id").
-			Where("role_id IN (?)", v).
-			SubQuery()
-		db = db.Where("id IN ?", subQuery)
+			Where("role_id IN (?)", v).Find(&r)
+		db = db.Where("id IN (?)", subQuery)
 	}
 	if v := params.QueryValue; v != "" {
 		v = "%" + v + "%"

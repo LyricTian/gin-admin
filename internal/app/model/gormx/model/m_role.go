@@ -7,7 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/google/wire"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // RoleSet 注入Role
@@ -38,11 +38,12 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		db = db.Where("name=?", v)
 	}
 	if v := params.UserID; v != "" {
+		r := entity.UserRoles{}
 		subQuery := entity.GetUserRoleDB(ctx, a.DB).
 			Where("deleted_at is null").
 			Where("user_id=?", v).
-			Select("role_id").SubQuery()
-		db = db.Where("id IN ?", subQuery)
+			Select("role_id").Find(&r)
+		db = db.Where("id IN (?)", subQuery)
 	}
 	if v := params.QueryValue; v != "" {
 		v = "%" + v + "%"
