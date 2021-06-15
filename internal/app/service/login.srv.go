@@ -1,4 +1,4 @@
-package bll
+package service
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"sort"
 
 	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/repo"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/auth"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
@@ -20,12 +20,12 @@ var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
 // Login 登录管理
 type Login struct {
 	Auth            auth.Auther
-	UserModel       *model.User
-	UserRoleModel   *model.UserRole
-	RoleModel       *model.Role
-	RoleMenuModel   *model.RoleMenu
-	MenuModel       *model.Menu
-	MenuActionModel *model.MenuAction
+	UserModel       *repo.User
+	UserRoleModel   *repo.UserRole
+	RoleModel       *repo.Role
+	RoleMenuModel   *repo.RoleMenu
+	MenuModel       *repo.Menu
+	MenuActionModel *repo.MenuAction
 }
 
 // GetCaptcha 获取图形验证码信息

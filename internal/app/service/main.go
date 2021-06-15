@@ -1,9 +1,9 @@
-package bll
+package service
 
 import "github.com/google/wire"
 
-// BllSet bll注入
-var BllSet = wire.NewSet(
+// ServiceSet bll注入
+var ServiceSet = wire.NewSet(
 	DemoSet,
 	LoginSet,
 	MenuSet,

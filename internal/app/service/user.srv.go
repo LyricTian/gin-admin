@@ -1,9 +1,9 @@
-package bll
+package service
 
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/repo"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/LyricTian/gin-admin/v7/pkg/util/hash"
@@ -18,10 +18,10 @@ var UserSet = wire.NewSet(wire.Struct(new(User), "*"))
 // User 用户管理
 type User struct {
 	Enforcer      *casbin.SyncedEnforcer
-	TransModel    *model.Trans
-	UserModel     *model.User
-	UserRoleModel *model.UserRole
-	RoleModel     *model.Role
+	TransModel    *repo.Trans
+	UserModel     *repo.User
+	UserRoleModel *repo.UserRole
+	RoleModel     *repo.Role
 }
 
 // Query 查询数据

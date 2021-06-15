@@ -18,6 +18,8 @@
 /data
 /internal/app/test/data
 /tmp
+/vendor
+
 
 # IDE configs
 .idea
