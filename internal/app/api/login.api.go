@@ -2,10 +2,10 @@ package api
 
 import (
 	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/gin-admin/v7/internal/app/bll"
 	"github.com/LyricTian/gin-admin/v7/internal/app/config"
 	"github.com/LyricTian/gin-admin/v7/internal/app/ginx"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v7/internal/app/service"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -17,13 +17,13 @@ var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
 
 // Login 登录管理
 type Login struct {
-	LoginBll *bll.Login
+	LoginSrv *service.Login
 }
 
 // GetCaptcha 获取验证码信息
 func (a *Login) GetCaptcha(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.LoginBll.GetCaptcha(ctx, config.C.Captcha.Length)
+	item, err := a.LoginSrv.GetCaptcha(ctx, config.C.Captcha.Length)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -48,7 +48,7 @@ func (a *Login) ResCaptcha(c *gin.Context) {
 	}
 
 	cfg := config.C.Captcha
-	err := a.LoginBll.ResCaptcha(ctx, c.Writer, captchaID, cfg.Width, cfg.Height)
+	err := a.LoginSrv.ResCaptcha(ctx, c.Writer, captchaID, cfg.Width, cfg.Height)
 	if err != nil {
 		ginx.ResError(c, err)
 	}
@@ -68,7 +68,7 @@ func (a *Login) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := a.LoginBll.Verify(ctx, item.UserName, item.Password)
+	user, err := a.LoginSrv.Verify(ctx, item.UserName, item.Password)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -78,7 +78,7 @@ func (a *Login) Login(c *gin.Context) {
 	// 将用户ID放入上下文
 	ginx.SetUserID(c, userID)
 
-	tokenInfo, err := a.LoginBll.GenerateToken(ctx, userID)
+	tokenInfo, err := a.LoginSrv.GenerateToken(ctx, userID)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -98,7 +98,7 @@ func (a *Login) Logout(c *gin.Context) {
 	userID := ginx.GetUserID(c)
 	if userID != "" {
 		ctx = logger.NewTagContext(ctx, "__logout__")
-		err := a.LoginBll.DestroyToken(ctx, ginx.GetToken(c))
+		err := a.LoginSrv.DestroyToken(ctx, ginx.GetToken(c))
 		if err != nil {
 			logger.WithContext(ctx).Errorf(err.Error())
 		}
@@ -110,7 +110,7 @@ func (a *Login) Logout(c *gin.Context) {
 // RefreshToken 刷新令牌
 func (a *Login) RefreshToken(c *gin.Context) {
 	ctx := c.Request.Context()
-	tokenInfo, err := a.LoginBll.GenerateToken(ctx, ginx.GetUserID(c))
+	tokenInfo, err := a.LoginSrv.GenerateToken(ctx, ginx.GetUserID(c))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -121,7 +121,7 @@ func (a *Login) RefreshToken(c *gin.Context) {
 // GetUserInfo 获取当前用户信息
 func (a *Login) GetUserInfo(c *gin.Context) {
 	ctx := c.Request.Context()
-	info, err := a.LoginBll.GetLoginInfo(ctx, ginx.GetUserID(c))
+	info, err := a.LoginSrv.GetLoginInfo(ctx, ginx.GetUserID(c))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -132,7 +132,7 @@ func (a *Login) GetUserInfo(c *gin.Context) {
 // QueryUserMenuTree 查询当前用户菜单树
 func (a *Login) QueryUserMenuTree(c *gin.Context) {
 	ctx := c.Request.Context()
-	menus, err := a.LoginBll.QueryUserMenuTree(ctx, ginx.GetUserID(c))
+	menus, err := a.LoginSrv.QueryUserMenuTree(ctx, ginx.GetUserID(c))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -149,7 +149,7 @@ func (a *Login) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	err := a.LoginBll.UpdatePassword(ctx, ginx.GetUserID(c), item)
+	err := a.LoginSrv.UpdatePassword(ctx, ginx.GetUserID(c), item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
