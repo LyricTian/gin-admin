@@ -1,6 +1,8 @@
 package router
 
 import (
+	socketio "github.com/googollee/go-socket.io"
+
 	"github.com/LyricTian/gin-admin/v7/internal/app/api"
 	"github.com/LyricTian/gin-admin/v7/pkg/auth"
 	"github.com/casbin/casbin/v2"
@@ -21,7 +23,9 @@ type IRouter interface {
 
 // Router 路由管理器
 type Router struct {
-	Auth           auth.Auther
+	Auth   auth.Auther
+	SockIO *socketio.Server
+
 	CasbinEnforcer *casbin.SyncedEnforcer
 	DemoAPI        *api.Demo
 	LoginAPI       *api.Login

@@ -1,4 +1,4 @@
-package bll
+package service
 
 import (
 	"context"

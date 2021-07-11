@@ -11,6 +11,7 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 
 	g.Use(middleware.UserAuthMiddleware(a.Auth,
 		middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
+		middleware.AllowPathPrefixSkipper("/ws"),
 	))
 
 	g.Use(middleware.CasbinMiddleware(a.CasbinEnforcer,
@@ -86,4 +87,8 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 			gUser.PATCH(":id/disable", a.UserAPI.Disable)
 		}
 	}
+
+	app.GET("/ws/*any", gin.WrapH(a.SockIO))
+	app.POST("/ws/*any", gin.WrapH(a.SockIO))
+
 }

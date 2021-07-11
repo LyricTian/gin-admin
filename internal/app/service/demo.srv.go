@@ -1,9 +1,9 @@
-package bll
+package service
 
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/model"
+	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/repo"
 	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v7/pkg/errors"
 	"github.com/LyricTian/gin-admin/v7/pkg/util/uuid"
@@ -15,7 +15,7 @@ var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"))
 
 // Demo 示例程序
 type Demo struct {
-	DemoModel *model.Demo
+	DemoModel *repo.Demo
 }
 
 // Query 查询数据

@@ -8,9 +8,6 @@
 
 </div>
 
-- [在线演示地址](http://139.129.88.71:10088) (用户名：root，密码：abc-123)（`温馨提醒：为了达到更好的演示效果，这里给出了拥有最高权限的用户，请手下留情，只操作自己新增的数据，不要动平台本身的数据！谢谢！`）
-- [Swagger 文档地址](http://139.129.88.71:10088/swagger/index.html)
-
 ## 特性
 
 - 遵循 `RESTful API` 设计规范 & 基于接口的编程规范
@@ -66,17 +63,17 @@ $ go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.c
 
 ## 生成`swagger`文档
 
-```
+```bash
 # 基于Makefile
 make swagger
 
 # OR 使用swag命令
-swag init --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
+swag init --parseDependency --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
 ```
 
 ## 重新生成依赖注入文件
 
-```
+```bash
 # 基于Makefile
 make wire
 
@@ -84,28 +81,80 @@ make wire
 wire gen ./internal/app
 ```
 
+## [gin-admin-cli](https://github.com/gin-admin/gin-admin-cli) 工具使用
+
+### 创建项目
+
+```bash
+gin-admin-cli new -d test-gin-admin -p test-gin-admin -m
+```
+
+### 快速生成业务模块
+
+#### 创建模板 task.yaml
+
+```bash
+name: Task
+comment: 任务管理
+fields:
+  - name: Code
+    type: string
+    comment: 任务编号
+    required: true
+    binding_options: ""
+    gorm_options: "size:50;index;"
+  - name: Name
+    type: string
+    comment: 任务名称
+    required: true
+    binding_options: ""
+    gorm_options: "size:50;index;"
+  - name: Memo
+    type: string
+    comment: 任务备注
+    required: false
+    binding_options: ""
+    gorm_options: "size:1024;"
+```
+
+#### 执行生成命令并运行
+
+```bash
+cd test-gin-admin
+gin-admin-cli g -d . -p test-gin-admin -f ./task.yaml
+
+# 生成 swagger
+make swagger
+
+# 生成依赖项
+make wire
+
+# 运行服务
+make start
+```
+
 ## 前端工程
 
 - 基于[Ant Design React](https://ant.design/index-cn)版本的实现：[gin-admin-react](https://github.com/gin-admin/gin-admin-react)(也可使用国内源：[https://gitee.com/lyric/gin-admin-react](https://gitee.com/lyric/gin-admin-react))
 
+## Questions
+
+### OSX 下基于 `sqlite3` 运行出现：`'stdlib.h' file not found`
+
+```bash
+export CGO_ENABLED=1; export CC=gcc; go get -v -x github.com/mattn/go-sqlite3
+```
+
 ## 互动交流
-
-### 与作者对话
-
-> 该项目是利用业余时间进行开发的，开发思路主要是源于自己的项目积累及个人思考，如果您有更好的想法和建议请与我进行沟通，一起探讨，畅聊技术人生，相互学习，一起进步。我非常期待！下面是我的微信二维码（如果此项目对您提供了帮助也可以请作者喝杯咖啡 (\*￣︶￣)，聊表心意，一起星巴克「续杯」~嘿嘿 ）：
 
 <div>
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/wechat.jpeg" width="256"alt="wechat" />
-<img src="http://store.tiannianshou.com/screenshots/gin-admin/we-pay.png" width="256" alt="we-pay" />
-</div>
-
-### QQ 群：1409099
-
 <img src="http://store.tiannianshou.com/screenshots/gin-admin/qqgroup.jpeg" width="256" alt="qqgroup" />
+</div>
 
 ## MIT License
 
-    Copyright (c) 2020 Lyric
+    Copyright (c) 2021 Lyric
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin

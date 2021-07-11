@@ -1,9 +1,9 @@
-package model
+package repo
 
 import "github.com/google/wire"
 
-// ModelSet model注入
-var ModelSet = wire.NewSet(
+// RepoSet model注入
+var RepoSet = wire.NewSet(
 	DemoSet,
 	MenuActionResourceSet,
 	MenuActionSet,
