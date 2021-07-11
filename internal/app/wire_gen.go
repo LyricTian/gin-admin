@@ -11,6 +11,7 @@ import (
 	"github.com/LyricTian/gin-admin/v7/internal/app/module/adapter"
 	"github.com/LyricTian/gin-admin/v7/internal/app/router"
 	"github.com/LyricTian/gin-admin/v7/internal/app/service"
+	"github.com/LyricTian/gin-admin/v7/internal/app/sockio"
 )
 
 import (
@@ -25,8 +26,14 @@ func BuildInjector() (*Injector, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	db, cleanup2, err := InitGormDB()
+	server, cleanup2, err := sockio.New()
 	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	db, cleanup3, err := InitGormDB()
+	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
@@ -52,8 +59,9 @@ func BuildInjector() (*Injector, func(), error) {
 		UserModel:         user,
 		UserRoleModel:     userRole,
 	}
-	syncedEnforcer, cleanup3, err := InitCasbin(casbinAdapter)
+	syncedEnforcer, cleanup4, err := InitCasbin(casbinAdapter)
 	if err != nil {
+		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -119,6 +127,7 @@ func BuildInjector() (*Injector, func(), error) {
 	}
 	routerRouter := &router.Router{
 		Auth:           auther,
+		SockIO:         server,
 		CasbinEnforcer: syncedEnforcer,
 		DemoAPI:        apiDemo,
 		LoginAPI:       apiLogin,
@@ -134,6 +143,7 @@ func BuildInjector() (*Injector, func(), error) {
 		MenuBll:        serviceMenu,
 	}
 	return injector, func() {
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()

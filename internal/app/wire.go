@@ -12,6 +12,8 @@ import (
 	"github.com/google/wire"
 
 	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/repo"
+
+	"github.com/LyricTian/gin-admin/v7/internal/app/sockio"
 )
 
 // BuildInjector 生成注入器
@@ -28,6 +30,7 @@ func BuildInjector() (*Injector, func(), error) {
 		router.RouterSet,
 		adapter.CasbinAdapterSet,
 		InjectorSet,
+		sockio.ProviderSet,
 	)
 	return new(Injector), nil, nil
 }
