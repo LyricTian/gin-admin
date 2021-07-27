@@ -123,6 +123,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 		monitorCleanFunc()
 		loggerCleanFunc()
 	}, nil
+
 }
 
 // InitCaptcha 初始化图形验证码
