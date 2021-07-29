@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/LyricTian/gin-admin/v7/internal/app/config"
-	"github.com/LyricTian/gin-admin/v7/pkg/auth"
-	"github.com/LyricTian/gin-admin/v7/pkg/auth/jwtauth"
-	"github.com/LyricTian/gin-admin/v7/pkg/auth/jwtauth/store/buntdb"
-	"github.com/LyricTian/gin-admin/v7/pkg/auth/jwtauth/store/redis"
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/pkg/auth"
+	"github.com/LyricTian/gin-admin/v8/pkg/auth/jwtauth"
+	"github.com/LyricTian/gin-admin/v8/pkg/auth/jwtauth/store/buntdb"
+	"github.com/LyricTian/gin-admin/v8/pkg/auth/jwtauth/store/redis"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 

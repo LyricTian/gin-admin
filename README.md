@@ -13,7 +13,7 @@
 - 遵循 `RESTful API` 设计规范 & 基于接口的编程规范
 - 基于 `GIN` 框架，提供了丰富的中间件支持（JWTAuth、CORS、RequestLogger、RequestRateLimiter、TraceID、CasbinEnforce、Recover、GZIP）
 - 基于 `Casbin` 的 RBAC 访问控制模型 -- **权限控制可以细粒度到按钮 & 接口**
-- 基于 `Gorm` 的数据库存储
+- 基于 `Gorm 2.0` 的数据库访问层 - 全功能 ORM
 - 基于 `WIRE` 的依赖注入 -- 依赖注入本身的作用是解决了各个模块间层级依赖繁琐的初始化过程
 - 基于 `Logrus & Context` 实现了日志输出，通过结合 Context 实现了统一的 TraceID/UserID 等关键字段的输出(同时支持日志钩子写入到`Gorm`)
 - 基于 `JWT` 的用户认证 -- 基于 JWT 的黑名单验证机制
@@ -36,7 +36,7 @@ go get -u github.com/swaggo/swag/cmd/swag
 ## 依赖框架
 
 - [Gin](https://gin-gonic.com/) -- The fastest full-featured web framework for Go.
-- [GORM](http://gorm.io/) -- The fantastic ORM library for Golang
+- [GORM](https://gorm.io/) -- The fantastic ORM library for Golang
 - [Casbin](https://casbin.org/) -- An authorization library that supports access control models like ACL, RBAC, ABAC in Golang
 - [Wire](https://github.com/google/wire) -- Compile-time Dependency Injection for Go
 
@@ -158,7 +158,7 @@ export CGO_ENABLED=1; export CC=gcc; go get -v -x github.com/mattn/go-sqlite3
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
-[godoc-url]: https://pkg.go.dev/github.com/LyricTian/gin-admin/v7
+[godoc-url]: https://pkg.go.dev/github.com/LyricTian/gin-admin/v8
 [godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin?status.svg
 [license-url]: http://opensource.org/licenses/MIT
 [license-image]: https://img.shields.io/npm/l/express.svg

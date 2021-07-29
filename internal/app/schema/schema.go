@@ -38,28 +38,28 @@ type ListResult struct {
 
 // PaginationResult 分页查询结果
 type PaginationResult struct {
-	Total    int  `json:"total"`
-	Current  uint `json:"current"`
-	PageSize uint `json:"pageSize"`
+	Total    int64 `json:"total"`
+	Current  int   `json:"current"`
+	PageSize int   `json:"pageSize"`
 }
 
 // PaginationParam 分页查询条件
 type PaginationParam struct {
 	Pagination bool `form:"-"`                                     // 是否使用分页查询
 	OnlyCount  bool `form:"-"`                                     // 是否仅查询count
-	Current    uint `form:"current,default=1"`                     // 当前页
-	PageSize   uint `form:"pageSize,default=10" binding:"max=100"` // 页大小
+	Current    int  `form:"current,default=1"`                     // 当前页
+	PageSize   int  `form:"pageSize,default=10" binding:"max=100"` // 页大小
 }
 
 // GetCurrent 获取当前页
-func (a PaginationParam) GetCurrent() uint {
+func (a PaginationParam) GetCurrent() int {
 	return a.Current
 }
 
 // GetPageSize 获取页大小
-func (a PaginationParam) GetPageSize() uint {
+func (a PaginationParam) GetPageSize() int {
 	pageSize := a.PageSize
-	if a.PageSize == 0 {
+	if a.PageSize <= 0 {
 		pageSize = 100
 	}
 	return pageSize
@@ -70,9 +70,9 @@ type OrderDirection int
 
 const (
 	// OrderByASC 升序排序
-	OrderByASC OrderDirection = 1
+	OrderByASC OrderDirection = iota + 1
 	// OrderByDESC 降序排序
-	OrderByDESC OrderDirection = 2
+	OrderByDESC
 )
 
 // NewOrderFieldWithKeys 创建排序字段(默认升序排序)，可指定不同key的排序规则
@@ -117,7 +117,7 @@ type OrderField struct {
 }
 
 // NewIDResult 创建响应唯一标识实例
-func NewIDResult(id string) *IDResult {
+func NewIDResult(id uint64) *IDResult {
 	return &IDResult{
 		ID: id,
 	}
@@ -125,5 +125,5 @@ func NewIDResult(id string) *IDResult {
 
 // IDResult 响应唯一标识
 type IDResult struct {
-	ID string `json:"id"`
+	ID uint64 `json:"id"`
 }

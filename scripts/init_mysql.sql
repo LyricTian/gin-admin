@@ -1,2 +1,2 @@
 -- Create a database
-CREATE DATABASE `gin-admin` DEFAULT CHARACTER SET = `utf8mb4`;
+CREATE DATABASE IF NOT EXISTS `gin-admin` DEFAULT CHARACTER SET = `utf8mb4`;

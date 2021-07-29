@@ -1,23 +1,24 @@
 package api
 
 import (
-	"github.com/LyricTian/gin-admin/v7/internal/app/ginx"
-	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v7/internal/app/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/contextx"
+	"github.com/LyricTian/gin-admin/v8/internal/app/ginx"
+	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v8/internal/app/service"
 )
 
-// RoleSet 注入Role
-var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
+var RoleSet = wire.NewSet(wire.Struct(new(RoleAPI), "*"))
 
-// Role 角色管理
-type Role struct {
-	RoleSrv *service.Role
+// RoleAPI 角色管理
+type RoleAPI struct {
+	RoleSrv *service.RoleSrv
 }
 
 // Query 查询数据
-func (a *Role) Query(c *gin.Context) {
+func (a *RoleAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -37,7 +38,7 @@ func (a *Role) Query(c *gin.Context) {
 }
 
 // QuerySelect 查询选择数据
-func (a *Role) QuerySelect(c *gin.Context) {
+func (a *RoleAPI) QuerySelect(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -56,9 +57,9 @@ func (a *Role) QuerySelect(c *gin.Context) {
 }
 
 // Get 查询指定数据
-func (a *Role) Get(c *gin.Context) {
+func (a *RoleAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.RoleSrv.Get(ctx, c.Param("id"))
+	item, err := a.RoleSrv.Get(ctx, ginx.ParseParamID(c, "id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -67,7 +68,7 @@ func (a *Role) Get(c *gin.Context) {
 }
 
 // Create 创建数据
-func (a *Role) Create(c *gin.Context) {
+func (a *RoleAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -75,7 +76,7 @@ func (a *Role) Create(c *gin.Context) {
 		return
 	}
 
-	item.Creator = ginx.GetUserID(c)
+	item.Creator = contextx.FromUserID(ctx)
 	result, err := a.RoleSrv.Create(ctx, item)
 	if err != nil {
 		ginx.ResError(c, err)
@@ -85,7 +86,7 @@ func (a *Role) Create(c *gin.Context) {
 }
 
 // Update 更新数据
-func (a *Role) Update(c *gin.Context) {
+func (a *RoleAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -93,7 +94,7 @@ func (a *Role) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.RoleSrv.Update(ctx, c.Param("id"), item)
+	err := a.RoleSrv.Update(ctx, ginx.ParseParamID(c, "id"), item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -102,9 +103,9 @@ func (a *Role) Update(c *gin.Context) {
 }
 
 // Delete 删除数据
-func (a *Role) Delete(c *gin.Context) {
+func (a *RoleAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSrv.Delete(ctx, c.Param("id"))
+	err := a.RoleSrv.Delete(ctx, ginx.ParseParamID(c, "id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -113,9 +114,9 @@ func (a *Role) Delete(c *gin.Context) {
 }
 
 // Enable 启用数据
-func (a *Role) Enable(c *gin.Context) {
+func (a *RoleAPI) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSrv.UpdateStatus(ctx, c.Param("id"), 1)
+	err := a.RoleSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 1)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -124,9 +125,9 @@ func (a *Role) Enable(c *gin.Context) {
 }
 
 // Disable 禁用数据
-func (a *Role) Disable(c *gin.Context) {
+func (a *RoleAPI) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSrv.UpdateStatus(ctx, c.Param("id"), 2)
+	err := a.RoleSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 2)
 	if err != nil {
 		ginx.ResError(c, err)
 		return

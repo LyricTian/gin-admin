@@ -1,23 +1,24 @@
 package api
 
 import (
-	"github.com/LyricTian/gin-admin/v7/internal/app/ginx"
-	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v7/internal/app/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/contextx"
+	"github.com/LyricTian/gin-admin/v8/internal/app/ginx"
+	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v8/internal/app/service"
 )
 
-// MenuSet 注入Menu
-var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
+var MenuSet = wire.NewSet(wire.Struct(new(MenuAPI), "*"))
 
-// Menu 菜单管理
-type Menu struct {
-	MenuSrv *service.Menu
+// MenuAPI 菜单管理
+type MenuAPI struct {
+	MenuSrv *service.MenuSrv
 }
 
 // Query 查询数据
-func (a *Menu) Query(c *gin.Context) {
+func (a *MenuAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -37,7 +38,7 @@ func (a *Menu) Query(c *gin.Context) {
 }
 
 // QueryTree 查询菜单树
-func (a *Menu) QueryTree(c *gin.Context) {
+func (a *MenuAPI) QueryTree(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -56,9 +57,9 @@ func (a *Menu) QueryTree(c *gin.Context) {
 }
 
 // Get 查询指定数据
-func (a *Menu) Get(c *gin.Context) {
+func (a *MenuAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.MenuSrv.Get(ctx, c.Param("id"))
+	item, err := a.MenuSrv.Get(ctx, ginx.ParseParamID(c, "id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -67,7 +68,7 @@ func (a *Menu) Get(c *gin.Context) {
 }
 
 // Create 创建数据
-func (a *Menu) Create(c *gin.Context) {
+func (a *MenuAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -75,7 +76,7 @@ func (a *Menu) Create(c *gin.Context) {
 		return
 	}
 
-	item.Creator = ginx.GetUserID(c)
+	item.Creator = contextx.FromUserID(ctx)
 	result, err := a.MenuSrv.Create(ctx, item)
 	if err != nil {
 		ginx.ResError(c, err)
@@ -85,7 +86,7 @@ func (a *Menu) Create(c *gin.Context) {
 }
 
 // Update 更新数据
-func (a *Menu) Update(c *gin.Context) {
+func (a *MenuAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -93,7 +94,7 @@ func (a *Menu) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.MenuSrv.Update(ctx, c.Param("id"), item)
+	err := a.MenuSrv.Update(ctx, ginx.ParseParamID(c, "id"), item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -102,9 +103,9 @@ func (a *Menu) Update(c *gin.Context) {
 }
 
 // Delete 删除数据
-func (a *Menu) Delete(c *gin.Context) {
+func (a *MenuAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSrv.Delete(ctx, c.Param("id"))
+	err := a.MenuSrv.Delete(ctx, ginx.ParseParamID(c, "id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -113,9 +114,9 @@ func (a *Menu) Delete(c *gin.Context) {
 }
 
 // Enable 启用数据
-func (a *Menu) Enable(c *gin.Context) {
+func (a *MenuAPI) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSrv.UpdateStatus(ctx, c.Param("id"), 1)
+	err := a.MenuSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 1)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -124,9 +125,9 @@ func (a *Menu) Enable(c *gin.Context) {
 }
 
 // Disable 禁用数据
-func (a *Menu) Disable(c *gin.Context) {
+func (a *MenuAPI) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSrv.UpdateStatus(ctx, c.Param("id"), 2)
+	err := a.MenuSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 2)
 	if err != nil {
 		ginx.ResError(c, err)
 		return

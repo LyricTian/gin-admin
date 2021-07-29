@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/repo"
-	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	casbinModel "github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/google/wire"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/dao"
+	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v8/pkg/logger"
 )
 
 var _ persist.Adapter = (*CasbinAdapter)(nil)
@@ -19,11 +20,11 @@ var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"), wire.Bi
 
 // CasbinAdapter casbin适配器
 type CasbinAdapter struct {
-	RoleModel         *repo.Role
-	RoleMenuModel     *repo.RoleMenu
-	MenuResourceModel *repo.MenuActionResource
-	UserModel         *repo.User
-	UserRoleModel     *repo.UserRole
+	RoleRepo         *dao.RoleRepo
+	RoleMenuRepo     *dao.RoleMenuRepo
+	MenuResourceRepo *dao.MenuActionResourceRepo
+	UserRepo         *dao.UserRepo
+	UserRoleRepo     *dao.UserRoleRepo
 }
 
 // LoadPolicy loads all policy rules from the storage.
@@ -46,7 +47,7 @@ func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {
 
 // 加载角色策略(p,role_id,path,method)
 func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model) error {
-	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+	roleResult, err := a.RoleRepo.Query(ctx, schema.RoleQueryParam{
 		Status: 1,
 	})
 	if err != nil {
@@ -55,13 +56,13 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 		return nil
 	}
 
-	roleMenuResult, err := a.RoleMenuModel.Query(ctx, schema.RoleMenuQueryParam{})
+	roleMenuResult, err := a.RoleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{})
 	if err != nil {
 		return err
 	}
 	mRoleMenus := roleMenuResult.Data.ToRoleIDMap()
 
-	menuResourceResult, err := a.MenuResourceModel.Query(ctx, schema.MenuActionResourceQueryParam{})
+	menuResourceResult, err := a.MenuResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{})
 	if err != nil {
 		return err
 	}
@@ -79,7 +80,7 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 							continue
 						}
 						mcache[mr.Path+mr.Method] = struct{}{}
-						line := fmt.Sprintf("p,%s,%s,%s", item.ID, mr.Path, mr.Method)
+						line := fmt.Sprintf("p,%d,%s,%s", item.ID, mr.Path, mr.Method)
 						persist.LoadPolicyLine(line, m)
 					}
 				}
@@ -92,13 +93,13 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 
 // 加载用户策略(g,user_id,role_id)
 func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model) error {
-	userResult, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+	userResult, err := a.UserRepo.Query(ctx, schema.UserQueryParam{
 		Status: 1,
 	})
 	if err != nil {
 		return err
 	} else if len(userResult.Data) > 0 {
-		userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{})
+		userRoleResult, err := a.UserRoleRepo.Query(ctx, schema.UserRoleQueryParam{})
 		if err != nil {
 			return err
 		}
@@ -107,7 +108,7 @@ func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model)
 		for _, uitem := range userResult.Data {
 			if urs, ok := mUserRoles[uitem.ID]; ok {
 				for _, ur := range urs {
-					line := fmt.Sprintf("g,%s,%s", ur.UserID, ur.RoleID)
+					line := fmt.Sprintf("g,%d,%d", ur.UserID, ur.RoleID)
 					persist.LoadPolicyLine(line, m)
 				}
 			}

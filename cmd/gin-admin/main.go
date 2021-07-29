@@ -13,16 +13,17 @@ import (
 	"context"
 	"os"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app"
-	"github.com/LyricTian/gin-admin/v7/pkg/logger"
 	"github.com/urfave/cli/v2"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app"
+	"github.com/LyricTian/gin-admin/v8/pkg/logger"
 )
 
 // VERSION 版本号，可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "7.0.0"
+var VERSION = "8.0.0"
 
 // @title gin-admin
-// @version 7.0.0
+// @version 8.0.0
 // @description RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
@@ -32,7 +33,6 @@ var VERSION = "7.0.0"
 // @contact.name LyricTian
 // @contact.email tiannianshou@gmail.com
 func main() {
-	logger.SetVersion(VERSION)
 	ctx := logger.NewTagContext(context.Background(), "__main__")
 
 	app := cli.NewApp()
@@ -51,27 +51,27 @@ func main() {
 func newWebCmd(ctx context.Context) *cli.Command {
 	return &cli.Command{
 		Name:  "web",
-		Usage: "运行web服务",
+		Usage: "Run http server",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "conf",
 				Aliases:  []string{"c"},
-				Usage:    "配置文件(.json,.yaml,.toml)",
+				Usage:    "App configuration file(.json,.yaml,.toml)",
 				Required: true,
 			},
 			&cli.StringFlag{
 				Name:     "model",
 				Aliases:  []string{"m"},
-				Usage:    "casbin的访问控制模型(.conf)",
+				Usage:    "Casbin model configuration(.conf)",
 				Required: true,
 			},
 			&cli.StringFlag{
 				Name:  "menu",
-				Usage: "初始化菜单数据配置文件(.yaml)",
+				Usage: "Initialize menu's data configuration(.yaml)",
 			},
 			&cli.StringFlag{
 				Name:  "www",
-				Usage: "静态站点目录",
+				Usage: "Static site directory",
 			},
 		},
 		Action: func(c *cli.Context) error {

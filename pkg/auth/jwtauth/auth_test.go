@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LyricTian/gin-admin/v7/pkg/auth/jwtauth/store/buntdb"
+	"github.com/LyricTian/gin-admin/v8/pkg/auth/jwtauth/store/buntdb"
 	"github.com/stretchr/testify/assert"
 )
 

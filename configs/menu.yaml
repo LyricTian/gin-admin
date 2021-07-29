@@ -4,43 +4,6 @@
   icon: dashboard
   router: "/dashboard"
   sequence: 9
-- name: DEMO
-  icon: tag
-  router: "/example/demo"
-  sequence: 8
-  actions:
-    - code: add
-      name: 新增
-      resources:
-        - method: POST
-          path: "/api/v1/demos"
-    - code: edit
-      name: 编辑
-      resources:
-        - method: GET
-          path: "/api/v1/demos/:id"
-        - method: PUT
-          path: "/api/v1/demos/:id"
-    - code: del
-      name: 删除
-      resources:
-        - method: DELETE
-          path: "/api/v1/demos/:id"
-    - code: query
-      name: 查询
-      resources:
-        - method: GET
-          path: "/api/v1/demos"
-    - code: disable
-      name: 禁用
-      resources:
-        - method: PATCH
-          path: "/api/v1/demos/:id/disable"
-    - code: enable
-      name: 启用
-      resources:
-        - method: PATCH
-          path: "/api/v1/demos/:id/enable"
 - name: 系统管理
   icon: setting
   sequence: 7

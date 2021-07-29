@@ -3,7 +3,7 @@ package app
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/persist"
 )
