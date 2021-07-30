@@ -1,13 +1,14 @@
 package app
 
 import (
-	"github.com/LyricTian/gin-admin/v8/internal/app/config"
-	"github.com/LyricTian/gin-admin/v8/internal/app/middleware"
-	"github.com/LyricTian/gin-admin/v8/internal/app/router"
 	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/internal/app/middleware"
+	"github.com/LyricTian/gin-admin/v8/internal/app/router"
 )
 
 // InitGinEngine 初始化gin引擎

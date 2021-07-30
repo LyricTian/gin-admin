@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
@@ -100,7 +101,10 @@ func (a *UserSrv) Create(ctx context.Context, item schema.User) (*schema.IDResul
 		return nil, err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	// Add user to casbin
+	for _, urItem := range item.UserRoles {
+		a.Enforcer.AddRoleForUser(strconv.FormatUint(urItem.UserID, 10), strconv.FormatUint(urItem.RoleID, 10))
+	}
 
 	return schema.NewIDResult(item.ID), nil
 }
@@ -145,19 +149,20 @@ func (a *UserSrv) Update(ctx context.Context, id uint64, item schema.User) error
 	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
+
+	addUserRoles, delUserRoles := a.compareUserRoles(ctx, oldItem.UserRoles, item.UserRoles)
 	err = a.TransRepo.Exec(ctx, func(ctx context.Context) error {
-		addUserRoles, delUserRoles := a.compareUserRoles(ctx, oldItem.UserRoles, item.UserRoles)
-		for _, rmitem := range addUserRoles {
-			rmitem.ID = snowflake.MustID()
-			rmitem.UserID = id
-			err := a.UserRoleRepo.Create(ctx, *rmitem)
+		for _, aitem := range addUserRoles {
+			aitem.ID = snowflake.MustID()
+			aitem.UserID = id
+			err := a.UserRoleRepo.Create(ctx, *aitem)
 			if err != nil {
 				return err
 			}
 		}
 
-		for _, rmitem := range delUserRoles {
-			err := a.UserRoleRepo.Delete(ctx, rmitem.ID)
+		for _, ritem := range delUserRoles {
+			err := a.UserRoleRepo.Delete(ctx, ritem.ID)
 			if err != nil {
 				return err
 			}
@@ -169,7 +174,15 @@ func (a *UserSrv) Update(ctx context.Context, id uint64, item schema.User) error
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	// Sync update casbin role for user
+	for _, aitem := range addUserRoles {
+		a.Enforcer.AddRoleForUser(strconv.FormatUint(id, 10), strconv.FormatUint(aitem.RoleID, 10))
+	}
+
+	for _, ritem := range delUserRoles {
+		a.Enforcer.DeleteRoleForUser(strconv.FormatUint(id, 10), strconv.FormatUint(ritem.RoleID, 10))
+	}
+
 	return nil
 }
 
@@ -212,25 +225,33 @@ func (a *UserSrv) Delete(ctx context.Context, id uint64) error {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	a.Enforcer.DeleteUser(strconv.FormatUint(id, 10))
 	return nil
 }
 
 // UpdateStatus 更新状态
 func (a *UserSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
-	oldItem, err := a.UserRepo.Get(ctx, id)
+	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
+	} else if oldItem.Status == status {
+		return nil
 	}
-	oldItem.Status = status
 
 	err = a.UserRepo.UpdateStatus(ctx, id, status)
 	if err != nil {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	if status == 1 {
+		for _, uritem := range oldItem.UserRoles {
+			a.Enforcer.AddRoleForUser(strconv.FormatUint(id, 10), strconv.FormatUint(uritem.RoleID, 10))
+		}
+	} else {
+		a.Enforcer.DeleteUser(strconv.FormatUint(id, 10))
+	}
+
 	return nil
 }

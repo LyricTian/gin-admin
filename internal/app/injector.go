@@ -1,11 +1,12 @@
 package app
 
 import (
-	"github.com/LyricTian/gin-admin/v8/internal/app/service"
-	"github.com/LyricTian/gin-admin/v8/pkg/auth"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/service"
+	"github.com/LyricTian/gin-admin/v8/pkg/auth"
 )
 
 // InjectorSet 注入Injector

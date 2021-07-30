@@ -2,24 +2,27 @@ package service
 
 import (
 	"context"
+	"strconv"
+
+	"github.com/casbin/casbin/v2"
+	"github.com/google/wire"
 
 	"github.com/LyricTian/gin-admin/v8/internal/app/dao"
 	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
 	"github.com/LyricTian/gin-admin/v8/pkg/errors"
 	"github.com/LyricTian/gin-admin/v8/pkg/util/snowflake"
-	"github.com/casbin/casbin/v2"
-	"github.com/google/wire"
 )
 
 var RoleSet = wire.NewSet(wire.Struct(new(RoleSrv), "*"))
 
 // RoleSrv 角色管理
 type RoleSrv struct {
-	Enforcer     *casbin.SyncedEnforcer
-	TransRepo    *dao.TransRepo
-	RoleRepo     *dao.RoleRepo
-	RoleMenuRepo *dao.RoleMenuRepo
-	UserRepo     *dao.UserRepo
+	Enforcer               *casbin.SyncedEnforcer
+	TransRepo              *dao.TransRepo
+	RoleRepo               *dao.RoleRepo
+	RoleMenuRepo           *dao.RoleMenuRepo
+	UserRepo               *dao.UserRepo
+	MenuActionResourceRepo *dao.MenuActionResourceRepo
 }
 
 // Query 查询数据
@@ -79,7 +82,16 @@ func (a *RoleSrv) Create(ctx context.Context, item schema.Role) (*schema.IDResul
 		return nil, err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	// Sync update casbin for role
+	resources, err := a.MenuActionResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{
+		MenuIDs: item.RoleMenus.ToMenuIDs(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, ritem := range resources.Data.ToMap() {
+		a.Enforcer.AddPermissionForUser(strconv.FormatUint(item.ID, 10), ritem.Path, ritem.Method)
+	}
 
 	return schema.NewIDResult(item.ID), nil
 }
@@ -138,7 +150,25 @@ func (a *RoleSrv) Update(ctx context.Context, id uint64, item schema.Role) error
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	// Sync update casbin for role
+	roleMenus, err := a.RoleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
+		RoleID: id,
+	})
+	if err != nil {
+		return err
+	}
+
+	resources, err := a.MenuActionResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{
+		MenuIDs: roleMenus.Data.ToMenuIDs(),
+	})
+	if err != nil {
+		return err
+	}
+
+	a.Enforcer.DeleteRole(strconv.FormatUint(item.ID, 10))
+	for _, ritem := range resources.Data.ToMap() {
+		a.Enforcer.AddPermissionForUser(strconv.FormatUint(item.ID, 10), ritem.Path, ritem.Method)
+	}
 
 	return nil
 }
@@ -192,7 +222,8 @@ func (a *RoleSrv) Delete(ctx context.Context, id uint64) error {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	a.Enforcer.DeleteRole(strconv.FormatUint(id, 10))
+
 	return nil
 }
 
@@ -203,6 +234,8 @@ func (a *RoleSrv) UpdateStatus(ctx context.Context, id uint64, status int) error
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
+	} else if oldItem.Status == status {
+		return nil
 	}
 
 	err = a.RoleRepo.UpdateStatus(ctx, id, status)
@@ -210,7 +243,27 @@ func (a *RoleSrv) UpdateStatus(ctx context.Context, id uint64, status int) error
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	if status == 1 {
+		roleMenus, err := a.RoleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
+			RoleID: id,
+		})
+		if err != nil {
+			return err
+		}
+
+		resources, err := a.MenuActionResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{
+			MenuIDs: roleMenus.Data.ToMenuIDs(),
+		})
+		if err != nil {
+			return err
+		}
+
+		for _, ritem := range resources.Data.ToMap() {
+			a.Enforcer.AddPermissionForUser(strconv.FormatUint(id, 10), ritem.Path, ritem.Method)
+		}
+	} else {
+		a.Enforcer.DeleteRole(strconv.FormatUint(id, 10))
+	}
 
 	return nil
 }

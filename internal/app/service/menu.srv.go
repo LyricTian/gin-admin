@@ -445,6 +445,8 @@ func (a *MenuSrv) UpdateStatus(ctx context.Context, id uint64, status int) error
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
+	} else if oldItem.Status == status {
+		return nil
 	}
 
 	return a.MenuRepo.UpdateStatus(ctx, id, status)

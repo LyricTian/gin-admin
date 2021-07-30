@@ -4,12 +4,13 @@
 package app
 
 import (
+	"github.com/google/wire"
+
 	"github.com/LyricTian/gin-admin/v8/internal/app/api"
 	"github.com/LyricTian/gin-admin/v8/internal/app/dao"
 	"github.com/LyricTian/gin-admin/v8/internal/app/module/adapter"
 	"github.com/LyricTian/gin-admin/v8/internal/app/router"
 	"github.com/LyricTian/gin-admin/v8/internal/app/service"
-	"github.com/google/wire"
 )
 
 // BuildInjector 生成注入器

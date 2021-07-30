@@ -92,11 +92,12 @@ func BuildInjector() (*Injector, func(), error) {
 		MenuSrv: menuSrv,
 	}
 	roleSrv := &service.RoleSrv{
-		Enforcer:     syncedEnforcer,
-		TransRepo:    trans,
-		RoleRepo:     roleRepo,
-		RoleMenuRepo: roleMenuRepo,
-		UserRepo:     userRepo,
+		Enforcer:               syncedEnforcer,
+		TransRepo:              trans,
+		RoleRepo:               roleRepo,
+		RoleMenuRepo:           roleMenuRepo,
+		UserRepo:               userRepo,
+		MenuActionResourceRepo: menuActionResourceRepo,
 	}
 	roleAPI := &api.RoleAPI{
 		RoleSrv: roleSrv,

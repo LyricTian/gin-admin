@@ -27,13 +27,15 @@ func init() {
 	config.MustLoad(configFile)
 
 	config.C.RunMode = "test"
-	config.C.Log.Level = 2
+	config.C.Log.Level = 4
 	config.C.JWTAuth.Enable = false
 	config.C.Casbin.Enable = false
 	config.C.Casbin.Model = modelFile
 	config.C.Gorm.Debug = false
 	config.C.Gorm.DBType = "sqlite3"
+	config.C.Log.EnableHook = false
 
+	app.InitLogger()
 	injector, _, err := app.BuildInjector()
 	if err != nil {
 		panic(err)
