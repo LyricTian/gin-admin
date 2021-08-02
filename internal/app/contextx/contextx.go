@@ -10,6 +10,7 @@ type (
 	noTransCtx   struct{}
 	transLockCtx struct{}
 	userIDCtx    struct{}
+	userNameCtx  struct{}
 	traceIDCtx   struct{}
 )
 
@@ -47,19 +48,35 @@ func FromTransLock(ctx context.Context) bool {
 }
 
 // NewUserID 创建用户ID的上下文
-func NewUserID(ctx context.Context, userID string) context.Context {
+func NewUserID(ctx context.Context, userID uint64) context.Context {
 	return context.WithValue(ctx, userIDCtx{}, userID)
 }
 
 // FromUserID 从上下文中获取用户ID
-func FromUserID(ctx context.Context) (string, bool) {
+func FromUserID(ctx context.Context) uint64 {
 	v := ctx.Value(userIDCtx{})
 	if v != nil {
-		if s, ok := v.(string); ok {
-			return s, s != ""
+		if s, ok := v.(uint64); ok {
+			return s
 		}
 	}
-	return "", false
+	return 0
+}
+
+// NewUserName 创建用户名的上下文
+func NewUserName(ctx context.Context, userName string) context.Context {
+	return context.WithValue(ctx, userNameCtx{}, userName)
+}
+
+// FromUserName 从上下文中获取用户名
+func FromUserName(ctx context.Context) string {
+	v := ctx.Value(userNameCtx{})
+	if v != nil {
+		if s, ok := v.(string); ok {
+			return s
+		}
+	}
+	return ""
 }
 
 // NewTraceID 创建追踪ID的上下文

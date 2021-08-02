@@ -6,30 +6,31 @@ import (
 	"sort"
 
 	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/repo"
-	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v7/pkg/auth"
-	"github.com/LyricTian/gin-admin/v7/pkg/errors"
-	"github.com/LyricTian/gin-admin/v7/pkg/util/hash"
 	"github.com/google/wire"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/dao"
+	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v8/pkg/auth"
+	"github.com/LyricTian/gin-admin/v8/pkg/errors"
+	"github.com/LyricTian/gin-admin/v8/pkg/util/hash"
 )
 
 // LoginSet 注入Login
-var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
+var LoginSet = wire.NewSet(wire.Struct(new(LoginSrv), "*"))
 
-// Login 登录管理
-type Login struct {
-	Auth            auth.Auther
-	UserModel       *repo.User
-	UserRoleModel   *repo.UserRole
-	RoleModel       *repo.Role
-	RoleMenuModel   *repo.RoleMenu
-	MenuModel       *repo.Menu
-	MenuActionModel *repo.MenuAction
+// LoginSrv 登录管理
+type LoginSrv struct {
+	Auth           auth.Auther
+	UserRepo       *dao.UserRepo
+	UserRoleRepo   *dao.UserRoleRepo
+	RoleRepo       *dao.RoleRepo
+	RoleMenuRepo   *dao.RoleMenuRepo
+	MenuRepo       *dao.MenuRepo
+	MenuActionRepo *dao.MenuActionRepo
 }
 
 // GetCaptcha 获取图形验证码信息
-func (a *Login) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
+func (a *LoginSrv) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
 	captchaID := captcha.NewLen(length)
 	item := &schema.LoginCaptcha{
 		CaptchaID: captchaID,
@@ -38,7 +39,7 @@ func (a *Login) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptch
 }
 
 // ResCaptcha 生成并响应图形验证码
-func (a *Login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, width, height int) error {
+func (a *LoginSrv) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, width, height int) error {
 	err := captcha.WriteImage(w, captchaID, width, height)
 	if err != nil {
 		if err == captcha.ErrNotFound {
@@ -55,25 +56,25 @@ func (a *Login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID
 }
 
 // Verify 登录验证
-func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
+func (a *LoginSrv) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
 	// 检查是否是超级用户
 	root := schema.GetRootUser()
 	if userName == root.UserName && root.Password == password {
 		return root, nil
 	}
 
-	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+	result, err := a.UserRepo.Query(ctx, schema.UserQueryParam{
 		UserName: userName,
 	})
 	if err != nil {
 		return nil, err
 	} else if len(result.Data) == 0 {
-		return nil, errors.ErrInvalidUserName
+		return nil, errors.New400Response("用户名不存在")
 	}
 
 	item := result.Data[0]
 	if item.Password != hash.SHA1String(password) {
-		return nil, errors.ErrInvalidPassword
+		return nil, errors.New400Response("密码错误")
 	} else if item.Status != 1 {
 		return nil, errors.ErrUserDisable
 	}
@@ -82,7 +83,7 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 }
 
 // GenerateToken 生成令牌
-func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
+func (a *LoginSrv) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
 	tokenInfo, err := a.Auth.GenerateToken(ctx, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -97,7 +98,7 @@ func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.Login
 }
 
 // DestroyToken 销毁令牌
-func (a *Login) DestroyToken(ctx context.Context, tokenString string) error {
+func (a *LoginSrv) DestroyToken(ctx context.Context, tokenString string) error {
 	err := a.Auth.DestroyToken(ctx, tokenString)
 	if err != nil {
 		return errors.WithStack(err)
@@ -105,8 +106,8 @@ func (a *Login) DestroyToken(ctx context.Context, tokenString string) error {
 	return nil
 }
 
-func (a *Login) checkAndGetUser(ctx context.Context, userID string) (*schema.User, error) {
-	user, err := a.UserModel.Get(ctx, userID)
+func (a *LoginSrv) checkAndGetUser(ctx context.Context, userID uint64) (*schema.User, error) {
+	user, err := a.UserRepo.Get(ctx, userID)
 	if err != nil {
 		return nil, err
 	} else if user == nil {
@@ -118,7 +119,7 @@ func (a *Login) checkAndGetUser(ctx context.Context, userID string) (*schema.Use
 }
 
 // GetLoginInfo 获取当前用户登录信息
-func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error) {
+func (a *LoginSrv) GetLoginInfo(ctx context.Context, userID uint64) (*schema.UserLoginInfo, error) {
 	if isRoot := schema.CheckIsRootUser(ctx, userID); isRoot {
 		root := schema.GetRootUser()
 		loginInfo := &schema.UserLoginInfo{
@@ -139,7 +140,7 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 		RealName: user.RealName,
 	}
 
-	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, err := a.UserRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: userID,
 	})
 	if err != nil {
@@ -147,7 +148,7 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 	}
 
 	if roleIDs := userRoleResult.Data.ToRoleIDs(); len(roleIDs) > 0 {
-		roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+		roleResult, err := a.RoleRepo.Query(ctx, schema.RoleQueryParam{
 			IDs:    roleIDs,
 			Status: 1,
 		})
@@ -161,11 +162,11 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 }
 
 // QueryUserMenuTree 查询当前用户的权限菜单树
-func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.MenuTrees, error) {
+func (a *LoginSrv) QueryUserMenuTree(ctx context.Context, userID uint64) (schema.MenuTrees, error) {
 	isRoot := schema.CheckIsRootUser(ctx, userID)
 	// 如果是root用户，则查询所有显示的菜单树
 	if isRoot {
-		result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		result, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 			Status: 1,
 		}, schema.MenuQueryOptions{
 			OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
@@ -174,14 +175,14 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 			return nil, err
 		}
 
-		menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{})
+		menuActionResult, err := a.MenuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
 		if err != nil {
 			return nil, err
 		}
 		return result.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap()).ToTree(), nil
 	}
 
-	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, err := a.UserRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: userID,
 	})
 	if err != nil {
@@ -190,7 +191,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 		return nil, errors.ErrNoPerm
 	}
 
-	roleMenuResult, err := a.RoleMenuModel.Query(ctx, schema.RoleMenuQueryParam{
+	roleMenuResult, err := a.RoleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
 		RoleIDs: userRoleResult.Data.ToRoleIDs(),
 	})
 	if err != nil {
@@ -199,7 +200,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 		return nil, errors.ErrNoPerm
 	}
 
-	menuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+	menuResult, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 		IDs:    roleMenuResult.Data.ToMenuIDs(),
 		Status: 1,
 	})
@@ -210,16 +211,18 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	}
 
 	mData := menuResult.Data.ToMap()
+
 	// 获取授权菜单的父级菜单，判断哪些父级菜单不在之前的授权菜单中，存放于qIDs切片
-	var qIDs []string
+	var qIDs []uint64
 	for _, pid := range menuResult.Data.SplitParentIDs() {
 		if _, ok := mData[pid]; !ok {
 			qIDs = append(qIDs, pid)
 		}
 	}
-	// 获取这些差异的父级菜单的信息，补充到menuResult.Data中
+
+	// 获取这些差异的父级菜单的信息，补充到 menuResult.Data 中
 	if len(qIDs) > 0 {
-		pmenuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		pmenuResult, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 			IDs: qIDs,
 		})
 		if err != nil {
@@ -229,7 +232,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	}
 
 	sort.Sort(menuResult.Data)
-	menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
+	menuActionResult, err := a.MenuActionRepo.Query(ctx, schema.MenuActionQueryParam{
 		IDs: roleMenuResult.Data.ToActionIDs(),
 	})
 	if err != nil {
@@ -239,7 +242,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 }
 
 // UpdatePassword 更新当前用户登录密码
-func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {
+func (a *LoginSrv) UpdatePassword(ctx context.Context, userID uint64, params schema.UpdatePasswordParam) error {
 	if schema.CheckIsRootUser(ctx, userID) {
 		return errors.New400Response("root用户不允许更新密码")
 	}
@@ -252,5 +255,5 @@ func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema
 	}
 
 	params.NewPassword = hash.SHA1String(params.NewPassword)
-	return a.UserModel.UpdatePassword(ctx, userID, params.NewPassword)
+	return a.UserRepo.UpdatePassword(ctx, userID, params.NewPassword)
 }

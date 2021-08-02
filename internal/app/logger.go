@@ -1,21 +1,19 @@
 package app
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/config"
-	"github.com/LyricTian/gin-admin/v7/pkg/logger"
-	loggerhook "github.com/LyricTian/gin-admin/v7/pkg/logger/hook"
-	loggergormhook "github.com/LyricTian/gin-admin/v7/pkg/logger/hook/gorm"
-	"github.com/sirupsen/logrus"
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/pkg/logger"
+	loggerhook "github.com/LyricTian/gin-admin/v8/pkg/logger/hook"
+	loggergormhook "github.com/LyricTian/gin-admin/v8/pkg/logger/hook/gorm"
 )
 
 // InitLogger 初始化日志模块
 func InitLogger() (func(), error) {
 	c := config.C.Log
-	logger.SetLevel(c.Level)
+	logger.SetLevel(logger.Level(c.Level))
 	logger.SetFormatter(c.Format)
 
 	// 设定日志输出
@@ -42,9 +40,9 @@ func InitLogger() (func(), error) {
 
 	var hook *loggerhook.Hook
 	if c.EnableHook {
-		var hookLevels []logrus.Level
+		var hookLevels []logger.Level
 		for _, lvl := range c.HookLevels {
-			plvl, err := logrus.ParseLevel(lvl)
+			plvl, err := logger.ParseLevel(lvl)
 			if err != nil {
 				return nil, err
 			}
@@ -53,28 +51,12 @@ func InitLogger() (func(), error) {
 
 		switch {
 		case c.Hook.IsGorm():
-			hc := config.C.LogGormHook
-
-			var dsn string
-			switch hc.DBType {
-			case "mysql":
-				dsn = config.C.MySQL.DSN()
-			case "sqlite3":
-				dsn = config.C.Sqlite3.DSN()
-			case "postgres":
-				dsn = config.C.Postgres.DSN()
-			default:
-				return nil, errors.New("unknown db")
+			db, err := NewGormDB()
+			if err != nil {
+				return nil, err
 			}
 
-			h := loggerhook.New(loggergormhook.New(&loggergormhook.Config{
-				DBType:       hc.DBType,
-				DSN:          dsn,
-				MaxLifetime:  hc.MaxLifetime,
-				MaxOpenConns: hc.MaxOpenConns,
-				MaxIdleConns: hc.MaxIdleConns,
-				TableName:    hc.Table,
-			}),
+			h := loggerhook.New(loggergormhook.New(db),
 				loggerhook.SetMaxWorkers(c.HookMaxThread),
 				loggerhook.SetMaxQueues(c.HookMaxBuffer),
 				loggerhook.SetLevels(hookLevels...),

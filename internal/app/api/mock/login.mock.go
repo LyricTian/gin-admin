@@ -5,11 +5,10 @@ import (
 	"github.com/google/wire"
 )
 
-// LoginSet 注入Login
-var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
+var LoginSet = wire.NewSet(wire.Struct(new(LoginMock), "*"))
 
-// Login 登录管理
-type Login struct {
+// LoginMock 登录管理
+type LoginMock struct {
 }
 
 // GetCaptcha 获取验证码信息
@@ -17,7 +16,7 @@ type Login struct {
 // @Summary 获取验证码信息
 // @Success 200 {object} schema.LoginCaptcha
 // @Router /api/v1/pub/login/captchaid [get]
-func (a *Login) GetCaptcha(c *gin.Context) {
+func (a *LoginMock) GetCaptcha(c *gin.Context) {
 }
 
 // ResCaptcha 响应图形验证码
@@ -30,7 +29,7 @@ func (a *Login) GetCaptcha(c *gin.Context) {
 // @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/login/captcha [get]
-func (a *Login) ResCaptcha(c *gin.Context) {
+func (a *LoginMock) ResCaptcha(c *gin.Context) {
 }
 
 // Login 用户登录
@@ -41,7 +40,7 @@ func (a *Login) ResCaptcha(c *gin.Context) {
 // @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:无效的请求参数}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/login [post]
-func (a *Login) Login(c *gin.Context) {
+func (a *LoginMock) Login(c *gin.Context) {
 }
 
 // Logout 用户登出
@@ -49,7 +48,7 @@ func (a *Login) Login(c *gin.Context) {
 // @Summary 用户登出
 // @Success 200 {object} schema.StatusResult "{status:OK}"
 // @Router /api/v1/pub/login/exit [post]
-func (a *Login) Logout(c *gin.Context) {
+func (a *LoginMock) Logout(c *gin.Context) {
 }
 
 // RefreshToken 刷新令牌
@@ -60,7 +59,7 @@ func (a *Login) Logout(c *gin.Context) {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/refresh-token [post]
-func (a *Login) RefreshToken(c *gin.Context) {
+func (a *LoginMock) RefreshToken(c *gin.Context) {
 }
 
 // GetUserInfo 获取当前用户信息
@@ -71,7 +70,7 @@ func (a *Login) RefreshToken(c *gin.Context) {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/current/user [get]
-func (a *Login) GetUserInfo(c *gin.Context) {
+func (a *LoginMock) GetUserInfo(c *gin.Context) {
 }
 
 // QueryUserMenuTree 查询当前用户菜单树
@@ -82,7 +81,7 @@ func (a *Login) GetUserInfo(c *gin.Context) {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/current/menutree [get]
-func (a *Login) QueryUserMenuTree(c *gin.Context) {
+func (a *LoginMock) QueryUserMenuTree(c *gin.Context) {
 }
 
 // UpdatePassword 更新个人密码
@@ -95,5 +94,5 @@ func (a *Login) QueryUserMenuTree(c *gin.Context) {
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:未授权}}"
 // @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:服务器错误}}"
 // @Router /api/v1/pub/current/password [put]
-func (a *Login) UpdatePassword(c *gin.Context) {
+func (a *LoginMock) UpdatePassword(c *gin.Context) {
 }

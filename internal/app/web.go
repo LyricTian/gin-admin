@@ -1,13 +1,14 @@
 package app
 
 import (
-	"github.com/LyricTian/gin-admin/v7/internal/app/config"
-	"github.com/LyricTian/gin-admin/v7/internal/app/middleware"
-	"github.com/LyricTian/gin-admin/v7/internal/app/router"
 	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/internal/app/middleware"
+	"github.com/LyricTian/gin-admin/v8/internal/app/router"
 )
 
 // InitGinEngine 初始化gin引擎
@@ -20,6 +21,9 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 
 	prefixes := r.Prefixes()
 
+	// Recover
+	app.Use(middleware.RecoveryMiddleware())
+
 	// Trace ID
 	app.Use(middleware.TraceMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
 
@@ -28,9 +32,6 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 
 	// Access logger
 	app.Use(middleware.LoggerMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
-
-	// Recover
-	app.Use(middleware.RecoveryMiddleware())
 
 	// CORS
 	if config.C.CORS.Enable {

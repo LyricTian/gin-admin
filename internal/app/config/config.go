@@ -6,8 +6,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/LyricTian/gin-admin/v7/pkg/util/json"
 	"github.com/koding/multiconfig"
+
+	"github.com/LyricTian/gin-admin/v8/pkg/util/json"
 )
 
 var (
@@ -110,11 +111,6 @@ func (h LogHook) IsGorm() bool {
 	return h == "gorm"
 }
 
-// IsMongo 是否是mongo钩子
-func (h LogHook) IsMongo() bool {
-	return h == "mongo"
-}
-
 // Log 日志配置参数
 type Log struct {
 	Level         int
@@ -144,6 +140,7 @@ type LogMongoHook struct {
 
 // Root root用户
 type Root struct {
+	UserID   uint64
 	UserName string
 	Password string
 	RealName string
@@ -163,13 +160,14 @@ type JWTAuth struct {
 
 // HTTP http配置参数
 type HTTP struct {
-	Host             string
-	Port             int
-	CertFile         string
-	KeyFile          string
-	ShutdownTimeout  int
-	MaxContentLength int64
-	MaxLoggerLength  int `default:"4096"`
+	Host               string
+	Port               int
+	CertFile           string
+	KeyFile            string
+	ShutdownTimeout    int
+	MaxContentLength   int64
+	MaxReqLoggerLength int `default:"1024"`
+	MaxResLoggerLength int
 }
 
 // Monitor 监控配置参数

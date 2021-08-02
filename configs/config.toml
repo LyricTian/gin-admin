@@ -23,13 +23,13 @@ KeyFile = ""
 ShutdownTimeout = 30
 # 允许的最大内容长度(64M)
 MaxContentLength = 67108864
-# 允许输出的最大日志长度
-MaxLoggerLength = 4096
+# 允许输出的最大请求日志长度
+MaxReqLoggerLength = 1024
 
 [Menu]
 # 使用启用初始化菜单数据
 Enable = true
-# 数据文件(yaml,也可以启动服务时使用-menu指定)
+# 数据文件(yaml,也可以启动服务时使用 -menu 指定)
 Data = ""
 
 [Casbin]
@@ -56,7 +56,7 @@ OutputFile = "data/gin-admin.log"
 # 是否启用日志钩子
 EnableHook = false
 # 写入钩子的日志级别
-HookLevels = ["info","warn","error"]
+HookLevels = ["info", "warn", "error"]
 # 日志钩子(支持：gorm/mongo)
 Hook = "gorm"
 # 写入钩子的最大工作线程数量
@@ -73,12 +73,6 @@ MaxLifetime = 7200
 MaxOpenConns = 1
 # 设置空闲连接池中的最大连接数
 MaxIdleConns = 1
-# 数据库表名
-Table = "g_logger"
-
-[LogMongoHook]
-# 数据库表名
-Collection = "g_logger"
 
 # 服务监控(GOPS:https://github.com/google/gops)
 [Monitor]
@@ -90,12 +84,14 @@ Addr = "127.0.0.1:16060"
 ConfigDir = ""
 
 [Root]
+# 用户ID
+UserID = 9
 # 登录用户名
 UserName = "root"
 # 登录密码
 Password = "abc-123"
-# 显示的真实姓名
-RealName = "超级管理员"
+# 显示名称
+RealName = "Admin"
 
 # redis配置信息
 [Redis]
@@ -117,9 +113,9 @@ Expired = 7200
 Store = "file"
 # 文件路径
 FilePath = "data/jwt_auth.db"
-# redis数据库(如果存储方式是redis，则指定存储的数据库)
+# redis 数据库(如果存储方式是redis，则指定存储的数据库)
 RedisDB = 10
-# 存储到redis数据库中的键名前缀
+# 存储到 redis 数据库中的键名前缀
 RedisPrefix = "auth_"
 
 [Captcha]
@@ -136,7 +132,7 @@ RedisDB = 10
 # 存储到redis数据库中的键名前缀
 RedisPrefix = "captcha_"
 
-# 请求频率限制(如果redis可用则使用redis，否则使用内存存储)
+# 请求频率限制
 [RateLimiter]
 # 是否启用
 Enable = false
@@ -151,7 +147,7 @@ Enable = false
 # 允许跨域请求的域名列表(*表示全部允许)
 AllowOrigins = ["*"]
 # 允许跨域请求的请求方式列表
-AllowMethods = ["GET","POST","PUT","DELETE","PATCH"]
+AllowMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 # 允许客户端与跨域请求一起使用的非简单标头的列表
 AllowHeaders = []
 # 请求是否可以包含cookie，HTTP身份验证或客户端SSL证书等用户凭据
@@ -163,7 +159,7 @@ MaxAge = 7200
 # 是否启用
 Enable = false
 # 排除的文件扩展名
-ExcludedExtentions = [".png",".gif",".jpeg",".jpg"]
+ExcludedExtentions = [".png", ".gif", ".jpeg", ".jpg"]
 # 排除的请求路径
 ExcludedPaths = []
 
@@ -187,7 +183,7 @@ EnableAutoMigrate = true
 # 连接地址
 Host = "127.0.0.1"
 # 连接端口
-Port= 3306
+Port = 3306
 # 用户名
 User = "root"
 # 密码
@@ -201,7 +197,7 @@ Parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true
 # 连接地址
 Host = "127.0.0.1"
 # 连接端口
-Port= 5432
+Port = 5432
 # 用户名
 User = "root"
 # 密码

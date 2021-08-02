@@ -3,20 +3,21 @@ package ginx
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v7/pkg/errors"
-	"github.com/LyricTian/gin-admin/v7/pkg/logger"
-	"github.com/LyricTian/gin-admin/v7/pkg/util/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v8/pkg/errors"
+	"github.com/LyricTian/gin-admin/v8/pkg/logger"
+	"github.com/LyricTian/gin-admin/v8/pkg/util/json"
 )
 
 // 定义上下文中的键
 const (
 	prefix           = "gin-admin"
-	UserIDKey        = prefix + "/user-id"
 	ReqBodyKey       = prefix + "/req-body"
 	ResBodyKey       = prefix + "/res-body"
 	LoggerReqBodyKey = prefix + "/logger-req-body"
@@ -33,14 +34,14 @@ func GetToken(c *gin.Context) string {
 	return token
 }
 
-// GetUserID 获取用户ID
-func GetUserID(c *gin.Context) string {
-	return c.GetString(UserIDKey)
-}
-
-// SetUserID 设定用户ID
-func SetUserID(c *gin.Context, userID string) {
-	c.Set(UserIDKey, userID)
+// ParseParamID Parse path id
+func ParseParamID(c *gin.Context, key string) uint64 {
+	val := c.Param(key)
+	id, err := strconv.ParseUint(val, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return id
 }
 
 // GetBody Get request body
@@ -107,6 +108,7 @@ func ResJSON(c *gin.Context, status int, v interface{}) {
 	if err != nil {
 		panic(err)
 	}
+
 	c.Set(ResBodyKey, buf)
 	c.Data(status, "application/json; charset=utf-8", buf)
 	c.Abort()
@@ -129,7 +131,7 @@ func ResError(c *gin.Context, err error, status ...int) {
 	}
 
 	if len(status) > 0 {
-		res.StatusCode = status[0]
+		res.Status = status[0]
 	}
 
 	if err := res.ERR; err != nil {
@@ -137,7 +139,7 @@ func ResError(c *gin.Context, err error, status ...int) {
 			res.Message = err.Error()
 		}
 
-		if status := res.StatusCode; status >= 400 && status < 500 {
+		if status := res.Status; status >= 400 && status < 500 {
 			logger.WithContext(ctx).Warnf(err.Error())
 		} else if status >= 500 {
 			logger.WithContext(logger.NewStackContext(ctx, err)).Errorf(err.Error())
@@ -148,5 +150,5 @@ func ResError(c *gin.Context, err error, status ...int) {
 		Code:    res.Code,
 		Message: res.Message,
 	}
-	ResJSON(c, res.StatusCode, schema.ErrorResult{Error: eitem})
+	ResJSON(c, res.Status, schema.ErrorResult{Error: eitem})
 }

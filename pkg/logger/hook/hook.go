@@ -111,23 +111,10 @@ func (h *Hook) Levels() []logrus.Level {
 
 // Fire is called when a log event is fired
 func (h *Hook) Fire(entry *logrus.Entry) error {
-	entry = h.copyEntry(entry)
-	h.q.Push(queue.NewJob(entry, func(v interface{}) {
+	h.q.Push(queue.NewJob(entry.Dup(), func(v interface{}) {
 		h.exec(v.(*logrus.Entry))
 	}))
 	return nil
-}
-
-func (h *Hook) copyEntry(e *logrus.Entry) *logrus.Entry {
-	entry := logrus.NewEntry(e.Logger)
-	entry.Data = make(logrus.Fields)
-	entry.Time = e.Time
-	entry.Level = e.Level
-	entry.Message = e.Message
-	for k, v := range e.Data {
-		entry.Data[k] = v
-	}
-	return entry
 }
 
 func (h *Hook) exec(entry *logrus.Entry) {

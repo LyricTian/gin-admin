@@ -5,21 +5,25 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/config"
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/internal/app/dao"
+	"github.com/LyricTian/gin-admin/v8/pkg/gormx"
 )
 
 // InitGormDB 初始化gorm存储
 func InitGormDB() (*gorm.DB, func(), error) {
 	cfg := config.C.Gorm
-	db, cleanFunc, err := NewGormDB()
+	db, err := NewGormDB()
 	if err != nil {
-		return nil, cleanFunc, err
+		return nil, nil, err
 	}
 
+	cleanFunc := func() {}
+
 	if cfg.EnableAutoMigrate {
-		err = gormx.AutoMigrate(db)
+		err = dao.AutoMigrate(db)
 		if err != nil {
 			return nil, cleanFunc, err
 		}
@@ -29,7 +33,7 @@ func InitGormDB() (*gorm.DB, func(), error) {
 }
 
 // NewGormDB 创建DB实例
-func NewGormDB() (*gorm.DB, func(), error) {
+func NewGormDB() (*gorm.DB, error) {
 	cfg := config.C
 	var dsn string
 	switch cfg.Gorm.DBType {
@@ -41,10 +45,10 @@ func NewGormDB() (*gorm.DB, func(), error) {
 	case "postgres":
 		dsn = cfg.Postgres.DSN()
 	default:
-		return nil, nil, errors.New("unknown db")
+		return nil, errors.New("unknown db")
 	}
 
-	return gormx.NewDB(&gormx.Config{
+	return gormx.New(&gormx.Config{
 		Debug:        cfg.Gorm.Debug,
 		DBType:       cfg.Gorm.DBType,
 		DSN:          dsn,

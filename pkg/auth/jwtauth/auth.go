@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v7/pkg/auth"
 	jwt "github.com/dgrijalva/jwt-go"
+
+	"github.com/LyricTian/gin-admin/v8/pkg/auth"
 )
 
 const defaultKey = "gin-admin"

@@ -12,13 +12,13 @@ import (
 
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/captcha/store"
-	"github.com/LyricTian/gin-admin/v7/internal/app/config"
-	"github.com/LyricTian/gin-admin/v7/pkg/logger"
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/pkg/logger"
 	"github.com/go-redis/redis"
 	"github.com/google/gops/agent"
 
 	// 引入swagger
-	_ "github.com/LyricTian/gin-admin/v7/internal/app/swagger"
+	_ "github.com/LyricTian/gin-admin/v8/internal/app/swagger"
 )
 
 type options struct {
@@ -86,7 +86,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	}
 	config.PrintWithJSON()
 
-	logger.WithContext(ctx).Printf("服务启动，运行模式：%s，版本号：%s，进程号：%d", config.C.RunMode, o.Version, os.Getpid())
+	logger.WithContext(ctx).Printf("Start server,#mode %s,#version %s,#pid %d", config.C.RunMode, o.Version, os.Getpid())
 
 	// 初始化日志模块
 	loggerCleanFunc, err := InitLogger()
@@ -108,7 +108,7 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 
 	// 初始化菜单数据
 	if config.C.Menu.Enable && config.C.Menu.Data != "" {
-		err = injector.MenuBll.InitData(ctx, config.C.Menu.Data)
+		err = injector.MenuSrv.InitData(ctx, config.C.Menu.Data)
 		if err != nil {
 			return nil, err
 		}
@@ -161,9 +161,9 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 	srv := &http.Server{
 		Addr:         addr,
 		Handler:      handler,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
 
 	go func() {
@@ -206,7 +206,7 @@ func Run(ctx context.Context, opts ...Option) error {
 EXIT:
 	for {
 		sig := <-sc
-		logger.WithContext(ctx).Infof("接收到信号[%s]", sig.String())
+		logger.WithContext(ctx).Infof("Receive signal[%s]", sig.String())
 		switch sig {
 		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
 			state = 0
@@ -218,7 +218,7 @@ EXIT:
 	}
 
 	cleanFunc()
-	logger.WithContext(ctx).Infof("服务退出")
+	logger.WithContext(ctx).Infof("Server exit")
 	time.Sleep(time.Second)
 	os.Exit(state)
 	return nil

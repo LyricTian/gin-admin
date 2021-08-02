@@ -2,31 +2,32 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"os"
 
-	"github.com/LyricTian/gin-admin/v7/internal/app/contextx"
-	"github.com/LyricTian/gin-admin/v7/internal/app/model/gormx/repo"
-	"github.com/LyricTian/gin-admin/v7/internal/app/schema"
-	"github.com/LyricTian/gin-admin/v7/pkg/errors"
-	"github.com/LyricTian/gin-admin/v7/pkg/util/uuid"
-	"github.com/LyricTian/gin-admin/v7/pkg/util/yaml"
 	"github.com/google/wire"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/contextx"
+	"github.com/LyricTian/gin-admin/v8/internal/app/dao"
+	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
+	"github.com/LyricTian/gin-admin/v8/pkg/errors"
+	"github.com/LyricTian/gin-admin/v8/pkg/util/snowflake"
+	"github.com/LyricTian/gin-admin/v8/pkg/util/yaml"
 )
 
-// MenuSet 注入Menu
-var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
+var MenuSet = wire.NewSet(wire.Struct(new(MenuSrv), "*"))
 
-// Menu 菜单管理
-type Menu struct {
-	TransModel              *repo.Trans
-	MenuModel               *repo.Menu
-	MenuActionModel         *repo.MenuAction
-	MenuActionResourceModel *repo.MenuActionResource
+// MenuSrv 菜单管理
+type MenuSrv struct {
+	TransRepo              *dao.TransRepo
+	MenuRepo               *dao.MenuRepo
+	MenuActionRepo         *dao.MenuActionRepo
+	MenuActionResourceRepo *dao.MenuActionResourceRepo
 }
 
 // InitData 初始化菜单数据
-func (a *Menu) InitData(ctx context.Context, dataFile string) error {
-	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+func (a *MenuSrv) InitData(ctx context.Context, dataFile string) error {
+	result, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 	})
 	if err != nil {
@@ -41,10 +42,10 @@ func (a *Menu) InitData(ctx context.Context, dataFile string) error {
 		return err
 	}
 
-	return a.createMenus(ctx, "", data)
+	return a.createMenus(ctx, 0, data)
 }
 
-func (a *Menu) readData(name string) (schema.MenuTrees, error) {
+func (a *MenuSrv) readData(name string) (schema.MenuTrees, error) {
 	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
@@ -58,21 +59,21 @@ func (a *Menu) readData(name string) (schema.MenuTrees, error) {
 	return data, err
 }
 
-func (a *Menu) createMenus(ctx context.Context, parentID string, list schema.MenuTrees) error {
-	return a.TransModel.Exec(ctx, func(ctx context.Context) error {
+func (a *MenuSrv) createMenus(ctx context.Context, parentID uint64, list schema.MenuTrees) error {
+	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		for _, item := range list {
 			sitem := schema.Menu{
-				Name:       item.Name,
-				Sequence:   item.Sequence,
-				Icon:       item.Icon,
-				Router:     item.Router,
-				ParentID:   parentID,
-				Status:     1,
-				ShowStatus: 1,
-				Actions:    item.Actions,
+				Name:     item.Name,
+				Sequence: item.Sequence,
+				Icon:     item.Icon,
+				Router:   item.Router,
+				ParentID: parentID,
+				Status:   1,
+				IsShow:   1,
+				Actions:  item.Actions,
 			}
-			if v := item.ShowStatus; v > 0 {
-				sitem.ShowStatus = v
+			if v := item.IsShow; v > 0 {
+				sitem.IsShow = v
 			}
 
 			nsitem, err := a.Create(ctx, sitem)
@@ -93,13 +94,13 @@ func (a *Menu) createMenus(ctx context.Context, parentID string, list schema.Men
 }
 
 // Query 查询数据
-func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
-	menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{})
+func (a *MenuSrv) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
+	menuActionResult, err := a.MenuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := a.MenuModel.Query(ctx, params, opts...)
+	result, err := a.MenuRepo.Query(ctx, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,8 +109,8 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 }
 
 // Get 查询指定数据
-func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
-	item, err := a.MenuModel.Get(ctx, id, opts...)
+func (a *MenuSrv) Get(ctx context.Context, id uint64, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
+	item, err := a.MenuRepo.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
 	} else if item == nil {
@@ -126,8 +127,8 @@ func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 }
 
 // QueryActions 查询动作数据
-func (a *Menu) QueryActions(ctx context.Context, id string) (schema.MenuActions, error) {
-	result, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
+func (a *MenuSrv) QueryActions(ctx context.Context, id uint64) (schema.MenuActions, error) {
+	result, err := a.MenuActionRepo.Query(ctx, schema.MenuActionQueryParam{
 		MenuID: id,
 	})
 	if err != nil {
@@ -136,7 +137,7 @@ func (a *Menu) QueryActions(ctx context.Context, id string) (schema.MenuActions,
 		return nil, nil
 	}
 
-	resourceResult, err := a.MenuActionResourceModel.Query(ctx, schema.MenuActionResourceQueryParam{
+	resourceResult, err := a.MenuActionResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{
 		MenuID: id,
 	})
 	if err != nil {
@@ -148,8 +149,8 @@ func (a *Menu) QueryActions(ctx context.Context, id string) (schema.MenuActions,
 	return result.Data, nil
 }
 
-func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
-	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+func (a *MenuSrv) checkName(ctx context.Context, item schema.Menu) error {
+	result, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{
 			OnlyCount: true,
 		},
@@ -159,13 +160,13 @@ func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.New400Response("菜单名称已经存在")
+		return errors.New400Response("名称不能重复")
 	}
 	return nil
 }
 
 // Create 创建数据
-func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error) {
+func (a *MenuSrv) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error) {
 	if err := a.checkName(ctx, item); err != nil {
 		return nil, err
 	}
@@ -175,15 +176,15 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, 
 		return nil, err
 	}
 	item.ParentPath = parentPath
-	item.ID = uuid.MustString()
+	item.ID = snowflake.MustID()
 
-	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
+	err = a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		err := a.createActions(ctx, item.ID, item.Actions)
 		if err != nil {
 			return err
 		}
 
-		return a.MenuModel.Create(ctx, item)
+		return a.MenuRepo.Create(ctx, item)
 	})
 	if err != nil {
 		return nil, err
@@ -193,19 +194,19 @@ func (a *Menu) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, 
 }
 
 // 创建动作数据
-func (a *Menu) createActions(ctx context.Context, menuID string, items schema.MenuActions) error {
+func (a *MenuSrv) createActions(ctx context.Context, menuID uint64, items schema.MenuActions) error {
 	for _, item := range items {
-		item.ID = uuid.MustString()
+		item.ID = snowflake.MustID()
 		item.MenuID = menuID
-		err := a.MenuActionModel.Create(ctx, *item)
+		err := a.MenuActionRepo.Create(ctx, *item)
 		if err != nil {
 			return err
 		}
 
 		for _, ritem := range item.Resources {
-			ritem.ID = uuid.MustString()
+			ritem.ID = snowflake.MustID()
 			ritem.ActionID = item.ID
-			err := a.MenuActionResourceModel.Create(ctx, *ritem)
+			err := a.MenuActionResourceRepo.Create(ctx, *ritem)
 			if err != nil {
 				return err
 			}
@@ -216,12 +217,12 @@ func (a *Menu) createActions(ctx context.Context, menuID string, items schema.Me
 }
 
 // 获取父级路径
-func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, error) {
-	if parentID == "" {
+func (a *MenuSrv) getParentPath(ctx context.Context, parentID uint64) (string, error) {
+	if parentID == 0 {
 		return "", nil
 	}
 
-	pitem, err := a.MenuModel.Get(ctx, parentID)
+	pitem, err := a.MenuRepo.Get(ctx, parentID)
 	if err != nil {
 		return "", err
 	} else if pitem == nil {
@@ -231,15 +232,16 @@ func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, erro
 	return a.joinParentPath(pitem.ParentPath, pitem.ID), nil
 }
 
-func (a *Menu) joinParentPath(parent, id string) string {
+func (a *MenuSrv) joinParentPath(parent string, id uint64) string {
 	if parent != "" {
-		return parent + "/" + id
+		parent += "/"
 	}
-	return id
+
+	return fmt.Sprintf("%s%d", parent, id)
 }
 
 // Update 更新数据
-func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
+func (a *MenuSrv) Update(ctx context.Context, id uint64, item schema.Menu) error {
 	if id == item.ParentID {
 		return errors.ErrInvalidParent
 	}
@@ -269,7 +271,7 @@ func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
 		item.ParentPath = oldItem.ParentPath
 	}
 
-	return a.TransModel.Exec(ctx, func(ctx context.Context) error {
+	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		err := a.updateActions(ctx, id, oldItem.Actions, item.Actions)
 		if err != nil {
 			return err
@@ -280,12 +282,12 @@ func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
 			return err
 		}
 
-		return a.MenuModel.Update(ctx, id, item)
+		return a.MenuRepo.Update(ctx, id, item)
 	})
 }
 
 // 更新动作数据
-func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newItems schema.MenuActions) error {
+func (a *MenuSrv) updateActions(ctx context.Context, menuID uint64, oldItems, newItems schema.MenuActions) error {
 	addActions, delActions, updateActions := a.compareActions(ctx, oldItems, newItems)
 
 	err := a.createActions(ctx, menuID, addActions)
@@ -294,12 +296,12 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 	}
 
 	for _, item := range delActions {
-		err := a.MenuActionModel.Delete(ctx, item.ID)
+		err := a.MenuActionRepo.Delete(ctx, item.ID)
 		if err != nil {
 			return err
 		}
 
-		err = a.MenuActionResourceModel.DeleteByActionID(ctx, item.ID)
+		err = a.MenuActionResourceRepo.DeleteByActionID(ctx, item.ID)
 		if err != nil {
 			return err
 		}
@@ -311,7 +313,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		// 只更新动作名称
 		if item.Name != oitem.Name {
 			oitem.Name = item.Name
-			err := a.MenuActionModel.Update(ctx, item.ID, *oitem)
+			err := a.MenuActionRepo.Update(ctx, item.ID, *oitem)
 			if err != nil {
 				return err
 			}
@@ -320,16 +322,16 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		// 计算需要更新的资源配置（只包括新增和删除的，更新的不关心）
 		addResources, delResources := a.compareResources(ctx, oitem.Resources, item.Resources)
 		for _, aritem := range addResources {
-			aritem.ID = uuid.MustString()
+			aritem.ID = snowflake.MustID()
 			aritem.ActionID = oitem.ID
-			err := a.MenuActionResourceModel.Create(ctx, *aritem)
+			err := a.MenuActionResourceRepo.Create(ctx, *aritem)
 			if err != nil {
 				return err
 			}
 		}
 
 		for _, ditem := range delResources {
-			err := a.MenuActionResourceModel.Delete(ctx, ditem.ID)
+			err := a.MenuActionResourceRepo.Delete(ctx, ditem.ID)
 			if err != nil {
 				return err
 			}
@@ -340,7 +342,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 }
 
 // 对比动作列表
-func (a *Menu) compareActions(ctx context.Context, oldActions, newActions schema.MenuActions) (addList, delList, updateList schema.MenuActions) {
+func (a *MenuSrv) compareActions(ctx context.Context, oldActions, newActions schema.MenuActions) (addList, delList, updateList schema.MenuActions) {
 	mOldActions := oldActions.ToMap()
 	mNewActions := newActions.ToMap()
 
@@ -360,7 +362,7 @@ func (a *Menu) compareActions(ctx context.Context, oldActions, newActions schema
 }
 
 // 对比资源列表
-func (a *Menu) compareResources(ctx context.Context, oldResources, newResources schema.MenuActionResources) (addList, delList schema.MenuActionResources) {
+func (a *MenuSrv) compareResources(ctx context.Context, oldResources, newResources schema.MenuActionResources) (addList, delList schema.MenuActionResources) {
 	mOldResources := oldResources.ToMap()
 	mNewResources := newResources.ToMap()
 
@@ -379,13 +381,13 @@ func (a *Menu) compareResources(ctx context.Context, oldResources, newResources 
 }
 
 // 检查并更新下级节点的父级路径
-func (a *Menu) updateChildParentPath(ctx context.Context, oldItem, newItem schema.Menu) error {
+func (a *MenuSrv) updateChildParentPath(ctx context.Context, oldItem, newItem schema.Menu) error {
 	if oldItem.ParentID == newItem.ParentID {
 		return nil
 	}
 
 	opath := a.joinParentPath(oldItem.ParentPath, oldItem.ID)
-	result, err := a.MenuModel.Query(contextx.NewNoTrans(ctx), schema.MenuQueryParam{
+	result, err := a.MenuRepo.Query(contextx.NewNoTrans(ctx), schema.MenuQueryParam{
 		PrefixParentPath: opath,
 	})
 	if err != nil {
@@ -394,7 +396,7 @@ func (a *Menu) updateChildParentPath(ctx context.Context, oldItem, newItem schem
 
 	npath := a.joinParentPath(newItem.ParentPath, newItem.ID)
 	for _, menu := range result.Data {
-		err = a.MenuModel.UpdateParentPath(ctx, menu.ID, npath+menu.ParentPath[len(opath):])
+		err = a.MenuRepo.UpdateParentPath(ctx, menu.ID, npath+menu.ParentPath[len(opath):])
 		if err != nil {
 			return err
 		}
@@ -403,15 +405,15 @@ func (a *Menu) updateChildParentPath(ctx context.Context, oldItem, newItem schem
 }
 
 // Delete 删除数据
-func (a *Menu) Delete(ctx context.Context, id string) error {
-	oldItem, err := a.MenuModel.Get(ctx, id)
+func (a *MenuSrv) Delete(ctx context.Context, id uint64) error {
+	oldItem, err := a.MenuRepo.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
-	result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+	result, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		ParentID:        &id,
 	})
@@ -421,29 +423,31 @@ func (a *Menu) Delete(ctx context.Context, id string) error {
 		return errors.ErrNotAllowDeleteWithChild
 	}
 
-	return a.TransModel.Exec(ctx, func(ctx context.Context) error {
-		err = a.MenuActionResourceModel.DeleteByMenuID(ctx, id)
+	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
+		err = a.MenuActionResourceRepo.DeleteByMenuID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		err := a.MenuActionModel.DeleteByMenuID(ctx, id)
+		err := a.MenuActionRepo.DeleteByMenuID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		return a.MenuModel.Delete(ctx, id)
+		return a.MenuRepo.Delete(ctx, id)
 	})
 }
 
 // UpdateStatus 更新状态
-func (a *Menu) UpdateStatus(ctx context.Context, id string, status int) error {
-	oldItem, err := a.MenuModel.Get(ctx, id)
+func (a *MenuSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
+	oldItem, err := a.MenuRepo.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldItem == nil {
 		return errors.ErrNotFound
+	} else if oldItem.Status == status {
+		return nil
 	}
 
-	return a.MenuModel.UpdateStatus(ctx, id, status)
+	return a.MenuRepo.UpdateStatus(ctx, id, status)
 }

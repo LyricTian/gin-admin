@@ -1,36 +1,5 @@
 basePath: /
 definitions:
-  schema.Demo:
-    properties:
-      code:
-        description: 编号
-        type: string
-      created_at:
-        description: 创建时间
-        type: string
-      creator:
-        description: 创建者
-        type: string
-      id:
-        description: 唯一标识
-        type: string
-      memo:
-        description: 备注
-        type: string
-      name:
-        description: 名称
-        type: string
-      status:
-        description: 状态(1:启用 2:停用)
-        type: integer
-      updated_at:
-        description: 更新时间
-        type: string
-    required:
-    - code
-    - name
-    - status
-    type: object
   schema.ErrorItem:
     properties:
       code:
@@ -49,7 +18,7 @@ definitions:
   schema.IDResult:
     properties:
       id:
-        type: string
+        type: integer
     type: object
   schema.ListResult:
     properties:
@@ -108,13 +77,16 @@ definitions:
         type: string
       creator:
         description: 创建者
-        type: string
+        type: integer
       icon:
         description: 菜单图标
         type: string
       id:
         description: 唯一标识
-        type: string
+        type: integer
+      is_show:
+        description: 是否显示(1:显示 2:隐藏)
+        type: integer
       memo:
         description: 备注
         type: string
@@ -123,7 +95,7 @@ definitions:
         type: string
       parent_id:
         description: 父级ID
-        type: string
+        type: integer
       parent_path:
         description: 父级路径
         type: string
@@ -133,9 +105,6 @@ definitions:
       sequence:
         description: 排序值
         type: integer
-      show_status:
-        description: 显示状态(1:显示 2:隐藏)
-        type: integer
       status:
         description: 状态(1:启用 2:禁用)
         type: integer
@@ -143,8 +112,8 @@ definitions:
         description: 更新时间
         type: string
     required:
+    - is_show
     - name
-    - show_status
     - status
     type: object
   schema.MenuAction:
@@ -154,10 +123,10 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: string
+        type: integer
       menu_id:
         description: 菜单ID
-        type: string
+        type: integer
       name:
         description: 动作名称
         type: string
@@ -175,10 +144,10 @@ definitions:
     properties:
       action_id:
         description: 菜单动作ID
-        type: string
+        type: integer
       id:
         description: 唯一标识
-        type: string
+        type: integer
       method:
         description: 资源请求方式(支持正则)
         type: string
@@ -206,13 +175,16 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: string
+        type: integer
+      is_show:
+        description: 是否显示(1:显示 2:隐藏)
+        type: integer
       name:
         description: 菜单名称
         type: string
       parent_id:
         description: 父级ID
-        type: string
+        type: integer
       parent_path:
         description: 父级路径
         type: string
@@ -221,9 +193,6 @@ definitions:
         type: string
       sequence:
         description: 排序值
-        type: integer
-      show_status:
-        description: 显示状态(1:显示 2:隐藏)
         type: integer
       status:
         description: 状态(1:启用 2:禁用)
@@ -245,10 +214,10 @@ definitions:
         type: string
       creator:
         description: 创建者
-        type: string
+        type: integer
       id:
         description: 唯一标识
-        type: string
+        type: integer
       memo:
         description: 备注
         type: string
@@ -278,16 +247,16 @@ definitions:
     properties:
       action_id:
         description: 动作ID
-        type: string
+        type: integer
       id:
         description: 唯一标识
-        type: string
+        type: integer
       menu_id:
         description: 菜单ID
-        type: string
+        type: integer
       role_id:
         description: 角色ID
-        type: string
+        type: integer
     required:
     - action_id
     - menu_id
@@ -318,13 +287,13 @@ definitions:
         type: string
       creator:
         description: 创建者
-        type: string
+        type: integer
       email:
         description: 邮箱
         type: string
       id:
         description: 唯一标识
-        type: string
+        type: integer
       password:
         description: 密码
         type: string
@@ -363,7 +332,7 @@ definitions:
         type: array
       user_id:
         description: 用户ID
-        type: string
+        type: integer
       user_name:
         description: 用户名
         type: string
@@ -372,13 +341,13 @@ definitions:
     properties:
       id:
         description: 唯一标识
-        type: string
+        type: integer
       role_id:
         description: 角色ID
-        type: string
+        type: integer
       user_id:
         description: 用户ID
-        type: string
+        type: integer
     type: object
   schema.UserShow:
     properties:
@@ -390,7 +359,7 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: string
+        type: integer
       phone:
         description: 手机号
         type: string
@@ -415,224 +384,8 @@ info:
     name: LyricTian
   description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
   title: gin-admin
-  version: 7.0.0
+  version: 8.0.0
 paths:
-  /api/v1/demos:
-    get:
-      parameters:
-      - default: 1
-        description: 分页索引
-        in: query
-        name: current
-        required: true
-        type: integer
-      - default: 10
-        description: 分页大小
-        in: query
-        name: pageSize
-        required: true
-        type: integer
-      - description: 查询值
-        in: query
-        name: queryValue
-        type: string
-      responses:
-        "200":
-          description: 查询结果
-          schema:
-            allOf:
-            - $ref: '#/definitions/schema.ListResult'
-            - properties:
-                list:
-                  items:
-                    $ref: '#/definitions/schema.Demo'
-                  type: array
-              type: object
-        "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "500":
-          description: '{error:{code:0,message:服务器错误}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-      security:
-      - ApiKeyAuth: []
-      summary: 查询数据
-      tags:
-      - Demo
-    post:
-      parameters:
-      - description: 创建数据
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/schema.Demo'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schema.IDResult'
-        "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "500":
-          description: '{error:{code:0,message:服务器错误}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-      security:
-      - ApiKeyAuth: []
-      summary: 创建数据
-      tags:
-      - Demo
-  /api/v1/demos/{id}:
-    delete:
-      parameters:
-      - description: 唯一标识
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: '{status:OK}'
-          schema:
-            $ref: '#/definitions/schema.StatusResult'
-        "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "500":
-          description: '{error:{code:0,message:服务器错误}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-      security:
-      - ApiKeyAuth: []
-      summary: 删除数据
-      tags:
-      - Demo
-    get:
-      parameters:
-      - description: 唯一标识
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schema.Demo'
-        "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "404":
-          description: '{error:{code:0,message:资源不存在}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "500":
-          description: '{error:{code:0,message:服务器错误}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-      security:
-      - ApiKeyAuth: []
-      summary: 查询指定数据
-      tags:
-      - Demo
-    put:
-      parameters:
-      - description: 唯一标识
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 更新数据
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/schema.Demo'
-      responses:
-        "200":
-          description: '{status:OK}'
-          schema:
-            $ref: '#/definitions/schema.StatusResult'
-        "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "500":
-          description: '{error:{code:0,message:服务器错误}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-      security:
-      - ApiKeyAuth: []
-      summary: 更新数据
-      tags:
-      - Demo
-  /api/v1/demos/{id}/disable:
-    patch:
-      parameters:
-      - description: 唯一标识
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: '{status:OK}'
-          schema:
-            $ref: '#/definitions/schema.StatusResult'
-        "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "500":
-          description: '{error:{code:0,message:服务器错误}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-      security:
-      - ApiKeyAuth: []
-      summary: 禁用数据
-      tags:
-      - Demo
-  /api/v1/demos/{id}/enable:
-    patch:
-      parameters:
-      - description: 唯一标识
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: '{status:OK}'
-          schema:
-            $ref: '#/definitions/schema.StatusResult'
-        "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "500":
-          description: '{error:{code:0,message:服务器错误}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-      security:
-      - ApiKeyAuth: []
-      summary: 启用数据
-      tags:
-      - Demo
   /api/v1/menus:
     get:
       parameters:
@@ -656,14 +409,14 @@ paths:
         in: query
         name: status
         type: integer
-      - description: 显示状态(1:显示 2:隐藏)
+      - description: 是否显示(1:显示 2:隐藏)
         in: query
-        name: showStatus
+        name: isShow
         type: integer
       - description: 父级ID
         in: query
         name: parentID
-        type: string
+        type: integer
       responses:
         "200":
           description: 查询结果
@@ -729,7 +482,7 @@ paths:
       - description: 父级ID
         in: query
         name: parentID
-        type: string
+        type: integer
       responses:
         "200":
           description: 查询结果
@@ -762,7 +515,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -787,7 +540,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: OK
@@ -816,7 +569,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       - description: 更新数据
         in: body
         name: body
@@ -852,7 +605,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -878,7 +631,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -1193,7 +946,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -1218,7 +971,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: OK
@@ -1247,7 +1000,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       - description: 更新数据
         in: body
         name: body
@@ -1283,7 +1036,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -1309,7 +1062,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -1417,7 +1170,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -1442,7 +1195,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: OK
@@ -1471,7 +1224,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       - description: 更新数据
         in: body
         name: body
@@ -1507,7 +1260,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
@@ -1533,7 +1286,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: '{status:OK}'
