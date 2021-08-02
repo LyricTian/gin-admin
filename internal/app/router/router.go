@@ -29,7 +29,7 @@ type Router struct {
 	MenuAPI        *api.MenuAPI
 	RoleAPI        *api.RoleAPI
 	UserAPI        *api.UserAPI
-}
+} // end
 
 // Register 注册路由
 func (a *Router) Register(app *gin.Engine) error {
@@ -113,5 +113,5 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 			gUser.PATCH(":id/enable", a.UserAPI.Enable)
 			gUser.PATCH(":id/disable", a.UserAPI.Disable)
 		}
-	}
+	} // v1 end
 }

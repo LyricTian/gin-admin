@@ -11,7 +11,7 @@ import (
 	"github.com/LyricTian/gin-admin/v8/internal/app/dao/role"
 	"github.com/LyricTian/gin-admin/v8/internal/app/dao/user"
 	"github.com/LyricTian/gin-admin/v8/internal/app/dao/util"
-)
+) // end
 
 // RepoSet repo injection
 var RepoSet = wire.NewSet(
@@ -23,7 +23,7 @@ var RepoSet = wire.NewSet(
 	role.RoleSet,
 	user.UserRoleSet,
 	user.UserSet,
-)
+) // end
 
 // Define repo type alias
 type (
@@ -35,7 +35,7 @@ type (
 	RoleRepo               = role.RoleRepo
 	UserRoleRepo           = user.UserRoleRepo
 	UserRepo               = user.UserRepo
-)
+) // end
 
 // Auto migration for given models
 func AutoMigrate(db *gorm.DB) error {
@@ -51,5 +51,5 @@ func AutoMigrate(db *gorm.DB) error {
 		new(role.Role),
 		new(user.UserRole),
 		new(user.User),
-	)
+	) // end
 }
