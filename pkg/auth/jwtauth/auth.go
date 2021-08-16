@@ -110,9 +110,7 @@ func (a *JWTAuth) GenerateToken(ctx context.Context, userID string) (auth.TokenI
 // 解析令牌
 func (a *JWTAuth) parseToken(tokenString string) (*jwt.StandardClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, a.opts.keyfunc)
-	if err != nil {
-		return nil, err
-	} else if !token.Valid {
+	if err != nil || !token.Valid {
 		return nil, auth.ErrInvalidToken
 	}
 
