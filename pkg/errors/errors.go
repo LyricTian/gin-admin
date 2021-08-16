@@ -16,7 +16,7 @@ var (
 
 // 定义错误
 var (
-	ErrInvalidToken            = NewResponse(10000, 401, "令牌失效")
+	ErrInvalidToken            = NewResponse(40001, 401, "令牌失效")
 	ErrNoPerm                  = NewResponse(0, 401, "无访问权限")
 	ErrNotFound                = NewResponse(0, 404, "资源不存在")
 	ErrMethodNotAllow          = NewResponse(0, 405, "方法不被允许")

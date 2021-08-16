@@ -33,7 +33,7 @@ type User struct {
 	Password string  `gorm:"size:40;default:'';"`                      // 密码(sha1(md5(明文)))
 	Email    *string `gorm:"size:255;"`                                // 邮箱
 	Phone    *string `gorm:"size:20;"`                                 // 手机号
-	Status   int     `gorm:"type:tinyint;index;default:0;"`            // 状态(1:启用 2:停用)
+	Status   int     `gorm:"index;default:0;"`                         // 状态(1:启用 2:停用)
 	Creator  uint64  `gorm:""`                                         // 创建者
 }
 
