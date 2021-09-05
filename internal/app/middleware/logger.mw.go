@@ -6,9 +6,11 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+	"github.com/LyricTian/gin-admin/v8/internal/app/contextx"
 	"github.com/LyricTian/gin-admin/v8/internal/app/ginx"
 	"github.com/LyricTian/gin-admin/v8/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // LoggerMiddleware 日志中间件
@@ -54,7 +56,14 @@ func LoggerMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 			}
 		}
 
-		ctx := c.Request.Context()
+		// Logger中间件应放在 TraceMiddleware后面
+		spanContext := trace.SpanContextFromContext(c.Request.Context())
+		traceID := spanContext.TraceID().String()
+		ctx := contextx.NewTraceID(c.Request.Context(), traceID)
+		ctx = logger.NewTraceIDContext(ctx, traceID)
+		c.Request = c.Request.WithContext(ctx)
+
+		ctx = c.Request.Context()
 		entry := logger.WithContext(logger.NewTagContext(ctx, "__request__"))
 		entry.WithFields(fields).Infof("[http] %s-%s-%s-%d(%dms)",
 			p, c.Request.Method, c.ClientIP(), c.Writer.Status(), timeConsuming)
