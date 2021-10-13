@@ -7,7 +7,7 @@ import (
 
 // Role 角色对象
 type Role struct {
-	ID        uint64    `json:"id"`                                    // 唯一标识
+	ID        uint64    `json:"id,string"`                             // 唯一标识
 	Name      string    `json:"name" binding:"required"`               // 角色名称
 	Sequence  int       `json:"sequence"`                              // 排序值
 	Memo      string    `json:"memo"`                                  // 备注
@@ -64,10 +64,10 @@ func (a Roles) ToMap() map[uint64]*Role {
 
 // RoleMenu 角色菜单对象
 type RoleMenu struct {
-	ID       uint64 `json:"id"`                           // 唯一标识
-	RoleID   uint64 `json:"role_id" binding:"required"`   // 角色ID
-	MenuID   uint64 `json:"menu_id" binding:"required"`   // 菜单ID
-	ActionID uint64 `json:"action_id" binding:"required"` // 动作ID
+	ID       uint64 `json:"id,string"`                           // 唯一标识
+	RoleID   uint64 `json:"role_id,string" binding:"required"`   // 角色ID
+	MenuID   uint64 `json:"menu_id,string" binding:"required"`   // 菜单ID
+	ActionID uint64 `json:"action_id,string" binding:"required"` // 动作ID
 }
 
 // RoleMenuQueryParam 查询条件

@@ -19,7 +19,7 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/logger"
 )
 
-// VERSION 版本号，可以通过编译的方式指定版本号：go build -ldflags "-X main.VERSION=x.x.x"
+// Usage: go build -ldflags "-X main.VERSION=x.x.x"
 var VERSION = "8.0.0"
 
 // @title gin-admin

@@ -125,5 +125,5 @@ func NewIDResult(id uint64) *IDResult {
 
 // IDResult 响应唯一标识
 type IDResult struct {
-	ID uint64 `json:"id"`
+	ID uint64 `json:"id,string"`
 }

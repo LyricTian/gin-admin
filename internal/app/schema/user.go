@@ -28,7 +28,7 @@ func CheckIsRootUser(ctx context.Context, userID uint64) bool {
 
 // User 用户对象
 type User struct {
-	ID        uint64    `json:"id"`                                    // 唯一标识
+	ID        uint64    `json:"id,string"`                             // 唯一标识
 	UserName  string    `json:"user_name" binding:"required"`          // 用户名
 	RealName  string    `json:"real_name" binding:"required"`          // 真实姓名
 	Password  string    `json:"password"`                              // 密码
@@ -111,9 +111,9 @@ func (a Users) ToUserShows(mUserRoles map[uint64]UserRoles, mRoles map[uint64]*R
 
 // UserRole 用户角色
 type UserRole struct {
-	ID     uint64 `json:"id"`      // 唯一标识
-	UserID uint64 `json:"user_id"` // 用户ID
-	RoleID uint64 `json:"role_id"` // 角色ID
+	ID     uint64 `json:"id,string"`      // 唯一标识
+	UserID uint64 `json:"user_id,string"` // 用户ID
+	RoleID uint64 `json:"role_id,string"` // 角色ID
 }
 
 // UserRoleQueryParam 查询条件
@@ -168,7 +168,7 @@ func (a UserRoles) ToUserIDMap() map[uint64]UserRoles {
 
 // UserShow 用户显示项
 type UserShow struct {
-	ID        uint64    `json:"id"`         // 唯一标识
+	ID        uint64    `json:"id,string"`  // 唯一标识
 	UserName  string    `json:"user_name"`  // 用户名
 	RealName  string    `json:"real_name"`  // 真实姓名
 	Phone     string    `json:"phone"`      // 手机号

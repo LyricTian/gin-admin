@@ -10,12 +10,12 @@ import (
 
 // Menu 菜单对象
 type Menu struct {
-	ID         uint64      `json:"id"`                                     // 唯一标识
+	ID         uint64      `json:"id,string"`                              // 唯一标识
 	Name       string      `json:"name" binding:"required"`                // 菜单名称
 	Sequence   int         `json:"sequence"`                               // 排序值
 	Icon       string      `json:"icon"`                                   // 菜单图标
 	Router     string      `json:"router"`                                 // 访问路由
-	ParentID   uint64      `json:"parent_id"`                              // 父级ID
+	ParentID   uint64      `json:"parent_id,string"`                       // 父级ID
 	ParentPath string      `json:"parent_path"`                            // 父级路径
 	IsShow     int         `json:"is_show" binding:"required,max=2,min=1"` // 是否显示(1:显示 2:隐藏)
 	Status     int         `json:"status" binding:"required,max=2,min=1"`  // 状态(1:启用 2:禁用)
@@ -135,11 +135,11 @@ func (a Menus) FillMenuAction(mActions map[uint64]MenuActions) Menus {
 
 // MenuTree 菜单树
 type MenuTree struct {
-	ID         uint64      `yaml:"-" json:"id"`                                  // 唯一标识
+	ID         uint64      `yaml:"-" json:"id,string"`                           // 唯一标识
 	Name       string      `yaml:"name" json:"name"`                             // 菜单名称
 	Icon       string      `yaml:"icon" json:"icon"`                             // 菜单图标
 	Router     string      `yaml:"router,omitempty" json:"router"`               // 访问路由
-	ParentID   uint64      `yaml:"-" json:"parent_id"`                           // 父级ID
+	ParentID   uint64      `yaml:"-" json:"parent_id,string"`                    // 父级ID
 	ParentPath string      `yaml:"-" json:"parent_path"`                         // 父级路径
 	Sequence   int         `yaml:"sequence" json:"sequence"`                     // 排序值
 	IsShow     int         `yaml:"-" json:"is_show"`                             // 是否显示(1:显示 2:隐藏)
@@ -180,11 +180,11 @@ func (a MenuTrees) ToTree() MenuTrees {
 
 // MenuAction 菜单动作对象
 type MenuAction struct {
-	ID        uint64              `yaml:"-" json:"id"`                          // 唯一标识
-	MenuID    uint64              `yaml:"-" binding:"required" json:"menu_id"`  // 菜单ID
-	Code      string              `yaml:"code" binding:"required" json:"code"`  // 动作编号
-	Name      string              `yaml:"name" binding:"required" json:"name"`  // 动作名称
-	Resources MenuActionResources `yaml:"resources,omitempty" json:"resources"` // 资源列表
+	ID        uint64              `yaml:"-" json:"id,string"`                         // 唯一标识
+	MenuID    uint64              `yaml:"-" binding:"required" json:"menu_id,string"` // 菜单ID
+	Code      string              `yaml:"code" binding:"required" json:"code"`        // 动作编号
+	Name      string              `yaml:"name" binding:"required" json:"name"`        // 动作名称
+	Resources MenuActionResources `yaml:"resources,omitempty" json:"resources"`       // 资源列表
 }
 
 // MenuActionQueryParam 查询条件
@@ -237,8 +237,8 @@ func (a MenuActions) ToMenuIDMap() map[uint64]MenuActions {
 
 // MenuActionResource 菜单动作关联资源对象
 type MenuActionResource struct {
-	ID       uint64 `yaml:"-" json:"id"`                             // 唯一标识
-	ActionID uint64 `yaml:"-" json:"action_id"`                      // 菜单动作ID
+	ID       uint64 `yaml:"-" json:"id,string"`                      // 唯一标识
+	ActionID uint64 `yaml:"-" json:"action_id,string"`               // 菜单动作ID
 	Method   string `yaml:"method" binding:"required" json:"method"` // 资源请求方式(支持正则)
 	Path     string `yaml:"path" binding:"required" json:"path"`     // 资源请求路径（支持/:id匹配）
 }

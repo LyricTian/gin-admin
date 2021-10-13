@@ -10,10 +10,10 @@ type LoginParam struct {
 
 // UserLoginInfo 用户登录信息
 type UserLoginInfo struct {
-	UserID   uint64 `json:"user_id"`   // 用户ID
-	UserName string `json:"user_name"` // 用户名
-	RealName string `json:"real_name"` // 真实姓名
-	Roles    Roles  `json:"roles"`     // 角色列表
+	UserID   uint64 `json:"user_id,string"` // 用户ID
+	UserName string `json:"user_name"`      // 用户名
+	RealName string `json:"real_name"`      // 真实姓名
+	Roles    Roles  `json:"roles"`          // 角色列表
 }
 
 // UpdatePasswordParam 更新密码请求参数
