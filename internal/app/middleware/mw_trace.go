@@ -1,31 +1,67 @@
 package middleware
 
 import (
-	"github.com/LyricTian/gin-admin/v8/internal/app/contextx"
-	"github.com/LyricTian/gin-admin/v8/pkg/logger"
-	"github.com/LyricTian/gin-admin/v8/pkg/util/trace"
+	"log"
+	"os"
+
+	"github.com/LyricTian/gin-admin/v8/internal/app/config"
+
+	// "github.com/LyricTian/gin-admin/v8/pkg/util/trace"
 	"github.com/gin-gonic/gin"
+
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+
+	// "go.opentelemetry.io/otel/exporters/prometheus"
+	"go.opentelemetry.io/otel/propagation"
+
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-// TraceMiddleware 跟踪ID中间件
+const (
+	environmentKey = "environment"
+	IDKey          = "ID"
+)
+
+// TODO: Add other type of exporter
+func newExporter() (sdktrace.SpanExporter, error) {
+	return jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(config.C.Trace.Endpoint)))
+}
+
+func initTracer() *sdktrace.TracerProvider {
+
+	exporter, err := newExporter()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	pid := int64(os.Getpid())
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(config.C.Trace.Sample)),
+		sdktrace.WithBatcher(exporter),
+		sdktrace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String(config.C.App.Name),
+			attribute.String(environmentKey, config.C.App.Environment),
+			attribute.Int64(IDKey, pid),
+		)),
+	)
+	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+	return tp
+}
 func TraceMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
+	initTracer()
+	handler := otelgin.Middleware(config.C.App.Name)
 	return func(c *gin.Context) {
 		if SkipHandler(c, skippers...) {
 			c.Next()
 			return
 		}
-
-		// 优先从请求头中获取请求ID
-		traceID := c.GetHeader("X-Request-Id")
-		if traceID == "" {
-			traceID = trace.NewTraceID()
-		}
-
-		ctx := contextx.NewTraceID(c.Request.Context(), traceID)
-		ctx = logger.NewTraceIDContext(ctx, traceID)
-		c.Request = c.Request.WithContext(ctx)
-		c.Writer.Header().Set("X-Trace-Id", traceID)
-
-		c.Next()
+		handler(c)
 	}
 }

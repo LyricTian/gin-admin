@@ -63,6 +63,9 @@ type Config struct {
 	WWW          string
 	Swagger      bool
 	PrintConfig  bool
+	App          App
+	Trace        Trace
+	Metrics      Metrics
 	HTTP         HTTP
 	Menu         Menu
 	Casbin       Casbin
@@ -86,6 +89,26 @@ type Config struct {
 // IsDebugMode 是否是debug模式
 func (c *Config) IsDebugMode() bool {
 	return c.RunMode == "debug"
+}
+
+// App 应用名称、环境的配置
+type App struct {
+	Name        string `default:"gin-admin"`
+	Environment string `default:"localhost"`
+}
+
+// Trace Opentelemetry中间件配置，默认使用Jaeger
+type Trace struct {
+	Enable   bool   `default:"true"`
+	Endpoint string `default:"http://localhost:14268/api/traces"`
+	Backend  string `default:"jaeger"`
+	// 采样率，默认全部采样
+	Sample float64 `default:"1"`
+}
+
+// Metrcis Prometheus配置
+type Metrics struct {
+	Enable bool `default:"true"`
 }
 
 // Menu 菜单配置参数

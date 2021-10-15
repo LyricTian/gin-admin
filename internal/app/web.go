@@ -25,7 +25,9 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 	app.Use(middleware.RecoveryMiddleware())
 
 	// Trace ID
-	app.Use(middleware.TraceMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
+	if config.C.Trace.Enable {
+		app.Use(middleware.TraceMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
+	}
 
 	// Copy body
 	app.Use(middleware.CopyBodyMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
