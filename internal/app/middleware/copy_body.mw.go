@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CopyBodyMiddleware Copy body
+// Copy body to context bytes array
 func CopyBodyMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	var maxMemory int64 = 64 << 20 // 64 MB
 	if v := config.C.HTTP.MaxContentLength; v > 0 {

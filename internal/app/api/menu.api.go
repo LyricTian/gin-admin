@@ -12,12 +12,10 @@ import (
 
 var MenuSet = wire.NewSet(wire.Struct(new(MenuAPI), "*"))
 
-// MenuAPI 菜单管理
 type MenuAPI struct {
 	MenuSrv *service.MenuSrv
 }
 
-// Query 查询数据
 func (a *MenuAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
@@ -28,7 +26,10 @@ func (a *MenuAPI) Query(c *gin.Context) {
 
 	params.Pagination = true
 	result, err := a.MenuSrv.Query(ctx, params, schema.MenuQueryOptions{
-		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
+		OrderFields: schema.NewOrderFields(
+			schema.NewOrderField("sequence", schema.OrderByDESC),
+			schema.NewOrderField("id", schema.OrderByDESC),
+		),
 	})
 	if err != nil {
 		ginx.ResError(c, err)
@@ -37,7 +38,6 @@ func (a *MenuAPI) Query(c *gin.Context) {
 	ginx.ResPage(c, result.Data, result.PageResult)
 }
 
-// QueryTree 查询菜单树
 func (a *MenuAPI) QueryTree(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
@@ -56,7 +56,6 @@ func (a *MenuAPI) QueryTree(c *gin.Context) {
 	ginx.ResList(c, result.Data.ToTree())
 }
 
-// Get 查询指定数据
 func (a *MenuAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.MenuSrv.Get(ctx, ginx.ParseParamID(c, "id"))
@@ -67,7 +66,6 @@ func (a *MenuAPI) Get(c *gin.Context) {
 	ginx.ResSuccess(c, item)
 }
 
-// Create 创建数据
 func (a *MenuAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
@@ -85,7 +83,6 @@ func (a *MenuAPI) Create(c *gin.Context) {
 	ginx.ResSuccess(c, result)
 }
 
-// Update 更新数据
 func (a *MenuAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
@@ -102,7 +99,6 @@ func (a *MenuAPI) Update(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Delete 删除数据
 func (a *MenuAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.MenuSrv.Delete(ctx, ginx.ParseParamID(c, "id"))
@@ -113,7 +109,6 @@ func (a *MenuAPI) Delete(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Enable 启用数据
 func (a *MenuAPI) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.MenuSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 1)
@@ -124,7 +119,6 @@ func (a *MenuAPI) Enable(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Disable 禁用数据
 func (a *MenuAPI) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.MenuSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 2)

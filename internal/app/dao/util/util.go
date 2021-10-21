@@ -13,14 +13,14 @@ import (
 	"github.com/LyricTian/gin-admin/v8/internal/app/schema"
 )
 
-// Model Define basic
+// Define base model
 type Model struct {
 	ID        uint64 `gorm:"primaryKey;"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-// GetDB Get gorm.DB from context
+// Get gorm.DB from context
 func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	trans, ok := contextx.FromTrans(ctx)
 	if ok && !contextx.FromNoTrans(ctx) {
@@ -36,21 +36,19 @@ func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return defDB
 }
 
-// GetDBWithModel Get gorm.DB.Model from context
+// Get gorm.DB.Model from context
 func GetDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB {
 	return GetDB(ctx, defDB).Model(m)
 }
 
-// TransFunc 定义事务执行函数
+// Define transaction execute function
 type TransFunc func(context.Context) error
 
-// ExecTrans 执行事务
 func ExecTrans(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 	transModel := &Trans{DB: db}
 	return transModel.Exec(ctx, fn)
 }
 
-// ExecTransWithLock 执行事务（加锁）
 func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 	if !contextx.FromTransLock(ctx) {
 		ctx = contextx.NewTransLock(ctx)
@@ -58,7 +56,6 @@ func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 	return ExecTrans(ctx, db, fn)
 }
 
-// WrapPageQuery 包装带有分页的查询
 func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (*schema.PaginationResult, error) {
 	if pp.OnlyCount {
 		var count int64
@@ -84,7 +81,6 @@ func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, 
 	}, nil
 }
 
-// FindPage 查询分页数据
 func FindPage(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (int64, error) {
 	var count int64
 	err := db.Count(&count).Error
@@ -105,7 +101,6 @@ func FindPage(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out i
 	return count, err
 }
 
-// FindOne 查询单条数据
 func FindOne(ctx context.Context, db *gorm.DB, out interface{}) (bool, error) {
 	result := db.First(out)
 	if err := result.Error; err != nil {
@@ -117,7 +112,6 @@ func FindOne(ctx context.Context, db *gorm.DB, out interface{}) (bool, error) {
 	return true, nil
 }
 
-// Check 检查数据是否存在
 func Check(ctx context.Context, db *gorm.DB) (bool, error) {
 	var count int64
 	result := db.Count(&count)
@@ -127,10 +121,9 @@ func Check(ctx context.Context, db *gorm.DB) (bool, error) {
 	return count > 0, nil
 }
 
-// OrderFieldFunc 排序字段转换函数
+// Define order fields convert function
 type OrderFieldFunc func(string) string
 
-// ParseOrder 解析排序字段
 func ParseOrder(items []*schema.OrderField, handle ...OrderFieldFunc) string {
 	orders := make([]string, len(items))
 

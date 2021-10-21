@@ -18,7 +18,8 @@ definitions:
   schema.IDResult:
     properties:
       id:
-        type: integer
+        example: "0"
+        type: string
     type: object
   schema.ListResult:
     properties:
@@ -83,7 +84,8 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       is_show:
         description: 是否显示(1:显示 2:隐藏)
         type: integer
@@ -95,7 +97,8 @@ definitions:
         type: string
       parent_id:
         description: 父级ID
-        type: integer
+        example: "0"
+        type: string
       parent_path:
         description: 父级路径
         type: string
@@ -123,10 +126,12 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       menu_id:
         description: 菜单ID
-        type: integer
+        example: "0"
+        type: string
       name:
         description: 动作名称
         type: string
@@ -144,10 +149,12 @@ definitions:
     properties:
       action_id:
         description: 菜单动作ID
-        type: integer
+        example: "0"
+        type: string
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       method:
         description: 资源请求方式(支持正则)
         type: string
@@ -175,7 +182,8 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       is_show:
         description: 是否显示(1:显示 2:隐藏)
         type: integer
@@ -184,7 +192,8 @@ definitions:
         type: string
       parent_id:
         description: 父级ID
-        type: integer
+        example: "0"
+        type: string
       parent_path:
         description: 父级路径
         type: string
@@ -217,7 +226,8 @@ definitions:
         type: integer
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       memo:
         description: 备注
         type: string
@@ -247,16 +257,20 @@ definitions:
     properties:
       action_id:
         description: 动作ID
-        type: integer
+        example: "0"
+        type: string
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       menu_id:
         description: 菜单ID
-        type: integer
+        example: "0"
+        type: string
       role_id:
         description: 角色ID
-        type: integer
+        example: "0"
+        type: string
     required:
     - action_id
     - menu_id
@@ -293,7 +307,8 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       password:
         description: 密码
         type: string
@@ -332,7 +347,8 @@ definitions:
         type: array
       user_id:
         description: 用户ID
-        type: integer
+        example: "0"
+        type: string
       user_name:
         description: 用户名
         type: string
@@ -341,13 +357,16 @@ definitions:
     properties:
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       role_id:
         description: 角色ID
-        type: integer
+        example: "0"
+        type: string
       user_id:
         description: 用户ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   schema.UserShow:
     properties:
@@ -359,7 +378,8 @@ definitions:
         type: string
       id:
         description: 唯一标识
-        type: integer
+        example: "0"
+        type: string
       phone:
         description: 手机号
         type: string
@@ -384,7 +404,7 @@ info:
     name: LyricTian
   description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
   title: gin-admin
-  version: 8.0.0
+  version: 8.1.0
 paths:
   /api/v1/menus:
     get:
@@ -429,12 +449,16 @@ paths:
                     $ref: '#/definitions/schema.Menu'
                   type: array
               type: object
+        "400":
+          description: '{error:{code:0,message:bad request}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -456,15 +480,15 @@ paths:
           schema:
             $ref: '#/definitions/schema.IDResult'
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -496,11 +520,11 @@ paths:
                   type: array
               type: object
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -522,11 +546,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -547,15 +571,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.Menu'
         "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "404":
-          description: '{error:{code:0,message:资源不存在}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -582,15 +602,15 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -612,11 +632,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -638,11 +658,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -665,11 +685,11 @@ paths:
                   type: array
               type: object
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -691,16 +711,12 @@ paths:
           description: '{status:OK}'
           schema:
             $ref: '#/definitions/schema.StatusResult'
-        "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -716,11 +732,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.UserLoginInfo'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -743,11 +759,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.LoginTokenInfo'
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       summary: 用户登录
@@ -771,11 +787,11 @@ paths:
         "200":
           description: 图形验证码
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       summary: 响应图形验证码
@@ -809,11 +825,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.LoginTokenInfo'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -857,11 +873,11 @@ paths:
                   type: array
               type: object
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -883,15 +899,15 @@ paths:
           schema:
             $ref: '#/definitions/schema.IDResult'
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -922,16 +938,12 @@ paths:
                     $ref: '#/definitions/schema.Role'
                   type: array
               type: object
-        "400":
-          description: '{error:{code:0,message:未知的查询类型}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -953,11 +965,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -977,16 +989,16 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/schema.Role'
-        "401":
-          description: '{error:{code:0,message:未授权}}'
+        "400":
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
-        "404":
-          description: '{error:{code:0,message:资源不存在}}'
+        "401":
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1013,15 +1025,15 @@ paths:
           schema:
             $ref: '#/definitions/schema.Role'
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1043,11 +1055,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1069,11 +1081,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1121,11 +1133,11 @@ paths:
                   type: array
               type: object
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1147,15 +1159,15 @@ paths:
           schema:
             $ref: '#/definitions/schema.IDResult'
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1177,11 +1189,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1202,15 +1214,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.User'
         "401":
-          description: '{error:{code:0,message:未授权}}'
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "404":
-          description: '{error:{code:0,message:资源不存在}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1237,15 +1245,15 @@ paths:
           schema:
             $ref: '#/definitions/schema.User'
         "400":
-          description: '{error:{code:0,message:无效的请求参数}}'
+          description: '{error:{code:0,message:bad request}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1267,11 +1275,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:
@@ -1293,11 +1301,11 @@ paths:
           schema:
             $ref: '#/definitions/schema.StatusResult'
         "401":
-          description: '{error:{code:0,message:未授权}}'
+          description: '{error:{code:9999,message:invalid signature}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
         "500":
-          description: '{error:{code:0,message:服务器错误}}'
+          description: '{error:{code:0,message:internal server error}}'
           schema:
             $ref: '#/definitions/schema.ErrorResult'
       security:

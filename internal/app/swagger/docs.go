@@ -102,14 +102,20 @@ var doc = `{
                             ]
                         }
                     },
+                    "400": {
+                        "description": "{error:{code:0,message:bad request}}",
+                        "schema": {
+                            "$ref": "#/definitions/schema.ErrorResult"
+                        }
+                    },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -145,19 +151,19 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -213,13 +219,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -255,19 +261,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
-                        "schema": {
-                            "$ref": "#/definitions/schema.ErrorResult"
-                        }
-                    },
-                    "404": {
-                        "description": "{error:{code:0,message:资源不存在}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -310,19 +310,19 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -356,13 +356,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -398,13 +398,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -440,13 +440,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -488,13 +488,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -531,20 +531,14 @@ var doc = `{
                             "$ref": "#/definitions/schema.StatusResult"
                         }
                     },
-                    "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
-                        "schema": {
-                            "$ref": "#/definitions/schema.ErrorResult"
-                        }
-                    },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -571,13 +565,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -610,13 +604,13 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -653,13 +647,13 @@ var doc = `{
                         "description": "图形验证码"
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -718,13 +712,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -796,13 +790,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -838,19 +832,19 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -905,20 +899,14 @@ var doc = `{
                             ]
                         }
                     },
-                    "400": {
-                        "description": "{error:{code:0,message:未知的查询类型}}",
-                        "schema": {
-                            "$ref": "#/definitions/schema.ErrorResult"
-                        }
-                    },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -953,20 +941,20 @@ var doc = `{
                             "$ref": "#/definitions/schema.Role"
                         }
                     },
-                    "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                    "400": {
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
-                    "404": {
-                        "description": "{error:{code:0,message:资源不存在}}",
+                    "401": {
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1009,19 +997,19 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1055,13 +1043,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1097,13 +1085,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1139,13 +1127,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1223,13 +1211,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1265,19 +1253,19 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1313,19 +1301,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
-                        "schema": {
-                            "$ref": "#/definitions/schema.ErrorResult"
-                        }
-                    },
-                    "404": {
-                        "description": "{error:{code:0,message:资源不存在}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1368,19 +1350,19 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{error:{code:0,message:无效的请求参数}}",
+                        "description": "{error:{code:0,message:bad request}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1414,13 +1396,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1456,13 +1438,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1498,13 +1480,13 @@ var doc = `{
                         }
                     },
                     "401": {
-                        "description": "{error:{code:0,message:未授权}}",
+                        "description": "{error:{code:9999,message:invalid signature}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
                     },
                     "500": {
-                        "description": "{error:{code:0,message:服务器错误}}",
+                        "description": "{error:{code:0,message:internal server error}}",
                         "schema": {
                             "$ref": "#/definitions/schema.ErrorResult"
                         }
@@ -1540,7 +1522,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -1637,7 +1620,8 @@ var doc = `{
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "is_show": {
                     "description": "是否显示(1:显示 2:隐藏)",
@@ -1653,7 +1637,8 @@ var doc = `{
                 },
                 "parent_id": {
                     "description": "父级ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "parent_path": {
                     "description": "父级路径",
@@ -1691,11 +1676,13 @@ var doc = `{
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "menu_id": {
                     "description": "菜单ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "name": {
                     "description": "动作名称",
@@ -1719,11 +1706,13 @@ var doc = `{
             "properties": {
                 "action_id": {
                     "description": "菜单动作ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "method": {
                     "description": "资源请求方式(支持正则)",
@@ -1758,7 +1747,8 @@ var doc = `{
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "is_show": {
                     "description": "是否显示(1:显示 2:隐藏)",
@@ -1770,7 +1760,8 @@ var doc = `{
                 },
                 "parent_id": {
                     "description": "父级ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "parent_path": {
                     "description": "父级路径",
@@ -1822,7 +1813,8 @@ var doc = `{
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "memo": {
                     "description": "备注",
@@ -1863,19 +1855,23 @@ var doc = `{
             "properties": {
                 "action_id": {
                     "description": "动作ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "menu_id": {
                     "description": "菜单ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "role_id": {
                     "description": "角色ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -1928,7 +1924,8 @@ var doc = `{
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "password": {
                     "description": "密码",
@@ -1975,7 +1972,8 @@ var doc = `{
                 },
                 "user_id": {
                     "description": "用户ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "user_name": {
                     "description": "用户名",
@@ -1988,15 +1986,18 @@ var doc = `{
             "properties": {
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "role_id": {
                     "description": "角色ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "user_id": {
                     "description": "用户ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -2013,7 +2014,8 @@ var doc = `{
                 },
                 "id": {
                     "description": "唯一标识",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "phone": {
                     "description": "手机号",
@@ -2061,7 +2063,7 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "8.0.0",
+	Version:     "8.1.0",
 	Host:        "",
 	BasePath:    "/",
 	Schemes:     []string{"http", "https"},

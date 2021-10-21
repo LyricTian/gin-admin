@@ -1,9 +1,9 @@
 /*
 Package main gin-admin
 
-Swagger 文档规则请参考：https://github.com/swaggo/swag#declarative-comments-format
+Swagger Reference: https://github.com/swaggo/swag#declarative-comments-format
 
-使用方式：
+Usage：
 
 	go get -u github.com/swaggo/swag/cmd/swag
 	swag init --generalInfo ./cmd/gin-admin/main.go --output ./internal/app/swagger */
@@ -20,10 +20,10 @@ import (
 )
 
 // Usage: go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "8.0.0"
+var VERSION = "8.1.0"
 
 // @title gin-admin
-// @version 8.0.0
+// @version 8.1.0
 // @description RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header

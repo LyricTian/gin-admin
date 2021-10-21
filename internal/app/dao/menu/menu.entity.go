@@ -10,22 +10,18 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/util/structure"
 )
 
-// GetMenuDB 获取菜单存储
 func GetMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDBWithModel(ctx, defDB, new(Menu))
 }
 
-// SchemaMenu 菜单对象
 type SchemaMenu schema.Menu
 
-// ToMenu 转换为菜单实体
 func (a SchemaMenu) ToMenu() *Menu {
 	item := new(Menu)
 	structure.Copy(a, item)
 	return item
 }
 
-// Menu 菜单实体
 type Menu struct {
 	util.Model
 	Name       string  `gorm:"size:50;index;default:'';not null;"` // 菜单名称
@@ -40,17 +36,14 @@ type Menu struct {
 	Creator    uint64  `gorm:""`                                   // 创建人
 }
 
-// ToSchemaMenu 转换为菜单对象
 func (a Menu) ToSchemaMenu() *schema.Menu {
 	item := new(schema.Menu)
 	structure.Copy(a, item)
 	return item
 }
 
-// Menus 菜单实体列表
 type Menus []*Menu
 
-// ToSchemaMenus 转换为菜单对象列表
 func (a Menus) ToSchemaMenus() []*schema.Menu {
 	list := make([]*schema.Menu, len(a))
 	for i, item := range a {

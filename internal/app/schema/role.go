@@ -79,7 +79,8 @@ type RoleMenuQueryParam struct {
 
 // RoleMenuQueryOptions 查询可选参数项
 type RoleMenuQueryOptions struct {
-	OrderFields []*OrderField // 排序字段
+	OrderFields  []*OrderField
+	SelectFields []string
 }
 
 // RoleMenuQueryResult 查询结果

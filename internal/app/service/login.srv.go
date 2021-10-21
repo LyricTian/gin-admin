@@ -15,10 +15,8 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/util/hash"
 )
 
-// LoginSet 注入Login
 var LoginSet = wire.NewSet(wire.Struct(new(LoginSrv), "*"))
 
-// LoginSrv 登录管理
 type LoginSrv struct {
 	Auth           auth.Auther
 	UserRepo       *dao.UserRepo
@@ -29,7 +27,6 @@ type LoginSrv struct {
 	MenuActionRepo *dao.MenuActionRepo
 }
 
-// GetCaptcha 获取图形验证码信息
 func (a *LoginSrv) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
 	captchaID := captcha.NewLen(length)
 	item := &schema.LoginCaptcha{
@@ -38,7 +35,6 @@ func (a *LoginSrv) GetCaptcha(ctx context.Context, length int) (*schema.LoginCap
 	return item, nil
 }
 
-// ResCaptcha 生成并响应图形验证码
 func (a *LoginSrv) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, width, height int) error {
 	err := captcha.WriteImage(w, captchaID, width, height)
 	if err != nil {
@@ -55,9 +51,7 @@ func (a *LoginSrv) ResCaptcha(ctx context.Context, w http.ResponseWriter, captch
 	return nil
 }
 
-// Verify 登录验证
 func (a *LoginSrv) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
-	// 检查是否是超级用户
 	root := schema.GetRootUser()
 	if userName == root.UserName && root.Password == password {
 		return root, nil
@@ -69,12 +63,12 @@ func (a *LoginSrv) Verify(ctx context.Context, userName, password string) (*sche
 	if err != nil {
 		return nil, err
 	} else if len(result.Data) == 0 {
-		return nil, errors.New400Response("用户名不存在")
+		return nil, errors.New400Response("not found user_name")
 	}
 
 	item := result.Data[0]
 	if item.Password != hash.SHA1String(password) {
-		return nil, errors.New400Response("密码错误")
+		return nil, errors.New400Response("password incorrect")
 	} else if item.Status != 1 {
 		return nil, errors.ErrUserDisable
 	}
@@ -82,7 +76,6 @@ func (a *LoginSrv) Verify(ctx context.Context, userName, password string) (*sche
 	return item, nil
 }
 
-// GenerateToken 生成令牌
 func (a *LoginSrv) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
 	tokenInfo, err := a.Auth.GenerateToken(ctx, userID)
 	if err != nil {
@@ -97,7 +90,6 @@ func (a *LoginSrv) GenerateToken(ctx context.Context, userID string) (*schema.Lo
 	return item, nil
 }
 
-// DestroyToken 销毁令牌
 func (a *LoginSrv) DestroyToken(ctx context.Context, tokenString string) error {
 	err := a.Auth.DestroyToken(ctx, tokenString)
 	if err != nil {
@@ -111,14 +103,13 @@ func (a *LoginSrv) checkAndGetUser(ctx context.Context, userID uint64) (*schema.
 	if err != nil {
 		return nil, err
 	} else if user == nil {
-		return nil, errors.ErrInvalidUser
+		return nil, errors.ErrNotFound
 	} else if user.Status != 1 {
 		return nil, errors.ErrUserDisable
 	}
 	return user, nil
 }
 
-// GetLoginInfo 获取当前用户登录信息
 func (a *LoginSrv) GetLoginInfo(ctx context.Context, userID uint64) (*schema.UserLoginInfo, error) {
 	if isRoot := schema.CheckIsRootUser(ctx, userID); isRoot {
 		root := schema.GetRootUser()
@@ -161,10 +152,8 @@ func (a *LoginSrv) GetLoginInfo(ctx context.Context, userID uint64) (*schema.Use
 	return info, nil
 }
 
-// QueryUserMenuTree 查询当前用户的权限菜单树
 func (a *LoginSrv) QueryUserMenuTree(ctx context.Context, userID uint64) (schema.MenuTrees, error) {
 	isRoot := schema.CheckIsRootUser(ctx, userID)
-	// 如果是root用户，则查询所有显示的菜单树
 	if isRoot {
 		result, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 			Status: 1,
@@ -212,7 +201,6 @@ func (a *LoginSrv) QueryUserMenuTree(ctx context.Context, userID uint64) (schema
 
 	mData := menuResult.Data.ToMap()
 
-	// 获取授权菜单的父级菜单，判断哪些父级菜单不在之前的授权菜单中，存放于qIDs切片
 	var qIDs []uint64
 	for _, pid := range menuResult.Data.SplitParentIDs() {
 		if _, ok := mData[pid]; !ok {
@@ -220,7 +208,6 @@ func (a *LoginSrv) QueryUserMenuTree(ctx context.Context, userID uint64) (schema
 		}
 	}
 
-	// 获取这些差异的父级菜单的信息，补充到 menuResult.Data 中
 	if len(qIDs) > 0 {
 		pmenuResult, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 			IDs: qIDs,
@@ -241,7 +228,6 @@ func (a *LoginSrv) QueryUserMenuTree(ctx context.Context, userID uint64) (schema
 	return menuResult.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap()).ToTree(), nil
 }
 
-// UpdatePassword 更新当前用户登录密码
 func (a *LoginSrv) UpdatePassword(ctx context.Context, userID uint64, params schema.UpdatePasswordParam) error {
 	if schema.CheckIsRootUser(ctx, userID) {
 		return errors.New400Response("root用户不允许更新密码")

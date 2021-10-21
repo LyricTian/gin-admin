@@ -12,7 +12,6 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/gormx"
 )
 
-// InitGormDB 初始化gorm存储
 func InitGormDB() (*gorm.DB, func(), error) {
 	cfg := config.C.Gorm
 	db, err := NewGormDB()
@@ -32,7 +31,6 @@ func InitGormDB() (*gorm.DB, func(), error) {
 	return db, cleanFunc, nil
 }
 
-// NewGormDB 创建DB实例
 func NewGormDB() (*gorm.DB, error) {
 	cfg := config.C
 	var dsn string

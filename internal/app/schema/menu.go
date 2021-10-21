@@ -44,8 +44,8 @@ type MenuQueryParam struct {
 
 // MenuQueryOptions 查询可选参数项
 type MenuQueryOptions struct {
-	OrderFields  []*OrderField // 排序字段
-	SelectFields []string      // 查询字段
+	OrderFields  []*OrderField
+	SelectFields []string
 }
 
 // MenuQueryResult 查询结果

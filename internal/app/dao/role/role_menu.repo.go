@@ -11,10 +11,8 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/errors"
 )
 
-// RoleMenuSet 注入RoleMenu
 var RoleMenuSet = wire.NewSet(wire.Struct(new(RoleMenuRepo), "*"))
 
-// RoleMenuRepo 角色菜单存储
 type RoleMenuRepo struct {
 	DB *gorm.DB
 }
@@ -27,7 +25,6 @@ func (a *RoleMenuRepo) getQueryOption(opts ...schema.RoleMenuQueryOptions) schem
 	return opt
 }
 
-// Query 查询数据
 func (a *RoleMenuRepo) Query(ctx context.Context, params schema.RoleMenuQueryParam, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenuQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
@@ -39,8 +36,13 @@ func (a *RoleMenuRepo) Query(ctx context.Context, params schema.RoleMenuQueryPar
 		db = db.Where("role_id IN (?)", v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(util.ParseOrder(opt.OrderFields))
+	if len(opt.SelectFields) > 0 {
+		db = db.Select(opt.SelectFields)
+	}
+
+	if len(opt.OrderFields) > 0 {
+		db = db.Order(util.ParseOrder(opt.OrderFields))
+	}
 
 	var list RoleMenus
 	pr, err := util.WrapPageQuery(ctx, db, params.PaginationParam, &list)
@@ -55,7 +57,6 @@ func (a *RoleMenuRepo) Query(ctx context.Context, params schema.RoleMenuQueryPar
 	return qr, nil
 }
 
-// Get 查询指定数据
 func (a *RoleMenuRepo) Get(ctx context.Context, id uint64, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenu, error) {
 	db := GetRoleMenuDB(ctx, a.DB).Where("id=?", id)
 	var item RoleMenu
@@ -69,27 +70,23 @@ func (a *RoleMenuRepo) Get(ctx context.Context, id uint64, opts ...schema.RoleMe
 	return item.ToSchemaRoleMenu(), nil
 }
 
-// Create 创建数据
 func (a *RoleMenuRepo) Create(ctx context.Context, item schema.RoleMenu) error {
 	eitem := SchemaRoleMenu(item).ToRoleMenu()
 	result := GetRoleMenuDB(ctx, a.DB).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// Update 更新数据
 func (a *RoleMenuRepo) Update(ctx context.Context, id uint64, item schema.RoleMenu) error {
 	eitem := SchemaRoleMenu(item).ToRoleMenu()
 	result := GetRoleMenuDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// Delete 删除数据
 func (a *RoleMenuRepo) Delete(ctx context.Context, id uint64) error {
 	result := GetRoleMenuDB(ctx, a.DB).Where("id=?", id).Delete(RoleMenu{})
 	return errors.WithStack(result.Error)
 }
 
-// DeleteByRoleID 根据角色ID删除数据
 func (a *RoleMenuRepo) DeleteByRoleID(ctx context.Context, roleID uint64) error {
 	result := GetRoleMenuDB(ctx, a.DB).Where("role_id=?", roleID).Delete(RoleMenu{})
 	return errors.WithStack(result.Error)

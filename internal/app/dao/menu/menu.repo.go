@@ -11,10 +11,8 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/errors"
 )
 
-// MenuSet 注入Menu
 var MenuSet = wire.NewSet(wire.Struct(new(MenuRepo), "*"))
 
-// MenuRepo 菜单存储
 type MenuRepo struct {
 	DB *gorm.DB
 }
@@ -27,7 +25,6 @@ func (a *MenuRepo) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQu
 	return opt
 }
 
-// Query 查询数据
 func (a *MenuRepo) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
@@ -59,8 +56,9 @@ func (a *MenuRepo) Query(ctx context.Context, params schema.MenuQueryParam, opts
 		db = db.Select(opt.SelectFields)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(util.ParseOrder(opt.OrderFields))
+	if len(opt.OrderFields) > 0 {
+		db = db.Order(util.ParseOrder(opt.OrderFields))
+	}
 
 	var list Menus
 	pr, err := util.WrapPageQuery(ctx, db, params.PaginationParam, &list)
@@ -76,7 +74,6 @@ func (a *MenuRepo) Query(ctx context.Context, params schema.MenuQueryParam, opts
 	return qr, nil
 }
 
-// Get 查询指定数据
 func (a *MenuRepo) Get(ctx context.Context, id uint64, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
 	var item Menu
 	ok, err := util.FindOne(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id), &item)
@@ -89,33 +86,28 @@ func (a *MenuRepo) Get(ctx context.Context, id uint64, opts ...schema.MenuQueryO
 	return item.ToSchemaMenu(), nil
 }
 
-// Create 创建数据
 func (a *MenuRepo) Create(ctx context.Context, item schema.Menu) error {
 	eitem := SchemaMenu(item).ToMenu()
 	result := GetMenuDB(ctx, a.DB).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// Update 更新数据
 func (a *MenuRepo) Update(ctx context.Context, id uint64, item schema.Menu) error {
 	eitem := SchemaMenu(item).ToMenu()
 	result := GetMenuDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// UpdateParentPath 更新父级路径
 func (a *MenuRepo) UpdateParentPath(ctx context.Context, id uint64, parentPath string) error {
 	result := GetMenuDB(ctx, a.DB).Where("id=?", id).Update("parent_path", parentPath)
 	return errors.WithStack(result.Error)
 }
 
-// Delete 删除数据
 func (a *MenuRepo) Delete(ctx context.Context, id uint64) error {
 	result := GetMenuDB(ctx, a.DB).Where("id=?", id).Delete(Menu{})
 	return errors.WithStack(result.Error)
 }
 
-// UpdateStatus 更新状态
 func (a *MenuRepo) UpdateStatus(ctx context.Context, id uint64, status int) error {
 	result := GetMenuDB(ctx, a.DB).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)

@@ -12,12 +12,10 @@ import (
 
 var RoleSet = wire.NewSet(wire.Struct(new(RoleAPI), "*"))
 
-// RoleAPI 角色管理
 type RoleAPI struct {
 	RoleSrv *service.RoleSrv
 }
 
-// Query 查询数据
 func (a *RoleAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
@@ -37,7 +35,6 @@ func (a *RoleAPI) Query(c *gin.Context) {
 	ginx.ResPage(c, result.Data, result.PageResult)
 }
 
-// QuerySelect 查询选择数据
 func (a *RoleAPI) QuerySelect(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
@@ -56,7 +53,6 @@ func (a *RoleAPI) QuerySelect(c *gin.Context) {
 	ginx.ResList(c, result.Data)
 }
 
-// Get 查询指定数据
 func (a *RoleAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.RoleSrv.Get(ctx, ginx.ParseParamID(c, "id"))
@@ -67,7 +63,6 @@ func (a *RoleAPI) Get(c *gin.Context) {
 	ginx.ResSuccess(c, item)
 }
 
-// Create 创建数据
 func (a *RoleAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
@@ -85,7 +80,6 @@ func (a *RoleAPI) Create(c *gin.Context) {
 	ginx.ResSuccess(c, result)
 }
 
-// Update 更新数据
 func (a *RoleAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
@@ -102,7 +96,6 @@ func (a *RoleAPI) Update(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Delete 删除数据
 func (a *RoleAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.RoleSrv.Delete(ctx, ginx.ParseParamID(c, "id"))
@@ -113,7 +106,6 @@ func (a *RoleAPI) Delete(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Enable 启用数据
 func (a *RoleAPI) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.RoleSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 1)
@@ -124,7 +116,6 @@ func (a *RoleAPI) Enable(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Disable 禁用数据
 func (a *RoleAPI) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.RoleSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 2)

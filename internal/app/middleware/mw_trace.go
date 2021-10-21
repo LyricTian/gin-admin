@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// TraceMiddleware 跟踪ID中间件
+// Get or set trace_id in request context
 func TraceMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if SkipHandler(c, skippers...) {
@@ -15,7 +15,6 @@ func TraceMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 			return
 		}
 
-		// 优先从请求头中获取请求ID
 		traceID := c.GetHeader("X-Request-Id")
 		if traceID == "" {
 			traceID = trace.NewTraceID()

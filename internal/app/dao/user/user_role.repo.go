@@ -11,10 +11,8 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/errors"
 )
 
-// UserRoleSet 注入UserRole
 var UserRoleSet = wire.NewSet(wire.Struct(new(UserRoleRepo), "*"))
 
-// UserRoleRepo 用户角色存储
 type UserRoleRepo struct {
 	DB *gorm.DB
 }
@@ -27,7 +25,6 @@ func (a *UserRoleRepo) getQueryOption(opts ...schema.UserRoleQueryOptions) schem
 	return opt
 }
 
-// Query 查询数据
 func (a *UserRoleRepo) Query(ctx context.Context, params schema.UserRoleQueryParam, opts ...schema.UserRoleQueryOptions) (*schema.UserRoleQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
@@ -39,8 +36,9 @@ func (a *UserRoleRepo) Query(ctx context.Context, params schema.UserRoleQueryPar
 		db = db.Where("user_id IN (?)", v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(util.ParseOrder(opt.OrderFields))
+	if len(opt.OrderFields) > 0 {
+		db = db.Order(util.ParseOrder(opt.OrderFields))
+	}
 
 	var list UserRoles
 	pr, err := util.WrapPageQuery(ctx, db, params.PaginationParam, &list)
@@ -55,7 +53,6 @@ func (a *UserRoleRepo) Query(ctx context.Context, params schema.UserRoleQueryPar
 	return qr, nil
 }
 
-// Get 查询指定数据
 func (a *UserRoleRepo) Get(ctx context.Context, id uint64, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
 	db := GetUserRoleDB(ctx, a.DB).Where("id=?", id)
 	var item UserRole
@@ -69,27 +66,23 @@ func (a *UserRoleRepo) Get(ctx context.Context, id uint64, opts ...schema.UserRo
 	return item.ToSchemaUserRole(), nil
 }
 
-// Create 创建数据
 func (a *UserRoleRepo) Create(ctx context.Context, item schema.UserRole) error {
 	eitem := SchemaUserRole(item).ToUserRole()
 	result := GetUserRoleDB(ctx, a.DB).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// Update 更新数据
 func (a *UserRoleRepo) Update(ctx context.Context, id uint64, item schema.UserRole) error {
 	eitem := SchemaUserRole(item).ToUserRole()
 	result := GetUserRoleDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// Delete 删除数据
 func (a *UserRoleRepo) Delete(ctx context.Context, id uint64) error {
 	result := GetUserRoleDB(ctx, a.DB).Where("id=?", id).Delete(UserRole{})
 	return errors.WithStack(result.Error)
 }
 
-// DeleteByUserID 根据用户ID删除数据
 func (a *UserRoleRepo) DeleteByUserID(ctx context.Context, userID uint64) error {
 	result := GetUserRoleDB(ctx, a.DB).Where("user_id=?", userID).Delete(UserRole{})
 	return errors.WithStack(result.Error)

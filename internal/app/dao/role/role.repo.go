@@ -11,10 +11,8 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/errors"
 )
 
-// RoleSet 注入Role
 var RoleSet = wire.NewSet(wire.Struct(new(RoleRepo), "*"))
 
-// RoleRepo 角色存储
 type RoleRepo struct {
 	DB *gorm.DB
 }
@@ -27,7 +25,6 @@ func (a *RoleRepo) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQu
 	return opt
 }
 
-// Query 查询数据
 func (a *RoleRepo) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
@@ -47,8 +44,9 @@ func (a *RoleRepo) Query(ctx context.Context, params schema.RoleQueryParam, opts
 		db = db.Select(opt.SelectFields)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(util.ParseOrder(opt.OrderFields))
+	if len(opt.OrderFields) > 0 {
+		db = db.Order(util.ParseOrder(opt.OrderFields))
+	}
 
 	var list Roles
 	pr, err := util.WrapPageQuery(ctx, db, params.PaginationParam, &list)
@@ -63,7 +61,6 @@ func (a *RoleRepo) Query(ctx context.Context, params schema.RoleQueryParam, opts
 	return qr, nil
 }
 
-// Get 查询指定数据
 func (a *RoleRepo) Get(ctx context.Context, id uint64, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	var role Role
 	ok, err := util.FindOne(ctx, GetRoleDB(ctx, a.DB).Where("id=?", id), &role)
@@ -76,27 +73,23 @@ func (a *RoleRepo) Get(ctx context.Context, id uint64, opts ...schema.RoleQueryO
 	return role.ToSchemaRole(), nil
 }
 
-// Create 创建数据
 func (a *RoleRepo) Create(ctx context.Context, item schema.Role) error {
 	eitem := SchemaRole(item).ToRole()
 	result := GetRoleDB(ctx, a.DB).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// Update 更新数据
 func (a *RoleRepo) Update(ctx context.Context, id uint64, item schema.Role) error {
 	eitem := SchemaRole(item).ToRole()
 	result := GetRoleDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-// Delete 删除数据
 func (a *RoleRepo) Delete(ctx context.Context, id uint64) error {
 	result := GetRoleDB(ctx, a.DB).Where("id=?", id).Delete(Role{})
 	return errors.WithStack(result.Error)
 }
 
-// UpdateStatus 更新状态
 func (a *RoleRepo) UpdateStatus(ctx context.Context, id uint64, status int) error {
 	result := GetRoleDB(ctx, a.DB).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)

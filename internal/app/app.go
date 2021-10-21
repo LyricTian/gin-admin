@@ -17,7 +17,6 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/google/gops/agent"
 
-	// 引入swagger
 	_ "github.com/LyricTian/gin-admin/v8/internal/app/swagger"
 )
 
@@ -29,45 +28,38 @@ type options struct {
 	Version    string
 }
 
-// Option 定义配置项
 type Option func(*options)
 
-// SetConfigFile 设定配置文件
 func SetConfigFile(s string) Option {
 	return func(o *options) {
 		o.ConfigFile = s
 	}
 }
 
-// SetModelFile 设定casbin模型配置文件
 func SetModelFile(s string) Option {
 	return func(o *options) {
 		o.ModelFile = s
 	}
 }
 
-// SetWWWDir 设定静态站点目录
 func SetWWWDir(s string) Option {
 	return func(o *options) {
 		o.WWWDir = s
 	}
 }
 
-// SetMenuFile 设定菜单数据文件
 func SetMenuFile(s string) Option {
 	return func(o *options) {
 		o.MenuFile = s
 	}
 }
 
-// SetVersion 设定版本号
 func SetVersion(s string) Option {
 	return func(o *options) {
 		o.Version = s
 	}
 }
 
-// Init 应用初始化
 func Init(ctx context.Context, opts ...Option) (func(), error) {
 	var o options
 	for _, opt := range opts {
@@ -86,27 +78,22 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	}
 	config.PrintWithJSON()
 
-	logger.WithContext(ctx).Printf("Start server,#mode %s,#version %s,#pid %d", config.C.RunMode, o.Version, os.Getpid())
+	logger.WithContext(ctx).Printf("Start server,#run_mode %s,#version %s,#pid %d", config.C.RunMode, o.Version, os.Getpid())
 
-	// 初始化日志模块
 	loggerCleanFunc, err := InitLogger()
 	if err != nil {
 		return nil, err
 	}
 
-	// 初始化服务运行监控
 	monitorCleanFunc := InitMonitor(ctx)
 
-	// 初始化图形验证码
 	InitCaptcha()
 
-	// 初始化依赖注入器
 	injector, injectorCleanFunc, err := BuildInjector()
 	if err != nil {
 		return nil, err
 	}
 
-	// 初始化菜单数据
 	if config.C.Menu.Enable && config.C.Menu.Data != "" {
 		err = injector.MenuSrv.InitData(ctx, config.C.Menu.Data)
 		if err != nil {
@@ -114,7 +101,6 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 		}
 	}
 
-	// 初始化HTTP服务
 	httpServerCleanFunc := InitHTTPServer(ctx, injector.Engine)
 
 	return func() {
@@ -125,7 +111,6 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	}, nil
 }
 
-// InitCaptcha 初始化图形验证码
 func InitCaptcha() {
 	cfg := config.C.Captcha
 	if cfg.Store == "redis" {
@@ -138,7 +123,6 @@ func InitCaptcha() {
 	}
 }
 
-// InitMonitor 初始化服务监控
 func InitMonitor(ctx context.Context) func() {
 	if c := config.C.Monitor; c.Enable {
 		// ShutdownCleanup set false to prevent automatically closes on os.Interrupt
@@ -154,7 +138,6 @@ func InitMonitor(ctx context.Context) func() {
 	return func() {}
 }
 
-// InitHTTPServer 初始化http服务
 func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 	cfg := config.C.HTTP
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
@@ -193,7 +176,6 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 	}
 }
 
-// Run 运行服务
 func Run(ctx context.Context, opts ...Option) error {
 	state := 1
 	sc := make(chan os.Signal, 1)

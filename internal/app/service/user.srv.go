@@ -16,7 +16,6 @@ import (
 
 var UserSet = wire.NewSet(wire.Struct(new(UserSrv), "*"))
 
-// UserSrv 用户管理
 type UserSrv struct {
 	Enforcer     *casbin.SyncedEnforcer
 	TransRepo    *dao.TransRepo
@@ -25,12 +24,10 @@ type UserSrv struct {
 	RoleRepo     *dao.RoleRepo
 }
 
-// Query 查询数据
 func (a *UserSrv) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
 	return a.UserRepo.Query(ctx, params, opts...)
 }
 
-// QueryShow 查询显示项数据
 func (a *UserSrv) QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error) {
 	result, err := a.UserRepo.Query(ctx, params, opts...)
 	if err != nil {
@@ -56,7 +53,6 @@ func (a *UserSrv) QueryShow(ctx context.Context, params schema.UserQueryParam, o
 	return result.ToShowResult(userRoleResult.Data.ToUserIDMap(), roleResult.Data.ToMap()), nil
 }
 
-// Get 查询指定数据
 func (a *UserSrv) Get(ctx context.Context, id uint64, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	item, err := a.UserRepo.Get(ctx, id, opts...)
 	if err != nil {
@@ -76,7 +72,6 @@ func (a *UserSrv) Get(ctx context.Context, id uint64, opts ...schema.UserQueryOp
 	return item, nil
 }
 
-// Create 创建数据
 func (a *UserSrv) Create(ctx context.Context, item schema.User) (*schema.IDResult, error) {
 	err := a.checkUserName(ctx, item)
 	if err != nil {
@@ -101,7 +96,6 @@ func (a *UserSrv) Create(ctx context.Context, item schema.User) (*schema.IDResul
 		return nil, err
 	}
 
-	// Add user to casbin
 	for _, urItem := range item.UserRoles {
 		a.Enforcer.AddRoleForUser(strconv.FormatUint(urItem.UserID, 10), strconv.FormatUint(urItem.RoleID, 10))
 	}
@@ -111,7 +105,7 @@ func (a *UserSrv) Create(ctx context.Context, item schema.User) (*schema.IDResul
 
 func (a *UserSrv) checkUserName(ctx context.Context, item schema.User) error {
 	if item.UserName == schema.GetRootUser().UserName {
-		return errors.New400Response("用户名不合法")
+		return errors.New400Response("user_name has been exists")
 	}
 
 	result, err := a.UserRepo.Query(ctx, schema.UserQueryParam{
@@ -121,12 +115,11 @@ func (a *UserSrv) checkUserName(ctx context.Context, item schema.User) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.New400Response("用户名已经存在")
+		return errors.New400Response("user_name has been exists")
 	}
 	return nil
 }
 
-// Update 更新数据
 func (a *UserSrv) Update(ctx context.Context, id uint64, item schema.User) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
@@ -174,7 +167,6 @@ func (a *UserSrv) Update(ctx context.Context, id uint64, item schema.User) error
 		return err
 	}
 
-	// Sync update casbin role for user
 	for _, aitem := range addUserRoles {
 		a.Enforcer.AddRoleForUser(strconv.FormatUint(id, 10), strconv.FormatUint(aitem.RoleID, 10))
 	}
@@ -204,7 +196,6 @@ func (a *UserSrv) compareUserRoles(ctx context.Context, oldUserRoles, newUserRol
 	return
 }
 
-// Delete 删除数据
 func (a *UserSrv) Delete(ctx context.Context, id uint64) error {
 	oldItem, err := a.UserRepo.Get(ctx, id)
 	if err != nil {
@@ -229,7 +220,6 @@ func (a *UserSrv) Delete(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// UpdateStatus 更新状态
 func (a *UserSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {

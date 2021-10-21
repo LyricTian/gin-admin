@@ -10,13 +10,11 @@ import (
 	loggergormhook "github.com/LyricTian/gin-admin/v8/pkg/logger/hook/gorm"
 )
 
-// InitLogger 初始化日志模块
 func InitLogger() (func(), error) {
 	c := config.C.Log
 	logger.SetLevel(logger.Level(c.Level))
 	logger.SetFormatter(c.Format)
 
-	// 设定日志输出
 	var file *os.File
 	if c.Output != "" {
 		switch c.Output {

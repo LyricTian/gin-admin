@@ -22,7 +22,7 @@ func wrapUserAuthContext(c *gin.Context, userID uint64, userName string) {
 	c.Request = c.Request.WithContext(ctx)
 }
 
-// UserAuthMiddleware 用户授权中间件
+// Valid user token (jwt)
 func UserAuthMiddleware(a auth.Auther, skippers ...SkipperFunc) gin.HandlerFunc {
 	if !config.C.JWTAuth.Enable {
 		return func(c *gin.Context) {

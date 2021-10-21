@@ -18,12 +18,10 @@ import (
 
 var LoginSet = wire.NewSet(wire.Struct(new(LoginAPI), "*"))
 
-// LoginAPI 登录管理
 type LoginAPI struct {
 	LoginSrv *service.LoginSrv
 }
 
-// GetCaptcha 获取验证码信息
 func (a *LoginAPI) GetCaptcha(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.LoginSrv.GetCaptcha(ctx, config.C.Captcha.Length)
@@ -34,18 +32,17 @@ func (a *LoginAPI) GetCaptcha(c *gin.Context) {
 	ginx.ResSuccess(c, item)
 }
 
-// ResCaptcha 响应图形验证码
 func (a *LoginAPI) ResCaptcha(c *gin.Context) {
 	ctx := c.Request.Context()
 	captchaID := c.Query("id")
 	if captchaID == "" {
-		ginx.ResError(c, errors.New400Response("请提供验证码ID"))
+		ginx.ResError(c, errors.New400Response("captcha id not empty"))
 		return
 	}
 
 	if c.Query("reload") != "" {
 		if !captcha.Reload(captchaID) {
-			ginx.ResError(c, errors.New400Response("未找到验证码ID"))
+			ginx.ResError(c, errors.New400Response("not found captcha id"))
 			return
 		}
 	}
@@ -57,7 +54,6 @@ func (a *LoginAPI) ResCaptcha(c *gin.Context) {
 	}
 }
 
-// Login 用户登录
 func (a *LoginAPI) Login(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.LoginParam
@@ -86,7 +82,7 @@ func (a *LoginAPI) Login(c *gin.Context) {
 	ctx = logger.NewUserIDContext(ctx, user.ID)
 	ctx = logger.NewUserNameContext(ctx, user.UserName)
 	ctx = logger.NewTagContext(ctx, "__login__")
-	logger.WithContext(ctx).Infof("登入系统")
+	logger.WithContext(ctx).Infof("login")
 
 	ginx.ResSuccess(c, tokenInfo)
 }
@@ -95,11 +91,9 @@ func (a *LoginAPI) formatTokenUserID(userID uint64, userName string) string {
 	return fmt.Sprintf("%d-%s", userID, userName)
 }
 
-// Logout 用户登出
 func (a *LoginAPI) Logout(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	// 检查用户是否处于登录状态，如果是则执行销毁
 	userID := contextx.FromUserID(ctx)
 	if userID != 0 {
 		ctx = logger.NewTagContext(ctx, "__logout__")
@@ -107,12 +101,11 @@ func (a *LoginAPI) Logout(c *gin.Context) {
 		if err != nil {
 			logger.WithContext(ctx).Errorf(err.Error())
 		}
-		logger.WithContext(ctx).Infof("登出系统")
+		logger.WithContext(ctx).Infof("logout")
 	}
 	ginx.ResOK(c)
 }
 
-// RefreshToken 刷新令牌
 func (a *LoginAPI) RefreshToken(c *gin.Context) {
 	ctx := c.Request.Context()
 	tokenInfo, err := a.LoginSrv.GenerateToken(ctx, a.formatTokenUserID(contextx.FromUserID(ctx), contextx.FromUserName(ctx)))
@@ -123,7 +116,6 @@ func (a *LoginAPI) RefreshToken(c *gin.Context) {
 	ginx.ResSuccess(c, tokenInfo)
 }
 
-// GetUserInfo 获取当前用户信息
 func (a *LoginAPI) GetUserInfo(c *gin.Context) {
 	ctx := c.Request.Context()
 	info, err := a.LoginSrv.GetLoginInfo(ctx, contextx.FromUserID(ctx))
@@ -134,7 +126,6 @@ func (a *LoginAPI) GetUserInfo(c *gin.Context) {
 	ginx.ResSuccess(c, info)
 }
 
-// QueryUserMenuTree 查询当前用户菜单树
 func (a *LoginAPI) QueryUserMenuTree(c *gin.Context) {
 	ctx := c.Request.Context()
 	menus, err := a.LoginSrv.QueryUserMenuTree(ctx, contextx.FromUserID(ctx))
@@ -145,7 +136,6 @@ func (a *LoginAPI) QueryUserMenuTree(c *gin.Context) {
 	ginx.ResList(c, menus)
 }
 
-// UpdatePassword 更新个人密码
 func (a *LoginAPI) UpdatePassword(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.UpdatePasswordParam

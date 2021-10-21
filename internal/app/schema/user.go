@@ -61,7 +61,8 @@ type UserQueryParam struct {
 
 // UserQueryOptions 查询可选参数项
 type UserQueryOptions struct {
-	OrderFields []*OrderField // 排序字段
+	OrderFields  []*OrderField
+	SelectFields []string
 }
 
 // UserQueryResult 查询结果

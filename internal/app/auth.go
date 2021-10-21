@@ -10,7 +10,6 @@ import (
 	"github.com/LyricTian/gin-admin/v8/pkg/auth/jwtauth/store/redis"
 )
 
-// InitAuth 初始化用户认证
 func InitAuth() (auth.Auther, func(), error) {
 	cfg := config.C.JWTAuth
 

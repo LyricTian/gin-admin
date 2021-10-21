@@ -16,12 +16,10 @@ import (
 
 var UserSet = wire.NewSet(wire.Struct(new(UserAPI), "*"))
 
-// UserAPI 用户管理
 type UserAPI struct {
 	UserSrv *service.UserSrv
 }
 
-// Query 查询数据
 func (a *UserAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.UserQueryParam
@@ -42,7 +40,6 @@ func (a *UserAPI) Query(c *gin.Context) {
 	ginx.ResPage(c, result.Data, result.PageResult)
 }
 
-// Get 查询指定数据
 func (a *UserAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.UserSrv.Get(ctx, ginx.ParseParamID(c, "id"))
@@ -53,7 +50,6 @@ func (a *UserAPI) Get(c *gin.Context) {
 	ginx.ResSuccess(c, item.CleanSecure())
 }
 
-// Create 创建数据
 func (a *UserAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.User
@@ -61,7 +57,7 @@ func (a *UserAPI) Create(c *gin.Context) {
 		ginx.ResError(c, err)
 		return
 	} else if item.Password == "" {
-		ginx.ResError(c, errors.New400Response("密码不能为空"))
+		ginx.ResError(c, errors.New400Response("password not empty"))
 		return
 	}
 
@@ -74,7 +70,6 @@ func (a *UserAPI) Create(c *gin.Context) {
 	ginx.ResSuccess(c, result)
 }
 
-// Update 更新数据
 func (a *UserAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.User
@@ -91,7 +86,6 @@ func (a *UserAPI) Update(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Delete 删除数据
 func (a *UserAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.UserSrv.Delete(ctx, ginx.ParseParamID(c, "id"))
@@ -102,7 +96,6 @@ func (a *UserAPI) Delete(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Enable 启用数据
 func (a *UserAPI) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.UserSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 1)
@@ -113,7 +106,6 @@ func (a *UserAPI) Enable(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-// Disable 禁用数据
 func (a *UserAPI) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.UserSrv.UpdateStatus(ctx, ginx.ParseParamID(c, "id"), 2)

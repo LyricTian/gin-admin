@@ -15,7 +15,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// RateLimiterMiddleware 请求频率限制中间件
+// Request rate limter (per minute)
 func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	cfg := config.C.RateLimiter
 	if !cfg.Enable {

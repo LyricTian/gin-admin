@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CasbinMiddleware casbin中间件
+// Valid use interface permission
 func CasbinMiddleware(enforcer *casbin.SyncedEnforcer, skippers ...SkipperFunc) gin.HandlerFunc {
 	cfg := config.C.Casbin
 	if !cfg.Enable {

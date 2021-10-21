@@ -15,10 +15,8 @@ import (
 
 var _ persist.Adapter = (*CasbinAdapter)(nil)
 
-// CasbinAdapterSet 注入CasbinAdapter
 var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"), wire.Bind(new(persist.Adapter), new(*CasbinAdapter)))
 
-// CasbinAdapter casbin适配器
 type CasbinAdapter struct {
 	RoleRepo         *dao.RoleRepo
 	RoleMenuRepo     *dao.RoleMenuRepo
@@ -27,7 +25,7 @@ type CasbinAdapter struct {
 	UserRoleRepo     *dao.UserRoleRepo
 }
 
-// LoadPolicy loads all policy rules from the storage.
+// Loads all policy rules from the storage.
 func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {
 	ctx := context.Background()
 	err := a.loadRolePolicy(ctx, model)
@@ -45,7 +43,7 @@ func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {
 	return nil
 }
 
-// 加载角色策略(p,role_id,path,method)
+// Load role policy (p,role_id,path,method)
 func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model) error {
 	roleResult, err := a.RoleRepo.Query(ctx, schema.RoleQueryParam{
 		Status: 1,
@@ -91,7 +89,7 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 	return nil
 }
 
-// 加载用户策略(g,user_id,role_id)
+// Load user policy (g,user_id,role_id)
 func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model) error {
 	userResult, err := a.UserRepo.Query(ctx, schema.UserQueryParam{
 		Status: 1,

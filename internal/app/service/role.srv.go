@@ -15,7 +15,6 @@ import (
 
 var RoleSet = wire.NewSet(wire.Struct(new(RoleSrv), "*"))
 
-// RoleSrv 角色管理
 type RoleSrv struct {
 	Enforcer               *casbin.SyncedEnforcer
 	TransRepo              *dao.TransRepo
@@ -25,12 +24,10 @@ type RoleSrv struct {
 	MenuActionResourceRepo *dao.MenuActionResourceRepo
 }
 
-// Query 查询数据
 func (a *RoleSrv) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
 	return a.RoleRepo.Query(ctx, params, opts...)
 }
 
-// Get 查询指定数据
 func (a *RoleSrv) Get(ctx context.Context, id uint64, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	item, err := a.RoleRepo.Get(ctx, id, opts...)
 	if err != nil {
@@ -48,7 +45,6 @@ func (a *RoleSrv) Get(ctx context.Context, id uint64, opts ...schema.RoleQueryOp
 	return item, nil
 }
 
-// QueryRoleMenus 查询角色菜单列表
 func (a *RoleSrv) QueryRoleMenus(ctx context.Context, roleID uint64) (schema.RoleMenus, error) {
 	result, err := a.RoleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
 		RoleID: roleID,
@@ -59,7 +55,6 @@ func (a *RoleSrv) QueryRoleMenus(ctx context.Context, roleID uint64) (schema.Rol
 	return result.Data, nil
 }
 
-// Create 创建数据
 func (a *RoleSrv) Create(ctx context.Context, item schema.Role) (*schema.IDResult, error) {
 	err := a.checkName(ctx, item)
 	if err != nil {
@@ -82,7 +77,6 @@ func (a *RoleSrv) Create(ctx context.Context, item schema.Role) (*schema.IDResul
 		return nil, err
 	}
 
-	// Sync update casbin for role
 	resources, err := a.MenuActionResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{
 		MenuIDs: item.RoleMenus.ToMenuIDs(),
 	})
@@ -109,7 +103,6 @@ func (a *RoleSrv) checkName(ctx context.Context, item schema.Role) error {
 	return nil
 }
 
-// Update 更新数据
 func (a *RoleSrv) Update(ctx context.Context, id uint64, item schema.Role) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
@@ -150,7 +143,6 @@ func (a *RoleSrv) Update(ctx context.Context, id uint64, item schema.Role) error
 		return err
 	}
 
-	// Sync update casbin for role
 	roleMenus, err := a.RoleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
 		RoleID: id,
 	})
@@ -191,7 +183,6 @@ func (a *RoleSrv) compareRoleMenus(ctx context.Context, oldRoleMenus, newRoleMen
 	return
 }
 
-// Delete 删除数据
 func (a *RoleSrv) Delete(ctx context.Context, id uint64) error {
 	oldItem, err := a.RoleRepo.Get(ctx, id)
 	if err != nil {
@@ -227,7 +218,6 @@ func (a *RoleSrv) Delete(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// UpdateStatus 更新状态
 func (a *RoleSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
 	oldItem, err := a.RoleRepo.Get(ctx, id)
 	if err != nil {

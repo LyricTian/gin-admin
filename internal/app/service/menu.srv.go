@@ -17,7 +17,6 @@ import (
 
 var MenuSet = wire.NewSet(wire.Struct(new(MenuSrv), "*"))
 
-// MenuSrv 菜单管理
 type MenuSrv struct {
 	TransRepo              *dao.TransRepo
 	MenuRepo               *dao.MenuRepo
@@ -25,7 +24,6 @@ type MenuSrv struct {
 	MenuActionResourceRepo *dao.MenuActionResourceRepo
 }
 
-// InitData 初始化菜单数据
 func (a *MenuSrv) InitData(ctx context.Context, dataFile string) error {
 	result, err := a.MenuRepo.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
@@ -33,7 +31,6 @@ func (a *MenuSrv) InitData(ctx context.Context, dataFile string) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		// 如果存在则不进行初始化
 		return nil
 	}
 
@@ -93,7 +90,6 @@ func (a *MenuSrv) createMenus(ctx context.Context, parentID uint64, list schema.
 	})
 }
 
-// Query 查询数据
 func (a *MenuSrv) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
 	menuActionResult, err := a.MenuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
 	if err != nil {
@@ -108,7 +104,6 @@ func (a *MenuSrv) Query(ctx context.Context, params schema.MenuQueryParam, opts 
 	return result, nil
 }
 
-// Get 查询指定数据
 func (a *MenuSrv) Get(ctx context.Context, id uint64, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
 	item, err := a.MenuRepo.Get(ctx, id, opts...)
 	if err != nil {
@@ -126,7 +121,6 @@ func (a *MenuSrv) Get(ctx context.Context, id uint64, opts ...schema.MenuQueryOp
 	return item, nil
 }
 
-// QueryActions 查询动作数据
 func (a *MenuSrv) QueryActions(ctx context.Context, id uint64) (schema.MenuActions, error) {
 	result, err := a.MenuActionRepo.Query(ctx, schema.MenuActionQueryParam{
 		MenuID: id,
@@ -165,7 +159,6 @@ func (a *MenuSrv) checkName(ctx context.Context, item schema.Menu) error {
 	return nil
 }
 
-// Create 创建数据
 func (a *MenuSrv) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error) {
 	if err := a.checkName(ctx, item); err != nil {
 		return nil, err
@@ -193,7 +186,6 @@ func (a *MenuSrv) Create(ctx context.Context, item schema.Menu) (*schema.IDResul
 	return schema.NewIDResult(item.ID), nil
 }
 
-// 创建动作数据
 func (a *MenuSrv) createActions(ctx context.Context, menuID uint64, items schema.MenuActions) error {
 	for _, item := range items {
 		item.ID = snowflake.MustID()
@@ -216,7 +208,6 @@ func (a *MenuSrv) createActions(ctx context.Context, menuID uint64, items schema
 	return nil
 }
 
-// 获取父级路径
 func (a *MenuSrv) getParentPath(ctx context.Context, parentID uint64) (string, error) {
 	if parentID == 0 {
 		return "", nil
@@ -240,7 +231,6 @@ func (a *MenuSrv) joinParentPath(parent string, id uint64) string {
 	return fmt.Sprintf("%s%d", parent, id)
 }
 
-// Update 更新数据
 func (a *MenuSrv) Update(ctx context.Context, id uint64, item schema.Menu) error {
 	if id == item.ParentID {
 		return errors.ErrInvalidParent
@@ -286,7 +276,6 @@ func (a *MenuSrv) Update(ctx context.Context, id uint64, item schema.Menu) error
 	})
 }
 
-// 更新动作数据
 func (a *MenuSrv) updateActions(ctx context.Context, menuID uint64, oldItems, newItems schema.MenuActions) error {
 	addActions, delActions, updateActions := a.compareActions(ctx, oldItems, newItems)
 
@@ -310,7 +299,6 @@ func (a *MenuSrv) updateActions(ctx context.Context, menuID uint64, oldItems, ne
 	mOldItems := oldItems.ToMap()
 	for _, item := range updateActions {
 		oitem := mOldItems[item.Code]
-		// 只更新动作名称
 		if item.Name != oitem.Name {
 			oitem.Name = item.Name
 			err := a.MenuActionRepo.Update(ctx, item.ID, *oitem)
@@ -319,7 +307,6 @@ func (a *MenuSrv) updateActions(ctx context.Context, menuID uint64, oldItems, ne
 			}
 		}
 
-		// 计算需要更新的资源配置（只包括新增和删除的，更新的不关心）
 		addResources, delResources := a.compareResources(ctx, oitem.Resources, item.Resources)
 		for _, aritem := range addResources {
 			aritem.ID = snowflake.MustID()
@@ -341,7 +328,6 @@ func (a *MenuSrv) updateActions(ctx context.Context, menuID uint64, oldItems, ne
 	return nil
 }
 
-// 对比动作列表
 func (a *MenuSrv) compareActions(ctx context.Context, oldActions, newActions schema.MenuActions) (addList, delList, updateList schema.MenuActions) {
 	mOldActions := oldActions.ToMap()
 	mNewActions := newActions.ToMap()
@@ -361,7 +347,6 @@ func (a *MenuSrv) compareActions(ctx context.Context, oldActions, newActions sch
 	return
 }
 
-// 对比资源列表
 func (a *MenuSrv) compareResources(ctx context.Context, oldResources, newResources schema.MenuActionResources) (addList, delList schema.MenuActionResources) {
 	mOldResources := oldResources.ToMap()
 	mNewResources := newResources.ToMap()
@@ -380,7 +365,6 @@ func (a *MenuSrv) compareResources(ctx context.Context, oldResources, newResourc
 	return
 }
 
-// 检查并更新下级节点的父级路径
 func (a *MenuSrv) updateChildParentPath(ctx context.Context, oldItem, newItem schema.Menu) error {
 	if oldItem.ParentID == newItem.ParentID {
 		return nil
@@ -404,7 +388,6 @@ func (a *MenuSrv) updateChildParentPath(ctx context.Context, oldItem, newItem sc
 	return nil
 }
 
-// Delete 删除数据
 func (a *MenuSrv) Delete(ctx context.Context, id uint64) error {
 	oldItem, err := a.MenuRepo.Get(ctx, id)
 	if err != nil {
@@ -420,7 +403,7 @@ func (a *MenuSrv) Delete(ctx context.Context, id uint64) error {
 	if err != nil {
 		return err
 	} else if result.PageResult.Total > 0 {
-		return errors.ErrNotAllowDeleteWithChild
+		return errors.New400Response("forbid delete")
 	}
 
 	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
@@ -438,7 +421,6 @@ func (a *MenuSrv) Delete(ctx context.Context, id uint64) error {
 	})
 }
 
-// UpdateStatus 更新状态
 func (a *MenuSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
 	oldItem, err := a.MenuRepo.Get(ctx, id)
 	if err != nil {

@@ -11,7 +11,6 @@ import (
 	"github.com/LyricTian/gin-admin/v8/internal/app/router"
 )
 
-// InitGinEngine 初始化gin引擎
 func InitGinEngine(r router.IRouter) *gin.Engine {
 	gin.SetMode(config.C.RunMode)
 

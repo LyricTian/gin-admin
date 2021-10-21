@@ -9,7 +9,6 @@ import (
 	"github.com/LyricTian/gin-admin/v8/internal/app/config"
 )
 
-// InitCasbin 初始化casbin
 func InitCasbin(adapter persist.Adapter) (*casbin.SyncedEnforcer, func(), error) {
 	cfg := config.C.Casbin
 	if cfg.Model == "" {

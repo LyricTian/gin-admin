@@ -13,7 +13,6 @@ import (
 	"github.com/LyricTian/gin-admin/v8/internal/app/service"
 )
 
-// BuildInjector 生成注入器
 func BuildInjector() (*Injector, func(), error) {
 	wire.Build(
 		InitGormDB,
