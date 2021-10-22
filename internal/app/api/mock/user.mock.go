@@ -10,7 +10,7 @@ var UserSet = wire.NewSet(wire.Struct(new(UserMock), "*"))
 type UserMock struct {
 }
 
-// @Tags 用户管理
+// @Tags UserAPI
 // @Summary 查询数据
 // @Security ApiKeyAuth
 // @Param current query int true "分页索引" default(1)
@@ -25,7 +25,7 @@ type UserMock struct {
 func (a *UserMock) Query(c *gin.Context) {
 }
 
-// @Tags 用户管理
+// @Tags UserAPI
 // @Summary 查询指定数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -36,7 +36,7 @@ func (a *UserMock) Query(c *gin.Context) {
 func (a *UserMock) Get(c *gin.Context) {
 }
 
-// @Tags 用户管理
+// @Tags UserAPI
 // @Summary 创建数据
 // @Security ApiKeyAuth
 // @Param body body schema.User true "创建数据"
@@ -48,7 +48,7 @@ func (a *UserMock) Get(c *gin.Context) {
 func (a *UserMock) Create(c *gin.Context) {
 }
 
-// @Tags 用户管理
+// @Tags UserAPI
 // @Summary 更新数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -61,7 +61,7 @@ func (a *UserMock) Create(c *gin.Context) {
 func (a *UserMock) Update(c *gin.Context) {
 }
 
-// @Tags 用户管理
+// @Tags UserAPI
 // @Summary 删除数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -72,7 +72,7 @@ func (a *UserMock) Update(c *gin.Context) {
 func (a *UserMock) Delete(c *gin.Context) {
 }
 
-// @Tags 用户管理
+// @Tags UserAPI
 // @Summary 启用数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -83,7 +83,7 @@ func (a *UserMock) Delete(c *gin.Context) {
 func (a *UserMock) Enable(c *gin.Context) {
 }
 
-// @Tags 用户管理
+// @Tags UserAPI
 // @Summary 禁用数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"

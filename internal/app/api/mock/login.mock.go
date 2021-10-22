@@ -10,14 +10,14 @@ var LoginSet = wire.NewSet(wire.Struct(new(LoginMock), "*"))
 type LoginMock struct {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 获取验证码信息
 // @Success 200 {object} schema.LoginCaptcha
 // @Router /api/v1/pub/login/captchaid [get]
 func (a *LoginMock) GetCaptcha(c *gin.Context) {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 响应图形验证码
 // @Param id query string true "验证码ID"
 // @Param reload query string false "重新加载"
@@ -29,7 +29,7 @@ func (a *LoginMock) GetCaptcha(c *gin.Context) {
 func (a *LoginMock) ResCaptcha(c *gin.Context) {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 用户登录
 // @Param body body schema.LoginParam true "请求参数"
 // @Success 200 {object} schema.LoginTokenInfo
@@ -39,14 +39,14 @@ func (a *LoginMock) ResCaptcha(c *gin.Context) {
 func (a *LoginMock) Login(c *gin.Context) {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 用户登出
 // @Success 200 {object} schema.StatusResult "{status:OK}"
 // @Router /api/v1/pub/login/exit [post]
 func (a *LoginMock) Logout(c *gin.Context) {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 刷新令牌
 // @Security ApiKeyAuth
 // @Success 200 {object} schema.LoginTokenInfo
@@ -56,7 +56,7 @@ func (a *LoginMock) Logout(c *gin.Context) {
 func (a *LoginMock) RefreshToken(c *gin.Context) {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 获取当前用户信息
 // @Security ApiKeyAuth
 // @Success 200 {object} schema.UserLoginInfo
@@ -66,7 +66,7 @@ func (a *LoginMock) RefreshToken(c *gin.Context) {
 func (a *LoginMock) GetUserInfo(c *gin.Context) {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 查询当前用户菜单树
 // @Security ApiKeyAuth
 // @Success 200 {object} schema.ListResult{list=[]schema.MenuTree} "查询结果"
@@ -76,7 +76,7 @@ func (a *LoginMock) GetUserInfo(c *gin.Context) {
 func (a *LoginMock) QueryUserMenuTree(c *gin.Context) {
 }
 
-// @Tags 登录管理
+// @Tags LoginAPI
 // @Summary 更新个人密码
 // @Security ApiKeyAuth
 // @Param body body schema.UpdatePasswordParam true "请求参数"

@@ -10,7 +10,7 @@ var RoleSet = wire.NewSet(wire.Struct(new(RoleMock), "*"))
 type RoleMock struct {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 查询数据
 // @Security ApiKeyAuth
 // @Param current query int true "分页索引" default(1)
@@ -24,7 +24,7 @@ type RoleMock struct {
 func (a *RoleMock) Query(c *gin.Context) {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 查询选择数据
 // @Security ApiKeyAuth
 // @Param queryValue query string false "查询值"
@@ -36,7 +36,7 @@ func (a *RoleMock) Query(c *gin.Context) {
 func (a *RoleMock) QuerySelect(c *gin.Context) {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 查询指定数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -48,7 +48,7 @@ func (a *RoleMock) QuerySelect(c *gin.Context) {
 func (a *RoleMock) Get(c *gin.Context) {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 创建数据
 // @Security ApiKeyAuth
 // @Param body body schema.Role true "创建数据"
@@ -60,7 +60,7 @@ func (a *RoleMock) Get(c *gin.Context) {
 func (a *RoleMock) Create(c *gin.Context) {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 更新数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -73,7 +73,7 @@ func (a *RoleMock) Create(c *gin.Context) {
 func (a *RoleMock) Update(c *gin.Context) {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 删除数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -84,7 +84,7 @@ func (a *RoleMock) Update(c *gin.Context) {
 func (a *RoleMock) Delete(c *gin.Context) {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 启用数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -95,7 +95,7 @@ func (a *RoleMock) Delete(c *gin.Context) {
 func (a *RoleMock) Enable(c *gin.Context) {
 }
 
-// @Tags 角色管理
+// @Tags RoleAPI
 // @Summary 禁用数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"

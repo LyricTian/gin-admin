@@ -9,7 +9,7 @@ var MenuSet = wire.NewSet(wire.Struct(new(MenuMock), "*"))
 
 type MenuMock struct{}
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 查询数据
 // @Security ApiKeyAuth
 // @Param current query int true "分页索引" default(1)
@@ -26,7 +26,7 @@ type MenuMock struct{}
 func (a *MenuMock) Query(c *gin.Context) {
 }
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 查询菜单树
 // @Security ApiKeyAuth
 // @Param status query int false "状态(1:启用 2:禁用)"
@@ -38,7 +38,7 @@ func (a *MenuMock) Query(c *gin.Context) {
 func (a *MenuMock) QueryTree(c *gin.Context) {
 }
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 查询指定数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -49,7 +49,7 @@ func (a *MenuMock) QueryTree(c *gin.Context) {
 func (a *MenuMock) Get(c *gin.Context) {
 }
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 创建数据
 // @Security ApiKeyAuth
 // @Param body body schema.Menu true "创建数据"
@@ -61,7 +61,7 @@ func (a *MenuMock) Get(c *gin.Context) {
 func (a *MenuMock) Create(c *gin.Context) {
 }
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 更新数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -74,7 +74,7 @@ func (a *MenuMock) Create(c *gin.Context) {
 func (a *MenuMock) Update(c *gin.Context) {
 }
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 删除数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -85,7 +85,7 @@ func (a *MenuMock) Update(c *gin.Context) {
 func (a *MenuMock) Delete(c *gin.Context) {
 }
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 启用数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"
@@ -96,7 +96,7 @@ func (a *MenuMock) Delete(c *gin.Context) {
 func (a *MenuMock) Enable(c *gin.Context) {
 }
 
-// @Tags 菜单管理
+// @Tags MenuAPI
 // @Summary 禁用数据
 // @Security ApiKeyAuth
 // @Param id path int true "唯一标识"

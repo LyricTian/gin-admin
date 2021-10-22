@@ -16,12 +16,12 @@ import (
 )
 
 const (
-	prefix           = "gin-admin"
-	ReqBodyKey       = prefix + "/req-body"
-	ResBodyKey       = prefix + "/res-body"
-	LoggerReqBodyKey = prefix + "/logger-req-body"
+	prefix     = "gin-admin"
+	ReqBodyKey = prefix + "/req-body"
+	ResBodyKey = prefix + "/res-body"
 )
 
+// Get jwt token from header (Authorization: Bearer xxx)
 func GetToken(c *gin.Context) string {
 	var token string
 	auth := c.GetHeader("Authorization")
@@ -32,6 +32,17 @@ func GetToken(c *gin.Context) string {
 	return token
 }
 
+// Get body data from context
+func GetBodyData(c *gin.Context) []byte {
+	if v, ok := c.Get(ReqBodyKey); ok {
+		if b, ok := v.([]byte); ok {
+			return b
+		}
+	}
+	return nil
+}
+
+// Param returns the value of the URL param
 func ParseParamID(c *gin.Context, key string) uint64 {
 	val := c.Param(key)
 	id, err := strconv.ParseUint(val, 10, 64)
@@ -41,15 +52,7 @@ func ParseParamID(c *gin.Context, key string) uint64 {
 	return id
 }
 
-func GetBody(c *gin.Context) []byte {
-	if v, ok := c.Get(ReqBodyKey); ok {
-		if b, ok := v.([]byte); ok {
-			return b
-		}
-	}
-	return nil
-}
-
+// Parse body json data to struct
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
 		return errors.Wrap400Response(err, fmt.Sprintf("Parse request json failed: %s", err.Error()))
@@ -57,6 +60,7 @@ func ParseJSON(c *gin.Context, obj interface{}) error {
 	return nil
 }
 
+// Parse query parameter to struct
 func ParseQuery(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindQuery(obj); err != nil {
 		return errors.Wrap400Response(err, fmt.Sprintf("Parse request query failed: %s", err.Error()))
@@ -64,6 +68,7 @@ func ParseQuery(c *gin.Context, obj interface{}) error {
 	return nil
 }
 
+// Parse body form data to struct
 func ParseForm(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindWith(obj, binding.Form); err != nil {
 		return errors.Wrap400Response(err, fmt.Sprintf("Parse request form failed: %s", err.Error()))
@@ -71,14 +76,17 @@ func ParseForm(c *gin.Context, obj interface{}) error {
 	return nil
 }
 
+// Response success with status ok
 func ResOK(c *gin.Context) {
 	ResSuccess(c, schema.StatusResult{Status: schema.OKStatus})
 }
 
+// Response data with list object
 func ResList(c *gin.Context, v interface{}) {
 	ResSuccess(c, schema.ListResult{List: v})
 }
 
+// Response pagination data object
 func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
 	list := schema.ListResult{
 		List:       v,
@@ -87,10 +95,12 @@ func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
 	ResSuccess(c, list)
 }
 
+// Response data object
 func ResSuccess(c *gin.Context, v interface{}) {
 	ResJSON(c, http.StatusOK, v)
 }
 
+// Response json data with status code
 func ResJSON(c *gin.Context, status int, v interface{}) {
 	buf, err := json.Marshal(v)
 	if err != nil {
@@ -102,6 +112,7 @@ func ResJSON(c *gin.Context, status int, v interface{}) {
 	c.Abort()
 }
 
+// Response error object and parse error status code
 func ResError(c *gin.Context, err error, status ...int) {
 	ctx := c.Request.Context()
 	var res *errors.ResponseError

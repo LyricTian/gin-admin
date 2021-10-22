@@ -13,16 +13,16 @@ const (
 )
 
 type StatusResult struct {
-	Status StatusText `json:"status"` // 状态(OK)
+	Status StatusText `json:"status"`
 }
 
 type ErrorResult struct {
-	Error ErrorItem `json:"error"` // 错误项
+	Error ErrorItem `json:"error"`
 }
 
 type ErrorItem struct {
-	Code    int    `json:"code"`    // 错误码
-	Message string `json:"message"` // 错误信息
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 type ListResult struct {
@@ -37,10 +37,10 @@ type PaginationResult struct {
 }
 
 type PaginationParam struct {
-	Pagination bool `form:"-"`                                     // 是否使用分页查询
-	OnlyCount  bool `form:"-"`                                     // 是否仅查询count
-	Current    int  `form:"current,default=1"`                     // 当前页
-	PageSize   int  `form:"pageSize,default=10" binding:"max=100"` // 页大小
+	Pagination bool `form:"-"`
+	OnlyCount  bool `form:"-"`
+	Current    int  `form:"current,default=1"`
+	PageSize   int  `form:"pageSize,default=10" binding:"max=100"`
 }
 
 func (a PaginationParam) GetCurrent() int {
@@ -94,8 +94,8 @@ func NewOrderField(key string, d OrderDirection) *OrderField {
 }
 
 type OrderField struct {
-	Key       string         // 字段名(字段名约束为小写蛇形)
-	Direction OrderDirection // 排序方向
+	Key       string
+	Direction OrderDirection
 }
 
 func NewIDResult(id uint64) *IDResult {
