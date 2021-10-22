@@ -23,7 +23,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "查询数据",
                 "parameters": [
@@ -117,7 +117,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "创建数据",
                 "parameters": [
@@ -167,7 +167,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "查询菜单树",
                 "parameters": [
@@ -229,7 +229,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
@@ -269,7 +269,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "更新数据",
                 "parameters": [
@@ -324,7 +324,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "删除数据",
                 "parameters": [
@@ -366,7 +366,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -408,7 +408,7 @@
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -450,7 +450,7 @@
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "查询当前用户菜单树",
                 "responses": {
@@ -498,7 +498,7 @@
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "更新个人密码",
                 "parameters": [
@@ -542,7 +542,7 @@
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "获取当前用户信息",
                 "responses": {
@@ -570,7 +570,7 @@
         "/api/v1/pub/login": {
             "post": {
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "用户登录",
                 "parameters": [
@@ -612,7 +612,7 @@
                     "image/png"
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "响应图形验证码",
                 "parameters": [
@@ -652,7 +652,7 @@
         "/api/v1/pub/login/captchaid": {
             "get": {
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "获取验证码信息",
                 "responses": {
@@ -668,7 +668,7 @@
         "/api/v1/pub/login/exit": {
             "post": {
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "用户登出",
                 "responses": {
@@ -689,7 +689,7 @@
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "刷新令牌",
                 "responses": {
@@ -722,7 +722,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "查询数据",
                 "parameters": [
@@ -798,7 +798,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "创建数据",
                 "parameters": [
@@ -848,7 +848,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "查询选择数据",
                 "parameters": [
@@ -910,7 +910,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
@@ -956,7 +956,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "更新数据",
                 "parameters": [
@@ -1011,7 +1011,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "删除数据",
                 "parameters": [
@@ -1053,7 +1053,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -1095,7 +1095,7 @@
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -1137,7 +1137,7 @@
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "查询数据",
                 "parameters": [
@@ -1219,7 +1219,7 @@
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "创建数据",
                 "parameters": [
@@ -1269,7 +1269,7 @@
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
@@ -1309,7 +1309,7 @@
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "更新数据",
                 "parameters": [
@@ -1364,7 +1364,7 @@
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "删除数据",
                 "parameters": [
@@ -1406,7 +1406,7 @@
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -1448,7 +1448,7 @@
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -1488,11 +1488,9 @@
             "type": "object",
             "properties": {
                 "code": {
-                    "description": "错误码",
                     "type": "integer"
                 },
                 "message": {
-                    "description": "错误信息",
                     "type": "string"
                 }
             }
@@ -1501,7 +1499,6 @@
             "type": "object",
             "properties": {
                 "error": {
-                    "description": "错误项",
                     "$ref": "#/definitions/schema.ErrorItem"
                 }
             }
@@ -1570,7 +1567,7 @@
                     "type": "string"
                 },
                 "expires_at": {
-                    "description": "令牌到期时间戳",
+                    "description": "过期时间戳",
                     "type": "integer"
                 },
                 "token_type": {
@@ -1867,7 +1864,6 @@
             "type": "object",
             "properties": {
                 "status": {
-                    "description": "状态(OK)",
                     "type": "string"
                 }
             }

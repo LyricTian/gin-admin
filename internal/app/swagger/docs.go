@@ -35,7 +35,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "查询数据",
                 "parameters": [
@@ -129,7 +129,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "创建数据",
                 "parameters": [
@@ -179,7 +179,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "查询菜单树",
                 "parameters": [
@@ -241,7 +241,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
@@ -281,7 +281,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "更新数据",
                 "parameters": [
@@ -336,7 +336,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "删除数据",
                 "parameters": [
@@ -378,7 +378,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -420,7 +420,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "菜单管理"
+                    "MenuAPI"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -462,7 +462,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "查询当前用户菜单树",
                 "responses": {
@@ -510,7 +510,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "更新个人密码",
                 "parameters": [
@@ -554,7 +554,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "获取当前用户信息",
                 "responses": {
@@ -582,7 +582,7 @@ var doc = `{
         "/api/v1/pub/login": {
             "post": {
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "用户登录",
                 "parameters": [
@@ -624,7 +624,7 @@ var doc = `{
                     "image/png"
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "响应图形验证码",
                 "parameters": [
@@ -664,7 +664,7 @@ var doc = `{
         "/api/v1/pub/login/captchaid": {
             "get": {
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "获取验证码信息",
                 "responses": {
@@ -680,7 +680,7 @@ var doc = `{
         "/api/v1/pub/login/exit": {
             "post": {
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "用户登出",
                 "responses": {
@@ -701,7 +701,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "登录管理"
+                    "LoginAPI"
                 ],
                 "summary": "刷新令牌",
                 "responses": {
@@ -734,7 +734,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "查询数据",
                 "parameters": [
@@ -810,7 +810,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "创建数据",
                 "parameters": [
@@ -860,7 +860,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "查询选择数据",
                 "parameters": [
@@ -922,7 +922,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
@@ -968,7 +968,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "更新数据",
                 "parameters": [
@@ -1023,7 +1023,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "删除数据",
                 "parameters": [
@@ -1065,7 +1065,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -1107,7 +1107,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "角色管理"
+                    "RoleAPI"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -1149,7 +1149,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "查询数据",
                 "parameters": [
@@ -1231,7 +1231,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "创建数据",
                 "parameters": [
@@ -1281,7 +1281,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "查询指定数据",
                 "parameters": [
@@ -1321,7 +1321,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "更新数据",
                 "parameters": [
@@ -1376,7 +1376,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "删除数据",
                 "parameters": [
@@ -1418,7 +1418,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "禁用数据",
                 "parameters": [
@@ -1460,7 +1460,7 @@ var doc = `{
                     }
                 ],
                 "tags": [
-                    "用户管理"
+                    "UserAPI"
                 ],
                 "summary": "启用数据",
                 "parameters": [
@@ -1500,11 +1500,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "description": "错误码",
                     "type": "integer"
                 },
                 "message": {
-                    "description": "错误信息",
                     "type": "string"
                 }
             }
@@ -1513,7 +1511,6 @@ var doc = `{
             "type": "object",
             "properties": {
                 "error": {
-                    "description": "错误项",
                     "$ref": "#/definitions/schema.ErrorItem"
                 }
             }
@@ -1582,7 +1579,7 @@ var doc = `{
                     "type": "string"
                 },
                 "expires_at": {
-                    "description": "令牌到期时间戳",
+                    "description": "过期时间戳",
                     "type": "integer"
                 },
                 "token_type": {
@@ -1879,7 +1876,6 @@ var doc = `{
             "type": "object",
             "properties": {
                 "status": {
-                    "description": "状态(OK)",
                     "type": "string"
                 }
             }

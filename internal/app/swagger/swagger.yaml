@@ -3,17 +3,14 @@ definitions:
   schema.ErrorItem:
     properties:
       code:
-        description: 错误码
         type: integer
       message:
-        description: 错误信息
         type: string
     type: object
   schema.ErrorResult:
     properties:
       error:
         $ref: '#/definitions/schema.ErrorItem'
-        description: 错误项
     type: object
   schema.IDResult:
     properties:
@@ -60,7 +57,7 @@ definitions:
         description: 访问令牌
         type: string
       expires_at:
-        description: 令牌到期时间戳
+        description: 过期时间戳
         type: integer
       token_type:
         description: 令牌类型
@@ -279,7 +276,6 @@ definitions:
   schema.StatusResult:
     properties:
       status:
-        description: 状态(OK)
         type: string
     type: object
   schema.UpdatePasswordParam:
@@ -465,7 +461,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询数据
       tags:
-      - 菜单管理
+      - MenuAPI
     post:
       parameters:
       - description: 创建数据
@@ -495,7 +491,7 @@ paths:
       - ApiKeyAuth: []
       summary: 创建数据
       tags:
-      - 菜单管理
+      - MenuAPI
   /api/v1/menus.tree:
     get:
       parameters:
@@ -531,7 +527,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询菜单树
       tags:
-      - 菜单管理
+      - MenuAPI
   /api/v1/menus/{id}:
     delete:
       parameters:
@@ -557,7 +553,7 @@ paths:
       - ApiKeyAuth: []
       summary: 删除数据
       tags:
-      - 菜单管理
+      - MenuAPI
     get:
       parameters:
       - description: 唯一标识
@@ -582,7 +578,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询指定数据
       tags:
-      - 菜单管理
+      - MenuAPI
     put:
       parameters:
       - description: 唯一标识
@@ -617,7 +613,7 @@ paths:
       - ApiKeyAuth: []
       summary: 更新数据
       tags:
-      - 菜单管理
+      - MenuAPI
   /api/v1/menus/{id}/disable:
     patch:
       parameters:
@@ -643,7 +639,7 @@ paths:
       - ApiKeyAuth: []
       summary: 禁用数据
       tags:
-      - 菜单管理
+      - MenuAPI
   /api/v1/menus/{id}/enable:
     patch:
       parameters:
@@ -669,7 +665,7 @@ paths:
       - ApiKeyAuth: []
       summary: 启用数据
       tags:
-      - 菜单管理
+      - MenuAPI
   /api/v1/pub/current/menutree:
     get:
       responses:
@@ -696,7 +692,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询当前用户菜单树
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/pub/current/password:
     put:
       parameters:
@@ -723,7 +719,7 @@ paths:
       - ApiKeyAuth: []
       summary: 更新个人密码
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/pub/current/user:
     get:
       responses:
@@ -743,7 +739,7 @@ paths:
       - ApiKeyAuth: []
       summary: 获取当前用户信息
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/pub/login:
     post:
       parameters:
@@ -768,7 +764,7 @@ paths:
             $ref: '#/definitions/schema.ErrorResult'
       summary: 用户登录
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/pub/login/captcha:
     get:
       parameters:
@@ -796,7 +792,7 @@ paths:
             $ref: '#/definitions/schema.ErrorResult'
       summary: 响应图形验证码
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/pub/login/captchaid:
     get:
       responses:
@@ -806,7 +802,7 @@ paths:
             $ref: '#/definitions/schema.LoginCaptcha'
       summary: 获取验证码信息
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/pub/login/exit:
     post:
       responses:
@@ -816,7 +812,7 @@ paths:
             $ref: '#/definitions/schema.StatusResult'
       summary: 用户登出
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/pub/refresh-token:
     post:
       responses:
@@ -836,7 +832,7 @@ paths:
       - ApiKeyAuth: []
       summary: 刷新令牌
       tags:
-      - 登录管理
+      - LoginAPI
   /api/v1/roles:
     get:
       parameters:
@@ -884,7 +880,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询数据
       tags:
-      - 角色管理
+      - RoleAPI
     post:
       parameters:
       - description: 创建数据
@@ -914,7 +910,7 @@ paths:
       - ApiKeyAuth: []
       summary: 创建数据
       tags:
-      - 角色管理
+      - RoleAPI
   /api/v1/roles.select:
     get:
       parameters:
@@ -950,7 +946,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询选择数据
       tags:
-      - 角色管理
+      - RoleAPI
   /api/v1/roles/{id}:
     delete:
       parameters:
@@ -976,7 +972,7 @@ paths:
       - ApiKeyAuth: []
       summary: 删除数据
       tags:
-      - 角色管理
+      - RoleAPI
     get:
       parameters:
       - description: 唯一标识
@@ -1005,7 +1001,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询指定数据
       tags:
-      - 角色管理
+      - RoleAPI
     put:
       parameters:
       - description: 唯一标识
@@ -1040,7 +1036,7 @@ paths:
       - ApiKeyAuth: []
       summary: 更新数据
       tags:
-      - 角色管理
+      - RoleAPI
   /api/v1/roles/{id}/disable:
     patch:
       parameters:
@@ -1066,7 +1062,7 @@ paths:
       - ApiKeyAuth: []
       summary: 禁用数据
       tags:
-      - 角色管理
+      - RoleAPI
   /api/v1/roles/{id}/enable:
     patch:
       parameters:
@@ -1092,7 +1088,7 @@ paths:
       - ApiKeyAuth: []
       summary: 启用数据
       tags:
-      - 角色管理
+      - RoleAPI
   /api/v1/users:
     get:
       parameters:
@@ -1144,7 +1140,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询数据
       tags:
-      - 用户管理
+      - UserAPI
     post:
       parameters:
       - description: 创建数据
@@ -1174,7 +1170,7 @@ paths:
       - ApiKeyAuth: []
       summary: 创建数据
       tags:
-      - 用户管理
+      - UserAPI
   /api/v1/users/{id}:
     delete:
       parameters:
@@ -1200,7 +1196,7 @@ paths:
       - ApiKeyAuth: []
       summary: 删除数据
       tags:
-      - 用户管理
+      - UserAPI
     get:
       parameters:
       - description: 唯一标识
@@ -1225,7 +1221,7 @@ paths:
       - ApiKeyAuth: []
       summary: 查询指定数据
       tags:
-      - 用户管理
+      - UserAPI
     put:
       parameters:
       - description: 唯一标识
@@ -1260,7 +1256,7 @@ paths:
       - ApiKeyAuth: []
       summary: 更新数据
       tags:
-      - 用户管理
+      - UserAPI
   /api/v1/users/{id}/disable:
     patch:
       parameters:
@@ -1286,7 +1282,7 @@ paths:
       - ApiKeyAuth: []
       summary: 禁用数据
       tags:
-      - 用户管理
+      - UserAPI
   /api/v1/users/{id}/enable:
     patch:
       parameters:
@@ -1312,7 +1308,7 @@ paths:
       - ApiKeyAuth: []
       summary: 启用数据
       tags:
-      - 用户管理
+      - UserAPI
 schemes:
 - http
 - https
