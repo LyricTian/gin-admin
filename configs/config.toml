@@ -63,6 +63,10 @@ Hook = "gorm"
 HookMaxThread = 1
 # 写入钩子的最大缓冲区数量
 HookMaxBuffer = 512
+# 日志轮询数量
+RotationCount = 20
+# 日志轮询时间周期
+RotationTime = 24
 
 [LogGormHook]
 # 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
