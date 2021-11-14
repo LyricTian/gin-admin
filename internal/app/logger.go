@@ -28,7 +28,7 @@ func InitLogger() (func(), error) {
 		case "file":
 			if name := c.OutputFile; name != "" {
 				_ = os.MkdirAll(filepath.Dir(name), 0777)
-
+				
 				f, err := rotatelogs.New(name+".%Y-%m-%d",
 					rotatelogs.WithLinkName(name),
 					rotatelogs.WithRotationTime(time.Duration(c.RotationTime)*time.Hour),
@@ -36,8 +36,9 @@ func InitLogger() (func(), error) {
 				if err != nil {
 					return nil, err
 				}
+				
 				logger.SetOutput(f)
-				//file = f
+				file = f
 			}
 		}
 	}
