@@ -3,11 +3,14 @@ package app
 import (
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/LyricTian/gin-admin/v8/internal/app/config"
 	"github.com/LyricTian/gin-admin/v8/pkg/logger"
 	loggerhook "github.com/LyricTian/gin-admin/v8/pkg/logger/hook"
 	loggergormhook "github.com/LyricTian/gin-admin/v8/pkg/logger/hook/gorm"
+
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 )
 
 func InitLogger() (func(), error) {
@@ -15,7 +18,7 @@ func InitLogger() (func(), error) {
 	logger.SetLevel(logger.Level(c.Level))
 	logger.SetFormatter(c.Format)
 
-	var file *os.File
+	var file *rotatelogs.RotateLogs
 	if c.Output != "" {
 		switch c.Output {
 		case "stdout":
@@ -25,11 +28,15 @@ func InitLogger() (func(), error) {
 		case "file":
 			if name := c.OutputFile; name != "" {
 				_ = os.MkdirAll(filepath.Dir(name), 0777)
-
-				f, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
+				
+				f, err := rotatelogs.New(name+".%Y-%m-%d",
+					rotatelogs.WithLinkName(name),
+					rotatelogs.WithRotationTime(time.Duration(c.RotationTime)*time.Hour),
+					rotatelogs.WithRotationCount(uint(c.RotationCount)))
 				if err != nil {
 					return nil, err
 				}
+				
 				logger.SetOutput(f)
 				file = f
 			}

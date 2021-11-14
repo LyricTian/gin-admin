@@ -29,6 +29,8 @@ require (
 	github.com/jinzhu/copier v0.3.2
 	github.com/json-iterator/go v1.1.11
 	github.com/koding/multiconfig v0.0.0-20171124222453-69c27309b2d7
+	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8 // indirect

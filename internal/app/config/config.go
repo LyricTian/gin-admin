@@ -113,6 +113,8 @@ type Log struct {
 	Hook          LogHook
 	HookMaxThread int
 	HookMaxBuffer int
+	RotationCount int
+	RotationTime  int
 }
 
 type LogGormHook struct {
