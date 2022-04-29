@@ -12,11 +12,11 @@
 *.out
 
 *.DS_Store
-/cmd/gin-admin/gin-admin
-/cmd/gin-admin/data
+/cmd/ginadmin/ginadmin
+/cmd/ginadmin/data
 /release
 /data
-/internal/app/test/data
+/internal/test/data
 /tmp
 /vendor
 
