@@ -7,16 +7,25 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Logger Logrus
-type Logger = logrus.Logger
+// Define logrus alias
+var (
+	SetOutput       = logrus.SetOutput
+	SetReportCaller = logrus.SetReportCaller
+	StandardLogger  = logrus.StandardLogger
+	ParseLevel      = logrus.ParseLevel
+)
 
-// Entry logrus.Entry alias
-type Entry = logrus.Entry
+type (
+	traceIDKey struct{}
+	userIDKey  struct{}
+	tagKey     struct{}
+	stackKey   struct{}
 
-// Hook logrus.Hook alias
-type Hook = logrus.Hook
-
-type Level = logrus.Level
+	Logger = logrus.Logger
+	Entry  = logrus.Entry
+	Hook   = logrus.Hook
+	Level  = logrus.Level
+)
 
 // Define logger level
 const (
@@ -29,12 +38,12 @@ const (
 	TraceLevel
 )
 
-// SetLevel Set logger level
+// Set logger level
 func SetLevel(level Level) {
 	logrus.SetLevel(level)
 }
 
-// SetFormatter Set logger output format (json/text)
+// Set logger output format (json/text)
 func SetFormatter(format string) {
 	switch format {
 	case "json":
@@ -44,27 +53,10 @@ func SetFormatter(format string) {
 	}
 }
 
-// AddHook Add logger hook
+// Add logger hook
 func AddHook(hook Hook) {
 	logrus.AddHook(hook)
 }
-
-// Define key
-const (
-	TraceIDKey  = "trace_id"
-	UserIDKey   = "user_id"
-	UserNameKey = "user_name"
-	TagKey      = "tag"
-	StackKey    = "stack"
-)
-
-type (
-	traceIDKey  struct{}
-	userIDKey   struct{}
-	userNameKey struct{}
-	tagKey      struct{}
-	stackKey    struct{}
-)
 
 func NewTraceIDContext(ctx context.Context, traceID string) context.Context {
 	return context.WithValue(ctx, traceIDKey{}, traceID)
@@ -80,26 +72,12 @@ func FromTraceIDContext(ctx context.Context) string {
 	return ""
 }
 
-func NewUserIDContext(ctx context.Context, userID uint64) context.Context {
+func NewUserIDContext(ctx context.Context, userID string) context.Context {
 	return context.WithValue(ctx, userIDKey{}, userID)
 }
 
-func FromUserIDContext(ctx context.Context) uint64 {
+func FromUserIDContext(ctx context.Context) string {
 	v := ctx.Value(userIDKey{})
-	if v != nil {
-		if s, ok := v.(uint64); ok {
-			return s
-		}
-	}
-	return 0
-}
-
-func NewUserNameContext(ctx context.Context, userName string) context.Context {
-	return context.WithValue(ctx, userNameKey{}, userName)
-}
-
-func FromUserNameContext(ctx context.Context) string {
-	v := ctx.Value(userNameKey{})
 	if v != nil {
 		if s, ok := v.(string); ok {
 			return s
@@ -136,45 +114,22 @@ func FromStackContext(ctx context.Context) error {
 	return nil
 }
 
-// WithContext Use context create entry
+// Use context create entry
 func WithContext(ctx context.Context) *Entry {
 	fields := logrus.Fields{}
 
 	if v := FromTraceIDContext(ctx); v != "" {
-		fields[TraceIDKey] = v
+		fields["trace_id"] = v
 	}
-
-	if v := FromUserIDContext(ctx); v != 0 {
-		fields[UserIDKey] = v
+	if v := FromUserIDContext(ctx); v != "" {
+		fields["user_id"] = v
 	}
-
-	if v := FromUserNameContext(ctx); v != "" {
-		fields[UserNameKey] = v
-	}
-
 	if v := FromTagContext(ctx); v != "" {
-		fields[TagKey] = v
+		fields["tag"] = v
 	}
-
 	if v := FromStackContext(ctx); v != nil {
-		fields[StackKey] = fmt.Sprintf("%+v", v)
+		fields["stack"] = fmt.Sprintf("%+v", v)
 	}
 
 	return logrus.WithContext(ctx).WithFields(fields)
 }
-
-// Define logrus alias
-var (
-	Tracef          = logrus.Tracef
-	Debugf          = logrus.Debugf
-	Infof           = logrus.Infof
-	Warnf           = logrus.Warnf
-	Errorf          = logrus.Errorf
-	Fatalf          = logrus.Fatalf
-	Panicf          = logrus.Panicf
-	Printf          = logrus.Printf
-	SetOutput       = logrus.SetOutput
-	SetReportCaller = logrus.SetReportCaller
-	StandardLogger  = logrus.StandardLogger
-	ParseLevel      = logrus.ParseLevel
-)

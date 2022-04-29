@@ -1,216 +1,106 @@
-# 运行模式(debug:调试,test:测试,release:正式)
-RunMode = "debug"
-
-# 静态站点目录(也可以启动服务时使用-www指定)
-WWW = ""
-
-# 是否启用swagger
-Swagger = true
-
-# 启动时是否打印配置参数
-PrintConfig = true
+PrintConfig = true 
+RunMode = "debug" # debug/test/release
+Swagger = true 
 
 [HTTP]
-# http监听地址
-Host = "0.0.0.0"
-# http监听端口
-Port = 10088
-# 证书路径
 CertFile = ""
-# 证书密钥
+Host = "0.0.0.0"
 KeyFile = ""
-# http优雅关闭等待超时时长(单位秒)
-ShutdownTimeout = 30
-# 允许的最大内容长度(64M)
-MaxContentLength = 67108864
-# 允许输出的最大请求日志长度
+MaxContentLength = 1024
 MaxReqLoggerLength = 1024
-
-[Menu]
-# 使用启用初始化菜单数据
-Enable = true
-# 数据文件(yaml,也可以启动服务时使用 -menu 指定)
-Data = ""
+Port = 8080
+ShutdownTimeout = 30
 
 [Casbin]
-# 是否启用casbin
-Enable = true
-# debug模式
 Debug = false
-# 模型配置文件(也可以启动服务时使用-m指定)
-Model = ""
-# 是否启用定期自动加载策略
-AutoLoad = false
-# 定期自动加载策略时间间隔（单位秒）
-AutoLoadInternal = 60
+Enable = false
+
+[CORS]
+AllowCredentials = true
+AllowHeaders = ["*"]
+AllowMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+AllowOrigins = ["*"]
+Enable = true
+MaxAge = 7200
 
 [Log]
-# 日志级别(1:fatal 2:error,3:warn,4:info,5:debug,6:trace)
-Level = 5
-# 日志格式（支持输出格式：text/json）
-Format = "text"
-# 日志输出(支持：stdout/stderr/file)
-Output = "stdout"
-# 指定日志输出的文件路径
-OutputFile = "data/gin-admin.log"
-# 是否启用日志钩子
-EnableHook = false
-# 写入钩子的日志级别
-HookLevels = ["info", "warn", "error"]
-# 日志钩子(支持：gorm/mongo)
-Hook = "gorm"
-# 写入钩子的最大工作线程数量
-HookMaxThread = 1
-# 写入钩子的最大缓冲区数量
-HookMaxBuffer = 512
-# 日志轮询数量
-RotationCount = 20
-# 日志轮询时间周期
-RotationTime = 24
+EnableHook = false 
+Format = "text" # formatter (text/json)
+Hook = "gorm" 
+HookLevels = ["info", "warn", "error"] 
+HookMaxBuffer = 512 
+HookMaxThread = 1 
+Level = 5 # logger level (1:fatal 2:error,3:warn,4:info,5:debug,6:trace)
+Output = "stdout" # io stream (stdout/stderr/file)
+OutputFile = "data/ginadmin.log" 
+RotationMaxAge = 15 # rotation file max retain days
+RotationSize = 128 # rotation file max size (M)
 
 [LogGormHook]
-# 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
-DBType = "sqlite3"
-# 设置连接可以重用的最长时间(单位：秒)
-MaxLifetime = 7200
-# 设置数据库的最大打开连接数
-MaxOpenConns = 1
-# 设置空闲连接池中的最大连接数
-MaxIdleConns = 1
+DBType = "sqlite3" # hook database (mysql/sqlite3/postgres)
+MaxIdleConns = 1 
+MaxLifetime = 7200 
+MaxOpenConns = 1 
 
-# 服务监控(GOPS:https://github.com/google/gops)
 [Monitor]
-# 是否启用
-Enable = false
-# HTTP的监听地址和端口
 Addr = "127.0.0.1:16060"
-# 配置文件目录(为空则使用默认目录)
 ConfigDir = ""
+Enable = false
 
 [Root]
-# 用户ID
-UserID = 9
-# 登录用户名
-UserName = "root"
-# 登录密码
-Password = "abc-123"
-# 显示名称
-RealName = "Admin"
+Email = "root"
+Password = "abc-123@"
+UserID = "root"
 
-# redis配置信息
 [Redis]
-# 地址
 Addr = "127.0.0.1:6379"
-# 密码
 Password = ""
 
 [JWTAuth]
-# 是否启用
-Enable = true
-# 签名方式(支持：HS512/HS384/HS512)
-SigningMethod = "HS512"
-# 签名key
-SigningKey = "gin-admin"
-# 过期时间（单位秒）
-Expired = 7200
-# 存储(支持：file/redis)
-Store = "file"
-# 文件路径
-FilePath = "data/jwt_auth.db"
-# redis 数据库(如果存储方式是redis，则指定存储的数据库)
-RedisDB = 10
-# 存储到 redis 数据库中的键名前缀
-RedisPrefix = "auth_"
+Enable = true 
+Expired = 7200 
+FilePath = "data/jwt_auth.db" 
+RedisDB = 1 
+RedisPrefix = "auth_" 
+SigningKey = "F@Tmt3F!" 
+SigningMethod = "HS512" # HS256/HS384/HS512
+Store = "file" # file/redis
 
 [Captcha]
-# 存储方式(支持：memory/redis)
-Store = "memory"
-# 数字长度
-Length = 4
-# 图片宽度
-Width = 400
-# 图片高度
-Height = 160
-# redis数据库(如果存储方式是redis，则指定存储的数据库)
-RedisDB = 10
-# 存储到redis数据库中的键名前缀
-RedisPrefix = "captcha_"
+Height = 160 
+Length = 4 
+RedisDB = 2 
+RedisPrefix = "captcha_" 
+Store = "memory" # memory/redis
+Width = 400 
 
-# 请求频率限制
 [RateLimiter]
-# 是否启用
-Enable = false
-# 每分钟每个用户允许的最大请求数量
 Count = 300
-# redis数据库(如果存储方式是redis，则指定存储的数据库)
+Enable = false
 RedisDB = 10
-
-[CORS]
-# 是否启用
-Enable = false
-# 允许跨域请求的域名列表(*表示全部允许)
-AllowOrigins = ["*"]
-# 允许跨域请求的请求方式列表
-AllowMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"]
-# 允许客户端与跨域请求一起使用的非简单标头的列表
-AllowHeaders = []
-# 请求是否可以包含cookie，HTTP身份验证或客户端SSL证书等用户凭据
-AllowCredentials = true
-# 可以缓存预检请求结果的时间（以秒为单位）
-MaxAge = 7200
-
-[GZIP]
-# 是否启用
-Enable = false
-# 排除的文件扩展名
-ExcludedExtentions = [".png", ".gif", ".jpeg", ".jpg"]
-# 排除的请求路径
-ExcludedPaths = []
 
 [Gorm]
-# 是否开启调试模式
-Debug = true
-# 数据库类型(目前支持的数据库类型：mysql/sqlite3/postgres)
-DBType = "sqlite3"
-# 设置连接可以重用的最长时间(单位：秒)
-MaxLifetime = 7200
-# 设置数据库的最大打开连接数
-MaxOpenConns = 150
-# 设置空闲连接池中的最大连接数
-MaxIdleConns = 50
-# 数据库表名前缀
-TablePrefix = "g_"
-# 是否启用自动映射数据库表结构
-EnableAutoMigrate = true
-
-[MySQL]
-# 连接地址
-Host = "127.0.0.1"
-# 连接端口
-Port = 3306
-# 用户名
-User = "root"
-# 密码
-Password = "123456"
-# 数据库
-DBName = "gin-admin"
-# 连接参数
-Parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
+DBType = "sqlite3" # database (sqlite3/mysql/postgres)
+Debug = true 
+EnableAutoMigrate = true 
+MaxIdleConns = 50 
+MaxIdleTime = 3600 
+MaxLifetime = 86400 
+MaxOpenConns = 150 
+TablePrefix = "" 
 
 [Postgres]
-# 连接地址
+DBName = "ginadmin"
 Host = "127.0.0.1"
-# 连接端口
-Port = 5432
-# 用户名
-User = "root"
-# 密码
 Password = "123456"
-# 数据库
-DBName = "gin-admin"
-# SSL模式
+Port = 55000
 SSLMode = "disable"
+User = "postgres"
 
 [Sqlite3]
-# 数据库路径
-Path = "data/gin-admin.db"
+Path = "data/ginadmin.db"
+
+[Cache]
+Path = ":memory:" 
+RedisDB = 3 
+Store = "bunt" # bunt/redis

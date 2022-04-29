@@ -1,0 +1,229 @@
+basePath: /
+definitions:
+  errors.Error:
+    properties:
+      code:
+        type: integer
+      detail:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+    type: object
+  schema.Demo:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  schema.ErrorResult:
+    properties:
+      error:
+        $ref: '#/definitions/errors.Error'
+    type: object
+  schema.ListResult:
+    properties:
+      list: {}
+      pagination:
+        $ref: '#/definitions/schema.PaginationResult'
+    type: object
+  schema.OkResult:
+    properties:
+      ok:
+        type: boolean
+    type: object
+  schema.PaginationResult:
+    properties:
+      current:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+    type: object
+info:
+  contact:
+    email: tiannianshou@gmail.com
+    name: LyricTian
+  description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
+  title: ginadmin
+  version: 9.0.0
+paths:
+  /api/v1/demos:
+    get:
+      parameters:
+      - default: 1
+        description: pagination index
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: pagination size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Query result (schema.Demo object)
+          schema:
+            allOf:
+            - $ref: '#/definitions/schema.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/schema.Demo'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Query demo list
+      tags:
+      - DemoAPI
+    post:
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Demo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.Demo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create demo
+      tags:
+      - DemoAPI
+  /api/v1/demos/{id}:
+    delete:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/schema.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete single demo by id
+      tags:
+      - DemoAPI
+    get:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.Demo'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get single demo by id
+      tags:
+      - DemoAPI
+    put:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Demo'
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/schema.OkResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update demo by id
+      tags:
+      - DemoAPI
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

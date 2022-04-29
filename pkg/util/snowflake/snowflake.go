@@ -1,6 +1,8 @@
 package snowflake
 
 import (
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/sony/sonyflake"
@@ -9,9 +11,23 @@ import (
 var sf *sonyflake.Sonyflake
 
 func init() {
-	sf = sonyflake.NewSonyflake(sonyflake.Settings{
-		StartTime: time.Date(2021, 7, 28, 0, 0, 0, 0, time.UTC),
-	})
+	settings := sonyflake.Settings{
+		StartTime: time.Date(2021, 11, 8, 0, 0, 0, 0, time.UTC),
+	}
+
+	machineID := os.Getenv("MACHINE_ID")
+	if machineID != "" {
+		id, err := strconv.ParseUint(machineID, 10, 16)
+		if err != nil {
+			os.Stderr.WriteString("[warn] parse machine id failed: " + err.Error())
+		} else {
+			settings.MachineID = func() (uint16, error) {
+				return uint16(id), nil
+			}
+		}
+	}
+
+	sf = sonyflake.NewSonyflake(settings)
 	if sf == nil {
 		panic("sonyflake not created")
 	}

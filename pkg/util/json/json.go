@@ -1,10 +1,12 @@
 package json
 
 import (
+	"os"
+
 	jsoniter "github.com/json-iterator/go"
 )
 
-// 定义JSON操作
+// Define alias
 var (
 	json          = jsoniter.ConfigCompatibleWithStandardLibrary
 	Marshal       = json.Marshal
@@ -14,11 +16,12 @@ var (
 	NewEncoder    = json.NewEncoder
 )
 
-// MarshalToString JSON编码为字符串
 func MarshalToString(v interface{}) string {
 	s, err := jsoniter.MarshalToString(v)
 	if err != nil {
+		os.Stderr.WriteString("[warning] jsoniter marshal to string failed: " + err.Error())
 		return ""
 	}
+
 	return s
 }
