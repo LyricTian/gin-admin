@@ -1,19 +1,11 @@
 {
-    "schemes": [
-        "http",
-        "https"
-    ],
     "swagger": "2.0",
     "info": {
         "description": "RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.",
         "title": "gin-admin",
-        "contact": {
-            "name": "LyricTian",
-            "email": "tiannianshou@gmail.com"
-        },
+        "contact": {},
         "version": "8.1.0"
     },
-    "basePath": "/",
     "paths": {
         "/api/v1/menus": {
             "get": {
@@ -1515,9 +1507,7 @@
         "schema.ListResult": {
             "type": "object",
             "properties": {
-                "list": {
-                    "type": "object"
-                },
+                "list": {},
                 "pagination": {
                     "$ref": "#/definitions/schema.PaginationResult"
                 }
@@ -1610,7 +1600,9 @@
                 },
                 "is_show": {
                     "description": "是否显示(1:显示 2:隐藏)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "memo": {
                     "description": "备注",
@@ -1639,7 +1631,9 @@
                 },
                 "status": {
                     "description": "状态(1:启用 2:禁用)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "updated_at": {
                     "description": "更新时间",
@@ -1822,7 +1816,9 @@
                 },
                 "status": {
                     "description": "状态(1:启用 2:禁用)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "updated_at": {
                     "description": "更新时间",
@@ -1925,7 +1921,9 @@
                 },
                 "status": {
                     "description": "用户状态(1:启用 2:停用)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "user_name": {
                     "description": "用户名",

@@ -3,6 +3,8 @@ package mock
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+
+	_ "github.com/LyricTian/gin-admin/v8/internal/app/schema"
 )
 
 var MenuSet = wire.NewSet(wire.Struct(new(MenuMock), "*"))

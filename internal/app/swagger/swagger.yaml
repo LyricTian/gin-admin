@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   schema.ErrorItem:
     properties:
@@ -20,8 +19,7 @@ definitions:
     type: object
   schema.ListResult:
     properties:
-      list:
-        type: object
+      list: {}
       pagination:
         $ref: '#/definitions/schema.PaginationResult'
     type: object
@@ -85,6 +83,8 @@ definitions:
         type: string
       is_show:
         description: 是否显示(1:显示 2:隐藏)
+        maximum: 2
+        minimum: 1
         type: integer
       memo:
         description: 备注
@@ -107,6 +107,8 @@ definitions:
         type: integer
       status:
         description: 状态(1:启用 2:禁用)
+        maximum: 2
+        minimum: 1
         type: integer
       updated_at:
         description: 更新时间
@@ -241,6 +243,8 @@ definitions:
         type: integer
       status:
         description: 状态(1:启用 2:禁用)
+        maximum: 2
+        minimum: 1
         type: integer
       updated_at:
         description: 更新时间
@@ -316,6 +320,8 @@ definitions:
         type: string
       status:
         description: 用户状态(1:启用 2:停用)
+        maximum: 2
+        minimum: 1
         type: integer
       user_name:
         description: 用户名
@@ -395,9 +401,7 @@ definitions:
         type: string
     type: object
 info:
-  contact:
-    email: tiannianshou@gmail.com
-    name: LyricTian
+  contact: {}
   description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
   title: gin-admin
   version: 8.1.0
@@ -1309,9 +1313,6 @@ paths:
       summary: 启用数据
       tags:
       - UserAPI
-schemes:
-- http
-- https
 securityDefinitions:
   ApiKeyAuth:
     in: header
