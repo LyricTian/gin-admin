@@ -5,9 +5,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/koding/multiconfig"
-
 	"github.com/LyricTian/gin-admin/v9/pkg/util/yaml"
+
+	"github.com/koding/multiconfig"
 )
 
 var (
@@ -51,7 +51,7 @@ func Print() {
 			return
 		}
 
-		fmt.Println("//-----------------   Server Config   --------------------//")
+		fmt.Println("//-----------------   Configurations   --------------------//")
 		fmt.Printf("\n %s \n", b)
 		fmt.Println("//------------------------ End ---------------------------//")
 	}
@@ -217,15 +217,6 @@ type Postgres struct {
 		Hosts  []string
 		Tables []string
 	}
-	TileSources struct {
-		Hosts    []string
-		Port     int
-		User     string
-		Password string
-		DBName   string
-		SSLMode  string
-		Tables   []string
-	}
 }
 
 func (a Postgres) DSN() string {
@@ -238,15 +229,6 @@ func (a Postgres) ReplicasDSN() []string {
 	for i, host := range a.Replicas.Hosts {
 		list[i] = fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s",
 			host, a.Port, a.User, a.DBName, a.Password, a.SSLMode)
-	}
-	return list
-}
-
-func (a Postgres) TileSourcesDSN() []string {
-	list := make([]string, len(a.TileSources.Hosts))
-	for i, host := range a.TileSources.Hosts {
-		list[i] = fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s",
-			host, a.TileSources.Port, a.TileSources.User, a.TileSources.DBName, a.TileSources.Password, a.TileSources.SSLMode)
 	}
 	return list
 }

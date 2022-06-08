@@ -8,8 +8,6 @@ github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/LyricTian/captcha v1.1.0 h1:/fwwOn0Qv0HqfQPMvVgvgOBMYINuaDr0sSBGylQK5YA=
 github.com/LyricTian/captcha v1.1.0/go.mod h1:/B+rAY8altkYP05+rMShopIisuw+dk2hU3LfX0bT6fY=
-github.com/LyricTian/queue v1.3.0 h1:1xEFZlteW6iu5Qbrz7ZsiSKMKaxY1bQHsbx0jrB1pDA=
-github.com/LyricTian/queue v1.3.0/go.mod h1:pbkoplz/zRToCay3pRjz75P8fQAgvkRKJdEzVUQYhXY=
 github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/PuerkitoBio/purell v1.1.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=

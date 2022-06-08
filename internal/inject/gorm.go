@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 	"time"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/plugin/dbresolver"
-
 	"github.com/LyricTian/gin-admin/v9/internal/config"
 	"github.com/LyricTian/gin-admin/v9/internal/dao"
 	"github.com/LyricTian/gin-admin/v9/pkg/gormx"
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
 )
 
 func InitGormDB(ctx context.Context) (*gorm.DB, func(), error) {
@@ -27,7 +27,7 @@ func InitGormDB(ctx context.Context) (*gorm.DB, func(), error) {
 	cleanFunc := func() {
 		db, err := db.DB()
 		if err != nil {
-			os.Stderr.WriteString("[gorm] Get db failed: " + err.Error())
+			os.Stderr.WriteString("Failed to get db: " + err.Error())
 			return
 		}
 		db.Close()
@@ -55,7 +55,7 @@ func NewGormDB(ctx context.Context) (*gorm.DB, error) {
 	case "postgres":
 		dsn = cfg.Postgres.DSN()
 	default:
-		return nil, errors.New("unknown db")
+		return nil, errors.New("Unknown db")
 	}
 
 	db, err := gormx.New(&gormx.Config{
@@ -90,24 +90,6 @@ func NewGormDB(ctx context.Context) (*gorm.DB, error) {
 
 		logger.WithContext(ctx).
 			Infof("gorm use replicas, #tables: %v, #replicas: %s", replicaTables, dsns)
-	}
-
-	if dsns := cfg.Postgres.TileSourcesDSN(); len(dsns) > 0 {
-		dialectors := make([]gorm.Dialector, len(dsns))
-		for i, dsn := range dsns {
-			dialectors[i] = postgres.Open(dsn)
-		}
-
-		tables := make([]interface{}, len(cfg.Postgres.TileSources.Tables))
-		for i, table := range cfg.Postgres.TileSources.Tables {
-			tables[i] = table
-		}
-
-		resolver.Register(dbresolver.Config{
-			Sources: dialectors,
-		}, tables...)
-
-		logger.WithContext(ctx).Infof("gorm use tile sources, #tables: %v, #sources: %v", tables, dsns)
 	}
 
 	resolver.SetMaxIdleConns(cfg.Gorm.MaxIdleConns).

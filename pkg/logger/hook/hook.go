@@ -3,8 +3,9 @@ package hook
 import (
 	"fmt"
 	"os"
+	"sync"
+	"sync/atomic"
 
-	"github.com/LyricTian/queue"
 	"github.com/sirupsen/logrus"
 )
 
@@ -66,21 +67,46 @@ func New(exec ExecCloser, opt ...Option) *Hook {
 		o(&opts)
 	}
 
-	q := queue.NewQueue(opts.maxJobs, opts.maxWorkers)
-	q.Run()
+	wg := new(sync.WaitGroup)
+	wg.Add(opts.maxWorkers)
 
-	return &Hook{
+	h := &Hook{
 		opts: &opts,
-		q:    q,
+		q:    make(chan *logrus.Entry, opts.maxJobs),
+		wg:   wg,
 		e:    exec,
 	}
+	h.dispatch()
+	return h
 }
 
 // Hook to send logs to a mongo database
 type Hook struct {
-	opts *options
-	q    *queue.Queue
-	e    ExecCloser
+	opts   *options
+	q      chan *logrus.Entry
+	wg     *sync.WaitGroup
+	e      ExecCloser
+	closed int32
+}
+
+func (h *Hook) dispatch() {
+	for i := 0; i < h.opts.maxWorkers; i++ {
+		go func() {
+			defer func() {
+				h.wg.Done()
+				if r := recover(); r != nil {
+					fmt.Fprintln(os.Stderr, "Hook panic:", r)
+				}
+			}()
+
+			for entry := range h.q {
+				err := h.e.Exec(entry)
+				if err != nil {
+					fmt.Fprintln(os.Stderr, "Failed to write entry:", err)
+				}
+			}
+		}()
+	}
 }
 
 // Returns the available logging levels
@@ -90,30 +116,34 @@ func (h *Hook) Levels() []logrus.Level {
 
 // Fire is called when a log event is fired
 func (h *Hook) Fire(entry *logrus.Entry) error {
-	if h.q.GetJobCount() == h.opts.maxJobs {
-		fmt.Fprintf(os.Stderr, "Too many jobs, waiting for queue to be empty, discard\n")
+	if atomic.LoadInt32(&h.closed) == 1 {
+		return nil
+	}
+
+	if len(h.q) == h.opts.maxJobs {
+		fmt.Fprintln(os.Stderr, "Too many jobs, waiting for queue to be empty, discard")
 		return nil
 	}
 
 	dup := entry.Dup()
 	dup.Level = entry.Level
 	dup.Message = entry.Message
-	h.q.Push(queue.NewJob(dup, func(v interface{}) {
-		for k, v := range h.opts.extra {
-			if _, ok := entry.Data[k]; !ok {
-				entry.Data[k] = v
-			}
+	for k, v := range h.opts.extra {
+		if _, ok := dup.Data[k]; !ok {
+			dup.Data[k] = v
 		}
-		err := h.e.Exec(entry)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to write entry: %v\n", err)
-		}
-	}))
+	}
+	h.q <- dup
 	return nil
 }
 
 // Waits for the log queue to be empty
 func (h *Hook) Flush() {
-	h.q.Terminate()
+	if atomic.LoadInt32(&h.closed) == 1 {
+		return
+	}
+	atomic.StoreInt32(&h.closed, 1)
+	close(h.q)
+	h.wg.Wait()
 	h.e.Close()
 }

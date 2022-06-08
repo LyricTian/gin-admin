@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	prefix     = "bobcatminer"
+	prefix     = "ginadmin"
 	ReqBodyKey = prefix + "/req-body"
 	ResBodyKey = prefix + "/res-body"
 )

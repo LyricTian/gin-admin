@@ -15,7 +15,7 @@ type Auther interface {
 	Release() error
 }
 
-const defaultKey = "BOBCATMINIERC7K0JNIS1S439RNJJP4G"
+const defaultKey = "GINADMINXXXXC7K0JNIS1S439RNJJP4G"
 
 var ErrInvalidToken = errors.New("jwt: invalid token")
 
