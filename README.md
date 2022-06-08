@@ -40,9 +40,7 @@ git clone https://github.com/LyricTian/gin-admin
 
 cd gin-admin
 
-go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
-
-# Or use Makefile: make start
+make start
 ```
 
 > The database and table structure will be automatically created during the startup process. After the startup is successful, you can access the swagger address through the browser: [http://127.0.0.1:10088/swagger/index.html](http://127.0.0.1:10088/swagger/index.html)
@@ -50,17 +48,13 @@ go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.con
 ### Generate `swagger` documentation
 
 ```bash
-swag init --parseDependency --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
-
-# Or use Makefile: make swagger
+make swagger
 ```
 
 ### Use `wire` to generate dependency injection
 
 ```bash
-wire gen ./internal/app
-
-# Or use Makefile: make wire
+make wire
 ```
 
 ## Use the [gin-admin-cli](https://github.com/gin-admin/gin-admin-cli) tool to quickly generate modules
@@ -100,50 +94,6 @@ make wire
 make start
 ```
 
-## Project Layout
-
-```text
-├── cmd
-│   └── gin-admin
-│       └── main.go       
-├── configs
-│   ├── config.toml       
-│   ├── menu.yaml         
-│   └── model.conf        
-├── docs                  
-├── internal
-│   └── app
-│       ├── api           
-│       ├── config        
-│       ├── contextx      
-│       ├── dao           
-│       ├── ginx          
-│       ├── middleware    
-│       ├── module        
-│       ├── router        
-│       ├── schema        
-│       ├── service       
-│       ├── swagger       
-│       ├── test          
-├── pkg
-│   ├── auth              
-│   │   └── jwtauth       
-│   ├── errors            
-│   ├── gormx             
-│   ├── logger            
-│   │   ├── hook
-│   └── util              
-│       ├── conv         
-│       ├── hash         
-│       ├── json
-│       ├── snowflake
-│       ├── structure
-│       ├── trace
-│       ├── uuid
-│       └── yaml
-└── scripts               
-```
-
 ## Contact
 
 <div>
@@ -153,7 +103,7 @@ make start
 
 ## MIT License
 
-    Copyright (c) 2021 Lyric
+    Copyright (c) 2022 Lyric
 
 [reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
 [reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin

@@ -1,6 +1,6 @@
 # gin-admin
 
-> 基于 GIN + Gorm 2.0 + CASBIN + WIRE 实现的RBAC权限管理脚手架，目标是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
+> 基于 GIN + Gorm 2.0 + CASBIN + WIRE 实现的 RBAC 权限管理脚手架，目标是提供一套轻量的中后台开发框架，方便、快速的完成业务需求的开发。
 
 [English](README.md) | 中文
 
@@ -21,7 +21,7 @@
 
 ## 依赖工具
 
-```
+```bash
 go get -u github.com/cosmtrek/air
 go get -u github.com/google/wire/cmd/wire
 go get -u github.com/swaggo/swag/cmd/swag
@@ -52,9 +52,6 @@ $ air
 
 # OR 基于Makefile运行
 $ make start
-
-# OR 使用go命令运行
-$ go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
 ```
 
 > 启动成功之后，可在浏览器中输入地址进行访问：[http://127.0.0.1:10088/swagger/index.html](http://127.0.0.1:10088/swagger/index.html)
@@ -64,9 +61,6 @@ $ go run cmd/gin-admin/main.go web -c ./configs/config.toml -m ./configs/model.c
 ```bash
 # 基于Makefile
 make swagger
-
-# OR 使用swag命令
-swag init --parseDependency --generalInfo ./cmd/${APP}/main.go --output ./internal/app/swagger
 ```
 
 ## 生成依赖注入文件
@@ -74,9 +68,6 @@ swag init --parseDependency --generalInfo ./cmd/${APP}/main.go --output ./intern
 ```bash
 # 基于Makefile
 make wire
-
-# OR 使用wire命令
-wire gen ./internal/app
 ```
 
 ## [gin-admin-cli](https://github.com/gin-admin/gin-admin-cli) 工具使用
@@ -169,15 +160,15 @@ export CGO_ENABLED=1; export CC=gcc; go get -v -x github.com/mattn/go-sqlite3
 │       ├── swagger       # swagger 生成文件
 │       ├── test          # 模块单元测试
 ├── pkg
-│   ├── auth              
+│   ├── auth
 │   │   └── jwtauth       # jwt 认证模块
 │   ├── errors            # 错误处理模块
 │   ├── gormx             # gorm 扩展模块
 │   ├── logger            # 日志模块
 │   │   ├── hook
 │   └── util              # 工具包
-│       ├── conv         
-│       ├── hash         
+│       ├── conv
+│       ├── hash
 │       ├── json
 │       ├── snowflake
 │       ├── structure
