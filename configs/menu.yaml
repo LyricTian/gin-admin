@@ -119,6 +119,8 @@
           resources:
             - method: GET
               path: "/api/v1/users"
+            - method: GET
+              path: "/api/v1/roles.select"
         - code: disable
           name: 禁用
           resources:
