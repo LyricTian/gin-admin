@@ -157,7 +157,7 @@ func (a *RoleSrv) Update(ctx context.Context, id uint64, item schema.Role) error
 		return err
 	}
 
-	a.Enforcer.DeleteRole(strconv.FormatUint(item.ID, 10))
+	a.Enforcer.DeletePermissionsForUser(strconv.FormatUint(item.ID, 10))
 	for _, ritem := range resources.Data.ToMap() {
 		a.Enforcer.AddPermissionForUser(strconv.FormatUint(item.ID, 10), ritem.Path, ritem.Method)
 	}
