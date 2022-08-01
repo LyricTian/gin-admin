@@ -1,7 +1,7 @@
 package jwtauth
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type TokenInfo interface {
@@ -30,5 +30,5 @@ func (t *tokenInfo) GetExpiresAt() int64 {
 }
 
 func (t *tokenInfo) EncodeToJSON() ([]byte, error) {
-	return json.Marshal(t)
+	return jsoniter.Marshal(t)
 }

@@ -4,18 +4,19 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LyricTian/gin-admin/v9/pkg/x/cachex"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAuth(t *testing.T) {
-	store, err := NewBuntDBStore(":memory:")
-	assert.Nil(t, err)
+	cache := cachex.NewBadgerCache(cachex.BadgerConfig{
+		Path: "./tmp/jwt",
+	})
 
+	store := NewStoreWithCache(cache)
+	ctx := context.Background()
 	jwtAuth := New(store)
 
-	defer jwtAuth.Release()
-
-	ctx := context.Background()
 	userID := "test"
 	token, err := jwtAuth.GenerateToken(ctx, userID)
 	assert.Nil(t, err)
@@ -32,4 +33,7 @@ func TestAuth(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, ErrInvalidToken.Error())
 	assert.Empty(t, id)
+
+	err = jwtAuth.Release(ctx)
+	assert.Nil(t, err)
 }

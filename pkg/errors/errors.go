@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -13,6 +14,17 @@ import (
 // Define alias
 var (
 	WithStack = errors.WithStack
+)
+
+const (
+	ErrBadRequestID          = "com.bad_request"
+	ErrUnauthorizedID        = "com.unauthorized"
+	ErrForbiddenID           = "com.forbidden"
+	ErrNotFoundID            = "com.not_found"
+	ErrMethodNotAllowedID    = "com.method_not_allowed"
+	ErrTooManyRequestsID     = "com.too_many_requests"
+	ErrRequestEntityTooLarge = "com.request_entity_too_large"
+	ErrInternalServerErrorID = "com.internal_server_error"
 )
 
 // Customize the error structure for implementation errors.Error interface
@@ -194,17 +206,25 @@ func As(err error) (*Error, bool) {
 }
 
 type MultiError struct {
+	lock   *sync.Mutex
 	Errors []*Error
 }
 
 func NewMultiError() *MultiError {
 	return &MultiError{
+		lock:   &sync.Mutex{},
 		Errors: make([]*Error, 0),
 	}
 }
 
 func (e *MultiError) Append(err *Error) {
 	e.Errors = append(e.Errors, err)
+}
+
+func (e *MultiError) AppendWithLock(err *Error) {
+	e.lock.Lock()
+	defer e.lock.Unlock()
+	e.Append(err)
 }
 
 func (e *MultiError) HasErrors() bool {

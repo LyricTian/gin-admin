@@ -4,66 +4,44 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
 
-// Define logrus alias
-var (
-	SetOutput       = logrus.SetOutput
-	SetReportCaller = logrus.SetReportCaller
-	StandardLogger  = logrus.StandardLogger
-	ParseLevel      = logrus.ParseLevel
+const (
+	TagKeyRecovery = "recovery"
+	TagKeyRequest  = "request"
+	TagKeyLogin    = "login"
+	TagKeyLogout   = "logout"
 )
 
 type (
-	traceIDKey struct{}
-	userIDKey  struct{}
-	tagKey     struct{}
-	stackKey   struct{}
-
-	Logger = logrus.Logger
-	Entry  = logrus.Entry
-	Hook   = logrus.Hook
-	Level  = logrus.Level
+	ctxLoggerKey  struct{}
+	ctxTraceIDKey struct{}
+	ctxUserIDKey  struct{}
+	ctxTagKey     struct{}
+	ctxStackKey   struct{}
 )
 
-// Define logger level
-const (
-	PanicLevel Level = iota
-	FatalLevel
-	ErrorLevel
-	WarnLevel
-	InfoLevel
-	DebugLevel
-	TraceLevel
-)
-
-// Set logger level
-func SetLevel(level Level) {
-	logrus.SetLevel(level)
+func NewLogger(ctx context.Context, logger *zap.Logger) context.Context {
+	return context.WithValue(ctx, ctxLoggerKey{}, logger)
 }
 
-// Set logger output format (json/text)
-func SetFormatter(format string) {
-	switch format {
-	case "json":
-		logrus.SetFormatter(new(logrus.JSONFormatter))
-	default:
-		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+func FromLogger(ctx context.Context) *zap.Logger {
+	v := ctx.Value(ctxLoggerKey{})
+	if v != nil {
+		if vv, ok := v.(*zap.Logger); ok {
+			return vv
+		}
 	}
+	return zap.L()
 }
 
-// Add logger hook
-func AddHook(hook Hook) {
-	logrus.AddHook(hook)
+func NewTraceID(ctx context.Context, traceID string) context.Context {
+	return context.WithValue(ctx, ctxTraceIDKey{}, traceID)
 }
 
-func NewTraceIDContext(ctx context.Context, traceID string) context.Context {
-	return context.WithValue(ctx, traceIDKey{}, traceID)
-}
-
-func FromTraceIDContext(ctx context.Context) string {
-	v := ctx.Value(traceIDKey{})
+func FromTraceID(ctx context.Context) string {
+	v := ctx.Value(ctxTraceIDKey{})
 	if v != nil {
 		if s, ok := v.(string); ok {
 			return s
@@ -72,12 +50,12 @@ func FromTraceIDContext(ctx context.Context) string {
 	return ""
 }
 
-func NewUserIDContext(ctx context.Context, userID string) context.Context {
-	return context.WithValue(ctx, userIDKey{}, userID)
+func NewUserID(ctx context.Context, userID string) context.Context {
+	return context.WithValue(ctx, ctxUserIDKey{}, userID)
 }
 
-func FromUserIDContext(ctx context.Context) string {
-	v := ctx.Value(userIDKey{})
+func FromUserID(ctx context.Context) string {
+	v := ctx.Value(ctxUserIDKey{})
 	if v != nil {
 		if s, ok := v.(string); ok {
 			return s
@@ -86,12 +64,12 @@ func FromUserIDContext(ctx context.Context) string {
 	return ""
 }
 
-func NewTagContext(ctx context.Context, tag string) context.Context {
-	return context.WithValue(ctx, tagKey{}, tag)
+func NewTag(ctx context.Context, tag string) context.Context {
+	return context.WithValue(ctx, ctxTagKey{}, tag)
 }
 
-func FromTagContext(ctx context.Context) string {
-	v := ctx.Value(tagKey{})
+func FromTag(ctx context.Context) string {
+	v := ctx.Value(ctxTagKey{})
 	if v != nil {
 		if s, ok := v.(string); ok {
 			return s
@@ -100,12 +78,12 @@ func FromTagContext(ctx context.Context) string {
 	return ""
 }
 
-func NewStackContext(ctx context.Context, stack error) context.Context {
-	return context.WithValue(ctx, stackKey{}, stack)
+func NewStack(ctx context.Context, stack error) context.Context {
+	return context.WithValue(ctx, ctxStackKey{}, stack)
 }
 
-func FromStackContext(ctx context.Context) error {
-	v := ctx.Value(stackKey{})
+func FromStack(ctx context.Context) error {
+	v := ctx.Value(ctxStackKey{})
 	if v != nil {
 		if s, ok := v.(error); ok {
 			return s
@@ -114,22 +92,25 @@ func FromStackContext(ctx context.Context) error {
 	return nil
 }
 
-// Use context create entry
-func WithContext(ctx context.Context) *Entry {
-	fields := logrus.Fields{}
+func Context(ctx context.Context) *zap.Logger {
+	var fields []zap.Field
+	if v := FromTraceID(ctx); v != "" {
+		fields = append(fields, zap.String("trace_id", v))
+	}
+	if v := FromUserID(ctx); v != "" {
+		fields = append(fields, zap.String("user_id", v))
+	}
+	if v := FromTag(ctx); v != "" {
+		fields = append(fields, zap.String("tag", v))
+	}
+	if v := FromStack(ctx); v != nil {
+		fields = append(fields, zap.Error(v))
+	}
+	return FromLogger(ctx).With(fields...)
+}
 
-	if v := FromTraceIDContext(ctx); v != "" {
-		fields["trace_id"] = v
-	}
-	if v := FromUserIDContext(ctx); v != "" {
-		fields["user_id"] = v
-	}
-	if v := FromTagContext(ctx); v != "" {
-		fields["tag"] = v
-	}
-	if v := FromStackContext(ctx); v != nil {
-		fields["stack"] = fmt.Sprintf("%+v", v)
-	}
+type PrintLogger struct{}
 
-	return logrus.WithContext(ctx).WithFields(fields)
+func (a *PrintLogger) Printf(format string, args ...interface{}) {
+	zap.L().Info(fmt.Sprintf(format, args...))
 }

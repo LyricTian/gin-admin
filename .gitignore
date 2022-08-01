@@ -12,13 +12,15 @@
 *.out
 
 *.DS_Store
-/cmd/ginadmin/ginadmin
-/cmd/ginadmin/data
+/ginadmin
+/ginadmin.lock
 /release
 /data
 /internal/test/data
-/tmp
+tmp
 /vendor
+/configs/rbac_policy.csv
+/configs/rbac_policy.csv.bak
 
 
 # IDE configs

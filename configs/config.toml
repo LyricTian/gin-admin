@@ -1,106 +1,141 @@
-PrintConfig = true 
+[General]
+AppName = "ginadmin"
 RunMode = "debug" # debug/test/release
-Swagger = true 
+PprofAddr = "localhost:6060"
+DisableSwagger = false
 
-[HTTP]
+[General.HTTP]
+Addr = ":8080"
+ReadTimeout = 60
+WriteTimeout = 60
+IdleTimeout = 10
+ShutdownTimeout = 10
 CertFile = ""
-Host = "0.0.0.0"
 KeyFile = ""
-MaxContentLength = 1024
-MaxReqLoggerLength = 1024
-Port = 8080
-ShutdownTimeout = 30
 
-[Casbin]
-Debug = false
-Enable = false
+[Storage]
 
-[CORS]
-AllowCredentials = true
-AllowHeaders = ["*"]
-AllowMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"]
-AllowOrigins = ["*"]
-Enable = true
-MaxAge = 7200
+[Storage.Cache]
+Type = "badger" # memory/badger/redis
+Delimiter = ":"
 
-[Log]
-EnableHook = false 
-Format = "text" # formatter (text/json)
-Hook = "gorm" 
-HookLevels = ["info", "warn", "error"] 
-HookMaxBuffer = 512 
-HookMaxThread = 1 
-Level = 5 # logger level (1:fatal 2:error,3:warn,4:info,5:debug,6:trace)
-Output = "stdout" # io stream (stdout/stderr/file)
-OutputFile = "data/ginadmin.log" 
-RotationMaxAge = 15 # rotation file max retain days
-RotationSize = 128 # rotation file max size (M)
+[Storage.Cache.Memory]
+CleanupInterval = 60
 
-[LogGormHook]
-DBType = "sqlite3" # hook database (mysql/sqlite3/postgres)
-MaxIdleConns = 1 
-MaxLifetime = 7200 
-MaxOpenConns = 1 
+[Storage.Cache.Badger]
+Path = "data/cache"
 
-[Monitor]
-Addr = "127.0.0.1:16060"
-ConfigDir = ""
-Enable = false
-
-[Root]
-Email = "root"
-Password = "abc-123@"
-UserID = "root"
-
-[Redis]
-Addr = "127.0.0.1:6379"
+[Storage.Cache.Redis]
+Addr = ""
+Username = ""
 Password = ""
+DB = 0
 
-[JWTAuth]
-Enable = true 
-Expired = 7200 
-FilePath = "data/jwt_auth.db" 
-RedisDB = 1 
-RedisPrefix = "auth_" 
-SigningKey = "F@Tmt3F!" 
-SigningMethod = "HS512" # HS256/HS384/HS512
-Store = "file" # file/redis
+[Storage.DB]
+Debug = true
+Type = "sqlite3"
+DSN = "data/sqlite/ginadmin.db"
+MaxLifetime = 86400
+MaxIdleTime = 3600
+MaxOpenConns = 100
+MaxIdleConns = 50
+TablePrefix = "g_"
 
-[Captcha]
-Height = 160 
-Length = 4 
-RedisDB = 2 
-RedisPrefix = "captcha_" 
-Store = "memory" # memory/redis
-Width = 400 
+[Middleware]
 
-[RateLimiter]
-Count = 300
+[Middleware.Recovery]
+Skip = 3
+
+[Middleware.Trace]
+RequestHeaderKey = "X-Request-Id"
+ResponseTraceKey = "X-Trace-Id"
+
+[Middleware.Logger]
+MaxOutputRequestBodyLen = 4096 # bytes
+MaxOutputResponseBodyLen = 1024 # bytes
+
+[Middleware.CopyBody]
+MaxContentLen = 33554432 # 32M
+
+[Middleware.CORS]
 Enable = false
-RedisDB = 10
+AllowAllOrigins = false
+AllowCredentials = false
+MaxAge = 0
+AllowWildcard = false
+AllowBrowserExtensions = false
+AllowWebSockets = false
+AllowFiles = false
 
-[Gorm]
-DBType = "sqlite3" # database (sqlite3/mysql/postgres)
-Debug = true 
-EnableAutoMigrate = true 
-MaxIdleConns = 50 
-MaxIdleTime = 3600 
-MaxLifetime = 86400 
-MaxOpenConns = 150 
-TablePrefix = "" 
+[Middleware.Auth]
+Disable = true
+SigningMethod = "HS512"
+SigningKey = "XnEsT0S@"
+Expired = 86400 # seconds
 
-[Postgres]
-DBName = "ginadmin"
-Host = "127.0.0.1"
-Password = "123456"
-Port = 55000
-SSLMode = "disable"
-User = "postgres"
+[Middleware.Auth.Store]
+Type = "badger" # memory/badger/redis
+Delimiter = ":"
 
-[Sqlite3]
-Path = "data/ginadmin.db"
+[Middleware.Auth.Store.Memory]
+CleanupInterval = 60
 
-[Cache]
-Path = ":memory:" 
-RedisDB = 3 
-Store = "bunt" # bunt/redis
+[Middleware.Auth.Store.Badger]
+Path = "data/authcache"
+
+[Middleware.Auth.Store.Redis]
+Addr = ""
+Username = ""
+Password = ""
+DB = 0
+
+[Middleware.RateLimiter]
+Enable = true
+Period = 30 # seconds
+MaxRequestsPerIP = 120
+MaxRequestsPerUser = 120
+
+[Middleware.RateLimiter.Store]
+Type = "memory" # memory/redis
+
+[Middleware.RateLimiter.Store.Memory]
+Expiration = 3600
+CleanupInterval = 60
+
+[Middleware.RateLimiter.Store.Redis]
+Addr = ""
+Username = ""
+Password = ""
+DB = 0
+
+[Middleware.Casbin]
+Disable = false
+Debug = true
+AutoLoadInterval = 60 # seconds
+
+[Middleware.Static]
+SkippedPathPrefixes = ["/api"]
+
+[Util]
+
+[Util.Captcha]
+Length = 4
+Width = 400
+Height = 160
+CacheType = "memory"
+
+[Util.Captcha.Redis]
+Addr = ""
+Username = ""
+Password = ""
+DB = 0
+KeyPrefix = "captcha:"
+
+[Dictionary]
+UserCacheExpire = 4 # Hours
+
+[Dictionary.RootUser]
+ID = "root"
+Username = "root"
+Password = "abc-123"
+Name = "Root"

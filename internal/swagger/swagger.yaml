@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   errors.Error:
     properties:
@@ -11,41 +10,292 @@ definitions:
       status:
         type: string
     type: object
-  schema.Demo:
+  typed.Captcha:
+    properties:
+      captcha_id:
+        type: string
+    type: object
+  typed.LoginPasswordUpdate:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  typed.LoginToken:
+    properties:
+      access_token:
+        description: jwt token
+        type: string
+      expires_at:
+        description: unix timestamp
+        type: integer
+      token_type:
+        description: 'Usage: (Authorization=token_type token)'
+        type: string
+    required:
+    - access_token
+    - expires_at
+    - token_type
+    type: object
+  typed.Menu:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/typed.MenuAction'
+        type: array
+      children:
+        items:
+          $ref: '#/definitions/typed.Menu'
+        type: array
+      created_at:
+        type: string
+      created_by:
+        type: string
+      hide:
+        type: boolean
+      icon:
+        type: string
+      id:
+        type: string
+      link:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      parent_path:
+        type: string
+      remark:
+        type: string
+      sequence:
+        type: integer
+      status:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  typed.MenuAction:
     properties:
       code:
         type: string
       created_at:
         type: string
-      description:
+      id:
+        type: string
+      menu_id:
+        type: string
+      name:
+        type: string
+      resources:
+        items:
+          $ref: '#/definitions/typed.MenuActionResource'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  typed.MenuActionResource:
+    properties:
+      action_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      menu_id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  typed.MenuCreate:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/typed.MenuAction'
+        type: array
+      hide:
+        type: boolean
+      icon:
+        type: string
+      link:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      remark:
+        type: string
+      sequence:
+        type: integer
+    required:
+    - name
+    - sequence
+    type: object
+  typed.Role:
+    properties:
+      created_at:
+        type: string
+      created_by:
         type: string
       id:
         type: string
       name:
         type: string
+      remark:
+        type: string
+      role_menus:
+        items:
+          $ref: '#/definitions/typed.RoleMenu'
+        type: array
+      sequence:
+        type: integer
+      status:
+        type: string
       updated_at:
         type: string
-    required:
-    - code
-    - name
+      updated_by:
+        type: string
     type: object
-  schema.ErrorResult:
+  typed.RoleCreate:
+    properties:
+      menus:
+        items:
+          $ref: '#/definitions/typed.RoleMenu'
+        type: array
+      name:
+        type: string
+      remark:
+        type: string
+      sequence:
+        type: integer
+    required:
+    - name
+    - sequence
+    type: object
+  typed.RoleMenu:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      menu_action_id:
+        type: string
+      menu_id:
+        type: string
+      role_id:
+        type: string
+    type: object
+  typed.User:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      remark:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+      user_roles:
+        items:
+          $ref: '#/definitions/typed.UserRole'
+        type: array
+      username:
+        type: string
+    type: object
+  typed.UserCreate:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      remark:
+        type: string
+      role_ids:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    required:
+    - name
+    - role_ids
+    - username
+    type: object
+  typed.UserLogin:
+    properties:
+      captcha_code:
+        description: captcha verify code
+        type: string
+      captcha_id:
+        description: captcha verify id
+        type: string
+      login_name:
+        description: login username
+        type: string
+      password:
+        description: login password (md5)
+        type: string
+    required:
+    - captcha_code
+    - captcha_id
+    - login_name
+    - password
+    type: object
+  typed.UserRole:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      role:
+        $ref: '#/definitions/typed.Role'
+      role_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  utilx.ErrorResult:
     properties:
       error:
         $ref: '#/definitions/errors.Error'
     type: object
-  schema.ListResult:
+  utilx.ListResult:
     properties:
       list: {}
       pagination:
-        $ref: '#/definitions/schema.PaginationResult'
+        $ref: '#/definitions/utilx.PaginationResult'
     type: object
-  schema.OkResult:
+  utilx.OkResult:
     properties:
       ok:
         type: boolean
     type: object
-  schema.PaginationResult:
+  utilx.PaginationResult:
     properties:
       current:
         type: integer
@@ -55,53 +305,119 @@ definitions:
         type: integer
     type: object
 info:
-  contact:
-    email: tiannianshou@gmail.com
-    name: LyricTian
-  description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
+  contact: {}
+  description: A simple, modular, high-performance RBAC development framework built
+    on golang.
   title: ginadmin
   version: 9.0.0
 paths:
-  /api/v1/demos:
-    get:
-      parameters:
-      - default: 1
-        description: pagination index
-        in: query
-        name: current
-        required: true
-        type: integer
-      - default: 10
-        description: pagination size
-        in: query
-        name: pageSize
-        required: true
-        type: integer
+  /api/rbac/v1/current/logout:
+    post:
       responses:
         "200":
-          description: Query result (schema.Demo object)
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout system
+      tags:
+      - LoginAPI
+  /api/rbac/v1/current/menus:
+    put:
+      responses:
+        "200":
+          description: query result
           schema:
             allOf:
-            - $ref: '#/definitions/schema.ListResult'
+            - $ref: '#/definitions/utilx.ListResult'
             - properties:
                 list:
                   items:
-                    $ref: '#/definitions/schema.Demo'
+                    $ref: '#/definitions/typed.Menu'
                   type: array
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
       security:
       - ApiKeyAuth: []
-      summary: Query demo list
+      summary: Query current user privilege menu trees
       tags:
-      - DemoAPI
+      - LoginAPI
+  /api/rbac/v1/current/password:
+    put:
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.LoginPasswordUpdate'
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update current user login password
+      tags:
+      - LoginAPI
+  /api/rbac/v1/current/refreshtoken:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.LoginToken'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Refresh current login token
+      tags:
+      - LoginAPI
+  /api/rbac/v1/current/user:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user
+      tags:
+      - LoginAPI
+  /api/rbac/v1/login:
     post:
       parameters:
       - description: Request body
@@ -109,30 +425,132 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/schema.Demo'
+          $ref: '#/definitions/typed.UserLogin'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.Demo'
+            $ref: '#/definitions/typed.LoginToken'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
+      summary: Login system by username and password
+      tags:
+      - LoginAPI
+  /api/rbac/v1/login/captcha:
+    get:
+      parameters:
+      - description: CaptchaID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Reload captcha image (reload=1)
+        in: query
+        name: reload
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: Captcha image
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      summary: Write captcha image
+      tags:
+      - LoginAPI
+  /api/rbac/v1/login/captchaid:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.Captcha'
+      summary: Get captcha id
+      tags:
+      - LoginAPI
+  /api/rbac/v1/menus:
+    get:
+      parameters:
+      - description: parent id
+        in: query
+        name: parentID
+        type: integer
+      - description: menu name (fuzzy query)
+        in: query
+        name: name
+        type: string
+      - description: menu status (enabled/disabled)
+        in: query
+        name: status
+        type: string
+      responses:
+        "200":
+          description: query result
+          schema:
+            allOf:
+            - $ref: '#/definitions/utilx.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/typed.Menu'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
       security:
       - ApiKeyAuth: []
-      summary: Create demo
+      summary: Query menu tree
       tags:
-      - DemoAPI
-  /api/v1/demos/{id}:
+      - MenuAPI
+    post:
+      parameters:
+      - description: request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.MenuCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.Menu'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create menu
+      tags:
+      - MenuAPI
+  /api/rbac/v1/menus/{id}:
     delete:
       parameters:
       - description: unique id
@@ -144,20 +562,20 @@ paths:
         "200":
           description: ok=true
           schema:
-            $ref: '#/definitions/schema.OkResult'
+            $ref: '#/definitions/utilx.OkResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
       security:
       - ApiKeyAuth: []
-      summary: Delete single demo by id
+      summary: Delete single menu by id
       tags:
-      - DemoAPI
+      - MenuAPI
     get:
       parameters:
       - description: unique id
@@ -169,58 +587,527 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schema.Demo'
+            $ref: '#/definitions/typed.Menu'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
       security:
       - ApiKeyAuth: []
-      summary: Get single demo by id
+      summary: Get single menu by id
       tags:
-      - DemoAPI
+      - MenuAPI
     put:
       parameters:
       - description: unique id
         in: path
         name: id
         required: true
-        type: string
-      - description: Request body
+        type: integer
+      - description: request body
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/schema.Demo'
+          $ref: '#/definitions/typed.MenuCreate'
       responses:
         "200":
           description: ok=true
           schema:
-            $ref: '#/definitions/schema.OkResult'
+            $ref: '#/definitions/utilx.OkResult'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/schema.ErrorResult'
+            $ref: '#/definitions/utilx.ErrorResult'
       security:
       - ApiKeyAuth: []
-      summary: Update demo by id
+      summary: Update menu by id
       tags:
-      - DemoAPI
-schemes:
-- http
-- https
+      - MenuAPI
+  /api/rbac/v1/menus/{id}/disable:
+    patch:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable menu status by id
+      tags:
+      - MenuAPI
+  /api/rbac/v1/menus/{id}/enable:
+    patch:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable menu status by id
+      tags:
+      - MenuAPI
+  /api/rbac/v1/roles:
+    get:
+      parameters:
+      - description: role name (fuzzy query)
+        in: query
+        name: name
+        type: string
+      - description: role status (enabled/disabled)
+        in: query
+        name: status
+        type: string
+      - description: ' result type (select/paginate, default: paginate)'
+        in: query
+        name: result
+        type: string
+      responses:
+        "200":
+          description: query result
+          schema:
+            allOf:
+            - $ref: '#/definitions/utilx.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/typed.Role'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Query role list
+      tags:
+      - RoleAPI
+    post:
+      parameters:
+      - description: request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.RoleCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.Role'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create role
+      tags:
+      - RoleAPI
+  /api/rbac/v1/roles/{id}:
+    delete:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete single role by id
+      tags:
+      - RoleAPI
+    get:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.Role'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get single role by id
+      tags:
+      - RoleAPI
+    put:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.RoleCreate'
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update role by id
+      tags:
+      - RoleAPI
+  /api/rbac/v1/roles/{id}/disable:
+    patch:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable role status by id
+      tags:
+      - RoleAPI
+  /api/rbac/v1/roles/{id}/enable:
+    patch:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable role status by id
+      tags:
+      - RoleAPI
+  /api/rbac/v1/users:
+    get:
+      parameters:
+      - description: user status (enabled/disabled)
+        in: query
+        name: status
+        type: string
+      - description: name (fuzzy query)
+        in: query
+        name: name
+        type: string
+      - description: username (fuzzy query)
+        in: query
+        name: username
+        type: string
+      - description: role id
+        in: query
+        name: roleID
+        type: string
+      responses:
+        "200":
+          description: query result
+          schema:
+            allOf:
+            - $ref: '#/definitions/utilx.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/typed.User'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Query user list
+      tags:
+      - UserAPI
+    post:
+      parameters:
+      - description: request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.UserCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create user
+      tags:
+      - UserAPI
+  /api/rbac/v1/users/{id}:
+    delete:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete single user by id
+      tags:
+      - UserAPI
+    get:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get single user by id
+      tags:
+      - UserAPI
+    put:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.UserCreate'
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user by id
+      tags:
+      - UserAPI
+  /api/rbac/v1/users/{id}/active:
+    patch:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Active user by id
+      tags:
+      - UserAPI
+  /api/rbac/v1/users/{id}/freeze:
+    patch:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Freeze user by id
+      tags:
+      - UserAPI
 securityDefinitions:
   ApiKeyAuth:
     in: header

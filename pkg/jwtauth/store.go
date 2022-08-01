@@ -2,75 +2,62 @@ package jwtauth
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"time"
 
-	"github.com/tidwall/buntdb"
+	"github.com/LyricTian/gin-admin/v9/pkg/x/cachex"
 )
 
-// JWT token storage interface
+// Storer is the interface that storage the token.
 type Storer interface {
 	Set(ctx context.Context, tokenStr string, expiration time.Duration) error
 	Delete(ctx context.Context, tokenStr string) error
 	Check(ctx context.Context, tokenStr string) (bool, error)
-	Close() error
+	Close(ctx context.Context) error
 }
 
-// Implementation Storer interface base buntdb storage
-func NewBuntDBStore(path string) (Storer, error) {
-	if path != ":memory:" {
-		os.MkdirAll(filepath.Dir(path), 0777)
+type storeOptions struct {
+	CacheNS string // default "jwt"
+}
+
+type StoreOption func(*storeOptions)
+
+func WithCacheNS(ns string) StoreOption {
+	return func(o *storeOptions) {
+		o.CacheNS = ns
 	}
+}
 
-	db, err := buntdb.Open(path)
-	if err != nil {
-		return nil, err
+func NewStoreWithCache(cache cachex.Cacher, opts ...StoreOption) Storer {
+	s := &storeImpl{
+		cache: cache,
+		opts: &storeOptions{
+			CacheNS: "jwt",
+		},
 	}
-
-	return &buntdbStore{
-		db: db,
-	}, nil
+	for _, opt := range opts {
+		opt(s.opts)
+	}
+	return s
 }
 
-type buntdbStore struct {
-	db *buntdb.DB
+type storeImpl struct {
+	opts  *storeOptions
+	cache cachex.Cacher
 }
 
-func (a *buntdbStore) Set(ctx context.Context, tokenStr string, expiration time.Duration) error {
-	return a.db.Update(func(tx *buntdb.Tx) error {
-		var opts *buntdb.SetOptions
-		if expiration > 0 {
-			opts = &buntdb.SetOptions{Expires: true, TTL: expiration}
-		}
-		_, _, err := tx.Set(tokenStr, "1", opts)
-		return err
-	})
+func (s *storeImpl) Set(ctx context.Context, tokenStr string, expiration time.Duration) error {
+	return s.cache.Set(ctx, s.opts.CacheNS, tokenStr, "", expiration)
 }
 
-func (a *buntdbStore) Delete(ctx context.Context, tokenStr string) error {
-	return a.db.Update(func(tx *buntdb.Tx) error {
-		_, err := tx.Delete(tokenStr)
-		if err != nil && err != buntdb.ErrNotFound {
-			return err
-		}
-		return nil
-	})
+func (s *storeImpl) Delete(ctx context.Context, tokenStr string) error {
+	return s.cache.Delete(ctx, s.opts.CacheNS, tokenStr)
 }
 
-func (a *buntdbStore) Check(ctx context.Context, tokenStr string) (bool, error) {
-	var exists bool
-	err := a.db.View(func(tx *buntdb.Tx) error {
-		val, err := tx.Get(tokenStr)
-		if err != nil && err != buntdb.ErrNotFound {
-			return err
-		}
-		exists = val == "1"
-		return nil
-	})
-	return exists, err
+func (s *storeImpl) Check(ctx context.Context, tokenStr string) (bool, error) {
+	_, found, err := s.cache.Get(ctx, s.opts.CacheNS, tokenStr)
+	return found, err
 }
 
-func (a *buntdbStore) Close() error {
-	return a.db.Close()
+func (s *storeImpl) Close(ctx context.Context) error {
+	return s.cache.Close(ctx)
 }

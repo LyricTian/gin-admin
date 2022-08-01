@@ -1,13 +1,9 @@
 package config
 
 import (
-	"fmt"
-	"strings"
 	"sync"
 
-	"github.com/LyricTian/gin-admin/v9/pkg/util/yaml"
-
-	"github.com/koding/multiconfig"
+	"github.com/pelletier/go-toml"
 )
 
 var (
@@ -15,228 +11,195 @@ var (
 	once sync.Once
 )
 
-// Load config file (toml/json/yaml)
-func MustLoad(fpaths ...string) {
+func MustLoad(name string) {
 	once.Do(func() {
-		loaders := []multiconfig.Loader{
-			&multiconfig.TagLoader{},
-			&multiconfig.EnvironmentLoader{},
+		tree, err := toml.LoadFile(name)
+		if err != nil {
+			panic("Failed to load toml file: " + err.Error())
 		}
 
-		for _, fpath := range fpaths {
-			if strings.HasSuffix(fpath, "toml") {
-				loaders = append(loaders, &multiconfig.TOMLLoader{Path: fpath})
-			}
-			if strings.HasSuffix(fpath, "json") {
-				loaders = append(loaders, &multiconfig.JSONLoader{Path: fpath})
-			}
-			if strings.HasSuffix(fpath, "yaml") {
-				loaders = append(loaders, &multiconfig.YAMLLoader{Path: fpath})
-			}
+		err = tree.Unmarshal(C)
+		if err != nil {
+			panic("Failed to unmarshal config: " + err.Error())
 		}
-
-		m := multiconfig.DefaultLoader{
-			Loader:    multiconfig.MultiLoader(loaders...),
-			Validator: multiconfig.MultiValidator(&multiconfig.RequiredValidator{}),
-		}
-		m.MustLoad(C)
 	})
 }
 
-func Print() {
-	if C.PrintConfig {
-		b, err := yaml.Marshal(C)
-		if err != nil {
-			fmt.Printf("[WARN] Configuration marshal yaml failed: %s \n", err.Error())
-			return
-		}
-
-		fmt.Println("//-----------------   Configurations   --------------------//")
-		fmt.Printf("\n %s \n", b)
-		fmt.Println("//------------------------ End ---------------------------//")
-	}
-}
-
 type Config struct {
-	AppName     string
-	RunMode     string
-	ConfigDir   string
-	WWW         string
-	Swagger     bool
-	PrintConfig bool
-	HTTP        HTTP
-	Casbin      Casbin
-	CORS        CORS
-	Log         Log
-	Root        Root
-	JWTAuth     JWTAuth
-	Monitor     Monitor
-	Captcha     Captcha
-	RateLimiter RateLimiter
-	Redis       Redis
-	Gorm        Gorm
-	MySQL       MySQL
-	Postgres    Postgres
-	Sqlite3     Sqlite3
-	Cache       struct {
-		Store   string // buntdb/redis
-		Path    string // buntdb path
-		RedisDB int    // redis database
+	General struct {
+		AppName string `default:"ginadmin"`
+		RunMode string `default:"debug"` // debug/test/release
+		HTTP    struct {
+			Addr            string `default:":8080"`
+			ShutdownTimeout int    `default:"10"` // seconds
+			ReadTimeout     int    `default:"60"` // seconds
+			WriteTimeout    int    `default:"60"` // seconds
+			IdleTimeout     int    `default:"10"` // seconds
+			CertFile        string
+			KeyFile         string
+		}
+		PprofAddr      string
+		DisableSwagger bool
+		ConfigDir      string // config directory (from command arguments)
+	}
+	Storage struct {
+		Cache struct {
+			Type      string `default:"memory"` // memory/badger/redis
+			Delimiter string `default:":"`      // delimiter for key
+			Memory    struct {
+				CleanupInterval int `default:"60"` // seconds
+			}
+			Badger struct {
+				Path string `default:"data/cache"`
+			}
+			Redis struct {
+				Addr     string
+				Username string
+				Password string
+				DB       int
+			}
+		}
+		DB struct {
+			Debug        bool
+			Type         string `default:"sqlite3"`                // sqlite3/mysql/postgres
+			DSN          string `default:"sqlite3:///ginadmin.db"` // database source name
+			MaxLifetime  int    `default:"86400"`                  // seconds
+			MaxIdleTime  int    `default:"3600"`                   // seconds
+			MaxOpenConns int    `default:"100"`                    // connections
+			MaxIdleConns int    `default:"50"`
+			TablePrefix  string `default:"g_"`
+			Replicas     struct {
+				DSNs         []string
+				Tables       []string
+				MaxLifetime  int
+				MaxIdleTime  int
+				MaxOpenConns int
+				MaxIdleConns int
+			}
+		}
+	}
+	Middleware struct {
+		Recovery struct {
+			Skip int `default:"3"` // skip the first n stack frames
+		}
+		Trace struct {
+			SkippedPathPrefixes []string
+			RequestHeaderKey    string `default:"X-Request-Id"`
+			ResponseTraceKey    string `default:"X-Trace-Id"`
+		}
+		Logger struct {
+			SkippedPathPrefixes      []string
+			MaxOutputRequestBodyLen  int `default:"4096"`
+			MaxOutputResponseBodyLen int `default:"1024"`
+		}
+		CopyBody struct {
+			SkippedPathPrefixes []string
+			MaxContentLen       int64 `default:"33554432"` // max content length (default 32MB)
+		}
+		CORS struct {
+			Enable                 bool
+			AllowAllOrigins        bool
+			AllowOrigins           []string
+			AllowMethods           []string
+			AllowHeaders           []string
+			AllowCredentials       bool
+			ExposeHeaders          []string
+			MaxAge                 int
+			AllowWildcard          bool
+			AllowBrowserExtensions bool
+			AllowWebSockets        bool
+			AllowFiles             bool
+		}
+		Auth struct {
+			Disable             bool
+			SkippedPathPrefixes []string
+			SigningMethod       string `default:"HS512"`    // HS256/HS384/HS512
+			SigningKey          string `default:"XnEsT0S@"` // secret key
+			OldSigningKey       string // old secret key (for migration)
+			Expired             int    `default:"86400"` // seconds
+			Store               struct {
+				Type      string `default:"memory"` // memory/badger/redis
+				Delimiter string `default:":"`      // delimiter for key
+				Memory    struct {
+					CleanupInterval int `default:"60"` // seconds
+				}
+				Badger struct {
+					Path string
+				}
+				Redis struct {
+					Addr     string
+					Username string
+					Password string
+					DB       int
+				}
+			}
+		}
+		RateLimiter struct {
+			Enable              bool
+			SkippedPathPrefixes []string
+			Period              int // seconds
+			MaxRequestsPerIP    int
+			MaxRequestsPerUser  int
+			Store               struct {
+				Type   string // memory/redis
+				Memory struct {
+					Expiration      int `default:"3600"` // seconds
+					CleanupInterval int `default:"60"`   // seconds
+				}
+				Redis struct {
+					Addr     string
+					Username string
+					Password string
+					DB       int
+				}
+			}
+		}
+		Casbin struct {
+			Disable             bool
+			Debug               bool
+			SkippedPathPrefixes []string
+			AutoLoadInterval    int `default:"3"` // seconds
+		}
+		Static struct {
+			SkippedPathPrefixes []string
+			Dir                 string // static directory (from command arguments)
+		}
+	}
+	Util struct {
+		Captcha struct {
+			Length    int    `default:"4"`
+			Width     int    `default:"400"`
+			Height    int    `default:"160"`
+			CacheType string `default:"memory"` // memory/redis
+			Redis     struct {
+				Addr      string
+				Username  string
+				Password  string
+				DB        int
+				KeyPrefix string `default:"captcha:"`
+			}
+		}
+	}
+	Dictionary struct {
+		RootUser struct {
+			ID       string `default:"root"`
+			Username string `default:"root"`
+			Password string `default:"123"`
+			Name     string `default:"Root"`
+		}
+		UserCacheExpire int `default:"4"` // user cache expire in hours
 	}
 }
 
-func (c *Config) IsDebugMode() bool {
-	return c.RunMode == "debug"
+func (c *Config) IsDebug() bool {
+	return c.General.RunMode == "debug"
 }
 
-func (c *Config) IsRootUser(userID string) bool {
-	return c.Root.UserID == userID
-}
-
-type Casbin struct {
-	Enable bool
-	Debug  bool
-}
-
-type CORS struct {
-	Enable           bool
-	AllowOrigins     []string
-	AllowMethods     []string
-	AllowHeaders     []string
-	AllowCredentials bool
-	MaxAge           int
-}
-
-type LogHook struct {
-	Type      string   // gorm
-	Levels    []string // debug/info/warn/error
-	MaxBuffer int      `default:"10240"`
-	MaxThread int      `default:"2"`
-}
-
-type Log struct {
-	Level          int
-	Format         string
-	Output         string
-	OutputFile     string
-	RotationCount  uint
-	RotationMaxAge int
-	RotationSize   int
-	Hooks          []LogHook
-}
-
-type Root struct {
-	UserID   string
-	Email    string
-	Password string
-}
-
-type JWTAuth struct {
-	Enable        bool
-	SigningMethod string
-	SigningKey    string
-	OldSigningKey string
-	Expired       int
-	Store         string
-	FilePath      string
-	RedisDB       int
-	RedisPrefix   string
-}
-
-type HTTP struct {
-	Host               string
-	Port               int
-	CertFile           string
-	KeyFile            string
-	ShutdownTimeout    int
-	MaxContentLength   int64
-	MaxReqLoggerLength int `default:"1024"`
-	MaxResLoggerLength int `default:"1024"`
-}
-
-type Monitor struct {
-	Enable    bool
-	Addr      string
-	ConfigDir string
-}
-
-type Captcha struct {
-	Enable      bool
-	Store       string
-	Length      int
-	Width       int
-	Height      int
-	RedisDB     int
-	RedisPrefix string
-}
-
-type RateLimiter struct {
-	Enable  bool
-	Count   int64
-	RedisDB int
-}
-
-type Redis struct {
-	Addr     string
-	Password string
-}
-
-type Gorm struct {
-	Debug             bool
-	DBType            string
-	MaxLifetime       int
-	MaxIdleTime       int
-	MaxOpenConns      int
-	MaxIdleConns      int
-	TablePrefix       string
-	EnableAutoMigrate bool
-}
-
-type MySQL struct {
-	Host       string
-	Port       int
-	User       string
-	Password   string
-	DBName     string
-	Parameters string
-}
-
-func (a MySQL) DSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
-		a.User, a.Password, a.Host, a.Port, a.DBName, a.Parameters)
-}
-
-type Postgres struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DBName   string
-	SSLMode  string
-	Replicas struct {
-		Hosts  []string
-		Tables []string
+func (c *Config) String() string {
+	b, err := toml.Marshal(c)
+	if err != nil {
+		panic("Failed to marshal config with toml: " + err.Error())
 	}
-}
 
-func (a Postgres) DSN() string {
-	return fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s",
-		a.Host, a.Port, a.User, a.DBName, a.Password, a.SSLMode)
-}
-
-func (a Postgres) ReplicasDSN() []string {
-	list := make([]string, len(a.Replicas.Hosts))
-	for i, host := range a.Replicas.Hosts {
-		list[i] = fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s",
-			host, a.Port, a.User, a.DBName, a.Password, a.SSLMode)
-	}
-	return list
-}
-
-type Sqlite3 struct {
-	Path string
-}
-
-func (a Sqlite3) DSN() string {
-	return a.Path
+	return string(b)
 }
