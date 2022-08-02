@@ -15,7 +15,6 @@ import (
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
 	"github.com/LyricTian/gin-admin/v9/pkg/x/cachex"
-
 	"github.com/casbin/casbin/v2"
 	"go.uber.org/zap"
 )
@@ -69,7 +68,7 @@ func (a *Casbinx) Load(ctx context.Context) error {
 	_ = os.Chmod(policyFile, 0444)
 
 	// load casbin
-	modelFile := filepath.Join(config.C.General.ConfigDir, "casbin_model.conf")
+	modelFile := filepath.Join(config.C.General.ConfigDir, "casbin_typed.conf")
 	e, err := casbin.NewEnforcer(modelFile, policyFile)
 	if err != nil {
 		return err

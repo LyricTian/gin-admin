@@ -21,6 +21,7 @@ tmp
 /vendor
 /configs/rbac_policy.csv
 /configs/rbac_policy.csv.bak
+/test/data
 
 
 # IDE configs

@@ -3,6 +3,8 @@ AppName = "ginadmin"
 RunMode = "debug" # debug/test/release
 PprofAddr = "localhost:6060"
 DisableSwagger = false
+DisablePrintConfig = false
+DisableInitMenu = false
 
 [General.HTTP]
 Addr = ":8080"
@@ -68,7 +70,7 @@ AllowWebSockets = false
 AllowFiles = false
 
 [Middleware.Auth]
-Disable = true
+Disable = false
 SigningMethod = "HS512"
 SigningKey = "XnEsT0S@"
 Expired = 86400 # seconds
@@ -81,7 +83,7 @@ Delimiter = ":"
 CleanupInterval = 60
 
 [Middleware.Auth.Store.Badger]
-Path = "data/authcache"
+Path = "data/auth"
 
 [Middleware.Auth.Store.Redis]
 Addr = ""

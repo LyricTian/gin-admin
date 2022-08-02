@@ -21,7 +21,7 @@ build:
 	@go build -ldflags "-w -s -X github.com/LyricTian/gin-admin/v9/cmd.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)
 
 wire:
-	@wire gen ./internal/initialize
+	@wire gen ./internal/inject
 
 swagger:
 	@swag init --parseDependency --generalInfo ./main.go --output ./internal/swagger

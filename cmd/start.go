@@ -8,8 +8,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/LyricTian/gin-admin/v9/internal"
 	"github.com/LyricTian/gin-admin/v9/internal/config"
-	"github.com/LyricTian/gin-admin/v9/internal/initialize"
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
 	"github.com/LyricTian/gin-admin/v9/pkg/x/gormx"
 
@@ -84,12 +84,14 @@ var StartCmd = &cli.Command{
 
 			// Load the configuration
 			config.MustLoad(filepath.Join(cfgDir, "config.toml"))
-			logger.Context(ctx).Info("Load configuration", zap.String("config", config.C.String()))
 			config.C.General.ConfigDir = cfgDir
 			config.C.Middleware.Static.Dir = staticDir
+			if !config.C.General.DisablePrintConfig {
+				logger.Context(ctx).Info("Load configuration", zap.String("config", config.C.String()))
+			}
 
 			// Initialize the server
-			cleanInit, err := initialize.Init(ctx)
+			cleanInit, err := internal.Init(ctx)
 			if err != nil {
 				return nil, err
 			}

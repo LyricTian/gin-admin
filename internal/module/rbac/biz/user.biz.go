@@ -1,4 +1,4 @@
-package service
+package biz
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type UserSvc struct {
+type UserBiz struct {
 	TransRepo    utilx.TransRepo
 	UserRepo     dao.UserRepo
 	UserRoleRepo dao.UserRoleRepo
@@ -23,7 +23,7 @@ type UserSvc struct {
 	Cache        cachex.Cacher
 }
 
-func (a *UserSvc) Query(ctx context.Context, params typed.UserQueryParam) (*typed.UserQueryResult, error) {
+func (a *UserBiz) Query(ctx context.Context, params typed.UserQueryParam) (*typed.UserQueryResult, error) {
 	params.Pagination = true
 	result, err := a.UserRepo.Query(ctx, params, typed.UserQueryOptions{
 		QueryOptions: utilx.QueryOptions{
@@ -65,7 +65,7 @@ func (a *UserSvc) Query(ctx context.Context, params typed.UserQueryParam) (*type
 	return result, nil
 }
 
-func (a *UserSvc) Get(ctx context.Context, id string) (*typed.User, error) {
+func (a *UserBiz) Get(ctx context.Context, id string) (*typed.User, error) {
 	user, err := a.UserRepo.Get(ctx, id, typed.UserQueryOptions{
 		QueryOptions: utilx.QueryOptions{
 			OmitFields: []string{"password"},
@@ -88,7 +88,11 @@ func (a *UserSvc) Get(ctx context.Context, id string) (*typed.User, error) {
 	return user, nil
 }
 
-func (a *UserSvc) Create(ctx context.Context, createItem typed.UserCreate) (*typed.User, error) {
+func (a *UserBiz) Create(ctx context.Context, createItem typed.UserCreate) (*typed.User, error) {
+	if createItem.Password == "" {
+		return nil, errors.BadRequest(errors.ErrBadRequestID, "Password is required")
+	}
+
 	exists, err := a.UserRepo.ExistsUsername(ctx, createItem.Username)
 	if err != nil {
 		return nil, err
@@ -138,7 +142,7 @@ func (a *UserSvc) Create(ctx context.Context, createItem typed.UserCreate) (*typ
 	return user, nil
 }
 
-func (a *UserSvc) Update(ctx context.Context, id string, createItem typed.UserCreate) error {
+func (a *UserBiz) Update(ctx context.Context, id string, createItem typed.UserCreate) error {
 	oldUser, err := a.UserRepo.Get(ctx, id)
 	if err != nil {
 		return err
@@ -204,7 +208,7 @@ func (a *UserSvc) Update(ctx context.Context, id string, createItem typed.UserCr
 	return nil
 }
 
-func (a *UserSvc) Delete(ctx context.Context, id string) error {
+func (a *UserBiz) Delete(ctx context.Context, id string) error {
 	exists, err := a.UserRepo.Exists(ctx, id)
 	if err != nil {
 		return err
@@ -236,7 +240,7 @@ func (a *UserSvc) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (a *UserSvc) UpdateStatus(ctx context.Context, id string, status typed.UserStatus) error {
+func (a *UserBiz) UpdateStatus(ctx context.Context, id string, status typed.UserStatus) error {
 	exists, err := a.UserRepo.Exists(ctx, id)
 	if err != nil {
 		return err
@@ -260,7 +264,7 @@ func (a *UserSvc) UpdateStatus(ctx context.Context, id string, status typed.User
 	return nil
 }
 
-func (a *UserSvc) GetRoleIDs(ctx context.Context, id string) ([]string, error) {
+func (a *UserBiz) GetRoleIDs(ctx context.Context, id string) ([]string, error) {
 	user, err := a.UserRepo.Get(ctx, id, typed.UserQueryOptions{
 		QueryOptions: utilx.QueryOptions{
 			SelectFields: []string{"status"},

@@ -1,0 +1,10 @@
+[General]
+AppName = "ginadmin-test"
+RunMode = "test"
+DisableInitMenu = true
+
+[Dictionary.RootUser]
+ID = "root"
+Username = "root"
+Password = "abc-123"
+Name = "Root"

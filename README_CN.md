@@ -143,7 +143,7 @@ export CGO_ENABLED=1; export CC=gcc; go get -v -x github.com/mattn/go-sqlite3
 ├── configs
 │   ├── config.toml       # 配置文件
 │   ├── menu.yaml         # 菜单初始化配置
-│   └── model.conf        # casbin 策略配置
+│   └── typed.conf        # casbin 策略配置
 ├── docs                  # 文档
 ├── internal
 │   └── app

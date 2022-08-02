@@ -4,20 +4,15 @@
 //go:build !wireinject
 // +build !wireinject
 
-package initialize
+package inject
 
 import (
 	"context"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/api"
+	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/biz"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/dao"
-	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/service"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
-)
-
-import (
-	_ "github.com/LyricTian/gin-admin/v9/internal/swagger"
-	_ "net/http/pprof"
 )
 
 // Injectors from wire.go:
@@ -61,25 +56,35 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	daoMenuActionResourceRepo := dao.MenuActionResourceRepo{
 		DB: db,
 	}
-	menuSvc := &service.MenuSvc{
+	menuBiz := &biz.MenuBiz{
 		TransRepo:              transRepo,
 		MenuRepo:               menuRepo,
 		MenuActionRepo:         menuActionRepo,
 		MenuActionResourceRepo: daoMenuActionResourceRepo,
 	}
-	menuAPI := &api.MenuAPI{
-		MenuSvc: menuSvc,
-	}
-	daoRoleRepo := dao.RoleRepo{
-		DB: db,
-	}
-	roleMenuRepo := dao.RoleMenuRepo{
+	userRepo := dao.UserRepo{
 		DB: db,
 	}
 	userRoleRepo := dao.UserRoleRepo{
 		DB: db,
 	}
-	roleSvc := &service.RoleSvc{
+	daoRoleRepo := dao.RoleRepo{
+		DB: db,
+	}
+	userBiz := &biz.UserBiz{
+		TransRepo:    transRepo,
+		UserRepo:     userRepo,
+		UserRoleRepo: userRoleRepo,
+		RoleRepo:     daoRoleRepo,
+		Cache:        cacher,
+	}
+	menuAPI := &api.MenuAPI{
+		MenuBiz: menuBiz,
+	}
+	roleMenuRepo := dao.RoleMenuRepo{
+		DB: db,
+	}
+	roleBiz := &biz.RoleBiz{
 		TransRepo:    transRepo,
 		RoleRepo:     daoRoleRepo,
 		RoleMenuRepo: roleMenuRepo,
@@ -87,20 +92,10 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		Cache:        cacher,
 	}
 	roleAPI := &api.RoleAPI{
-		RoleSvc: roleSvc,
-	}
-	userRepo := dao.UserRepo{
-		DB: db,
-	}
-	userSvc := &service.UserSvc{
-		TransRepo:    transRepo,
-		UserRepo:     userRepo,
-		UserRoleRepo: userRoleRepo,
-		RoleRepo:     daoRoleRepo,
-		Cache:        cacher,
+		RoleBiz: roleBiz,
 	}
 	userAPI := &api.UserAPI{
-		UserSvc: userSvc,
+		UserBiz: userBiz,
 	}
 	daoUserRepo := &dao.UserRepo{
 		DB: db,
@@ -114,7 +109,7 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	daoMenuActionRepo := &dao.MenuActionRepo{
 		DB: db,
 	}
-	loginSvc := &service.LoginSvc{
+	loginBiz := &biz.LoginBiz{
 		Auth:           auther,
 		Cache:          cacher,
 		UserRepo:       daoUserRepo,
@@ -124,17 +119,17 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		MenuActionRepo: daoMenuActionRepo,
 	}
 	loginAPI := &api.LoginAPI{
-		LoginSvc: loginSvc,
+		LoginBiz: loginBiz,
 	}
 	rbacRBAC := &rbac.RBAC{
 		DB:       db,
 		Casbinx:  casbinx,
+		MenuBiz:  menuBiz,
+		UserBiz:  userBiz,
 		MenuAPI:  menuAPI,
 		RoleAPI:  roleAPI,
 		UserAPI:  userAPI,
 		LoginAPI: loginAPI,
-		MenuSvc:  menuSvc,
-		UserSvc:  userSvc,
 	}
 	injector := &Injector{
 		Auth:  auther,

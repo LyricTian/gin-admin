@@ -1,4 +1,4 @@
-package initialize
+package internal
 
 import (
 	"context"
@@ -11,13 +11,13 @@ import (
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/captcha/store"
 	"github.com/LyricTian/gin-admin/v9/internal/config"
+	"github.com/LyricTian/gin-admin/v9/internal/inject"
 	"github.com/LyricTian/gin-admin/v9/internal/middleware"
 	"github.com/LyricTian/gin-admin/v9/internal/x/contextx"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 	"github.com/LyricTian/gin-admin/v9/pkg/errors"
 	"github.com/LyricTian/gin-admin/v9/pkg/jwtauth"
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
-
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -33,16 +33,19 @@ import (
 func Init(ctx context.Context) (func(), error) {
 	initCaptcha()
 
-	injector, cleanInjectFn, err := BuildInjector(ctx)
+	injector, cleanInjectFn, err := inject.BuildInjector(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// Initialize modules
-	if err := injector.RBAC.Init(ctx); err != nil {
-		return cleanInjectFn, err
-	}
+	{
+		if err := injector.RBAC.Init(ctx); err != nil {
+			return cleanInjectFn, err
+		}
+	} // end
 
+	// Initialize http server with gin
 	cleanHTTP, err := initHTTPServer(ctx, injector)
 	if err != nil {
 		return cleanInjectFn, err
@@ -65,7 +68,7 @@ func Init(ctx context.Context) (func(), error) {
 	}, nil
 }
 
-func initHTTPServer(ctx context.Context, injector *Injector) (func(), error) {
+func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), error) {
 	gin.SetMode(config.C.General.RunMode)
 	app := gin.New()
 
@@ -103,7 +106,7 @@ func initHTTPServer(ctx context.Context, injector *Injector) (func(), error) {
 
 		// Register RBAC APIs
 		injector.RBAC.RegisterAPI(ctx, apiGroup)
-	}
+	} // end
 
 	if !config.C.General.DisableSwagger {
 		app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -116,6 +119,8 @@ func initHTTPServer(ctx context.Context, injector *Injector) (func(), error) {
 		}))
 	}
 
+	logger.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", config.C.General.HTTP.Addr))
+
 	srv := &http.Server{
 		Addr:         config.C.General.HTTP.Addr,
 		Handler:      app,
@@ -123,8 +128,6 @@ func initHTTPServer(ctx context.Context, injector *Injector) (func(), error) {
 		WriteTimeout: time.Second * time.Duration(config.C.General.HTTP.WriteTimeout),
 		IdleTimeout:  time.Second * time.Duration(config.C.General.HTTP.IdleTimeout),
 	}
-
-	logger.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", config.C.General.HTTP.Addr))
 	go func() {
 		var err error
 		if config.C.General.HTTP.CertFile != "" && config.C.General.HTTP.KeyFile != "" {
@@ -144,12 +147,12 @@ func initHTTPServer(ctx context.Context, injector *Injector) (func(), error) {
 
 		srv.SetKeepAlivesEnabled(false)
 		if err := srv.Shutdown(ctx); err != nil {
-			logger.Context(ctx).Error("HTTP server shutdown error", zap.Error(err))
+			logger.Context(ctx).Error("Failed to shutdown http server", zap.Error(err))
 		}
 	}, nil
 }
 
-func initMiddlewares(g *gin.RouterGroup, injector *Injector) {
+func initMiddlewares(g *gin.RouterGroup, injector *inject.Injector) {
 	g.Use(middleware.RecoveryWithConfig(middleware.RecoveryConfig{
 		Skip: config.C.Middleware.Recovery.Skip,
 	}))
@@ -212,7 +215,7 @@ func initMiddlewares(g *gin.RouterGroup, injector *Injector) {
 				return sub, nil
 			}
 
-			roleIDs, err := injector.RBAC.UserSvc.GetRoleIDs(ctx, sub)
+			roleIDs, err := injector.RBAC.UserBiz.GetRoleIDs(ctx, sub)
 			if err != nil {
 				return "", err
 			}

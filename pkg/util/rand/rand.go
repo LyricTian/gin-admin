@@ -25,7 +25,7 @@ var (
 
 // definition error
 var (
-	ErrInvalidFlag = errors.New("invalid random flag")
+	ErrInvalidFlag = errors.New("Invalid flag")
 )
 
 // Random generate a random string specifying the length of the random number

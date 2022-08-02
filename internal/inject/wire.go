@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-package initialize
+package inject
 
 // The build tag makes sure the stub is not built in the final build.
 
@@ -10,7 +10,6 @@ import (
 
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
-
 	"github.com/google/wire"
 )
 

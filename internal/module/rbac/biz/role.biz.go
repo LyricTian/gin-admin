@@ -1,4 +1,4 @@
-package service
+package biz
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type RoleSvc struct {
+type RoleBiz struct {
 	TransRepo    utilx.TransRepo
 	RoleRepo     dao.RoleRepo
 	RoleMenuRepo dao.RoleMenuRepo
@@ -22,7 +22,7 @@ type RoleSvc struct {
 	Cache        cachex.Cacher
 }
 
-func (a *RoleSvc) Query(ctx context.Context, params typed.RoleQueryParam) (*typed.RoleQueryResult, error) {
+func (a *RoleBiz) Query(ctx context.Context, params typed.RoleQueryParam) (*typed.RoleQueryResult, error) {
 	params.Pagination = true
 	queryOpts := utilx.QueryOptions{
 		OrderFields: []utilx.OrderByParam{
@@ -45,7 +45,7 @@ func (a *RoleSvc) Query(ctx context.Context, params typed.RoleQueryParam) (*type
 	return result, nil
 }
 
-func (a *RoleSvc) Get(ctx context.Context, id string) (*typed.Role, error) {
+func (a *RoleBiz) Get(ctx context.Context, id string) (*typed.Role, error) {
 	role, err := a.RoleRepo.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (a *RoleSvc) Get(ctx context.Context, id string) (*typed.Role, error) {
 	return role, nil
 }
 
-func (a *RoleSvc) Create(ctx context.Context, createItem typed.RoleCreate) (*typed.Role, error) {
+func (a *RoleBiz) Create(ctx context.Context, createItem typed.RoleCreate) (*typed.Role, error) {
 	role := &typed.Role{
 		ID:        xid.NewID(),
 		Name:      createItem.Name,
@@ -100,7 +100,7 @@ func (a *RoleSvc) Create(ctx context.Context, createItem typed.RoleCreate) (*typ
 	return role, nil
 }
 
-func (a *RoleSvc) Update(ctx context.Context, id string, createItem typed.RoleCreate) error {
+func (a *RoleBiz) Update(ctx context.Context, id string, createItem typed.RoleCreate) error {
 	oldRole, err := a.RoleRepo.Get(ctx, id)
 	if err != nil {
 		return err
@@ -137,7 +137,7 @@ func (a *RoleSvc) Update(ctx context.Context, id string, createItem typed.RoleCr
 	})
 }
 
-func (a *RoleSvc) clearUserCacheByID(ctx context.Context, id string) error {
+func (a *RoleBiz) clearUserCacheByID(ctx context.Context, id string) error {
 	userRoleResult, err := a.UserRoleRepo.Query(ctx, typed.UserRoleQueryParam{
 		RoleID: id,
 	}, typed.UserRoleQueryOptions{
@@ -159,7 +159,7 @@ func (a *RoleSvc) clearUserCacheByID(ctx context.Context, id string) error {
 	return nil
 }
 
-func (a *RoleSvc) Delete(ctx context.Context, id string) error {
+func (a *RoleBiz) Delete(ctx context.Context, id string) error {
 	exists, err := a.RoleRepo.Exists(ctx, id)
 	if err != nil {
 		return err
@@ -196,7 +196,7 @@ func (a *RoleSvc) Delete(ctx context.Context, id string) error {
 	return a.clearUserCacheByID(ctx, id)
 }
 
-func (a *RoleSvc) UpdateStatus(ctx context.Context, id string, status typed.RoleStatus) error {
+func (a *RoleBiz) UpdateStatus(ctx context.Context, id string, status typed.RoleStatus) error {
 	exists, err := a.RoleRepo.Exists(ctx, id)
 	if err != nil {
 		return err

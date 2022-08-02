@@ -1,14 +1,14 @@
 package api
 
 import (
-	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/service"
+	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/biz"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/typed"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 	"github.com/gin-gonic/gin"
 )
 
 type RoleAPI struct {
-	RoleSvc *service.RoleSvc
+	RoleBiz *biz.RoleBiz
 }
 
 // @Tags RoleAPI
@@ -29,7 +29,7 @@ func (a *RoleAPI) Query(c *gin.Context) {
 		return
 	}
 
-	result, err := a.RoleSvc.Query(ctx, params)
+	result, err := a.RoleBiz.Query(ctx, params)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -47,7 +47,7 @@ func (a *RoleAPI) Query(c *gin.Context) {
 // @Router /api/rbac/v1/roles/{id} [get]
 func (a *RoleAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.RoleSvc.Get(ctx, c.Param("id"))
+	item, err := a.RoleBiz.Get(ctx, c.Param("id"))
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -72,7 +72,7 @@ func (a *RoleAPI) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := a.RoleSvc.Create(ctx, item)
+	result, err := a.RoleBiz.Create(ctx, item)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -98,7 +98,7 @@ func (a *RoleAPI) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.RoleSvc.Update(ctx, c.Param("id"), item)
+	err := a.RoleBiz.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -116,7 +116,7 @@ func (a *RoleAPI) Update(c *gin.Context) {
 // @Router /api/rbac/v1/roles/{id} [delete]
 func (a *RoleAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSvc.Delete(ctx, c.Param("id"))
+	err := a.RoleBiz.Delete(ctx, c.Param("id"))
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -134,7 +134,7 @@ func (a *RoleAPI) Delete(c *gin.Context) {
 // @Router /api/rbac/v1/roles/{id}/enable [patch]
 func (a *RoleAPI) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSvc.UpdateStatus(ctx, c.Param("id"), typed.RoleStatusEnabled)
+	err := a.RoleBiz.UpdateStatus(ctx, c.Param("id"), typed.RoleStatusEnabled)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -152,7 +152,7 @@ func (a *RoleAPI) Enable(c *gin.Context) {
 // @Router /api/rbac/v1/roles/{id}/disable [patch]
 func (a *RoleAPI) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSvc.UpdateStatus(ctx, c.Param("id"), typed.RoleStatusDisabled)
+	err := a.RoleBiz.UpdateStatus(ctx, c.Param("id"), typed.RoleStatusDisabled)
 	if err != nil {
 		utilx.ResError(c, err)
 		return

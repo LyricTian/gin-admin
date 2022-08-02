@@ -1,14 +1,14 @@
 package api
 
 import (
-	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/service"
+	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/biz"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/typed"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 	"github.com/gin-gonic/gin"
 )
 
 type LoginAPI struct {
-	LoginSvc *service.LoginSvc
+	LoginBiz *biz.LoginBiz
 }
 
 // @Tags LoginAPI
@@ -17,7 +17,7 @@ type LoginAPI struct {
 // @Router /api/rbac/v1/login/captchaid [get]
 func (a *LoginAPI) GetCaptchaID(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.LoginSvc.GetCaptchaID(ctx)
+	item, err := a.LoginBiz.GetCaptchaID(ctx)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -36,7 +36,7 @@ func (a *LoginAPI) GetCaptchaID(c *gin.Context) {
 // @Router /api/rbac/v1/login/captcha [get]
 func (a *LoginAPI) WriteCaptchaImage(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.LoginSvc.WriteCaptchaImage(ctx, c.Writer, c.Query("id"), c.Query("reload") == "1")
+	err := a.LoginBiz.WriteCaptchaImage(ctx, c.Writer, c.Query("id"), c.Query("reload") == "1")
 	if err != nil {
 		utilx.ResError(c, err)
 	}
@@ -57,7 +57,7 @@ func (a *LoginAPI) Login(c *gin.Context) {
 		return
 	}
 
-	loginToken, err := a.LoginSvc.Login(ctx, item.TrimSpace())
+	loginToken, err := a.LoginBiz.Login(ctx, item.TrimSpace())
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -72,7 +72,7 @@ func (a *LoginAPI) Login(c *gin.Context) {
 // @Router /api/rbac/v1/current/logout [post]
 func (a *LoginAPI) Logout(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.LoginSvc.Logout(ctx, utilx.GetToken(c))
+	err := a.LoginBiz.Logout(ctx, utilx.GetToken(c))
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -89,7 +89,7 @@ func (a *LoginAPI) Logout(c *gin.Context) {
 // @Router /api/rbac/v1/current/refreshtoken [post]
 func (a *LoginAPI) RefreshToken(c *gin.Context) {
 	ctx := c.Request.Context()
-	tokenInfo, err := a.LoginSvc.RefreshToken(ctx)
+	tokenInfo, err := a.LoginBiz.RefreshToken(ctx)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -106,7 +106,7 @@ func (a *LoginAPI) RefreshToken(c *gin.Context) {
 // @Router /api/rbac/v1/current/user [get]
 func (a *LoginAPI) GetCurrentUser(c *gin.Context) {
 	ctx := c.Request.Context()
-	info, err := a.LoginSvc.GetCurrentUser(ctx)
+	info, err := a.LoginBiz.GetCurrentUser(ctx)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -130,7 +130,7 @@ func (a *LoginAPI) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	err := a.LoginSvc.UpdatePassword(ctx, item)
+	err := a.LoginBiz.UpdatePassword(ctx, item)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -147,7 +147,7 @@ func (a *LoginAPI) UpdatePassword(c *gin.Context) {
 // @Router /api/rbac/v1/current/menus [put]
 func (a *LoginAPI) QueryPrivilegeMenus(c *gin.Context) {
 	ctx := c.Request.Context()
-	result, err := a.LoginSvc.QueryPrivilegeMenus(ctx)
+	result, err := a.LoginBiz.QueryPrivilegeMenus(ctx)
 	if err != nil {
 		utilx.ResError(c, err)
 		return

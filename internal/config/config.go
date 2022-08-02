@@ -38,9 +38,11 @@ type Config struct {
 			CertFile        string
 			KeyFile         string
 		}
-		PprofAddr      string
-		DisableSwagger bool
-		ConfigDir      string // config directory (from command arguments)
+		PprofAddr          string
+		DisableSwagger     bool
+		DisablePrintConfig bool
+		DisableInitMenu    bool
+		ConfigDir          string // config directory (from command arguments)
 	}
 	Storage struct {
 		Cache struct {
@@ -61,11 +63,11 @@ type Config struct {
 		}
 		DB struct {
 			Debug        bool
-			Type         string `default:"sqlite3"`                // sqlite3/mysql/postgres
-			DSN          string `default:"sqlite3:///ginadmin.db"` // database source name
-			MaxLifetime  int    `default:"86400"`                  // seconds
-			MaxIdleTime  int    `default:"3600"`                   // seconds
-			MaxOpenConns int    `default:"100"`                    // connections
+			Type         string `default:"sqlite3"`                 // sqlite3/mysql/postgres
+			DSN          string `default:"data/sqlite/ginadmin.db"` // database source name
+			MaxLifetime  int    `default:"86400"`                   // seconds
+			MaxIdleTime  int    `default:"3600"`                    // seconds
+			MaxOpenConns int    `default:"100"`                     // connections
 			MaxIdleConns int    `default:"50"`
 			TablePrefix  string `default:"g_"`
 			Replicas     struct {
@@ -184,7 +186,7 @@ type Config struct {
 		RootUser struct {
 			ID       string `default:"root"`
 			Username string `default:"root"`
-			Password string `default:"123"`
+			Password string `default:"abc-123"`
 			Name     string `default:"Root"`
 		}
 		UserCacheExpire int `default:"4"` // user cache expire in hours

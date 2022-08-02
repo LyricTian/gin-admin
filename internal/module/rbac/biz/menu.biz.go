@@ -1,4 +1,4 @@
-package service
+package biz
 
 import (
 	"context"
@@ -15,14 +15,14 @@ import (
 	"github.com/LyricTian/gin-admin/v9/pkg/util/xid"
 )
 
-type MenuSvc struct {
+type MenuBiz struct {
 	TransRepo              utilx.TransRepo
 	MenuRepo               dao.MenuRepo
 	MenuActionRepo         dao.MenuActionRepo
 	MenuActionResourceRepo dao.MenuActionResourceRepo
 }
 
-func (a *MenuSvc) InitFromJSON(ctx context.Context, dataFile string) error {
+func (a *MenuBiz) InitFromJSON(ctx context.Context, dataFile string) error {
 	// If exists menu data in database, skip init menu data.
 	menuResult, err := a.MenuRepo.Query(ctx, typed.MenuQueryParam{
 		PaginationParam: utilx.PaginationParam{
@@ -53,7 +53,7 @@ func (a *MenuSvc) InitFromJSON(ctx context.Context, dataFile string) error {
 	return a.createMenus(ctx, "", menuTrees)
 }
 
-func (a *MenuSvc) createMenus(ctx context.Context, parentID string, createItems typed.Menus) error {
+func (a *MenuBiz) createMenus(ctx context.Context, parentID string, createItems typed.Menus) error {
 	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		for _, citem := range createItems {
 			menu, err := a.Create(ctx, typed.MenuCreate{
@@ -82,7 +82,7 @@ func (a *MenuSvc) createMenus(ctx context.Context, parentID string, createItems 
 	})
 }
 
-func (a *MenuSvc) Query(ctx context.Context, params typed.MenuQueryParam) (*typed.MenuQueryResult, error) {
+func (a *MenuBiz) Query(ctx context.Context, params typed.MenuQueryParam) (*typed.MenuQueryResult, error) {
 	params.PageSize = -1
 	result, err := a.MenuRepo.Query(ctx, params, typed.MenuQueryOptions{
 		QueryOptions: utilx.QueryOptions{
@@ -99,7 +99,7 @@ func (a *MenuSvc) Query(ctx context.Context, params typed.MenuQueryParam) (*type
 	return result, nil
 }
 
-func (a *MenuSvc) Get(ctx context.Context, id string) (*typed.Menu, error) {
+func (a *MenuBiz) Get(ctx context.Context, id string) (*typed.Menu, error) {
 	menu, err := a.MenuRepo.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (a *MenuSvc) Get(ctx context.Context, id string) (*typed.Menu, error) {
 	return menu, nil
 }
 
-func (a *MenuSvc) getParent(ctx context.Context, parentID string) (*typed.Menu, error) {
+func (a *MenuBiz) getParent(ctx context.Context, parentID string) (*typed.Menu, error) {
 	parent, err := a.MenuRepo.Get(ctx, parentID, typed.MenuQueryOptions{
 		QueryOptions: utilx.QueryOptions{
 			SelectFields: []string{"id", "parent_path"},
@@ -139,7 +139,7 @@ func (a *MenuSvc) getParent(ctx context.Context, parentID string) (*typed.Menu, 
 	return parent, nil
 }
 
-func (a *MenuSvc) Create(ctx context.Context, createItem typed.MenuCreate) (*typed.Menu, error) {
+func (a *MenuBiz) Create(ctx context.Context, createItem typed.MenuCreate) (*typed.Menu, error) {
 	menu := &typed.Menu{
 		ID:        xid.NewID(),
 		Name:      createItem.Name,
@@ -192,7 +192,7 @@ func (a *MenuSvc) Create(ctx context.Context, createItem typed.MenuCreate) (*typ
 	return menu, nil
 }
 
-func (a *MenuSvc) Update(ctx context.Context, id string, createItem typed.MenuCreate) error {
+func (a *MenuBiz) Update(ctx context.Context, id string, createItem typed.MenuCreate) error {
 	oldMenu, err := a.MenuRepo.Get(ctx, id)
 	if err != nil {
 		return err
@@ -238,7 +238,7 @@ func (a *MenuSvc) Update(ctx context.Context, id string, createItem typed.MenuCr
 	})
 }
 
-func (a *MenuSvc) updateChildrenParentPath(ctx context.Context, oldParentPath, newParentPath string) error {
+func (a *MenuBiz) updateChildrenParentPath(ctx context.Context, oldParentPath, newParentPath string) error {
 	menuResult, err := a.MenuRepo.Query(ctx, typed.MenuQueryParam{
 		ParentPathPrefix: oldParentPath,
 	}, typed.MenuQueryOptions{
@@ -263,7 +263,7 @@ func (a *MenuSvc) updateChildrenParentPath(ctx context.Context, oldParentPath, n
 	return nil
 }
 
-func (a *MenuSvc) updateActions(ctx context.Context, id string, actions typed.MenuActions) error {
+func (a *MenuBiz) updateActions(ctx context.Context, id string, actions typed.MenuActions) error {
 	if len(actions) == 0 {
 		if err := a.MenuActionRepo.DeleteByMenuID(ctx, id); err != nil {
 			return err
@@ -350,7 +350,7 @@ func (a *MenuSvc) updateActions(ctx context.Context, id string, actions typed.Me
 	return nil
 }
 
-func (a *MenuSvc) deleteByID(ctx context.Context, id string) error {
+func (a *MenuBiz) deleteByID(ctx context.Context, id string) error {
 	if err := a.MenuRepo.Delete(ctx, id); err != nil {
 		return err
 	}
@@ -366,7 +366,7 @@ func (a *MenuSvc) deleteByID(ctx context.Context, id string) error {
 	return nil
 }
 
-func (a *MenuSvc) Delete(ctx context.Context, id string) error {
+func (a *MenuBiz) Delete(ctx context.Context, id string) error {
 	oldMenu, err := a.MenuRepo.Get(ctx, id, typed.MenuQueryOptions{
 		QueryOptions: utilx.QueryOptions{
 			SelectFields: []string{"id", "parent_path"},
@@ -399,7 +399,7 @@ func (a *MenuSvc) Delete(ctx context.Context, id string) error {
 	})
 }
 
-func (a *MenuSvc) UpdateStatus(ctx context.Context, id string, status typed.MenuStatus) error {
+func (a *MenuBiz) UpdateStatus(ctx context.Context, id string, status typed.MenuStatus) error {
 	oldMenu, err := a.MenuRepo.Get(ctx, id, typed.MenuQueryOptions{
 		QueryOptions: utilx.QueryOptions{
 			SelectFields: []string{"id", "parent_path"},

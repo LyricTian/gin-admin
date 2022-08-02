@@ -1,4 +1,4 @@
-package service
+package biz
 
 import (
 	"context"
@@ -17,11 +17,10 @@ import (
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
 	"github.com/LyricTian/gin-admin/v9/pkg/util/hash"
 	"github.com/LyricTian/gin-admin/v9/pkg/x/cachex"
-
 	"go.uber.org/zap"
 )
 
-type LoginSvc struct {
+type LoginBiz struct {
 	Auth           jwtauth.Auther
 	Cache          cachex.Cacher
 	UserRepo       *dao.UserRepo
@@ -31,14 +30,14 @@ type LoginSvc struct {
 	MenuActionRepo *dao.MenuActionRepo
 }
 
-func (a *LoginSvc) GetCaptchaID(ctx context.Context) (*typed.Captcha, error) {
+func (a *LoginBiz) GetCaptchaID(ctx context.Context) (*typed.Captcha, error) {
 	item := &typed.Captcha{
 		CaptchaID: captcha.NewLen(config.C.Util.Captcha.Length),
 	}
 	return item, nil
 }
 
-func (a *LoginSvc) WriteCaptchaImage(ctx context.Context, w http.ResponseWriter, captchaID string, reload bool) error {
+func (a *LoginBiz) WriteCaptchaImage(ctx context.Context, w http.ResponseWriter, captchaID string, reload bool) error {
 	if reload && !captcha.Reload(captchaID) {
 		return errors.NotFound(errors.ErrNotFoundID, "Captcha id not found")
 	}
@@ -58,7 +57,7 @@ func (a *LoginSvc) WriteCaptchaImage(ctx context.Context, w http.ResponseWriter,
 	return nil
 }
 
-func (a *LoginSvc) generateToken(ctx context.Context, userID string) (*typed.LoginToken, error) {
+func (a *LoginBiz) generateToken(ctx context.Context, userID string) (*typed.LoginToken, error) {
 	tokenInfo, err := a.Auth.GenerateToken(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -73,7 +72,7 @@ func (a *LoginSvc) generateToken(ctx context.Context, userID string) (*typed.Log
 	}, nil
 }
 
-func (a *LoginSvc) Login(ctx context.Context, params typed.UserLogin) (*typed.LoginToken, error) {
+func (a *LoginBiz) Login(ctx context.Context, params typed.UserLogin) (*typed.LoginToken, error) {
 	if !captcha.VerifyString(params.CaptchaID, params.CaptchaCode) {
 		return nil, errors.BadRequest(errors.ErrBadRequestID, "Invalid captcha code")
 	}
@@ -128,7 +127,7 @@ func (a *LoginSvc) Login(ctx context.Context, params typed.UserLogin) (*typed.Lo
 	return a.generateToken(ctx, userID)
 }
 
-func (a *LoginSvc) Logout(ctx context.Context, token string) error {
+func (a *LoginBiz) Logout(ctx context.Context, token string) error {
 	ctx = logger.NewTag(ctx, logger.TagKeyLogout)
 
 	err := a.Auth.DestroyToken(ctx, token)
@@ -146,7 +145,7 @@ func (a *LoginSvc) Logout(ctx context.Context, token string) error {
 	return nil
 }
 
-func (a *LoginSvc) RefreshToken(ctx context.Context) (*typed.LoginToken, error) {
+func (a *LoginBiz) RefreshToken(ctx context.Context) (*typed.LoginToken, error) {
 	userID := contextx.FromUserID(ctx)
 	user, err := a.UserRepo.Get(ctx, userID, typed.UserQueryOptions{
 		QueryOptions: utilx.QueryOptions{
@@ -170,7 +169,7 @@ func (a *LoginSvc) RefreshToken(ctx context.Context) (*typed.LoginToken, error) 
 	return loginToken, nil
 }
 
-func (a *LoginSvc) GetCurrentUser(ctx context.Context) (*typed.User, error) {
+func (a *LoginBiz) GetCurrentUser(ctx context.Context) (*typed.User, error) {
 	if utilx.IsRootUser(ctx) {
 		return &typed.User{
 			ID:        config.C.Dictionary.RootUser.ID,
@@ -219,7 +218,7 @@ func (a *LoginSvc) GetCurrentUser(ctx context.Context) (*typed.User, error) {
 	return user, nil
 }
 
-func (a *LoginSvc) QueryPrivilegeMenus(ctx context.Context) (typed.Menus, error) {
+func (a *LoginBiz) QueryPrivilegeMenus(ctx context.Context) (typed.Menus, error) {
 	userID := contextx.FromUserID(ctx)
 
 	var menuIDList []string
@@ -264,7 +263,11 @@ func (a *LoginSvc) QueryPrivilegeMenus(ctx context.Context) (typed.Menus, error)
 	return menuResult.Data.ToTree(), nil
 }
 
-func (a *LoginSvc) UpdatePassword(ctx context.Context, params typed.LoginPasswordUpdate) error {
+func (a *LoginBiz) UpdatePassword(ctx context.Context, params typed.LoginPasswordUpdate) error {
+	if utilx.IsRootUser(ctx) {
+		return errors.Forbidden(errors.ErrForbiddenID, "Root user can not update password")
+	}
+
 	userID := contextx.FromUserID(ctx)
 	user, err := a.UserRepo.Get(ctx, userID, typed.UserQueryOptions{
 		QueryOptions: utilx.QueryOptions{

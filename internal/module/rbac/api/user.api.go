@@ -1,14 +1,14 @@
 package api
 
 import (
-	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/service"
+	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/biz"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/typed"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 	"github.com/gin-gonic/gin"
 )
 
 type UserAPI struct {
-	UserSvc *service.UserSvc
+	UserBiz *biz.UserBiz
 }
 
 // @Tags UserAPI
@@ -30,7 +30,7 @@ func (a *UserAPI) Query(c *gin.Context) {
 		return
 	}
 
-	result, err := a.UserSvc.Query(ctx, params)
+	result, err := a.UserBiz.Query(ctx, params)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -48,7 +48,7 @@ func (a *UserAPI) Query(c *gin.Context) {
 // @Router /api/rbac/v1/users/{id} [get]
 func (a *UserAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.UserSvc.Get(ctx, c.Param("id"))
+	item, err := a.UserBiz.Get(ctx, c.Param("id"))
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -73,7 +73,7 @@ func (a *UserAPI) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := a.UserSvc.Create(ctx, item)
+	result, err := a.UserBiz.Create(ctx, item)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -99,7 +99,7 @@ func (a *UserAPI) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.UserSvc.Update(ctx, c.Param("id"), item)
+	err := a.UserBiz.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -117,7 +117,7 @@ func (a *UserAPI) Update(c *gin.Context) {
 // @Router /api/rbac/v1/users/{id} [delete]
 func (a *UserAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.UserSvc.Delete(ctx, c.Param("id"))
+	err := a.UserBiz.Delete(ctx, c.Param("id"))
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -135,7 +135,7 @@ func (a *UserAPI) Delete(c *gin.Context) {
 // @Router /api/rbac/v1/users/{id}/active [patch]
 func (a *UserAPI) Active(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.UserSvc.UpdateStatus(ctx, c.Param("id"), typed.UserStatusActivated)
+	err := a.UserBiz.UpdateStatus(ctx, c.Param("id"), typed.UserStatusActivated)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -153,7 +153,7 @@ func (a *UserAPI) Active(c *gin.Context) {
 // @Router /api/rbac/v1/users/{id}/freeze [patch]
 func (a *UserAPI) Freeze(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.UserSvc.UpdateStatus(ctx, c.Param("id"), typed.UserStatusFreezed)
+	err := a.UserBiz.UpdateStatus(ctx, c.Param("id"), typed.UserStatusFreezed)
 	if err != nil {
 		utilx.ResError(c, err)
 		return

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/service"
+	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/biz"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/typed"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 
@@ -9,7 +9,7 @@ import (
 )
 
 type MenuAPI struct {
-	MenuSvc *service.MenuSvc
+	MenuBiz *biz.MenuBiz
 }
 
 // @Tags MenuAPI
@@ -30,12 +30,12 @@ func (a *MenuAPI) Query(c *gin.Context) {
 		return
 	}
 
-	result, err := a.MenuSvc.Query(ctx, params)
+	result, err := a.MenuBiz.Query(ctx, params)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResList(c, result.Data)
+	utilx.ResList(c, result)
 }
 
 // @Tags MenuAPI
@@ -48,7 +48,7 @@ func (a *MenuAPI) Query(c *gin.Context) {
 // @Router /api/rbac/v1/menus/{id} [get]
 func (a *MenuAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.MenuSvc.Get(ctx, c.Param("id"))
+	item, err := a.MenuBiz.Get(ctx, c.Param("id"))
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -73,7 +73,7 @@ func (a *MenuAPI) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := a.MenuSvc.Create(ctx, item)
+	result, err := a.MenuBiz.Create(ctx, item)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -99,7 +99,7 @@ func (a *MenuAPI) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.MenuSvc.Update(ctx, c.Param("id"), item)
+	err := a.MenuBiz.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -117,7 +117,7 @@ func (a *MenuAPI) Update(c *gin.Context) {
 // @Router /api/rbac/v1/menus/{id} [delete]
 func (a *MenuAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSvc.Delete(ctx, c.Param("id"))
+	err := a.MenuBiz.Delete(ctx, c.Param("id"))
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -135,7 +135,7 @@ func (a *MenuAPI) Delete(c *gin.Context) {
 // @Router /api/rbac/v1/menus/{id}/enable [patch]
 func (a *MenuAPI) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSvc.UpdateStatus(ctx, c.Param("id"), typed.MenuStatusEnabled)
+	err := a.MenuBiz.UpdateStatus(ctx, c.Param("id"), typed.MenuStatusEnabled)
 	if err != nil {
 		utilx.ResError(c, err)
 		return
@@ -153,7 +153,7 @@ func (a *MenuAPI) Enable(c *gin.Context) {
 // @Router /api/rbac/v1/menus/{id}/disable [patch]
 func (a *MenuAPI) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSvc.UpdateStatus(ctx, c.Param("id"), typed.MenuStatusDisabled)
+	err := a.MenuBiz.UpdateStatus(ctx, c.Param("id"), typed.MenuStatusDisabled)
 	if err != nil {
 		utilx.ResError(c, err)
 		return

@@ -1,11 +1,13 @@
 package middleware
 
 import (
+	"fmt"
+
 	"github.com/LyricTian/gin-admin/v9/internal/x/contextx"
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
-	"github.com/LyricTian/gin-admin/v9/pkg/util/trace"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/xid"
 )
 
 type TraceConfig struct {
@@ -32,7 +34,7 @@ func TraceWithConfig(config TraceConfig) gin.HandlerFunc {
 
 		traceID := c.GetHeader(config.RequestHeaderKey)
 		if traceID == "" {
-			traceID = trace.NewTraceID()
+			traceID = fmt.Sprintf("trace-%s", xid.New().String())
 		}
 
 		ctx := contextx.NewTraceID(c.Request.Context(), traceID)

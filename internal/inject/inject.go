@@ -1,4 +1,4 @@
-package initialize
+package inject
 
 import (
 	"context"
@@ -10,18 +10,18 @@ import (
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
 	"github.com/LyricTian/gin-admin/v9/pkg/x/cachex"
 	"github.com/LyricTian/gin-admin/v9/pkg/x/gormx"
-
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
+// Inject global objects
 type Injector struct {
 	Auth  jwtauth.Auther
 	Cache cachex.Cacher
 	DB    *gorm.DB
 	RBAC  *rbac.RBAC
-}
+} // end
 
 func InitAuth(ctx context.Context) (jwtauth.Auther, func(), error) {
 	cfg := config.C.Middleware.Auth

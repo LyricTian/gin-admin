@@ -71,5 +71,5 @@ type UserCreate struct {
 	Email    string   `json:"email"`
 	Phone    string   `json:"phone"`
 	Remark   string   `json:"remark"`
-	RoleIDs  []string `json:"role_ids" binding:"required"`
+	RoleIDs  []string `json:"role_ids"`
 }
