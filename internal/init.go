@@ -42,6 +42,9 @@ func Init(ctx context.Context) (func(), error) {
 		if err := injector.RBAC.Init(ctx); err != nil {
 			return cleanInjectFn, err
 		}
+		if err := injector.SYS.Init(ctx); err != nil {
+			return cleanInjectFn, err
+		}
 	} // end
 
 	// Initialize http server with gin
@@ -105,6 +108,9 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 
 		// Register RBAC APIs
 		injector.RBAC.RegisterAPI(ctx, apiGroup)
+
+		// Register SYS APIs
+		injector.SYS.RegisterAPI(ctx, apiGroup)
 	} // end
 
 	if !config.C.General.DisableSwagger {

@@ -11,7 +11,7 @@ fields:
     comments: Namespace of the dictionary
     in_query: true
     query_comments: query namespace
-    query_if_expression: v := params.Namespace; len(v) > 0
+    query_if_expression: v := params.Ns; len(v) > 0
     query_where_condition: '"ns=?", v'
     in_create: true
   - name: Key

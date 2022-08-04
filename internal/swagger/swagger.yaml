@@ -15,6 +15,45 @@ definitions:
       captcha_id:
         type: string
     type: object
+  typed.Dictionary:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: string
+      key:
+        description: Key of the dictionary
+        type: string
+      ns:
+        description: Namespace of the dictionary
+        type: string
+      remark:
+        description: Remark of the key
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+      value:
+        description: Value of the key
+        type: string
+    type: object
+  typed.DictionaryCreate:
+    properties:
+      key:
+        type: string
+      ns:
+        type: string
+      remark:
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    - ns
+    type: object
   typed.LoginPasswordUpdate:
     properties:
       new_password:
@@ -1138,6 +1177,170 @@ paths:
       summary: Freeze user by id
       tags:
       - UserAPI
+  /api/sys/v1/dictionaries:
+    get:
+      parameters:
+      - default: 1
+        description: pagination index
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: pagination size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: query namespace
+        in: query
+        name: ns
+        type: string
+      - description: query key
+        in: query
+        name: key
+        type: string
+      responses:
+        "200":
+          description: query result
+          schema:
+            allOf:
+            - $ref: '#/definitions/utilx.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/typed.Dictionary'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Query dictionary list
+      tags:
+      - DictionaryAPI
+    post:
+      parameters:
+      - description: request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.DictionaryCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.Dictionary'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create dictionary
+      tags:
+      - DictionaryAPI
+  /api/sys/v1/dictionaries/{id}:
+    delete:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete single dictionary by id
+      tags:
+      - DictionaryAPI
+    get:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/typed.Dictionary'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get single dictionary by id
+      tags:
+      - DictionaryAPI
+    put:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/typed.DictionaryCreate'
+      responses:
+        "200":
+          description: ok=true
+          schema:
+            $ref: '#/definitions/utilx.OkResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utilx.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update dictionary by id
+      tags:
+      - DictionaryAPI
 securityDefinitions:
   ApiKeyAuth:
     in: header

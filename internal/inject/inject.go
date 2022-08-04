@@ -6,6 +6,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/v9/internal/config"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac"
+	"github.com/LyricTian/gin-admin/v9/internal/module/sys"
 	"github.com/LyricTian/gin-admin/v9/pkg/jwtauth"
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
 	"github.com/LyricTian/gin-admin/v9/pkg/x/cachex"
@@ -21,6 +22,7 @@ type Injector struct {
 	Cache cachex.Cacher
 	DB    *gorm.DB
 	RBAC  *rbac.RBAC
+	SYS   *sys.SYS
 } // end
 
 func InitAuth(ctx context.Context) (jwtauth.Auther, func(), error) {

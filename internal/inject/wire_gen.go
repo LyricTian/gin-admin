@@ -12,6 +12,10 @@ import (
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/api"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/biz"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/dao"
+	"github.com/LyricTian/gin-admin/v9/internal/module/sys"
+	api2 "github.com/LyricTian/gin-admin/v9/internal/module/sys/api"
+	biz2 "github.com/LyricTian/gin-admin/v9/internal/module/sys/biz"
+	dao2 "github.com/LyricTian/gin-admin/v9/internal/module/sys/dao"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 )
 
@@ -131,11 +135,26 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		UserAPI:  userAPI,
 		LoginAPI: loginAPI,
 	}
+	dictionaryRepo := dao2.DictionaryRepo{
+		DB: db,
+	}
+	dictionaryBiz := &biz2.DictionaryBiz{
+		TransRepo:      transRepo,
+		DictionaryRepo: dictionaryRepo,
+	}
+	dictionaryAPI := &api2.DictionaryAPI{
+		DictionaryBiz: dictionaryBiz,
+	}
+	sysSYS := &sys.SYS{
+		DB:            db,
+		DictionaryAPI: dictionaryAPI,
+	}
 	injector := &Injector{
 		Auth:  auther,
 		Cache: cacher,
 		DB:    db,
 		RBAC:  rbacRBAC,
+		SYS:   sysSYS,
 	}
 	return injector, func() {
 		cleanup3()

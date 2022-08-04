@@ -62,7 +62,7 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 	cfg.Directory = dir
 	cfg.TplDirectory = tplDir
 	cfg.ModuleLowerName = ToLower(cfg.ModuleName)
-	cfg.LowerUnderlineName = ToLowerUnderlined(cfg.ModuleName)
+	cfg.LowerUnderlineName = ToLowerUnderlined(cfg.Name)
 	cfg.PluralName = ToPlural(cfg.Name)
 	cfg.LowerPluralName = ToLower(cfg.PluralName)
 	cfg.LowerSpaceName = ToLowerSpace(cfg.Name)
@@ -104,9 +104,10 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				initModuleStart = true
 			}
 			if initModuleStart && strings.HasSuffix(line, "// end") {
+				initModuleStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf("\t\tif err := injector.%s.Init(ctx); err != nil {\n", cfg.ModuleName))
-				buf.WriteString("\t\t\treturn cleanInjectFn, err\n\t\t}")
+				buf.WriteString(fmt.Sprintf("if err := injector.%s.Init(ctx); err != nil {\n", cfg.ModuleName))
+				buf.WriteString("return cleanInjectFn, err\n}")
 				return buf.String(), -1, true
 			}
 
@@ -114,9 +115,10 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				initRegisterStart = true
 			}
 			if initRegisterStart && strings.HasSuffix(line, "// end") {
+				initRegisterStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf("\n\t\t// Register %s APIs\n", cfg.ModuleName))
-				buf.WriteString(fmt.Sprintf("\t\tinjector.%s.RegisterAPI(ctx, apiGroup)", cfg.ModuleName))
+				buf.WriteString(fmt.Sprintf("\n// Register %s APIs\n", cfg.ModuleName))
+				buf.WriteString(fmt.Sprintf("injector.%s.RegisterAPI(ctx, apiGroup)", cfg.ModuleName))
 				return buf.String(), -1, true
 			}
 
@@ -135,8 +137,10 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				wireImportStart = true
 			}
 			if wireImportStart && strings.HasSuffix(line, "// end") {
+				wireImportStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf(`\t"%s/internal/module/%s"`, cfg.PkgName, cfg.ModuleLowerName))
+				buf.WriteByte('\t')
+				buf.WriteString(fmt.Sprintf(`"%s/internal/module/%s"`, cfg.PkgName, cfg.ModuleLowerName))
 				return buf.String(), -1, true
 			}
 
@@ -144,8 +148,9 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				wireBuildStart = true
 			}
 			if wireBuildStart && strings.HasSuffix(line, "// end") {
+				wireBuildStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf("\t\t%s.Set", cfg.ModuleLowerName))
+				buf.WriteString(fmt.Sprintf("\t\t%s.Set,", cfg.ModuleLowerName))
 				return buf.String(), -1, true
 			}
 			return "", 0, false
@@ -163,8 +168,9 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				injectImportStart = true
 			}
 			if injectImportStart && strings.HasSuffix(line, "// end") {
+				injectImportStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf(`\t"%s/internal/module/%s"`, cfg.PkgName, cfg.ModuleLowerName))
+				buf.WriteString(fmt.Sprintf(`"%s/internal/module/%s"`, cfg.PkgName, cfg.ModuleLowerName))
 				return buf.String(), -1, true
 			}
 
@@ -172,8 +178,9 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				injectStructStart = true
 			}
 			if injectStructStart && strings.HasSuffix(line, "// end") {
+				injectStructStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf("\t%s  *rbac.%s", cfg.ModuleName, cfg.ModuleName))
+				buf.WriteString(fmt.Sprintf("%s  *%s.%s", cfg.ModuleName, cfg.ModuleLowerName, cfg.ModuleName))
 				return buf.String(), -1, true
 			}
 			return "", 0, false
@@ -189,6 +196,7 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				moduleSetStart = true
 			}
 			if moduleSetStart && strings.HasSuffix(line, "// end") {
+				moduleSetStart = false
 				var buf bytes.Buffer
 				buf.WriteString(fmt.Sprintf(`wire.Struct(new(dao.%sRepo), "*"),\n`, cfg.Name))
 				buf.WriteString(fmt.Sprintf(`wire.Struct(new(biz.%sBiz), "*"),\n`, cfg.Name))
@@ -200,6 +208,7 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				moduleStructStart = true
 			}
 			if moduleStructStart && strings.HasSuffix(line, "// end") {
+				moduleStructStart = false
 				var buf bytes.Buffer
 				buf.WriteString(fmt.Sprintf("%sAPI  *api.%sAPI", cfg.Name, cfg.Name))
 				return buf.String(), -1, true
@@ -209,6 +218,7 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				moduleMigrateStart = true
 			}
 			if moduleMigrateStart && strings.HasSuffix(line, "// end") {
+				moduleMigrateStart = false
 				var buf bytes.Buffer
 				buf.WriteString(fmt.Sprintf("&typed.%s{},", cfg.Name))
 				return buf.String(), -1, true
@@ -218,6 +228,7 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 				moduleGroupStart = true
 			}
 			if moduleGroupStart && strings.HasSuffix(line, "// end") {
+				moduleGroupStart = false
 				var buf bytes.Buffer
 				buf.WriteString(fmt.Sprintf(`g%s := v1.Group("%s")\n`, cfg.Name, cfg.LowerPluralName))
 				buf.WriteString("{\n")

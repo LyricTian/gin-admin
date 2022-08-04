@@ -8,10 +8,7 @@ import (
 	"{{.PkgName}}/internal/x/contextx"
 	"{{.PkgName}}/internal/x/utilx"
 	"{{.PkgName}}/pkg/errors"
-	"{{.PkgName}}/pkg/logger"
 	"{{.PkgName}}/pkg/util/xid"
-	"{{.PkgName}}/pkg/x/cachex"
-	"go.uber.org/zap"
 )
 
 type {{.Name}}Biz struct {
@@ -76,7 +73,7 @@ func (a *{{.Name}}Biz) Update(ctx context.Context, id string, createItem typed.{
 	} else if old{{.Name}} == nil {
 		return errors.NotFound(errors.ErrNotFoundID, "{{.Name}} not found")
 	}
-    {{range .Fields}}{{if .InCreate}}old{{.Name}} = {{if .Optional}}&{{end}}createItem.{{.Name}}{{end}}
+    {{range .Fields}}{{if .InCreate}}old{{$.Name}}.{{.Name}} = {{if .Optional}}&{{end}}createItem.{{.Name}}{{end}}
 	{{end}}
 	old{{.Name}}.UpdatedBy = contextx.FromUserID(ctx)
 
@@ -97,16 +94,10 @@ func (a *{{.Name}}Biz) Delete(ctx context.Context, id string) error {
 		return errors.NotFound(errors.ErrNotFoundID, "{{.Name}} not found")
 	}
 
-	err = a.TransRepo.Exec(ctx, func(ctx context.Context) error {
+	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		if err := a.{{.Name}}Repo.Delete(ctx, id); err != nil {
 			return err
 		}
-
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

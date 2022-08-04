@@ -68,7 +68,7 @@ func (a *Casbinx) Load(ctx context.Context) error {
 	_ = os.Chmod(policyFile, 0444)
 
 	// load casbin
-	modelFile := filepath.Join(config.C.General.ConfigDir, "casbin_typed.conf")
+	modelFile := filepath.Join(config.C.General.ConfigDir, "casbin_model.conf")
 	e, err := casbin.NewEnforcer(modelFile, policyFile)
 	if err != nil {
 		return err
