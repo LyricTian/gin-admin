@@ -51,23 +51,17 @@ var GenerateCmd = &cli.Command{
 		}()
 
 		ctx := logger.NewTag(context.Background(), "generate")
-		return Run(ctx, func() (func(), error) {
-			// Initialize the logger first
-			cleanLogger, err := logger.InitWithConfig(c.String("logcfg"), HandleLoggerHook)
-			if err != nil {
-				return nil, err
-			}
+		// Initialize the logger first
+		cleanLogger, err := logger.InitWithConfig(c.String("logcfg"), HandleLoggerHook)
+		if err != nil {
+			return err
+		}
+		defer cleanLogger()
 
-			err = generate.Generate(ctx, c.String("projectdir"), c.String("tpldir"), c.StringSlice("result"), c.String("config"))
-			if err != nil {
-				logger.Context(ctx).Error("Failed to generate", zap.Error(err))
-			}
-
-			return func() {
-				if cleanLogger != nil {
-					cleanLogger()
-				}
-			}, err
-		})
+		err = generate.Generate(ctx, c.String("projectdir"), c.String("tpldir"), c.StringSlice("result"), c.String("config"))
+		if err != nil {
+			logger.Context(ctx).Error("Failed to generate", zap.Error(err))
+		}
+		return err
 	},
 }

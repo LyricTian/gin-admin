@@ -9,7 +9,8 @@ import (
 {{if .Description}}// {{.Description}}{{end}}
 type {{.Name}} struct {
 	ID        string     `gorm:"size:20;primarykey;" json:"id"`
-	{{range .Fields}}{{.Name}} {{if .Optional}}*{{end}}{{.Type}} `{{if .GormTag}}gorm:"{{.GormTag}}" {{end}}json:"{{.LowerUnderlineName}}"`{{if .Comments}} // {{.Comments}}{{end}}{{end}}
+	{{range .Fields}}{{.Name}} {{if .Optional}}*{{end}}{{.Type}} `{{if .GormTag}}gorm:"{{.GormTag}}" {{end}}json:"{{.LowerUnderlineName}}"`{{if .Comments}} // {{.Comments}}{{end}}
+	{{end}}
 	CreatedAt time.Time  `gorm:"index;" json:"created_at"`
 	CreatedBy string     `gorm:"size:20;" json:"created_by"`
 	UpdatedAt time.Time  `gorm:"index;" json:"updated_at"`
@@ -18,7 +19,8 @@ type {{.Name}} struct {
 
 type {{.Name}}QueryParam struct {
 	utilx.PaginationParam
-	{{range .Fields}}{{if .QueryIfExpression}}{{.Name}} {{.Type}} `form:"{{if .InQuery}}{{.FirstLowerName}}{{else}}-{{end}}"`{{end}}{{end}}
+	{{range .Fields}}{{if .QueryIfExpression}}{{.Name}} {{.Type}} `form:"{{if .InQuery}}{{.FirstLowerName}}{{else}}-{{end}}"`{{end}}
+	{{end}}
 }
 
 type {{.Name}}QueryOptions struct {
@@ -33,5 +35,6 @@ type {{.Name}}QueryResult struct {
 type {{.PluralName}} []*{{.Name}}
 
 type {{.Name}}Create struct {
-    {{range .Fields}}{{if .InCreate}}{{.Name}} {{.Type}} `json:"{{.LowerUnderlineName}}"{{if .BindingTag}} binding:"{{.BindingTag}}"{{end}}`{{end}}{{end}}
+    {{range .Fields}}{{if .InCreate}}{{.Name}} {{.Type}} `json:"{{.LowerUnderlineName}}"{{if .BindingTag}} binding:"{{.BindingTag}}"{{end}}`{{end}}
+	{{end}}
 }

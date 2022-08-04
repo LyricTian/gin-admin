@@ -16,7 +16,8 @@ type {{.Name}}API struct {
 // @Summary Query {{.LowerSpaceName}} list
 // @Param current query int true "pagination index" default(1)
 // @Param pageSize query int true "pagination size" default(10)
-{{range .Fields}}{{if .InQuery}}// @Param {{.FirstLowerName}} query {{.Type}} false "{{.QueryComments}}"{{end}}{{end}}
+{{range .Fields}}{{if .InQuery}}// @Param {{.FirstLowerName}} query {{.Type}} false "{{.QueryComments}}"{{end}}
+{{end}}
 // @Success 200 {object} utilx.ListResult{list=[]typed.{{.Name}}} "query result"
 // @Failure 401 {object} utilx.ErrorResult
 // @Failure 500 {object} utilx.ErrorResult
