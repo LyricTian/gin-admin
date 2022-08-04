@@ -11,8 +11,8 @@ type MenuActionResource struct {
 	ID        string    `gorm:"size:20;primarykey;" json:"id"`
 	MenuID    string    `gorm:"size:20;index;" json:"menu_id"`
 	ActionID  string    `gorm:"size:20;index;" json:"action_id"`
-	Method    string    `gorm:"size:20;" json:"method"`
-	Path      string    `gorm:"size:512;" json:"path"`
+	Method    string    `gorm:"size:20;" json:"method"` // HTTP Method (GET, POST, PUT, DELETE)
+	Path      string    `gorm:"size:512;" json:"path"`  // Path of the resource (:id means the parameter is required)
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

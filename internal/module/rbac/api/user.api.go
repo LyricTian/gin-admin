@@ -14,6 +14,8 @@ type UserAPI struct {
 // @Tags UserAPI
 // @Security ApiKeyAuth
 // @Summary Query user list
+// @Param current query int true "pagination index" default(1)
+// @Param pageSize query int true "pagination size" default(10)
 // @Param status query string false "user status (enabled/disabled)"
 // @Param name query string false "name (fuzzy query)"
 // @Param username query string false "username (fuzzy query)"

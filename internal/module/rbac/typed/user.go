@@ -16,9 +16,9 @@ const (
 // User management
 type User struct {
 	ID        string     `gorm:"size:20;primarykey;" json:"id"`
-	Username  string     `gorm:"size:64;index;" json:"username"`
-	Name      string     `gorm:"size:64;" json:"name"`
-	Password  string     `gorm:"size:60;" json:"-"`
+	Username  string     `gorm:"size:64;index;" json:"username"` // Login username (must be unique)
+	Name      string     `gorm:"size:64;" json:"name"`           // Name of the user
+	Password  string     `gorm:"size:60;" json:"-"`              // Password of the user
 	Email     *string    `gorm:"size:64;" json:"email"`
 	Phone     *string    `gorm:"size:20;" json:"phone"`
 	Remark    *string    `gorm:"size:1024;" json:"remark"`

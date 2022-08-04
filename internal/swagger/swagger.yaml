@@ -68,6 +68,7 @@ definitions:
       parent_id:
         type: string
       parent_path:
+        description: parent path (split by '.')
         type: string
       remark:
         type: string
@@ -83,6 +84,7 @@ definitions:
   typed.MenuAction:
     properties:
       code:
+        description: Code of the action (for example, add, edit, delete, etc.)
         type: string
       created_at:
         type: string
@@ -91,6 +93,7 @@ definitions:
       menu_id:
         type: string
       name:
+        description: Name of the action (for example, Add, Edit, Delete, etc.)
         type: string
       resources:
         items:
@@ -110,8 +113,10 @@ definitions:
       menu_id:
         type: string
       method:
+        description: HTTP Method (GET, POST, PUT, DELETE)
         type: string
       path:
+        description: Path of the resource (:id means the parameter is required)
         type: string
       updated_at:
         type: string
@@ -205,6 +210,7 @@ definitions:
       id:
         type: string
       name:
+        description: Name of the user
         type: string
       phone:
         type: string
@@ -221,6 +227,7 @@ definitions:
           $ref: '#/definitions/typed.UserRole'
         type: array
       username:
+        description: Login username (must be unique)
         type: string
     type: object
   typed.UserCreate:
@@ -243,7 +250,6 @@ definitions:
         type: string
     required:
     - name
-    - role_ids
     - username
     type: object
   typed.UserLogin:
@@ -691,6 +697,18 @@ paths:
   /api/rbac/v1/roles:
     get:
       parameters:
+      - default: 1
+        description: pagination index
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: pagination size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
       - description: role name (fuzzy query)
         in: query
         name: name
@@ -899,6 +917,18 @@ paths:
   /api/rbac/v1/users:
     get:
       parameters:
+      - default: 1
+        description: pagination index
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: pagination size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
       - description: user status (enabled/disabled)
         in: query
         name: status

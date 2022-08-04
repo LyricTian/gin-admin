@@ -27,7 +27,7 @@ func (a *MenuRepo) Query(ctx context.Context, params typed.MenuQueryParam, opts 
 	db := GetMenuDB(ctx, a.DB)
 
 	if v := len(params.IDList); v > 0 {
-		db = db.Where("id in (?)", params.IDList)
+		db = db.Where("id in (?)", v)
 	}
 	if v := params.LikeName; v != "" {
 		db = db.Where("name like ?", "%"+v+"%")

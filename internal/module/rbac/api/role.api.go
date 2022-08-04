@@ -14,6 +14,8 @@ type RoleAPI struct {
 // @Tags RoleAPI
 // @Security ApiKeyAuth
 // @Summary Query role list
+// @Param current query int true "pagination index" default(1)
+// @Param pageSize query int true "pagination size" default(10)
 // @Param name query string false "role name (fuzzy query)"
 // @Param status query string false "role status (enabled/disabled)"
 // @Param result query string false " result type (select/paginate, default: paginate)"

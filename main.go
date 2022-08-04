@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/LyricTian/gin-admin/v9/cmd"
-
 	"github.com/urfave/cli/v2"
 )
 
@@ -28,6 +27,7 @@ func main() {
 		cmd.StartCmd,
 		cmd.VersionCmd,
 		cmd.StopCmd,
+		cmd.GenerateCmd,
 	}
 	err := app.Run(os.Args)
 	if err != nil {

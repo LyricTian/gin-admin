@@ -38,8 +38,7 @@ func Init(ctx context.Context) (func(), error) {
 		return nil, err
 	}
 
-	// Initialize modules
-	{
+	{ // Initialize modules
 		if err := injector.RBAC.Init(ctx); err != nil {
 			return cleanInjectFn, err
 		}
@@ -101,7 +100,7 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 	})
 
 	apiGroup := app.Group("/api")
-	{
+	{ // Register api handlers
 		initMiddlewares(apiGroup, injector)
 
 		// Register RBAC APIs

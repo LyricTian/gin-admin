@@ -643,6 +643,22 @@ const docTemplate = `{
                 "summary": "Query role list",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "pagination index",
+                        "name": "current",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "pagination size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "description": "role name (fuzzy query)",
                         "name": "name",
@@ -979,6 +995,22 @@ const docTemplate = `{
                 ],
                 "summary": "Query user list",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "pagination index",
+                        "name": "current",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "pagination size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "user status (enabled/disabled)",
@@ -1414,6 +1446,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parent_path": {
+                    "description": "parent path (split by '.')",
                     "type": "string"
                 },
                 "remark": {
@@ -1437,6 +1470,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "Code of the action (for example, add, edit, delete, etc.)",
                     "type": "string"
                 },
                 "created_at": {
@@ -1449,6 +1483,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "description": "Name of the action (for example, Add, Edit, Delete, etc.)",
                     "type": "string"
                 },
                 "resources": {
@@ -1478,9 +1513,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "method": {
+                    "description": "HTTP Method (GET, POST, PUT, DELETE)",
                     "type": "string"
                 },
                 "path": {
+                    "description": "Path of the resource (:id means the parameter is required)",
                     "type": "string"
                 },
                 "updated_at": {
@@ -1622,6 +1659,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "description": "Name of the user",
                     "type": "string"
                 },
                 "phone": {
@@ -1646,6 +1684,7 @@ const docTemplate = `{
                     }
                 },
                 "username": {
+                    "description": "Login username (must be unique)",
                     "type": "string"
                 }
             }
@@ -1654,7 +1693,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "name",
-                "role_ids",
                 "username"
             ],
             "properties": {

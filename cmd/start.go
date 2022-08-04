@@ -46,17 +46,17 @@ var StartCmd = &cli.Command{
 			}
 		}()
 
-		ctx := logger.NewTag(context.Background(), "main")
+		ctx := logger.NewTag(context.Background(), "start")
 		return Run(ctx, func() (func(), error) {
 			// Initialize the logger first
 			cfgDir := c.String("configdir")
-			staticDir := c.String("staticdir")
 			cleanLogger, err := logger.InitWithConfig(filepath.Join(cfgDir, "logger.toml"), HandleLoggerHook)
 			if err != nil {
 				return nil, err
 			}
 
 			daemon := c.Bool("deamon")
+			staticDir := c.String("staticdir")
 			logger.Context(ctx).Info("Starting server",
 				zap.String("version", VERSION),
 				zap.String("configdir", cfgDir),

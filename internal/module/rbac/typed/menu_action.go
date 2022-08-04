@@ -10,8 +10,8 @@ import (
 type MenuAction struct {
 	ID        string              `gorm:"size:20;primarykey;" json:"id"`
 	MenuID    string              `gorm:"size:20;index;" json:"menu_id"`
-	Code      string              `gorm:"size:64;" json:"code"`
-	Name      string              `gorm:"size:64;" json:"name"`
+	Code      string              `gorm:"size:64;" json:"code"` // Code of the action (for example, add, edit, delete, etc.)
+	Name      string              `gorm:"size:64;" json:"name"` // Name of the action (for example, Add, Edit, Delete, etc.)
 	CreatedAt time.Time           `json:"created_at"`
 	UpdatedAt time.Time           `json:"updated_at"`
 	Resources MenuActionResources `gorm:"-" json:"resources"`
