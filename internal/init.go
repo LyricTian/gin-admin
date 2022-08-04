@@ -42,6 +42,7 @@ func Init(ctx context.Context) (func(), error) {
 		if err := injector.RBAC.Init(ctx); err != nil {
 			return cleanInjectFn, err
 		}
+
 		if err := injector.SYS.Init(ctx); err != nil {
 			return cleanInjectFn, err
 		}

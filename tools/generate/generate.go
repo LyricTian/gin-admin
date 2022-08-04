@@ -106,6 +106,7 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 			if initModuleStart && strings.HasSuffix(line, "// end") {
 				initModuleStart = false
 				var buf bytes.Buffer
+				buf.WriteByte('\n')
 				buf.WriteString(fmt.Sprintf("if err := injector.%s.Init(ctx); err != nil {\n", cfg.ModuleName))
 				buf.WriteString("return cleanInjectFn, err\n}")
 				return buf.String(), -1, true
