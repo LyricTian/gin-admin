@@ -9,7 +9,7 @@ import (
 func TestConfig(t *testing.T) {
 	cfg := &Config{
 		PkgName:     "github.com/LyricTian/gin-admin/v9",
-		ModelName:   "SYS",
+		ModuleName:  "SYS",
 		Name:        "Dictionary",
 		Description: "Dictionary management for key/value pairs",
 		Fields: []Field{

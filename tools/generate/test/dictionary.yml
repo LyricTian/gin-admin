@@ -1,19 +1,8 @@
 pkg_name: github.com/LyricTian/gin-admin/v9
-model_name: SYS
+module_name: SYS
 name: Dictionary
 description: Dictionary management for key/value pairs
 fields:
-  - name: ID
-    type: string
-    optional: false
-    gorm_tag: size:20;primarykey;
-    binding_tag: ""
-    comments: ""
-    in_query: false
-    query_comments: ""
-    query_if_expression: ""
-    query_where_condition: ""
-    in_create: false
   - name: Ns
     type: string
     optional: false
@@ -41,53 +30,20 @@ fields:
     optional: true
     gorm_tag: size:4096;
     binding_tag: ""
-    comments: Value of the dictionary
+    comments: Value of the key
     in_query: false
     query_comments: ""
     query_if_expression: ""
     query_where_condition: ""
     in_create: true
-  - name: CreatedAt
-    type: time.Time
-    optional: false
-    gorm_tag: index;
-    binding_tag: ""
-    comments: ""
-    in_query: false
-    query_comments: ""
-    query_if_expression: ""
-    query_where_condition: ""
-    in_create: false
-  - name: CreatedBy
+  - name: Remark
     type: string
-    optional: false
-    gorm_tag: size:20;
+    optional: true
+    gorm_tag: size:1024;
     binding_tag: ""
-    comments: ""
+    comments: Remark of the key
     in_query: false
     query_comments: ""
     query_if_expression: ""
     query_where_condition: ""
-    in_create: false
-  - name: UpdatedAt
-    type: time.Time
-    optional: false
-    gorm_tag: index;
-    binding_tag: ""
-    comments: ""
-    in_query: false
-    query_comments: ""
-    query_if_expression: ""
-    query_where_condition: ""
-    in_create: false
-  - name: UpdatedBy
-    type: string
-    optional: false
-    gorm_tag: size:20;
-    binding_tag: ""
-    comments: ""
-    in_query: false
-    query_comments: ""
-    query_if_expression: ""
-    query_where_condition: ""
-    in_create: false
+    in_create: true

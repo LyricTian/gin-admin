@@ -13,7 +13,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-)
+) // end
 
 // Inject global objects
 type Injector struct {

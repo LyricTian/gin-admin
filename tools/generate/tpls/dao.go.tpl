@@ -24,13 +24,10 @@ func (a *{{.Name}}Repo) Query(ctx context.Context, params typed.{{.Name}}QueryPa
 	}
 
 	db := Get{{.Name}}DB(ctx, a.DB)
-    {{range .Fields}}
-        {{if .QueryIfExpression}}
+    {{range .Fields}}{{if .QueryIfExpression}}
         if {{.QueryIfExpression}} {
             db = db.Where({{.QueryWhereCondition}})
-        }
-        {{end}}
-	{{end}}
+        }{{end}}{{end}}
 
 	var list typed.{{.PluralName}}
 	pr, err := utilx.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)

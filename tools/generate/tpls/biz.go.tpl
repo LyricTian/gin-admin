@@ -50,9 +50,7 @@ func (a *{{.Name}}Biz) Get(ctx context.Context, id string) (*typed.{{.Name}}, er
 func (a *{{.Name}}Biz) Create(ctx context.Context, createItem typed.{{.Name}}Create) (*typed.{{.Name}}, error) {
 	{{.LowerName}} := &typed.{{.Name}}{
 		ID:        xid.NewID(),
-        {{range .Fields}}
-        {{if .InCreate}}{{.Name}}: {{if .Optional}}&{{end}}createItem.{{.Name}},{{end}}
-        {{end}}
+        {{range .Fields}}{{if .InCreate}}{{.Name}}: {{if .Optional}}&{{end}}createItem.{{.Name}},{{end}}{{end}}
 		CreatedBy: contextx.FromUserID(ctx),
 	}
 
@@ -77,9 +75,7 @@ func (a *{{.Name}}Biz) Update(ctx context.Context, id string, createItem typed.{
 	} else if old{{.Name}} == nil {
 		return errors.NotFound(errors.ErrNotFoundID, "{{.Name}} not found")
 	}
-    {{range .Fields}}
-    {{if .InCreate}}old{{.Name}} = {{if .Optional}}&{{end}}createItem.{{.Name}}{{end}}
-    {{end}}
+    {{range .Fields}}{{if .InCreate}}old{{.Name}} = {{if .Optional}}&{{end}}createItem.{{.Name}}{{end}}{{end}}
 	old{{.Name}}.UpdatedBy = contextx.FromUserID(ctx)
 
 	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
