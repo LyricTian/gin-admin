@@ -22,4 +22,4 @@ MaxOpenConns = 16
 MaxIdleConns = 8
 MaxLifetime = 86400
 MaxIdleTime = 7200
-TablePrefix = "g_"
+TablePrefix = ""

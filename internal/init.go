@@ -203,6 +203,10 @@ func initMiddlewares(g *gin.RouterGroup, injector *inject.Injector) {
 		},
 		ParseUserID: func(c *gin.Context) (string, error) {
 			ctx := c.Request.Context()
+			if utilx.GetToken(c) == "" {
+				return "", utilx.ErrInvalidToken
+			}
+
 			sub, err := injector.Auth.ParseSubject(ctx, utilx.GetToken(c))
 			if err != nil {
 				if err == jwtauth.ErrInvalidToken {

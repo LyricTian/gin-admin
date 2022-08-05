@@ -193,6 +193,54 @@
                         ]
                     }
                 ]
+            },
+            {
+                "name": "Dictionary",
+                "icon": "appstore",
+                "sequence": 1007,
+                "link": "/system/dictionary",
+                "actions": [
+                    {
+                        "code": "rw",
+                        "name": "ReadWrite",
+                        "resources": [
+                            {
+                                "method": "GET",
+                                "path": "/api/sys/v1/dictionaries"
+                            },
+                            {
+                                "method": "GET",
+                                "path": "/api/sys/v1/dictionaries/:id"
+                            },
+                            {
+                                "method": "POST",
+                                "path": "/api/sys/v1/dictionaries"
+                            },
+                            {
+                                "method": "PUT",
+                                "path": "/api/sys/v1/dictionaries/:id"
+                            },
+                            {
+                                "method": "DELETE",
+                                "path": "/api/sys/v1/dictionaries/:id"
+                            }
+                        ]
+                    },
+                    {
+                        "code": "ro",
+                        "name": "Readonly",
+                        "resources": [
+                            {
+                                "method": "GET",
+                                "path": "/api/sys/v1/dictionaries"
+                            },
+                            {
+                                "method": "GET",
+                                "path": "/api/sys/v1/dictionaries/:id"
+                            }
+                        ]
+                    }
+                ]
             }
         ]
     }

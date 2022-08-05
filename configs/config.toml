@@ -41,7 +41,7 @@ MaxLifetime = 86400
 MaxIdleTime = 3600
 MaxOpenConns = 100
 MaxIdleConns = 50
-TablePrefix = "g_"
+TablePrefix = ""
 
 [Middleware]
 
@@ -71,6 +71,7 @@ AllowFiles = false
 
 [Middleware.Auth]
 Disable = false
+SkippedPathPrefixes = ["/api/rbac/v1/login"]
 SigningMethod = "HS512"
 SigningKey = "XnEsT0S@"
 Expired = 86400 # seconds
@@ -112,6 +113,7 @@ DB = 0
 
 [Middleware.Casbin]
 Disable = false
+SkippedPathPrefixes = ["/api/rbac/v1/login", "/api/rbac/v1/current"]
 Debug = true
 AutoLoadInterval = 60 # seconds
 
