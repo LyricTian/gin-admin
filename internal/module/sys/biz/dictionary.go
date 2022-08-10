@@ -47,7 +47,7 @@ func (a *DictionaryBiz) Get(ctx context.Context, id string) (*typed.Dictionary, 
 func (a *DictionaryBiz) Create(ctx context.Context, createItem typed.DictionaryCreate) (*typed.Dictionary, error) {
 	dictionary := &typed.Dictionary{
 		ID:        xid.NewID(),
-		Ns:        createItem.Ns,
+		Namespace: createItem.Namespace,
 		Key:       createItem.Key,
 		Value:     &createItem.Value,
 		Remark:    &createItem.Remark,
@@ -75,7 +75,7 @@ func (a *DictionaryBiz) Update(ctx context.Context, id string, createItem typed.
 	} else if oldDictionary == nil {
 		return errors.NotFound(errors.ErrNotFoundID, "Dictionary not found")
 	}
-	oldDictionary.Ns = createItem.Ns
+	oldDictionary.Namespace = createItem.Namespace
 	oldDictionary.Key = createItem.Key
 	oldDictionary.Value = &createItem.Value
 	oldDictionary.Remark = &createItem.Remark

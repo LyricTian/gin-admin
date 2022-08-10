@@ -25,8 +25,8 @@ func (a *DictionaryRepo) Query(ctx context.Context, params typed.DictionaryQuery
 
 	db := GetDictionaryDB(ctx, a.DB)
 
-	if v := params.Ns; len(v) > 0 {
-		db = db.Where("ns=?", v)
+	if v := params.Namespace; len(v) > 0 {
+		db = db.Where("namespace=?", v)
 	}
 	if v := params.Key; len(v) > 0 {
 		db = db.Where("key=?", v)

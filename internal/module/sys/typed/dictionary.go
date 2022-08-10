@@ -9,10 +9,10 @@ import (
 // Dictionary management for key/value pairs
 type Dictionary struct {
 	ID        string    `gorm:"size:20;primarykey;" json:"id"`
-	Ns        string    `gorm:"size:64;index;" json:"ns"`   // Namespace of the dictionary
-	Key       string    `gorm:"size:128;index;" json:"key"` // Key of the dictionary
-	Value     *string   `gorm:"size:4096;" json:"value"`    // Value of the key
-	Remark    *string   `gorm:"size:1024;" json:"remark"`   // Remark of the key
+	Namespace string    `gorm:"size:64;index;" json:"namespace"` // Namespace of the dictionary
+	Key       string    `gorm:"size:128;index;" json:"key"`      // Key of the dictionary
+	Value     *string   `gorm:"size:4096;" json:"value"`         // Value of the key
+	Remark    *string   `gorm:"size:1024;" json:"remark"`        // Remark of the key
 	CreatedAt time.Time `gorm:"index;" json:"created_at"`
 	CreatedBy string    `gorm:"size:20;" json:"created_by"`
 	UpdatedAt time.Time `gorm:"index;" json:"updated_at"`
@@ -21,8 +21,8 @@ type Dictionary struct {
 
 type DictionaryQueryParam struct {
 	utilx.PaginationParam
-	Ns  string `form:"ns"`
-	Key string `form:"key"`
+	Namespace string `form:"namespace"`
+	Key       string `form:"key"`
 }
 
 type DictionaryQueryOptions struct {
@@ -37,8 +37,8 @@ type DictionaryQueryResult struct {
 type Dictionaries []*Dictionary
 
 type DictionaryCreate struct {
-	Ns     string `json:"ns" binding:"required"`
-	Key    string `json:"key" binding:"required"`
-	Value  string `json:"value"`
-	Remark string `json:"remark"`
+	Namespace string `json:"namespace" binding:"required"`
+	Key       string `json:"key" binding:"required"`
+	Value     string `json:"value"`
+	Remark    string `json:"remark"`
 }

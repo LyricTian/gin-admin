@@ -1491,7 +1491,7 @@
         }, {
           "description" : "query namespace",
           "in" : "query",
-          "name" : "ns",
+          "name" : "namespace",
           "schema" : {
             "type" : "string"
           }
@@ -1814,7 +1814,7 @@
             "description" : "Key of the dictionary",
             "type" : "string"
           },
-          "ns" : {
+          "namespace" : {
             "description" : "Namespace of the dictionary",
             "type" : "string"
           },
@@ -1840,7 +1840,7 @@
           "key" : {
             "type" : "string"
           },
-          "ns" : {
+          "namespace" : {
             "type" : "string"
           },
           "remark" : {
@@ -1850,7 +1850,7 @@
             "type" : "string"
           }
         },
-        "required" : [ "key", "ns" ],
+        "required" : [ "key", "namespace" ],
         "type" : "object"
       },
       "typed.LoginPasswordUpdate" : {

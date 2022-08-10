@@ -1418,7 +1418,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "query namespace",
-                        "name": "ns",
+                        "name": "namespace",
                         "in": "query"
                     },
                     {
@@ -1717,7 +1717,7 @@ const docTemplate = `{
                     "description": "Key of the dictionary",
                     "type": "string"
                 },
-                "ns": {
+                "namespace": {
                     "description": "Namespace of the dictionary",
                     "type": "string"
                 },
@@ -1741,13 +1741,13 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "key",
-                "ns"
+                "namespace"
             ],
             "properties": {
                 "key": {
                     "type": "string"
                 },
-                "ns": {
+                "namespace": {
                     "type": "string"
                 },
                 "remark": {

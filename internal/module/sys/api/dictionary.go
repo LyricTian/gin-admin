@@ -16,7 +16,7 @@ type DictionaryAPI struct {
 // @Summary Query dictionary list
 // @Param current query int true "pagination index" default(1)
 // @Param pageSize query int true "pagination size" default(10)
-// @Param ns query string false "query namespace"
+// @Param namespace query string false "query namespace"
 // @Param key query string false "query key"
 // @Success 200 {object} utilx.ResponseResult{data=[]typed.Dictionary} "query result"
 // @Failure 401 {object} utilx.ResponseResult

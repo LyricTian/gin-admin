@@ -26,7 +26,7 @@ definitions:
       key:
         description: Key of the dictionary
         type: string
-      ns:
+      namespace:
         description: Namespace of the dictionary
         type: string
       remark:
@@ -44,7 +44,7 @@ definitions:
     properties:
       key:
         type: string
-      ns:
+      namespace:
         type: string
       remark:
         type: string
@@ -52,7 +52,7 @@ definitions:
         type: string
     required:
     - key
-    - ns
+    - namespace
     type: object
   typed.LoginPasswordUpdate:
     properties:
@@ -1218,7 +1218,7 @@ paths:
         type: integer
       - description: query namespace
         in: query
-        name: ns
+        name: namespace
         type: string
       - description: query key
         in: query
