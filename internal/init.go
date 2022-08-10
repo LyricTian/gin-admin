@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -80,7 +81,7 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 	})
 
 	app.NoMethod(func(c *gin.Context) {
-		logger.Context(c.Request.Context()).Warn("NoMethod",
+		logger.Context(c.Request.Context()).Warn("No method",
 			zap.String("method", c.Request.Method),
 			zap.String("ip", c.ClientIP()),
 			zap.String("remote_addr", c.Request.RemoteAddr),
@@ -92,7 +93,7 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 	})
 
 	app.NoRoute(func(c *gin.Context) {
-		logger.Context(c.Request.Context()).Warn("NoMethod",
+		logger.Context(c.Request.Context()).Warn("No route",
 			zap.String("method", c.Request.Method),
 			zap.String("ip", c.ClientIP()),
 			zap.String("remote_addr", c.Request.RemoteAddr),
@@ -115,6 +116,7 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 	} // end
 
 	if !config.C.General.DisableSwagger {
+		app.StaticFile("/openapi.json", filepath.Join(config.C.General.ConfigDir, "openapi.json"))
 		app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 

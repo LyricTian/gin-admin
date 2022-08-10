@@ -73,3 +73,7 @@ type UserCreate struct {
 	Remark   string   `json:"remark"`
 	RoleIDs  []string `json:"role_ids"`
 }
+
+type UserUpdateStatus struct {
+	Status UserStatus `json:"status" binding:"required"` // activated/freezed
+}

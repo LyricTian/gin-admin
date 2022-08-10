@@ -29,9 +29,15 @@ const docTemplate = `{
                 "summary": "Logout system",
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -54,12 +60,12 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ListResult"
+                                    "$ref": "#/definitions/utilx.ResponseResult"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
-                                        "list": {
+                                        "data": {
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/typed.Menu"
@@ -73,13 +79,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -109,21 +115,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -144,19 +156,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.LoginToken"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.LoginToken"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -177,19 +201,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.User"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.User"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -216,19 +252,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.LoginToken"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.LoginToken"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -262,16 +310,10 @@ const docTemplate = `{
                     "200": {
                         "description": "Captcha image"
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -287,7 +329,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.Captcha"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.Captcha"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -330,12 +384,12 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ListResult"
+                                    "$ref": "#/definitions/utilx.ResponseResult"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
-                                        "list": {
+                                        "data": {
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/typed.Menu"
@@ -349,13 +403,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -385,25 +439,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.Menu"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.Menu"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -433,19 +499,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.Menu"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.Menu"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -480,27 +558,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -514,7 +592,7 @@ const docTemplate = `{
                 "tags": [
                     "MenuAPI"
                 ],
-                "summary": "Delete single menu by id",
+                "summary": "Delete menu by id",
                 "parameters": [
                     {
                         "type": "string",
@@ -526,28 +604,28 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
             }
         },
-        "/api/rbac/v1/menus/{id}/disable": {
-            "patch": {
+        "/api/rbac/v1/menus/{id}/status": {
+            "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -556,7 +634,7 @@ const docTemplate = `{
                 "tags": [
                     "MenuAPI"
                 ],
-                "summary": "Disable menu status by id",
+                "summary": "Update menu status by id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -564,67 +642,40 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/typed.MenuUpdateStatus"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/rbac/v1/menus/{id}/enable": {
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "MenuAPI"
-                ],
-                "summary": "Enable menu status by id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "unique id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok=true",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -683,12 +734,12 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ListResult"
+                                    "$ref": "#/definitions/utilx.ResponseResult"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
-                                        "list": {
+                                        "data": {
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/typed.Role"
@@ -702,13 +753,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -738,25 +789,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.Role"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.Role"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -786,19 +849,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.Role"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.Role"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -833,27 +908,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -867,7 +942,7 @@ const docTemplate = `{
                 "tags": [
                     "RoleAPI"
                 ],
-                "summary": "Delete single role by id",
+                "summary": "Delete role by id",
                 "parameters": [
                     {
                         "type": "string",
@@ -879,28 +954,28 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
             }
         },
-        "/api/rbac/v1/roles/{id}/disable": {
-            "patch": {
+        "/api/rbac/v1/roles/{id}/status": {
+            "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -909,7 +984,7 @@ const docTemplate = `{
                 "tags": [
                     "RoleAPI"
                 ],
-                "summary": "Disable role status by id",
+                "summary": "Update role status by id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -917,67 +992,40 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/typed.RoleUpdateStatus"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/rbac/v1/roles/{id}/enable": {
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "RoleAPI"
-                ],
-                "summary": "Enable role status by id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "unique id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok=true",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1042,12 +1090,12 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ListResult"
+                                    "$ref": "#/definitions/utilx.ResponseResult"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
-                                        "list": {
+                                        "data": {
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/typed.User"
@@ -1061,13 +1109,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1097,25 +1145,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.User"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.User"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1145,19 +1205,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.User"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.User"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1192,27 +1264,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1226,7 +1298,7 @@ const docTemplate = `{
                 "tags": [
                     "UserAPI"
                 ],
-                "summary": "Delete single user by id",
+                "summary": "Delete user by id",
                 "parameters": [
                     {
                         "type": "string",
@@ -1238,28 +1310,28 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
             }
         },
-        "/api/rbac/v1/users/{id}/active": {
-            "patch": {
+        "/api/rbac/v1/users/{id}/status": {
+            "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -1268,75 +1340,48 @@ const docTemplate = `{
                 "tags": [
                     "UserAPI"
                 ],
-                "summary": "Active user by id",
+                "summary": "Update user status by id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "unique id",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/typed.UserUpdateStatus"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/rbac/v1/users/{id}/freeze": {
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "tags": [
-                    "UserAPI"
-                ],
-                "summary": "Freeze user by id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "unique id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok=true",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1389,12 +1434,12 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ListResult"
+                                    "$ref": "#/definitions/utilx.ResponseResult"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
-                                        "list": {
+                                        "data": {
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/typed.Dictionary"
@@ -1408,13 +1453,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1444,25 +1489,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.Dictionary"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.Dictionary"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1492,19 +1549,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/typed.Dictionary"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/typed.Dictionary"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1539,27 +1608,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1585,21 +1654,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok=true",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.OkResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ErrorResult"
+                            "$ref": "#/definitions/utilx.ResponseResult"
                         }
                     }
                 }
@@ -1881,6 +1950,18 @@ const docTemplate = `{
                 }
             }
         },
+        "typed.MenuUpdateStatus": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "description": "enabled/disabled",
+                    "type": "string"
+                }
+            }
+        },
         "typed.Role": {
             "type": "object",
             "properties": {
@@ -1959,6 +2040,18 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "typed.RoleUpdateStatus": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "description": "enabled/disabled",
                     "type": "string"
                 }
             }
@@ -2089,28 +2182,15 @@ const docTemplate = `{
                 }
             }
         },
-        "utilx.ErrorResult": {
+        "typed.UserUpdateStatus": {
             "type": "object",
+            "required": [
+                "status"
+            ],
             "properties": {
-                "error": {
-                    "$ref": "#/definitions/errors.Error"
-                }
-            }
-        },
-        "utilx.ListResult": {
-            "type": "object",
-            "properties": {
-                "list": {},
-                "pagination": {
-                    "$ref": "#/definitions/utilx.PaginationResult"
-                }
-            }
-        },
-        "utilx.OkResult": {
-            "type": "object",
-            "properties": {
-                "ok": {
-                    "type": "boolean"
+                "status": {
+                    "description": "activated/freezed",
+                    "type": "string"
                 }
             }
         },
@@ -2125,6 +2205,21 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "utilx.ResponseResult": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "$ref": "#/definitions/errors.Error"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/utilx.PaginationResult"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         }

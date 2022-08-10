@@ -179,3 +179,7 @@ type MenuCreate struct {
 	Hide     bool        `json:"hide"`
 	Actions  MenuActions `json:"actions"`
 }
+
+type MenuUpdateStatus struct {
+	Status MenuStatus `json:"status" binding:"required"` // enabled/disabled
+}

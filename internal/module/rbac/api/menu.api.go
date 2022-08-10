@@ -4,7 +4,6 @@ import (
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/biz"
 	"github.com/LyricTian/gin-admin/v9/internal/module/rbac/typed"
 	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,9 +17,9 @@ type MenuAPI struct {
 // @Param parentID query int false "parent id"
 // @Param name query string false "menu name (fuzzy query)"
 // @Param status query string false "menu status (enabled/disabled)"
-// @Success 200 {object} utilx.ListResult{list=[]typed.Menu} "query result"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=[]typed.Menu} "query result"
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/menus [get]
 func (a *MenuAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -35,16 +34,16 @@ func (a *MenuAPI) Query(c *gin.Context) {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResList(c, result)
+	utilx.ResSuccess(c, result)
 }
 
 // @Tags MenuAPI
 // @Security ApiKeyAuth
 // @Summary Get single menu by id
 // @Param id path string true "unique id"
-// @Success 200 {object} typed.Menu
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.Menu}
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/menus/{id} [get]
 func (a *MenuAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -60,10 +59,10 @@ func (a *MenuAPI) Get(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Create menu
 // @Param body body typed.MenuCreate true "request body"
-// @Success 200 {object} typed.Menu
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.Menu}
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/menus [post]
 func (a *MenuAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -86,10 +85,10 @@ func (a *MenuAPI) Create(c *gin.Context) {
 // @Summary Update menu by id
 // @Param id path int true "unique id"
 // @Param body body typed.MenuCreate true "request body"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/menus/{id} [put]
 func (a *MenuAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -109,11 +108,11 @@ func (a *MenuAPI) Update(c *gin.Context) {
 
 // @Tags MenuAPI
 // @Security ApiKeyAuth
-// @Summary Delete single menu by id
+// @Summary Delete menu by id
 // @Param id path string true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/menus/{id} [delete]
 func (a *MenuAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -127,33 +126,23 @@ func (a *MenuAPI) Delete(c *gin.Context) {
 
 // @Tags MenuAPI
 // @Security ApiKeyAuth
-// @Summary Enable menu status by id
+// @Summary Update menu status by id
 // @Param id path int true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
-// @Router /api/rbac/v1/menus/{id}/enable [patch]
-func (a *MenuAPI) Enable(c *gin.Context) {
+// @Param body body typed.MenuUpdateStatus true "request body"
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
+// @Router /api/rbac/v1/menus/{id}/status [put]
+func (a *MenuAPI) UpdateStatus(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuBiz.UpdateStatus(ctx, c.Param("id"), typed.MenuStatusEnabled)
-	if err != nil {
+	var item typed.MenuUpdateStatus
+	if err := utilx.ParseJSON(c, &item); err != nil {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResOK(c)
-}
 
-// @Tags MenuAPI
-// @Security ApiKeyAuth
-// @Summary Disable menu status by id
-// @Param id path int true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
-// @Router /api/rbac/v1/menus/{id}/disable [patch]
-func (a *MenuAPI) Disable(c *gin.Context) {
-	ctx := c.Request.Context()
-	err := a.MenuBiz.UpdateStatus(ctx, c.Param("id"), typed.MenuStatusDisabled)
+	err := a.MenuBiz.UpdateStatus(ctx, c.Param("id"), item.Status)
 	if err != nil {
 		utilx.ResError(c, err)
 		return

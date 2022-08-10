@@ -26,5 +26,10 @@ wire:
 swagger:
 	@swag init --parseDependency --generalInfo ./main.go --output ./internal/swagger
 
+# Dependency: https://github.com/OpenAPITools/openapi-generator
+# brew install openapi-generator
+openapi:
+	@openapi-generator generate -i ./internal/swagger/swagger.json -o ./internal/swagger/v3 -g openapi --minimal-update && cp ./internal/swagger/v3/openapi.json ./configs/openapi.json
+
 clean:
 	rm -rf data $(SERVER_BIN) pkg/x/cachex/tmp pkg/jwtauth/tmp

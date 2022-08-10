@@ -1,0 +1,2428 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "contact" : { },
+    "description" : "A simple, modular, high-performance RBAC development framework built on golang.",
+    "title" : "ginadmin",
+    "version" : "9.0.0"
+  },
+  "servers" : [ {
+    "url" : "/"
+  } ],
+  "paths" : {
+    "/api/rbac/v1/current/logout" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Logout system",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/rbac/v1/current/menus" : {
+      "put" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_current_menus_put_200_response"
+                }
+              }
+            },
+            "description" : "query result"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query current user privilege menu trees",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/rbac/v1/current/password" : {
+      "put" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.LoginPasswordUpdate"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update current user login password",
+        "tags" : [ "LoginAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/current/refreshtoken" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_current_refreshtoken_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Refresh current login token",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/rbac/v1/current/user" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_current_user_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Get current user",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/rbac/v1/login" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.UserLogin"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_current_refreshtoken_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "summary" : "Login system by username and password",
+        "tags" : [ "LoginAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/login/captcha" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "CaptchaID",
+          "in" : "query",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "Reload captcha image (reload=1)",
+          "in" : "query",
+          "name" : "reload",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : { },
+            "description" : "Captcha image"
+          },
+          "404" : {
+            "content" : {
+              "image/png" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Not Found"
+          }
+        },
+        "summary" : "Write captcha image",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/rbac/v1/login/captchaid" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_login_captchaid_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Get captcha id",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/rbac/v1/menus" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "parent id",
+          "in" : "query",
+          "name" : "parentID",
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "description" : "menu name (fuzzy query)",
+          "in" : "query",
+          "name" : "name",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "menu status (enabled/disabled)",
+          "in" : "query",
+          "name" : "status",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_current_menus_put_200_response"
+                }
+              }
+            },
+            "description" : "query result"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query menu tree",
+        "tags" : [ "MenuAPI" ]
+      },
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.MenuCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_menus_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Create menu",
+        "tags" : [ "MenuAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/menus/{id}" : {
+      "delete" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Delete menu by id",
+        "tags" : [ "MenuAPI" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_menus_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Get single menu by id",
+        "tags" : [ "MenuAPI" ]
+      },
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.MenuCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update menu by id",
+        "tags" : [ "MenuAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/menus/{id}/status" : {
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.MenuUpdateStatus"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update menu status by id",
+        "tags" : [ "MenuAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/roles" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "pagination index",
+          "in" : "query",
+          "name" : "current",
+          "required" : true,
+          "schema" : {
+            "default" : 1,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "pagination size",
+          "in" : "query",
+          "name" : "pageSize",
+          "required" : true,
+          "schema" : {
+            "default" : 10,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "role name (fuzzy query)",
+          "in" : "query",
+          "name" : "name",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "role status (enabled/disabled)",
+          "in" : "query",
+          "name" : "status",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : " result type (select/paginate, default: paginate)",
+          "in" : "query",
+          "name" : "result",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_roles_get_200_response"
+                }
+              }
+            },
+            "description" : "query result"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query role list",
+        "tags" : [ "RoleAPI" ]
+      },
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.RoleCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_roles_get_200_response_1"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Create role",
+        "tags" : [ "RoleAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/roles/{id}" : {
+      "delete" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Delete role by id",
+        "tags" : [ "RoleAPI" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_roles_get_200_response_1"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Get single role by id",
+        "tags" : [ "RoleAPI" ]
+      },
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.RoleCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update role by id",
+        "tags" : [ "RoleAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/roles/{id}/status" : {
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.RoleUpdateStatus"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update role status by id",
+        "tags" : [ "RoleAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/users" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "pagination index",
+          "in" : "query",
+          "name" : "current",
+          "required" : true,
+          "schema" : {
+            "default" : 1,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "pagination size",
+          "in" : "query",
+          "name" : "pageSize",
+          "required" : true,
+          "schema" : {
+            "default" : 10,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "user status (enabled/disabled)",
+          "in" : "query",
+          "name" : "status",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "name (fuzzy query)",
+          "in" : "query",
+          "name" : "name",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "username (fuzzy query)",
+          "in" : "query",
+          "name" : "username",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "role id",
+          "in" : "query",
+          "name" : "roleID",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_users_get_200_response"
+                }
+              }
+            },
+            "description" : "query result"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query user list",
+        "tags" : [ "UserAPI" ]
+      },
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.UserCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_current_user_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Create user",
+        "tags" : [ "UserAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/users/{id}" : {
+      "delete" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Delete user by id",
+        "tags" : [ "UserAPI" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_rbac_v1_current_user_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Get single user by id",
+        "tags" : [ "UserAPI" ]
+      },
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.UserCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update user by id",
+        "tags" : [ "UserAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/rbac/v1/users/{id}/status" : {
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.UserUpdateStatus"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update user status by id",
+        "tags" : [ "UserAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/sys/v1/dictionaries" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "pagination index",
+          "in" : "query",
+          "name" : "current",
+          "required" : true,
+          "schema" : {
+            "default" : 1,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "pagination size",
+          "in" : "query",
+          "name" : "pageSize",
+          "required" : true,
+          "schema" : {
+            "default" : 10,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "query namespace",
+          "in" : "query",
+          "name" : "ns",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "query key",
+          "in" : "query",
+          "name" : "key",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_sys_v1_dictionaries_get_200_response"
+                }
+              }
+            },
+            "description" : "query result"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query dictionary list",
+        "tags" : [ "DictionaryAPI" ]
+      },
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.DictionaryCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_sys_v1_dictionaries_get_200_response_1"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Create dictionary",
+        "tags" : [ "DictionaryAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/sys/v1/dictionaries/{id}" : {
+      "delete" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Delete single dictionary by id",
+        "tags" : [ "DictionaryAPI" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_sys_v1_dictionaries_get_200_response_1"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Get single dictionary by id",
+        "tags" : [ "DictionaryAPI" ]
+      },
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/typed.DictionaryCreate"
+              }
+            }
+          },
+          "description" : "request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update dictionary by id",
+        "tags" : [ "DictionaryAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "errors.Error" : {
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "detail" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.Captcha" : {
+        "properties" : {
+          "captcha_id" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.Dictionary" : {
+        "properties" : {
+          "created_at" : {
+            "type" : "string"
+          },
+          "created_by" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "key" : {
+            "description" : "Key of the dictionary",
+            "type" : "string"
+          },
+          "ns" : {
+            "description" : "Namespace of the dictionary",
+            "type" : "string"
+          },
+          "remark" : {
+            "description" : "Remark of the key",
+            "type" : "string"
+          },
+          "updated_at" : {
+            "type" : "string"
+          },
+          "updated_by" : {
+            "type" : "string"
+          },
+          "value" : {
+            "description" : "Value of the key",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.DictionaryCreate" : {
+        "properties" : {
+          "key" : {
+            "type" : "string"
+          },
+          "ns" : {
+            "type" : "string"
+          },
+          "remark" : {
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "key", "ns" ],
+        "type" : "object"
+      },
+      "typed.LoginPasswordUpdate" : {
+        "properties" : {
+          "new_password" : {
+            "type" : "string"
+          },
+          "old_password" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "new_password", "old_password" ],
+        "type" : "object"
+      },
+      "typed.LoginToken" : {
+        "properties" : {
+          "access_token" : {
+            "description" : "jwt token",
+            "type" : "string"
+          },
+          "expires_at" : {
+            "description" : "unix timestamp",
+            "type" : "integer"
+          },
+          "token_type" : {
+            "description" : "Usage: (Authorization=token_type token)",
+            "type" : "string"
+          }
+        },
+        "required" : [ "access_token", "expires_at", "token_type" ],
+        "type" : "object"
+      },
+      "typed.Menu" : {
+        "properties" : {
+          "actions" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.MenuAction"
+            },
+            "type" : "array"
+          },
+          "children" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.Menu"
+            },
+            "type" : "array"
+          },
+          "created_at" : {
+            "type" : "string"
+          },
+          "created_by" : {
+            "type" : "string"
+          },
+          "hide" : {
+            "type" : "boolean"
+          },
+          "icon" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "link" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "parent_id" : {
+            "type" : "string"
+          },
+          "parent_path" : {
+            "description" : "parent path (split by '.')",
+            "type" : "string"
+          },
+          "remark" : {
+            "type" : "string"
+          },
+          "sequence" : {
+            "type" : "integer"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "updated_at" : {
+            "type" : "string"
+          },
+          "updated_by" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.MenuAction" : {
+        "properties" : {
+          "code" : {
+            "description" : "Code of the action (for example, add, edit, delete, etc.)",
+            "type" : "string"
+          },
+          "created_at" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "menu_id" : {
+            "type" : "string"
+          },
+          "name" : {
+            "description" : "Name of the action (for example, Add, Edit, Delete, etc.)",
+            "type" : "string"
+          },
+          "resources" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.MenuActionResource"
+            },
+            "type" : "array"
+          },
+          "updated_at" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.MenuActionResource" : {
+        "properties" : {
+          "action_id" : {
+            "type" : "string"
+          },
+          "created_at" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "menu_id" : {
+            "type" : "string"
+          },
+          "method" : {
+            "description" : "HTTP Method (GET, POST, PUT, DELETE)",
+            "type" : "string"
+          },
+          "path" : {
+            "description" : "Path of the resource (:id means the parameter is required)",
+            "type" : "string"
+          },
+          "updated_at" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.MenuCreate" : {
+        "properties" : {
+          "actions" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.MenuAction"
+            },
+            "type" : "array"
+          },
+          "hide" : {
+            "type" : "boolean"
+          },
+          "icon" : {
+            "type" : "string"
+          },
+          "link" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "parent_id" : {
+            "type" : "string"
+          },
+          "remark" : {
+            "type" : "string"
+          },
+          "sequence" : {
+            "type" : "integer"
+          }
+        },
+        "required" : [ "name", "sequence" ],
+        "type" : "object"
+      },
+      "typed.MenuUpdateStatus" : {
+        "properties" : {
+          "status" : {
+            "description" : "enabled/disabled",
+            "type" : "string"
+          }
+        },
+        "required" : [ "status" ],
+        "type" : "object"
+      },
+      "typed.Role" : {
+        "properties" : {
+          "created_at" : {
+            "type" : "string"
+          },
+          "created_by" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "remark" : {
+            "type" : "string"
+          },
+          "role_menus" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.RoleMenu"
+            },
+            "type" : "array"
+          },
+          "sequence" : {
+            "type" : "integer"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "updated_at" : {
+            "type" : "string"
+          },
+          "updated_by" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.RoleCreate" : {
+        "properties" : {
+          "menus" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.RoleMenu"
+            },
+            "type" : "array"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "remark" : {
+            "type" : "string"
+          },
+          "sequence" : {
+            "type" : "integer"
+          }
+        },
+        "required" : [ "name", "sequence" ],
+        "type" : "object"
+      },
+      "typed.RoleMenu" : {
+        "properties" : {
+          "created_at" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "menu_action_id" : {
+            "type" : "string"
+          },
+          "menu_id" : {
+            "type" : "string"
+          },
+          "role_id" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.RoleUpdateStatus" : {
+        "properties" : {
+          "status" : {
+            "description" : "enabled/disabled",
+            "type" : "string"
+          }
+        },
+        "required" : [ "status" ],
+        "type" : "object"
+      },
+      "typed.User" : {
+        "properties" : {
+          "created_at" : {
+            "type" : "string"
+          },
+          "created_by" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "name" : {
+            "description" : "Name of the user",
+            "type" : "string"
+          },
+          "phone" : {
+            "type" : "string"
+          },
+          "remark" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "updated_at" : {
+            "type" : "string"
+          },
+          "updated_by" : {
+            "type" : "string"
+          },
+          "user_roles" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.UserRole"
+            },
+            "type" : "array"
+          },
+          "username" : {
+            "description" : "Login username (must be unique)",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.UserCreate" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "password" : {
+            "type" : "string"
+          },
+          "phone" : {
+            "type" : "string"
+          },
+          "remark" : {
+            "type" : "string"
+          },
+          "role_ids" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "username" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "name", "username" ],
+        "type" : "object"
+      },
+      "typed.UserLogin" : {
+        "properties" : {
+          "captcha_code" : {
+            "description" : "captcha verify code",
+            "type" : "string"
+          },
+          "captcha_id" : {
+            "description" : "captcha verify id",
+            "type" : "string"
+          },
+          "login_name" : {
+            "description" : "login username",
+            "type" : "string"
+          },
+          "password" : {
+            "description" : "login password (md5)",
+            "type" : "string"
+          }
+        },
+        "required" : [ "captcha_code", "captcha_id", "login_name", "password" ],
+        "type" : "object"
+      },
+      "typed.UserRole" : {
+        "properties" : {
+          "created_at" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "role" : {
+            "$ref" : "#/components/schemas/typed.Role"
+          },
+          "role_id" : {
+            "type" : "string"
+          },
+          "user_id" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "typed.UserUpdateStatus" : {
+        "properties" : {
+          "status" : {
+            "description" : "activated/freezed",
+            "type" : "string"
+          }
+        },
+        "required" : [ "status" ],
+        "type" : "object"
+      },
+      "utilx.PaginationResult" : {
+        "properties" : {
+          "current" : {
+            "type" : "integer"
+          },
+          "pageSize" : {
+            "type" : "integer"
+          },
+          "total" : {
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "utilx.ResponseResult" : {
+        "properties" : {
+          "data" : {
+            "type" : "object"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/errors.Error"
+          },
+          "pagination" : {
+            "$ref" : "#/components/schemas/utilx.PaginationResult"
+          },
+          "success" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_current_menus_put_200_response" : {
+        "properties" : {
+          "data" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.Menu"
+            },
+            "type" : "array"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_current_refreshtoken_post_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/typed.LoginToken"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_current_user_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/typed.User"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_login_captchaid_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/typed.Captcha"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_menus_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/typed.Menu"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_roles_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.Role"
+            },
+            "type" : "array"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_roles_get_200_response_1" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/typed.Role"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_rbac_v1_users_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.User"
+            },
+            "type" : "array"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_sys_v1_dictionaries_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "items" : {
+              "$ref" : "#/components/schemas/typed.Dictionary"
+            },
+            "type" : "array"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_sys_v1_dictionaries_get_200_response_1" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/typed.Dictionary"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      }
+    },
+    "securitySchemes" : {
+      "ApiKeyAuth" : {
+        "in" : "header",
+        "name" : "Authorization",
+        "type" : "apiKey"
+      }
+    }
+  },
+  "x-original-swagger-version" : "2.0"
+}

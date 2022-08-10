@@ -19,9 +19,9 @@ type RoleAPI struct {
 // @Param name query string false "role name (fuzzy query)"
 // @Param status query string false "role status (enabled/disabled)"
 // @Param result query string false " result type (select/paginate, default: paginate)"
-// @Success 200 {object} utilx.ListResult{list=[]typed.Role} "query result"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=[]typed.Role} "query result"
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/roles [get]
 func (a *RoleAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -36,16 +36,16 @@ func (a *RoleAPI) Query(c *gin.Context) {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResList(c, result.Data)
+	utilx.ResPage(c, result.Data, result.PageResult)
 }
 
 // @Tags RoleAPI
 // @Security ApiKeyAuth
 // @Summary Get single role by id
 // @Param id path string true "unique id"
-// @Success 200 {object} typed.Role
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.Role}
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/roles/{id} [get]
 func (a *RoleAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -61,10 +61,10 @@ func (a *RoleAPI) Get(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Create role
 // @Param body body typed.RoleCreate true "request body"
-// @Success 200 {object} typed.Role
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.Role}
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/roles [post]
 func (a *RoleAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -87,10 +87,10 @@ func (a *RoleAPI) Create(c *gin.Context) {
 // @Summary Update role by id
 // @Param id path int true "unique id"
 // @Param body body typed.RoleCreate true "request body"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/roles/{id} [put]
 func (a *RoleAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -110,11 +110,11 @@ func (a *RoleAPI) Update(c *gin.Context) {
 
 // @Tags RoleAPI
 // @Security ApiKeyAuth
-// @Summary Delete single role by id
+// @Summary Delete role by id
 // @Param id path string true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/roles/{id} [delete]
 func (a *RoleAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -128,33 +128,23 @@ func (a *RoleAPI) Delete(c *gin.Context) {
 
 // @Tags RoleAPI
 // @Security ApiKeyAuth
-// @Summary Enable role status by id
+// @Summary Update role status by id
 // @Param id path int true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
-// @Router /api/rbac/v1/roles/{id}/enable [patch]
-func (a *RoleAPI) Enable(c *gin.Context) {
+// @Param body body typed.RoleUpdateStatus true "request body"
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
+// @Router /api/rbac/v1/roles/{id}/status [put]
+func (a *RoleAPI) UpdateStatus(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleBiz.UpdateStatus(ctx, c.Param("id"), typed.RoleStatusEnabled)
-	if err != nil {
+	var item typed.RoleUpdateStatus
+	if err := utilx.ParseJSON(c, &item); err != nil {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResOK(c)
-}
 
-// @Tags RoleAPI
-// @Security ApiKeyAuth
-// @Summary Disable role status by id
-// @Param id path int true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
-// @Router /api/rbac/v1/roles/{id}/disable [patch]
-func (a *RoleAPI) Disable(c *gin.Context) {
-	ctx := c.Request.Context()
-	err := a.RoleBiz.UpdateStatus(ctx, c.Param("id"), typed.RoleStatusDisabled)
+	err := a.RoleBiz.UpdateStatus(ctx, c.Param("id"), item.Status)
 	if err != nil {
 		utilx.ResError(c, err)
 		return

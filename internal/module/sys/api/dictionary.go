@@ -18,9 +18,9 @@ type DictionaryAPI struct {
 // @Param pageSize query int true "pagination size" default(10)
 // @Param ns query string false "query namespace"
 // @Param key query string false "query key"
-// @Success 200 {object} utilx.ListResult{list=[]typed.Dictionary} "query result"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=[]typed.Dictionary} "query result"
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/sys/v1/dictionaries [get]
 func (a *DictionaryAPI) Query(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -35,16 +35,16 @@ func (a *DictionaryAPI) Query(c *gin.Context) {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResList(c, result.Data)
+	utilx.ResPage(c, result.Data, result.PageResult)
 }
 
 // @Tags DictionaryAPI
 // @Security ApiKeyAuth
 // @Summary Get single dictionary by id
 // @Param id path string true "unique id"
-// @Success 200 {object} typed.Dictionary
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.Dictionary}
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/sys/v1/dictionaries/{id} [get]
 func (a *DictionaryAPI) Get(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -60,10 +60,10 @@ func (a *DictionaryAPI) Get(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Create dictionary
 // @Param body body typed.DictionaryCreate true "request body"
-// @Success 200 {object} typed.Dictionary
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.Dictionary}
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/sys/v1/dictionaries [post]
 func (a *DictionaryAPI) Create(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -86,10 +86,10 @@ func (a *DictionaryAPI) Create(c *gin.Context) {
 // @Summary Update dictionary by id
 // @Param id path int true "unique id"
 // @Param body body typed.DictionaryCreate true "request body"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/sys/v1/dictionaries/{id} [put]
 func (a *DictionaryAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -111,9 +111,9 @@ func (a *DictionaryAPI) Update(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Delete single dictionary by id
 // @Param id path string true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/sys/v1/dictionaries/{id} [delete]
 func (a *DictionaryAPI) Delete(c *gin.Context) {
 	ctx := c.Request.Context()

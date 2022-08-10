@@ -7,17 +7,11 @@ const (
 	ResponseBodyKey = "res-body"
 )
 
-type OkResult struct {
-	Ok bool `json:"ok"`
-}
-
-type ErrorResult struct {
-	Error *errors.Error `json:"error"`
-}
-
-type ListResult struct {
-	List       interface{}       `json:"list"`
+type ResponseResult struct {
+	Success    bool              `json:"success"`
+	Data       interface{}       `json:"data,omitempty"`
 	Pagination *PaginationResult `json:"pagination,omitempty"`
+	Error      *errors.Error     `json:"error,omitempty"`
 }
 
 type PaginationResult struct {

@@ -114,8 +114,7 @@ func (a *RBAC) RegisterAPI(ctx context.Context, group *gin.RouterGroup) {
 			gMenu.POST("", a.MenuAPI.Create)
 			gMenu.PUT(":id", a.MenuAPI.Update)
 			gMenu.DELETE(":id", a.MenuAPI.Delete)
-			gMenu.PATCH(":id/enable", a.MenuAPI.Enable)
-			gMenu.PATCH(":id/disable", a.MenuAPI.Disable)
+			gMenu.PUT(":id/status", a.MenuAPI.UpdateStatus)
 		}
 
 		gRole := v1.Group("roles")
@@ -125,8 +124,7 @@ func (a *RBAC) RegisterAPI(ctx context.Context, group *gin.RouterGroup) {
 			gRole.POST("", a.RoleAPI.Create)
 			gRole.PUT(":id", a.RoleAPI.Update)
 			gRole.DELETE(":id", a.RoleAPI.Delete)
-			gRole.PATCH(":id/enable", a.RoleAPI.Enable)
-			gRole.PATCH(":id/disable", a.RoleAPI.Disable)
+			gRole.PUT(":id/status", a.RoleAPI.UpdateStatus)
 		}
 
 		gUser := v1.Group("users")
@@ -136,8 +134,7 @@ func (a *RBAC) RegisterAPI(ctx context.Context, group *gin.RouterGroup) {
 			gUser.POST("", a.UserAPI.Create)
 			gUser.PUT(":id", a.UserAPI.Update)
 			gUser.DELETE(":id", a.UserAPI.Delete)
-			gUser.PATCH(":id/active", a.UserAPI.Active)
-			gUser.PATCH(":id/freeze", a.UserAPI.Freeze)
+			gUser.PUT(":id/status", a.UserAPI.UpdateStatus)
 		}
 	} // end
 }

@@ -22,6 +22,7 @@ tmp
 /configs/rbac_policy.csv
 /configs/rbac_policy.csv.bak
 /test/data
+/internal/swagger/v3/.openapi-generator
 
 
 # IDE configs

@@ -5,7 +5,7 @@ import (
 )
 
 func TestGeneratePassword(t *testing.T) {
-	origin := "abc_123@!"
+	origin := "abc-123"
 	hashPwd, err := GeneratePassword(origin)
 	if err != nil {
 		t.Error("GeneratePassword Failed: ", err.Error())
@@ -18,5 +18,5 @@ func TestGeneratePassword(t *testing.T) {
 }
 
 func TestMD5(t *testing.T) {
-	t.Log(MD5String("123456"))
+	t.Log(MD5String("abc-123"))
 }

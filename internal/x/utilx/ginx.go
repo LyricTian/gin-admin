@@ -80,29 +80,29 @@ func ResJSON(c *gin.Context, status int, v interface{}) {
 
 // Response data object
 func ResSuccess(c *gin.Context, v interface{}) {
-	ResJSON(c, http.StatusOK, v)
+	ResJSON(c, http.StatusOK, ResponseResult{
+		Success: true,
+		Data:    v,
+	})
 }
 
-// Response success with status ok
+// Response success
 func ResOK(c *gin.Context) {
-	ResSuccess(c, OkResult{Ok: true})
+	ResJSON(c, http.StatusOK, ResponseResult{
+		Success: true,
+	})
 }
 
-// Response data with list object
-func ResList(c *gin.Context, v interface{}) {
-	ResSuccess(c, ListResult{List: v})
-}
-
-// Response pagination data object
+// Response pagination data
 func ResPage(c *gin.Context, v interface{}, pr *PaginationResult) {
-	list := ListResult{
-		List:       v,
+	ResJSON(c, http.StatusOK, ResponseResult{
+		Success:    true,
+		Data:       v,
 		Pagination: pr,
-	}
-	ResSuccess(c, list)
+	})
 }
 
-// Response error object and parse error status code
+// Response error and parse status code
 func ResError(c *gin.Context, err error, status ...int) {
 	ctx := c.Request.Context()
 
@@ -128,5 +128,5 @@ func ResError(c *gin.Context, err error, status ...int) {
 		ierr.Detail = http.StatusText(http.StatusInternalServerError)
 	}
 
-	ResJSON(c, code, ErrorResult{Error: ierr})
+	ResJSON(c, code, ResponseResult{Error: ierr})
 }

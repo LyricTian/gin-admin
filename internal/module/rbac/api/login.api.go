@@ -13,7 +13,7 @@ type LoginAPI struct {
 
 // @Tags LoginAPI
 // @Summary Get captcha id
-// @Success 200 {object} typed.Captcha
+// @Success 200 {object} utilx.ResponseResult{data=typed.Captcha}
 // @Router /api/rbac/v1/login/captchaid [get]
 func (a *LoginAPI) GetCaptchaID(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -31,8 +31,7 @@ func (a *LoginAPI) GetCaptchaID(c *gin.Context) {
 // @Param reload query string false "Reload captcha image (reload=1)"
 // @Produce image/png
 // @Success 200 "Captcha image"
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Failure 404 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/login/captcha [get]
 func (a *LoginAPI) WriteCaptchaImage(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -45,9 +44,9 @@ func (a *LoginAPI) WriteCaptchaImage(c *gin.Context) {
 // @Tags LoginAPI
 // @Summary Login system by username and password
 // @Param body body typed.UserLogin true "Request body"
-// @Success 200 {object} typed.LoginToken
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.LoginToken}
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/login [post]
 func (a *LoginAPI) Login(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -68,7 +67,8 @@ func (a *LoginAPI) Login(c *gin.Context) {
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Logout system
-// @Success 200 {object} utilx.OkResult "ok=true"
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/current/logout [post]
 func (a *LoginAPI) Logout(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -83,9 +83,9 @@ func (a *LoginAPI) Logout(c *gin.Context) {
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Refresh current login token
-// @Success 200 {object} typed.LoginToken
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.LoginToken}
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/current/refreshtoken [post]
 func (a *LoginAPI) RefreshToken(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -100,9 +100,9 @@ func (a *LoginAPI) RefreshToken(c *gin.Context) {
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Get current user
-// @Success 200 {object} typed.User
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.User}
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/current/user [get]
 func (a *LoginAPI) GetCurrentUser(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -118,9 +118,10 @@ func (a *LoginAPI) GetCurrentUser(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Update current user login password
 // @Param body body typed.LoginPasswordUpdate true "Request body"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/current/password [put]
 func (a *LoginAPI) UpdatePassword(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -141,9 +142,9 @@ func (a *LoginAPI) UpdatePassword(c *gin.Context) {
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Query current user privilege menu trees
-// @Success 200 {object} utilx.ListResult{list=[]typed.Menu} "query result"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=[]typed.Menu} "query result"
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/rbac/v1/current/menus [put]
 func (a *LoginAPI) QueryPrivilegeMenus(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -152,5 +153,5 @@ func (a *LoginAPI) QueryPrivilegeMenus(c *gin.Context) {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResList(c, result)
+	utilx.ResSuccess(c, result)
 }

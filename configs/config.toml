@@ -70,7 +70,7 @@ AllowWebSockets = false
 AllowFiles = false
 
 [Middleware.Auth]
-Disable = false
+Disable = true
 SkippedPathPrefixes = ["/api/rbac/v1/login"]
 SigningMethod = "HS512"
 SigningKey = "XnEsT0S@"

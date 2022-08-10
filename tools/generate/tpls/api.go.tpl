@@ -18,9 +18,9 @@ type {{.Name}}API struct {
 // @Param pageSize query int true "pagination size" default(10)
 {{range .Fields}}{{if .InQuery}}// @Param {{.FirstLowerName}} query {{.Type}} false "{{.QueryComments}}"{{end}}
 {{end}}
-// @Success 200 {object} utilx.ListResult{list=[]typed.{{.Name}}} "query result"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=[]typed.{{.Name}}} "query result"
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/{{.ModuleLowerName}}/v1/{{.LowerPluralName}} [get]
 func (a *{{.Name}}API) Query(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -42,9 +42,9 @@ func (a *{{.Name}}API) Query(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Get single {{.LowerSpaceName}} by id
 // @Param id path string true "unique id"
-// @Success 200 {object} typed.{{.Name}}
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.{{.Name}}}
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/{{.ModuleLowerName}}/v1/{{.LowerPluralName}}/{id} [get]
 func (a *{{.Name}}API) Get(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -60,10 +60,10 @@ func (a *{{.Name}}API) Get(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Create {{.LowerSpaceName}}
 // @Param body body typed.{{.Name}}Create true "request body"
-// @Success 200 {object} typed.{{.Name}}
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult{data=typed.{{.Name}}}
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/{{.ModuleLowerName}}/v1/{{.LowerPluralName}} [post]
 func (a *{{.Name}}API) Create(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -86,10 +86,10 @@ func (a *{{.Name}}API) Create(c *gin.Context) {
 // @Summary Update {{.LowerSpaceName}} by id
 // @Param id path int true "unique id"
 // @Param body body typed.{{.Name}}Create true "request body"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 400 {object} utilx.ErrorResult
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 400 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/{{.ModuleLowerName}}/v1/{{.LowerPluralName}}/{id} [put]
 func (a *{{.Name}}API) Update(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -109,11 +109,11 @@ func (a *{{.Name}}API) Update(c *gin.Context) {
 
 // @Tags {{.Name}}API
 // @Security ApiKeyAuth
-// @Summary Delete single {{.LowerSpaceName}} by id
+// @Summary Delete {{.LowerSpaceName}} by id
 // @Param id path string true "unique id"
-// @Success 200 {object} utilx.OkResult "ok=true"
-// @Failure 401 {object} utilx.ErrorResult
-// @Failure 500 {object} utilx.ErrorResult
+// @Success 200 {object} utilx.ResponseResult
+// @Failure 401 {object} utilx.ResponseResult
+// @Failure 500 {object} utilx.ResponseResult
 // @Router /api/{{.ModuleLowerName}}/v1/{{.LowerPluralName}}/{id} [delete]
 func (a *{{.Name}}API) Delete(c *gin.Context) {
 	ctx := c.Request.Context()

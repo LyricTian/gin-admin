@@ -1,18 +1,18 @@
 [
     {
-        "name": "Home",
+        "name": "dashboard",
         "icon": "dashboard",
         "sequence": 99,
         "link": "/dashboard"
     },
     {
-        "name": "System",
+        "name": "system",
         "icon": "setting",
         "sequence": 10,
         "children": [
             {
-                "name": "Menu",
-                "icon": "solution",
+                "name": "menu",
+                "icon": "apartment",
                 "sequence": 1010,
                 "link": "/system/menu",
                 "actions": [
@@ -67,7 +67,7 @@
                 ]
             },
             {
-                "name": "Role",
+                "name": "role",
                 "icon": "audit",
                 "sequence": 1009,
                 "link": "/system/role",
@@ -131,7 +131,7 @@
                 ]
             },
             {
-                "name": "User",
+                "name": "user",
                 "icon": "user",
                 "sequence": 1008,
                 "link": "/system/user",
@@ -195,8 +195,8 @@
                 ]
             },
             {
-                "name": "Dictionary",
-                "icon": "appstore",
+                "name": "dictionary",
+                "icon": "control",
                 "sequence": 1007,
                 "link": "/system/dictionary",
                 "actions": [

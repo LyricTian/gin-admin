@@ -61,3 +61,7 @@ type RoleCreate struct {
 	Remark    string    `json:"remark"`
 	RoleMenus RoleMenus `json:"menus"`
 }
+
+type RoleUpdateStatus struct {
+	Status RoleStatus `json:"status" binding:"required"` // enabled/disabled
+}
