@@ -9,7 +9,7 @@ import (
 )
 
 // @title ginadmin
-// @version 9.0.0
+// @version 9.0.1
 // @description A simple, modular, high-performance RBAC development framework built on golang.
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header

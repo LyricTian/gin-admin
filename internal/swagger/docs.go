@@ -2194,20 +2194,6 @@ const docTemplate = `{
                 }
             }
         },
-        "utilx.PaginationResult": {
-            "type": "object",
-            "properties": {
-                "current": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
         "utilx.ResponseResult": {
             "type": "object",
             "properties": {
@@ -2215,11 +2201,11 @@ const docTemplate = `{
                 "error": {
                     "$ref": "#/definitions/errors.Error"
                 },
-                "pagination": {
-                    "$ref": "#/definitions/utilx.PaginationResult"
-                },
                 "success": {
                     "type": "boolean"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         }
@@ -2235,7 +2221,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "9.0.0",
+	Version:          "9.0.1",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},

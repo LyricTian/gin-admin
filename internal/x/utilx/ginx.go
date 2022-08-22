@@ -95,10 +95,14 @@ func ResOK(c *gin.Context) {
 
 // Response pagination data
 func ResPage(c *gin.Context, v interface{}, pr *PaginationResult) {
+	var total int64
+	if pr != nil {
+		total = pr.Total
+	}
 	ResJSON(c, http.StatusOK, ResponseResult{
-		Success:    true,
-		Data:       v,
-		Pagination: pr,
+		Success: true,
+		Data:    v,
+		Total:   total,
 	})
 }
 

@@ -3,7 +3,7 @@ module_name: SYS
 name: Dictionary
 description: Dictionary management for key/value pairs
 fields:
-  - name: Ns
+  - name: Namespace
     type: string
     optional: false
     gorm_tag: size:64;index:idx_dictionary_ns_key;

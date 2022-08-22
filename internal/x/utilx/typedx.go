@@ -8,10 +8,10 @@ const (
 )
 
 type ResponseResult struct {
-	Success    bool              `json:"success"`
-	Data       interface{}       `json:"data,omitempty"`
-	Pagination *PaginationResult `json:"pagination,omitempty"`
-	Error      *errors.Error     `json:"error,omitempty"`
+	Success bool          `json:"success"`
+	Data    interface{}   `json:"data,omitempty"`
+	Total   int64         `json:"total,omitempty"`
+	Error   *errors.Error `json:"error,omitempty"`
 }
 
 type PaginationResult struct {

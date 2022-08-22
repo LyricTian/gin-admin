@@ -4,7 +4,7 @@
         "description": "A simple, modular, high-performance RBAC development framework built on golang.",
         "title": "ginadmin",
         "contact": {},
-        "version": "9.0.0"
+        "version": "9.0.1"
     },
     "paths": {
         "/api/rbac/v1/current/logout": {
@@ -2185,20 +2185,6 @@
                 }
             }
         },
-        "utilx.PaginationResult": {
-            "type": "object",
-            "properties": {
-                "current": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
         "utilx.ResponseResult": {
             "type": "object",
             "properties": {
@@ -2206,11 +2192,11 @@
                 "error": {
                     "$ref": "#/definitions/errors.Error"
                 },
-                "pagination": {
-                    "$ref": "#/definitions/utilx.PaginationResult"
-                },
                 "success": {
                     "type": "boolean"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         }

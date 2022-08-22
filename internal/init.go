@@ -127,8 +127,6 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 		}))
 	}
 
-	logger.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", config.C.General.HTTP.Addr))
-
 	srv := &http.Server{
 		Addr:         config.C.General.HTTP.Addr,
 		Handler:      app,
@@ -136,6 +134,8 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 		WriteTimeout: time.Second * time.Duration(config.C.General.HTTP.WriteTimeout),
 		IdleTimeout:  time.Second * time.Duration(config.C.General.HTTP.IdleTimeout),
 	}
+	logger.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", srv.Addr))
+
 	go func() {
 		var err error
 		if config.C.General.HTTP.CertFile != "" && config.C.General.HTTP.KeyFile != "" {
