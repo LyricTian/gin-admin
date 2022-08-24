@@ -15,10 +15,8 @@ type {{.Name}}API struct {
 // @Security ApiKeyAuth
 // @Summary Query {{.LowerSpaceName}} list
 // @Param current query int true "pagination index" default(1)
-// @Param pageSize query int true "pagination size" default(10)
-{{range .Fields}}{{if .InQuery}}// @Param {{.FirstLowerName}} query {{.Type}} false "{{.QueryComments}}"{{end}}
-{{end}}
-// @Success 200 {object} utilx.ResponseResult{data=[]typed.{{.Name}}} "query result"
+// @Param pageSize query int true "pagination size" default(10){{range .Fields}}
+{{if .InQuery}}// @Param {{.FirstLowerName}} query {{.Type}} false "{{.QueryComments}}"{{end}}{{end}}// @Success 200 {object} utilx.ResponseResult{data=[]typed.{{.Name}}} "query result"
 // @Failure 401 {object} utilx.ResponseResult
 // @Failure 500 {object} utilx.ResponseResult
 // @Router /api/{{.ModuleLowerName}}/v1/{{.LowerPluralName}} [get]
@@ -35,7 +33,7 @@ func (a *{{.Name}}API) Query(c *gin.Context) {
 		utilx.ResError(c, err)
 		return
 	}
-	utilx.ResList(c, result.Data)
+	utilx.ResPage(c, result.Data, result.PageResult)
 }
 
 // @Tags {{.Name}}API

@@ -199,9 +199,12 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 			if moduleSetStart && strings.HasSuffix(line, "// end") {
 				moduleSetStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf(`wire.Struct(new(dao.%sRepo), "*"),\n`, cfg.Name))
-				buf.WriteString(fmt.Sprintf(`wire.Struct(new(biz.%sBiz), "*"),\n`, cfg.Name))
+				buf.WriteString(fmt.Sprintf(`wire.Struct(new(dao.%sRepo), "*"),`, cfg.Name))
+				buf.WriteByte('\n')
+				buf.WriteString(fmt.Sprintf(`wire.Struct(new(biz.%sBiz), "*"),`, cfg.Name))
+				buf.WriteByte('\n')
 				buf.WriteString(fmt.Sprintf(`wire.Struct(new(api.%sAPI), "*"),`, cfg.Name))
+				buf.WriteByte('\n')
 				return buf.String(), -1, true
 			}
 
@@ -231,13 +234,20 @@ func Generate(ctx context.Context, dir, tplDir string, results []string, yamlCfg
 			if moduleGroupStart && strings.HasSuffix(line, "// end") {
 				moduleGroupStart = false
 				var buf bytes.Buffer
-				buf.WriteString(fmt.Sprintf(`g%s := v1.Group("%s")\n`, cfg.Name, cfg.LowerPluralName))
-				buf.WriteString("{\n")
-				buf.WriteString(fmt.Sprintf(`g%s.GET("", a.%sAPI.Query)\n`, cfg.Name, cfg.Name))
-				buf.WriteString(fmt.Sprintf(`g%s.GET(":id", a.%sAPI.Get)\n`, cfg.Name, cfg.Name))
-				buf.WriteString(fmt.Sprintf(`g%s.POST("", a.%sAPI.Create)\n`, cfg.Name, cfg.Name))
-				buf.WriteString(fmt.Sprintf(`g%s.PUT(":id", a.%sAPI.Update)\n`, cfg.Name, cfg.Name))
-				buf.WriteString(fmt.Sprintf(`g%s.DELETE(":id", a.%sAPI.Delete)\n`, cfg.Name, cfg.Name))
+				buf.WriteString(fmt.Sprintf(`g%s := v1.Group("%s")`, cfg.Name, cfg.LowerPluralName))
+				buf.WriteByte('\n')
+				buf.WriteString("{")
+				buf.WriteByte('\n')
+				buf.WriteString(fmt.Sprintf(`g%s.GET("", a.%sAPI.Query)`, cfg.Name, cfg.Name))
+				buf.WriteByte('\n')
+				buf.WriteString(fmt.Sprintf(`g%s.GET(":id", a.%sAPI.Get)`, cfg.Name, cfg.Name))
+				buf.WriteByte('\n')
+				buf.WriteString(fmt.Sprintf(`g%s.POST("", a.%sAPI.Create)`, cfg.Name, cfg.Name))
+				buf.WriteByte('\n')
+				buf.WriteString(fmt.Sprintf(`g%s.PUT(":id", a.%sAPI.Update)`, cfg.Name, cfg.Name))
+				buf.WriteByte('\n')
+				buf.WriteString(fmt.Sprintf(`g%s.DELETE(":id", a.%sAPI.Delete)`, cfg.Name, cfg.Name))
+				buf.WriteByte('\n')
 				buf.WriteString("}")
 				return buf.String(), -1, true
 			}
