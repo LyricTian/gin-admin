@@ -17,6 +17,10 @@ definitions:
     type: object
   typed.Dictionary:
     properties:
+      children:
+        items:
+          $ref: '#/definitions/typed.Dictionary'
+        type: array
       created_at:
         type: string
       created_by:
@@ -24,10 +28,13 @@ definitions:
       id:
         type: string
       key:
-        description: Key of the dictionary
+        description: Key of the dictionary (Unique key for the same parent)
         type: string
-      namespace:
-        description: Namespace of the dictionary
+      parent_id:
+        description: Parent ID
+        type: string
+      parent_path:
+        description: 'Parent path (split by .)(max depth: 10)'
         type: string
       remark:
         description: Remark of the key
@@ -44,7 +51,7 @@ definitions:
     properties:
       key:
         type: string
-      namespace:
+      parent_id:
         type: string
       remark:
         type: string
@@ -52,7 +59,17 @@ definitions:
         type: string
     required:
     - key
-    - namespace
+    type: object
+  typed.DictionaryUpdate:
+    properties:
+      key:
+        type: string
+      remark:
+        type: string
+      value:
+        type: string
+    required:
+    - key
     type: object
   typed.LoginPasswordUpdate:
     properties:
@@ -1195,25 +1212,17 @@ paths:
   /api/sys/v1/dictionaries:
     get:
       parameters:
-      - default: 1
-        description: pagination index
-        in: query
-        name: current
-        required: true
-        type: integer
-      - default: 10
-        description: pagination size
-        in: query
-        name: pageSize
-        required: true
-        type: integer
-      - description: query namespace
-        in: query
-        name: namespace
-        type: string
-      - description: query key
+      - description: query key or path key (split by .)
         in: query
         name: key
+        type: string
+      - description: full text query value (key/value/remark)
+        in: query
+        name: queryValue
+        type: string
+      - description: 'parent id (-1: all, 0: root)'
+        in: query
+        name: parentID
         type: string
       responses:
         "200":
@@ -1237,7 +1246,7 @@ paths:
             $ref: '#/definitions/utilx.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Query dictionary list
+      summary: Query dictionary tree
       tags:
       - DictionaryAPI
     post:
@@ -1343,7 +1352,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/typed.DictionaryCreate'
+          $ref: '#/definitions/typed.DictionaryUpdate'
       responses:
         "200":
           description: OK

@@ -13,11 +13,10 @@ type DictionaryAPI struct {
 
 // @Tags DictionaryAPI
 // @Security ApiKeyAuth
-// @Summary Query dictionary list
-// @Param current query int true "pagination index" default(1)
-// @Param pageSize query int true "pagination size" default(10)
-// @Param namespace query string false "query namespace"
-// @Param key query string false "query key"
+// @Summary Query dictionary tree
+// @Param key query string false "query key or path key (split by .)"
+// @Param queryValue query string false "full text query value (key/value/remark)"
+// @Param parentID query string false "parent id (-1: all, 0: root)"
 // @Success 200 {object} utilx.ResponseResult{data=[]typed.Dictionary} "query result"
 // @Failure 401 {object} utilx.ResponseResult
 // @Failure 500 {object} utilx.ResponseResult
@@ -85,7 +84,7 @@ func (a *DictionaryAPI) Create(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Summary Update dictionary by id
 // @Param id path int true "unique id"
-// @Param body body typed.DictionaryCreate true "request body"
+// @Param body body typed.DictionaryUpdate true "request body"
 // @Success 200 {object} utilx.ResponseResult
 // @Failure 400 {object} utilx.ResponseResult
 // @Failure 401 {object} utilx.ResponseResult
@@ -93,7 +92,7 @@ func (a *DictionaryAPI) Create(c *gin.Context) {
 // @Router /api/sys/v1/dictionaries/{id} [put]
 func (a *DictionaryAPI) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item typed.DictionaryCreate
+	var item typed.DictionaryUpdate
 	if err := utilx.ParseJSON(c, &item); err != nil {
 		utilx.ResError(c, err)
 		return

@@ -23,8 +23,8 @@ type Menu struct {
 	Sequence   int         `gorm:"index;" json:"sequence"`
 	Icon       *string     `gorm:"size:128;" json:"icon"`
 	Link       *string     `gorm:"size:255;" json:"link"`
-	ParentID   *string     `gorm:"size:20;" json:"parent_id"`
-	ParentPath *string     `gorm:"size:512;" json:"parent_path"` // parent path (split by '.')
+	ParentID   *string     `gorm:"size:20;index;" json:"parent_id"`
+	ParentPath *string     `gorm:"size:255;index;" json:"parent_path"` // parent path (split by '.')
 	Remark     *string     `gorm:"size:1024;" json:"remark"`
 	Hide       bool        `json:"hide"`
 	Status     MenuStatus  `gorm:"size:20;index;" json:"status"`
@@ -129,6 +129,9 @@ func (a Menus) SplitParentIDs() []string {
 
 		if item.ParentPath != nil {
 			for _, pp := range strings.Split(*item.ParentPath, MenuParentPathDelimiter) {
+				if pp == "" {
+					continue
+				}
 				if _, ok := mIDList[pp]; ok {
 					continue
 				}

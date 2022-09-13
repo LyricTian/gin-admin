@@ -25,11 +25,17 @@ func (a *DictionaryRepo) Query(ctx context.Context, params typed.DictionaryQuery
 
 	db := GetDictionaryDB(ctx, a.DB)
 
-	if v := params.Namespace; len(v) > 0 {
-		db = db.Where("namespace=?", v)
-	}
 	if v := params.Key; len(v) > 0 {
 		db = db.Where("key=?", v)
+	}
+	if v := params.ParentID; v != nil {
+		db = db.Where("parent_id=?", *v)
+	}
+	if v := params.LikeLeftParentPath; len(v) > 0 {
+		db = db.Where("parent_path like ?", v+"%")
+	}
+	if v := params.QueryValue; v != "" {
+		db = db.Where("key like ? or value like ? or remark like ?", "%"+v+"%", "%"+v+"%", "%"+v+"%")
 	}
 
 	var list typed.Dictionaries
@@ -63,6 +69,22 @@ func (a *DictionaryRepo) Get(ctx context.Context, id string, opts ...typed.Dicti
 	return item, nil
 }
 
+func (a *DictionaryRepo) GetByKeyAndParentID(ctx context.Context, key string, parentID string, opts ...typed.DictionaryQueryOptions) (*typed.Dictionary, error) {
+	var opt typed.DictionaryQueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+
+	item := new(typed.Dictionary)
+	ok, err := utilx.FindOne(ctx, GetDictionaryDB(ctx, a.DB).Where("key=? and parent_id=?", key, parentID), opt.QueryOptions, item)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	} else if !ok {
+		return nil, nil
+	}
+	return item, nil
+}
+
 func (a *DictionaryRepo) Exists(ctx context.Context, id string) (bool, error) {
 	exists, err := utilx.Exists(ctx, GetDictionaryDB(ctx, a.DB).Where("id=?", id))
 	return exists, errors.WithStack(err)
@@ -80,5 +102,10 @@ func (a *DictionaryRepo) Update(ctx context.Context, item *typed.Dictionary) err
 
 func (a *DictionaryRepo) Delete(ctx context.Context, id string) error {
 	result := GetDictionaryDB(ctx, a.DB).Where("id=?", id).Delete(new(typed.Dictionary))
+	return errors.WithStack(result.Error)
+}
+
+func (a *DictionaryRepo) DeleteByParentPath(ctx context.Context, parentPath string) error {
+	result := GetDictionaryDB(ctx, a.DB).Where("parent_path like ?", parentPath+"%").Delete(new(typed.Dictionary))
 	return errors.WithStack(result.Error)
 }

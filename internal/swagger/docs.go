@@ -1397,34 +1397,24 @@ const docTemplate = `{
                 "tags": [
                     "DictionaryAPI"
                 ],
-                "summary": "Query dictionary list",
+                "summary": "Query dictionary tree",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "pagination index",
-                        "name": "current",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "pagination size",
-                        "name": "pageSize",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
                         "type": "string",
-                        "description": "query namespace",
-                        "name": "namespace",
+                        "description": "query key or path key (split by .)",
+                        "name": "key",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "query key",
-                        "name": "key",
+                        "description": "full text query value (key/value/remark)",
+                        "name": "queryValue",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "parent id (-1: all, 0: root)",
+                        "name": "parentID",
                         "in": "query"
                     }
                 ],
@@ -1602,7 +1592,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/typed.DictionaryCreate"
+                            "$ref": "#/definitions/typed.DictionaryUpdate"
                         }
                     }
                 ],
@@ -1704,6 +1694,12 @@ const docTemplate = `{
         "typed.Dictionary": {
             "type": "object",
             "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/typed.Dictionary"
+                    }
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1714,11 +1710,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "key": {
-                    "description": "Key of the dictionary",
+                    "description": "Key of the dictionary (Unique key for the same parent)",
                     "type": "string"
                 },
-                "namespace": {
-                    "description": "Namespace of the dictionary",
+                "parent_id": {
+                    "description": "Parent ID",
+                    "type": "string"
+                },
+                "parent_path": {
+                    "description": "Parent path (split by .)(max depth: 10)",
                     "type": "string"
                 },
                 "remark": {
@@ -1740,14 +1740,30 @@ const docTemplate = `{
         "typed.DictionaryCreate": {
             "type": "object",
             "required": [
-                "key",
-                "namespace"
+                "key"
             ],
             "properties": {
                 "key": {
                     "type": "string"
                 },
-                "namespace": {
+                "parent_id": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "typed.DictionaryUpdate": {
+            "type": "object",
+            "required": [
+                "key"
+            ],
+            "properties": {
+                "key": {
                     "type": "string"
                 },
                 "remark": {

@@ -17,17 +17,9 @@
                 "link": "/system/menu",
                 "actions": [
                     {
-                        "code": "rw",
-                        "name": "ReadWrite",
+                        "code": "wo",
+                        "name": "WriteOnly",
                         "resources": [
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/menus"
-                            },
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/menus/:id"
-                            },
                             {
                                 "method": "POST",
                                 "path": "/api/rbac/v1/menus"
@@ -73,21 +65,9 @@
                 "link": "/system/role",
                 "actions": [
                     {
-                        "code": "rw",
-                        "name": "ReadWrite",
+                        "code": "wo",
+                        "name": "WriteOnly",
                         "resources": [
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/menus"
-                            },
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/roles"
-                            },
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/roles/:id"
-                            },
                             {
                                 "method": "POST",
                                 "path": "/api/rbac/v1/roles"
@@ -137,21 +117,9 @@
                 "link": "/system/user",
                 "actions": [
                     {
-                        "code": "rw",
-                        "name": "ReadWrite",
+                        "code": "wo",
+                        "name": "WriteOnly",
                         "resources": [
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/roles"
-                            },
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/users"
-                            },
-                            {
-                                "method": "GET",
-                                "path": "/api/rbac/v1/users/:id"
-                            },
                             {
                                 "method": "POST",
                                 "path": "/api/rbac/v1/users"
@@ -201,17 +169,9 @@
                 "link": "/system/dictionary",
                 "actions": [
                     {
-                        "code": "rw",
-                        "name": "ReadWrite",
+                        "code": "wo",
+                        "name": "WriteOnly",
                         "resources": [
-                            {
-                                "method": "GET",
-                                "path": "/api/sys/v1/dictionaries"
-                            },
-                            {
-                                "method": "GET",
-                                "path": "/api/sys/v1/dictionaries/:id"
-                            },
                             {
                                 "method": "POST",
                                 "path": "/api/sys/v1/dictionaries"
