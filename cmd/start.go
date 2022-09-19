@@ -25,7 +25,7 @@ var StartCmd = &cli.Command{
 		&cli.StringFlag{
 			Name:     "configdir",
 			Usage:    "Configuration directory (logger.toml/config.toml)",
-			Required: true,
+			Required: false,
 			Value:    "configs",
 		},
 		&cli.StringFlag{
@@ -48,8 +48,12 @@ var StartCmd = &cli.Command{
 
 		ctx := logger.NewTag(context.Background(), "start")
 		return Run(ctx, func() (func(), error) {
-			// Initialize the logger first
 			cfgDir := c.String("configdir")
+			if cfgDir == "" {
+				cfgDir = "configs"
+			}
+
+			// Initialize the logger first
 			cleanLogger, err := logger.InitWithConfig(filepath.Join(cfgDir, "logger.toml"), HandleLoggerHook)
 			if err != nil {
 				return nil, err
