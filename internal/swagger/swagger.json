@@ -1,10 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "A simple, modular, high-performance RBAC development framework built on golang.",
-        "title": "ginadmin",
+        "description": "A DevOps platform based on golang for service monitoring, configuration center, log search, etc.",
+        "title": "Bobber DevOps",
         "contact": {},
-        "version": "9.0.1"
+        "version": "v9.0.1"
     },
     "paths": {
         "/api/rbac/v1/current/logout": {

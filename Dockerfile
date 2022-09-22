@@ -1,12 +1,12 @@
 FROM golang:alpine as builder
 
 ARG APP=ginadmin
-ARG VERSION=v9.0.0
+ARG VERSION=v9.0.1
 ARG RELEASE_TAG=$(VERSION)
 
 WORKDIR /go/src/${APP}
 COPY . .
-RUN go build -ldflags "-w -s -X github.com/LyricTian/gin-admin/v9/cmd.VERSION=${RELEASE_TAG}" -o ./${APP} .
+RUN go build -ldflags "-w -s -X main.VERSION=${RELEASE_TAG}" -o ./${APP} .
 
 FROM alpine
 ARG APP=ginadmin

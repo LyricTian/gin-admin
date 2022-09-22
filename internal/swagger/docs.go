@@ -2237,12 +2237,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "9.0.1",
+	Version:          "v9.0.1",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "ginadmin",
-	Description:      "A simple, modular, high-performance RBAC development framework built on golang.",
+	Title:            "Bobber DevOps",
+	Description:      "A DevOps platform based on golang for service monitoring, configuration center, log search, etc.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

@@ -69,11 +69,6 @@ func newDeleteRequest(formatRouter string, args ...interface{}) *http.Request {
 	return req
 }
 
-func newPatchRequest(formatRouter string, args ...interface{}) *http.Request {
-	req, _ := http.NewRequest(http.MethodPatch, fmt.Sprintf(formatRouter, args...), nil)
-	return req
-}
-
 func newGetRequest(params map[string]string, formatRouter string, args ...interface{}) *http.Request {
 	values := make(url.Values)
 	for k, v := range params {

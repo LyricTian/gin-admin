@@ -377,10 +377,10 @@ definitions:
     type: object
 info:
   contact: {}
-  description: A simple, modular, high-performance RBAC development framework built
-    on golang.
-  title: ginadmin
-  version: 9.0.1
+  description: A DevOps platform based on golang for service monitoring, configuration
+    center, log search, etc.
+  title: Bobber DevOps
+  version: v9.0.1
 paths:
   /api/rbac/v1/current/logout:
     post:

@@ -10,6 +10,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/v9/internal"
 	"github.com/LyricTian/gin-admin/v9/internal/config"
+	"github.com/LyricTian/gin-admin/v9/internal/x/utilx"
 	"github.com/LyricTian/gin-admin/v9/pkg/logger"
 	"github.com/LyricTian/gin-admin/v9/pkg/x/gormx"
 
@@ -47,7 +48,7 @@ var StartCmd = &cli.Command{
 		}()
 
 		ctx := logger.NewTag(context.Background(), "start")
-		return Run(ctx, func() (func(), error) {
+		return utilx.Run(ctx, func() (func(), error) {
 			cfgDir := c.String("configdir")
 			if cfgDir == "" {
 				cfgDir = "configs"
@@ -62,7 +63,6 @@ var StartCmd = &cli.Command{
 			daemon := c.Bool("deamon")
 			staticDir := c.String("staticdir")
 			logger.Context(ctx).Info("Starting server",
-				zap.String("version", VERSION),
 				zap.String("configdir", cfgDir),
 				zap.String("staticdir", staticDir),
 				zap.Int("pid", os.Getpid()),

@@ -55,21 +55,37 @@ func (a *Casbinx) Load(ctx context.Context) error {
 		}
 	}
 
-	policyFile := filepath.Join(config.C.General.ConfigDir, "rbac_policy.csv")
-	_ = os.Rename(policyFile, policyFile+".bak")
+	// Load the local policy model
+	policyFile := filepath.Join(config.C.General.ConfigDir, "policy.csv")
+	if _, err := os.Stat(policyFile); err != nil {
+		if !os.IsNotExist(err) {
+			return err
+		}
+	} else {
+		policyBuf, err := ioutil.ReadFile(policyFile)
+		if err != nil {
+			return err
+		} else if len(policyBuf) > 0 {
+			buf.WriteByte('\n')
+			buf.Write(policyBuf)
+		}
+	}
 
-	err = ioutil.WriteFile(policyFile, buf.Bytes(), 0666)
+	genPolicyFile := filepath.Join(config.C.General.ConfigDir, "gen_rbac_policy.csv")
+	_ = os.Rename(genPolicyFile, genPolicyFile+".bak")
+
+	err = ioutil.WriteFile(genPolicyFile, buf.Bytes(), 0666)
 	if err != nil {
-		logger.Context(ctx).Error("write rbac policy file error", zap.String("file", policyFile), zap.Error(err))
+		logger.Context(ctx).Error("Failed to write policy file", zap.String("file", genPolicyFile), zap.Error(err))
 		return err
 	}
 
 	// set readonly
-	_ = os.Chmod(policyFile, 0444)
+	_ = os.Chmod(genPolicyFile, 0444)
 
 	// load casbin
 	modelFile := filepath.Join(config.C.General.ConfigDir, "casbin_model.conf")
-	e, err := casbin.NewEnforcer(modelFile, policyFile)
+	e, err := casbin.NewEnforcer(modelFile, genPolicyFile)
 	if err != nil {
 		return err
 	}
@@ -78,7 +94,7 @@ func (a *Casbinx) Load(ctx context.Context) error {
 	e.EnableLog(config.C.Middleware.Casbin.Debug)
 	a.enforcer = e
 
-	logger.Context(ctx).Info("Load casbin success", zap.String("file", policyFile))
+	logger.Context(ctx).Info("Load casbin success", zap.String("file", genPolicyFile))
 
 	return nil
 }
