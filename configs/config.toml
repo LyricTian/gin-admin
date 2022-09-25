@@ -61,13 +61,15 @@ MaxContentLen = 33554432 # 32M
 
 [Middleware.CORS]
 Enable = false
-AllowAllOrigins = false
-AllowCredentials = false
-MaxAge = 0
-AllowWildcard = false
-AllowBrowserExtensions = false
-AllowWebSockets = false
-AllowFiles = false
+AllowAllOrigins = true
+AllowOrigins = ["*"]
+AllowMethods = ["*"]
+AllowHeaders = ["*"]
+AllowCredentials = true
+MaxAge = 86400
+AllowWildcard = true
+AllowWebSockets = true
+AllowFiles = true
 
 [Middleware.Auth]
 Disable = true
