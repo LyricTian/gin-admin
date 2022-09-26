@@ -45,6 +45,16 @@ TablePrefix = ""
 
 [Middleware]
 
+[Middleware.CORS]
+Enable = false
+AllowOrigins = ["*"]
+AllowMethods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+AllowHeaders = ["*"]
+MaxAge = 86400
+AllowWildcard = true
+AllowWebSockets = true
+AllowFiles = true
+
 [Middleware.Recovery]
 Skip = 3
 
@@ -58,18 +68,6 @@ MaxOutputResponseBodyLen = 1024 # bytes
 
 [Middleware.CopyBody]
 MaxContentLen = 33554432 # 32M
-
-[Middleware.CORS]
-Enable = false
-AllowAllOrigins = true
-AllowOrigins = ["*"]
-AllowMethods = ["*"]
-AllowHeaders = ["*"]
-AllowCredentials = true
-MaxAge = 86400
-AllowWildcard = true
-AllowWebSockets = true
-AllowFiles = true
 
 [Middleware.Auth]
 Disable = true

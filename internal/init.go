@@ -104,6 +104,21 @@ func initHTTPServer(ctx context.Context, injector *inject.Injector) (func(), err
 		utilx.ResError(c, errors.NotFound(errors.ErrNotFoundID, "Not found"))
 	})
 
+	app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		Enable:                 config.C.Middleware.CORS.Enable,
+		AllowAllOrigins:        config.C.Middleware.CORS.AllowAllOrigins,
+		AllowOrigins:           config.C.Middleware.CORS.AllowOrigins,
+		AllowMethods:           config.C.Middleware.CORS.AllowMethods,
+		AllowHeaders:           config.C.Middleware.CORS.AllowHeaders,
+		AllowCredentials:       config.C.Middleware.CORS.AllowCredentials,
+		ExposeHeaders:          config.C.Middleware.CORS.ExposeHeaders,
+		MaxAge:                 config.C.Middleware.CORS.MaxAge,
+		AllowWildcard:          config.C.Middleware.CORS.AllowWildcard,
+		AllowBrowserExtensions: config.C.Middleware.CORS.AllowBrowserExtensions,
+		AllowWebSockets:        config.C.Middleware.CORS.AllowWebSockets,
+		AllowFiles:             config.C.Middleware.CORS.AllowFiles,
+	}))
+
 	apiGroup := app.Group("/api")
 	{ // Register api handlers
 		initMiddlewares(apiGroup, injector)
@@ -180,21 +195,6 @@ func initMiddlewares(g *gin.RouterGroup, injector *inject.Injector) {
 	g.Use(middleware.CopyBodyWithConfig(middleware.CopyBodyConfig{
 		SkippedPathPrefixes: config.C.Middleware.CopyBody.SkippedPathPrefixes,
 		MaxContentLen:       config.C.Middleware.CopyBody.MaxContentLen,
-	}))
-
-	g.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		Enable:                 config.C.Middleware.CORS.Enable,
-		AllowAllOrigins:        config.C.Middleware.CORS.AllowAllOrigins,
-		AllowOrigins:           config.C.Middleware.CORS.AllowOrigins,
-		AllowMethods:           config.C.Middleware.CORS.AllowMethods,
-		AllowHeaders:           config.C.Middleware.CORS.AllowHeaders,
-		AllowCredentials:       config.C.Middleware.CORS.AllowCredentials,
-		ExposeHeaders:          config.C.Middleware.CORS.ExposeHeaders,
-		MaxAge:                 config.C.Middleware.CORS.MaxAge,
-		AllowWildcard:          config.C.Middleware.CORS.AllowWildcard,
-		AllowBrowserExtensions: config.C.Middleware.CORS.AllowBrowserExtensions,
-		AllowWebSockets:        config.C.Middleware.CORS.AllowWebSockets,
-		AllowFiles:             config.C.Middleware.CORS.AllowFiles,
 	}))
 
 	g.Use(middleware.AuthWithConfig(middleware.AuthConfig{

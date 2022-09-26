@@ -81,6 +81,20 @@ type Config struct {
 		}
 	}
 	Middleware struct {
+		CORS struct {
+			Enable                 bool
+			AllowAllOrigins        bool
+			AllowOrigins           []string
+			AllowMethods           []string
+			AllowHeaders           []string
+			AllowCredentials       bool
+			ExposeHeaders          []string
+			MaxAge                 int
+			AllowWildcard          bool
+			AllowBrowserExtensions bool
+			AllowWebSockets        bool
+			AllowFiles             bool
+		}
 		Recovery struct {
 			Skip int `default:"3"` // skip the first n stack frames
 		}
@@ -97,20 +111,6 @@ type Config struct {
 		CopyBody struct {
 			SkippedPathPrefixes []string
 			MaxContentLen       int64 `default:"33554432"` // max content length (default 32MB)
-		}
-		CORS struct {
-			Enable                 bool
-			AllowAllOrigins        bool
-			AllowOrigins           []string
-			AllowMethods           []string
-			AllowHeaders           []string
-			AllowCredentials       bool
-			ExposeHeaders          []string
-			MaxAge                 int
-			AllowWildcard          bool
-			AllowBrowserExtensions bool
-			AllowWebSockets        bool
-			AllowFiles             bool
 		}
 		Auth struct {
 			Disable             bool
