@@ -2,11 +2,8 @@ package mail
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
-
-	"github.com/LyricTian/gin-admin/v9/pkg/logger"
 
 	"gopkg.in/gomail.v2"
 )
@@ -57,12 +54,7 @@ func (s *SmtpSender) Send(ctx context.Context, to []string, cc []string, bcc []s
 	}
 
 	d := gomail.NewDialer(s.SmtpHost, s.Port, s.UserName, s.AuthCode)
-	err := d.DialAndSend(msg)
-	if err != nil {
-		logger.Context(ctx).Error(fmt.Sprintf("Failed to send email, #From: %s, #Name: %s, #To: %s, #Subject: %s, #Body: %s, #Reason: %v", s.FromMail, s.FromName, to, subject, body, err))
-	}
-
-	return err
+	return d.DialAndSend(msg)
 }
 
 func (s *SmtpSender) SendTo(ctx context.Context, to []string, subject string, body string, file ...string) error {

@@ -14,17 +14,21 @@ import (
 // Define alias
 var (
 	WithStack = errors.WithStack
+	Wrap      = errors.Wrap
+	Wrapf     = errors.Wrapf
 )
 
 const (
-	ErrBadRequestID          = "com.bad_request"
-	ErrUnauthorizedID        = "com.unauthorized"
-	ErrForbiddenID           = "com.forbidden"
-	ErrNotFoundID            = "com.not_found"
-	ErrMethodNotAllowedID    = "com.method_not_allowed"
-	ErrTooManyRequestsID     = "com.too_many_requests"
-	ErrRequestEntityTooLarge = "com.request_entity_too_large"
-	ErrInternalServerErrorID = "com.internal_server_error"
+	DefaultBadRequestID            = "bad_request"
+	DefaultUnauthorizedID          = "unauthorized"
+	DefaultForbiddenID             = "forbidden"
+	DefaultNotFoundID              = "not_found"
+	DefaultMethodNotAllowedID      = "method_not_allowed"
+	DefaultTooManyRequestsID       = "too_many_requests"
+	DefaultRequestEntityTooLargeID = "request_entity_too_large"
+	DefaultInternalServerErrorID   = "internal_server_error"
+	DefaultConflictID              = "conflict"
+	DefaultRequestTimeoutID        = "request_timeout"
 )
 
 // Customize the error structure for implementation errors.Error interface
@@ -63,6 +67,9 @@ func Parse(err string) *Error {
 
 // BadRequest generates a 400 error.
 func BadRequest(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultBadRequestID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusBadRequest,
@@ -73,6 +80,9 @@ func BadRequest(id, format string, a ...interface{}) error {
 
 // Unauthorized generates a 401 error.
 func Unauthorized(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultUnauthorizedID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusUnauthorized,
@@ -83,6 +93,9 @@ func Unauthorized(id, format string, a ...interface{}) error {
 
 // Forbidden generates a 403 error.
 func Forbidden(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultForbiddenID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusForbidden,
@@ -93,6 +106,9 @@ func Forbidden(id, format string, a ...interface{}) error {
 
 // NotFound generates a 404 error.
 func NotFound(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultNotFoundID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusNotFound,
@@ -103,6 +119,9 @@ func NotFound(id, format string, a ...interface{}) error {
 
 // MethodNotAllowed generates a 405 error.
 func MethodNotAllowed(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultMethodNotAllowedID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusMethodNotAllowed,
@@ -113,6 +132,9 @@ func MethodNotAllowed(id, format string, a ...interface{}) error {
 
 // TooManyRequests generates a 429 error.
 func TooManyRequests(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultTooManyRequestsID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusTooManyRequests,
@@ -123,6 +145,9 @@ func TooManyRequests(id, format string, a ...interface{}) error {
 
 // Timeout generates a 408 error.
 func Timeout(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultRequestTimeoutID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusRequestTimeout,
@@ -133,6 +158,9 @@ func Timeout(id, format string, a ...interface{}) error {
 
 // Conflict generates a 409 error.
 func Conflict(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultConflictID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusConflict,
@@ -143,6 +171,9 @@ func Conflict(id, format string, a ...interface{}) error {
 
 // RequestEntityTooLarge generates a 413 error.
 func RequestEntityTooLarge(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultRequestEntityTooLargeID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusRequestEntityTooLarge,
@@ -153,6 +184,9 @@ func RequestEntityTooLarge(id, format string, a ...interface{}) error {
 
 // InternalServerError generates a 500 error.
 func InternalServerError(id, format string, a ...interface{}) error {
+	if id == "" {
+		id = DefaultInternalServerErrorID
+	}
 	return &Error{
 		ID:     id,
 		Code:   http.StatusInternalServerError,
@@ -207,21 +241,21 @@ func As(err error) (*Error, bool) {
 
 type MultiError struct {
 	lock   *sync.Mutex
-	Errors []*Error
+	Errors []error
 }
 
 func NewMultiError() *MultiError {
 	return &MultiError{
 		lock:   &sync.Mutex{},
-		Errors: make([]*Error, 0),
+		Errors: make([]error, 0),
 	}
 }
 
-func (e *MultiError) Append(err *Error) {
+func (e *MultiError) Append(err error) {
 	e.Errors = append(e.Errors, err)
 }
 
-func (e *MultiError) AppendWithLock(err *Error) {
+func (e *MultiError) AppendWithLock(err error) {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 	e.Append(err)

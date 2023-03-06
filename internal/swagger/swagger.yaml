@@ -10,359 +10,56 @@ definitions:
       status:
         type: string
     type: object
-  typed.Captcha:
+  schema.Resource:
     properties:
-      captcha_id:
+      action:
+        description: Resource action
         type: string
-    type: object
-  typed.Dictionary:
-    properties:
-      children:
-        items:
-          $ref: '#/definitions/typed.Dictionary'
-        type: array
-      created_at:
-        type: string
-      created_by:
-        type: string
-      id:
-        type: string
-      key:
-        description: Key of the dictionary (Unique key for the same parent)
-        type: string
-      parent_id:
-        description: Parent ID
-        type: string
-      parent_path:
-        description: 'Parent path (split by .)(max depth: 10)'
-        type: string
-      remark:
-        description: Remark of the key
-        type: string
-      updated_at:
-        type: string
-      updated_by:
-        type: string
-      value:
-        description: Value of the key
-        type: string
-    type: object
-  typed.DictionaryCreate:
-    properties:
-      key:
-        type: string
-      parent_id:
-        type: string
-      remark:
-        type: string
-      value:
-        type: string
-    required:
-    - key
-    type: object
-  typed.DictionaryUpdate:
-    properties:
-      key:
-        type: string
-      remark:
-        type: string
-      value:
-        type: string
-    required:
-    - key
-    type: object
-  typed.LoginPasswordUpdate:
-    properties:
-      new_password:
-        type: string
-      old_password:
-        type: string
-    required:
-    - new_password
-    - old_password
-    type: object
-  typed.LoginToken:
-    properties:
-      access_token:
-        description: jwt token
-        type: string
-      expires_at:
-        description: unix timestamp
-        type: integer
-      token_type:
-        description: 'Usage: (Authorization=token_type token)'
-        type: string
-    required:
-    - access_token
-    - expires_at
-    - token_type
-    type: object
-  typed.Menu:
-    properties:
-      actions:
-        items:
-          $ref: '#/definitions/typed.MenuAction'
-        type: array
-      children:
-        items:
-          $ref: '#/definitions/typed.Menu'
-        type: array
-      created_at:
-        type: string
-      created_by:
-        type: string
-      hide:
-        type: boolean
-      icon:
-        type: string
-      id:
-        type: string
-      link:
-        type: string
-      name:
-        type: string
-      parent_id:
-        type: string
-      parent_path:
-        description: parent path (split by '.')
-        type: string
-      remark:
-        type: string
-      sequence:
-        type: integer
-      status:
-        type: string
-      updated_at:
-        type: string
-      updated_by:
-        type: string
-    type: object
-  typed.MenuAction:
-    properties:
       code:
-        description: Code of the action (for example, add, edit, delete, etc.)
+        description: 'Unique code (format: module.resource.action)'
         type: string
       created_at:
+        description: Create time
+        type: string
+      description:
+        description: Description
         type: string
       id:
+        description: Unique ID
         type: string
-      menu_id:
+      object:
+        description: Resource object
         type: string
-      name:
-        description: Name of the action (for example, Add, Edit, Delete, etc.)
-        type: string
-      resources:
-        items:
-          $ref: '#/definitions/typed.MenuActionResource'
-        type: array
-      updated_at:
-        type: string
-    type: object
-  typed.MenuActionResource:
-    properties:
-      action_id:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      menu_id:
-        type: string
-      method:
-        description: HTTP Method (GET, POST, PUT, DELETE)
-        type: string
-      path:
-        description: Path of the resource (:id means the parameter is required)
+      status:
+        description: Status (enabled/disabled)
         type: string
       updated_at:
+        description: Update time
         type: string
     type: object
-  typed.MenuCreate:
+  schema.ResourceCreate:
     properties:
-      actions:
-        items:
-          $ref: '#/definitions/typed.MenuAction'
-        type: array
-      hide:
-        type: boolean
-      icon:
+      action:
+        description: Resource action
         type: string
-      link:
+      code:
+        description: 'Unique code (format: module.resource.action)'
         type: string
-      name:
+      description:
+        description: Description
         type: string
-      parent_id:
-        type: string
-      remark:
-        type: string
-      sequence:
-        type: integer
-    required:
-    - name
-    - sequence
-    type: object
-  typed.MenuUpdateStatus:
-    properties:
-      status:
-        description: enabled/disabled
-        type: string
-    required:
-    - status
-    type: object
-  typed.Role:
-    properties:
-      created_at:
-        type: string
-      created_by:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      remark:
-        type: string
-      role_menus:
-        items:
-          $ref: '#/definitions/typed.RoleMenu'
-        type: array
-      sequence:
-        type: integer
-      status:
-        type: string
-      updated_at:
-        type: string
-      updated_by:
-        type: string
-    type: object
-  typed.RoleCreate:
-    properties:
-      menus:
-        items:
-          $ref: '#/definitions/typed.RoleMenu'
-        type: array
-      name:
-        type: string
-      remark:
-        type: string
-      sequence:
-        type: integer
-    required:
-    - name
-    - sequence
-    type: object
-  typed.RoleMenu:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      menu_action_id:
-        type: string
-      menu_id:
-        type: string
-      role_id:
-        type: string
-    type: object
-  typed.RoleUpdateStatus:
-    properties:
-      status:
-        description: enabled/disabled
-        type: string
-    required:
-    - status
-    type: object
-  typed.User:
-    properties:
-      created_at:
-        type: string
-      created_by:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        description: Name of the user
-        type: string
-      phone:
-        type: string
-      remark:
+      object:
+        description: Resource object
         type: string
       status:
-        type: string
-      updated_at:
-        type: string
-      updated_by:
-        type: string
-      user_roles:
-        items:
-          $ref: '#/definitions/typed.UserRole'
-        type: array
-      username:
-        description: Login username (must be unique)
-        type: string
-    type: object
-  typed.UserCreate:
-    properties:
-      email:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-      phone:
-        type: string
-      remark:
-        type: string
-      role_ids:
-        items:
-          type: string
-        type: array
-      username:
+        description: Status (enabled/disabled)
+        enum:
+        - enabled
+        - disabled
         type: string
     required:
-    - name
-    - username
-    type: object
-  typed.UserLogin:
-    properties:
-      captcha_code:
-        description: captcha verify code
-        type: string
-      captcha_id:
-        description: captcha verify id
-        type: string
-      login_name:
-        description: login username
-        type: string
-      password:
-        description: login password (md5)
-        type: string
-    required:
-    - captcha_code
-    - captcha_id
-    - login_name
-    - password
-    type: object
-  typed.UserRole:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      role:
-        $ref: '#/definitions/typed.Role'
-      role_id:
-        type: string
-      user_id:
-        type: string
-    type: object
-  typed.UserUpdateStatus:
-    properties:
-      status:
-        description: activated/freezed
-        type: string
-    required:
+    - action
+    - object
     - status
     type: object
   utilx.ResponseResult:
@@ -377,407 +74,11 @@ definitions:
     type: object
 info:
   contact: {}
-  description: A DevOps platform based on golang for service monitoring, configuration
-    center, log search, etc.
-  title: Bobber DevOps
-  version: v9.0.1
+  description: RBAC scaffolding based on Gin + Gorm 2.0 + Casbin + Wire DI.
+  title: GIN-ADMIN
+  version: v10.0.0-beta
 paths:
-  /api/rbac/v1/current/logout:
-    post:
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Logout system
-      tags:
-      - LoginAPI
-  /api/rbac/v1/current/menus:
-    put:
-      responses:
-        "200":
-          description: query result
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/typed.Menu'
-                  type: array
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Query current user privilege menu trees
-      tags:
-      - LoginAPI
-  /api/rbac/v1/current/password:
-    put:
-      parameters:
-      - description: Request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.LoginPasswordUpdate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Update current user login password
-      tags:
-      - LoginAPI
-  /api/rbac/v1/current/refreshtoken:
-    post:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.LoginToken'
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Refresh current login token
-      tags:
-      - LoginAPI
-  /api/rbac/v1/current/user:
-    get:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.User'
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Get current user
-      tags:
-      - LoginAPI
-  /api/rbac/v1/login:
-    post:
-      parameters:
-      - description: Request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.UserLogin'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.LoginToken'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      summary: Login system by username and password
-      tags:
-      - LoginAPI
-  /api/rbac/v1/login/captcha:
-    get:
-      parameters:
-      - description: CaptchaID
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: Reload captcha image (reload=1)
-        in: query
-        name: reload
-        type: string
-      produces:
-      - image/png
-      responses:
-        "200":
-          description: Captcha image
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      summary: Write captcha image
-      tags:
-      - LoginAPI
-  /api/rbac/v1/login/captchaid:
-    get:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.Captcha'
-              type: object
-      summary: Get captcha id
-      tags:
-      - LoginAPI
-  /api/rbac/v1/menus:
-    get:
-      parameters:
-      - description: parent id
-        in: query
-        name: parentID
-        type: integer
-      - description: menu name (fuzzy query)
-        in: query
-        name: name
-        type: string
-      - description: menu status (enabled/disabled)
-        in: query
-        name: status
-        type: string
-      responses:
-        "200":
-          description: query result
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/typed.Menu'
-                  type: array
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Query menu tree
-      tags:
-      - MenuAPI
-    post:
-      parameters:
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.MenuCreate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.Menu'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Create menu
-      tags:
-      - MenuAPI
-  /api/rbac/v1/menus/{id}:
-    delete:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete menu by id
-      tags:
-      - MenuAPI
-    get:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.Menu'
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Get single menu by id
-      tags:
-      - MenuAPI
-    put:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.MenuCreate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Update menu by id
-      tags:
-      - MenuAPI
-  /api/rbac/v1/menus/{id}/status:
-    put:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.MenuUpdateStatus'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Update menu status by id
-      tags:
-      - MenuAPI
-  /api/rbac/v1/roles:
+  /api/v1/resources:
     get:
       parameters:
       - default: 1
@@ -792,246 +93,24 @@ paths:
         name: pageSize
         required: true
         type: integer
-      - description: role name (fuzzy query)
+      - description: resource code (fuzzy query)
         in: query
-        name: name
+        name: code
         type: string
-      - description: role status (enabled/disabled)
-        in: query
-        name: status
-        type: string
-      - description: ' result type (select/paginate, default: paginate)'
-        in: query
-        name: result
-        type: string
-      responses:
-        "200":
-          description: query result
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/typed.Role'
-                  type: array
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Query role list
-      tags:
-      - RoleAPI
-    post:
-      parameters:
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.RoleCreate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.Role'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Create role
-      tags:
-      - RoleAPI
-  /api/rbac/v1/roles/{id}:
-    delete:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete role by id
-      tags:
-      - RoleAPI
-    get:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.Role'
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Get single role by id
-      tags:
-      - RoleAPI
-    put:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.RoleCreate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Update role by id
-      tags:
-      - RoleAPI
-  /api/rbac/v1/roles/{id}/status:
-    put:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.RoleUpdateStatus'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Update role status by id
-      tags:
-      - RoleAPI
-  /api/rbac/v1/users:
-    get:
-      parameters:
-      - default: 1
-        description: pagination index
-        in: query
-        name: current
-        required: true
-        type: integer
-      - default: 10
-        description: pagination size
-        in: query
-        name: pageSize
-        required: true
-        type: integer
-      - description: user status (enabled/disabled)
+      - description: resource status (enabled, disabled)
         in: query
         name: status
         type: string
-      - description: name (fuzzy query)
-        in: query
-        name: name
-        type: string
-      - description: username (fuzzy query)
-        in: query
-        name: username
-        type: string
-      - description: role id
-        in: query
-        name: roleID
-        type: string
       responses:
         "200":
-          description: query result
+          description: OK
           schema:
             allOf:
             - $ref: '#/definitions/utilx.ResponseResult'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/typed.User'
+                    $ref: '#/definitions/schema.Resource'
                   type: array
               type: object
         "401":
@@ -1044,17 +123,17 @@ paths:
             $ref: '#/definitions/utilx.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Query user list
+      summary: Query paginated resource list
       tags:
-      - UserAPI
+      - ResourceAPI
     post:
       parameters:
-      - description: request body
+      - description: Request body
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/typed.UserCreate'
+          $ref: '#/definitions/schema.ResourceCreate'
       responses:
         "200":
           description: OK
@@ -1063,7 +142,7 @@ paths:
             - $ref: '#/definitions/utilx.ResponseResult'
             - properties:
                 data:
-                  $ref: '#/definitions/typed.User'
+                  $ref: '#/definitions/schema.Resource'
               type: object
         "400":
           description: Bad Request
@@ -1079,10 +158,10 @@ paths:
             $ref: '#/definitions/utilx.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Create user
+      summary: Create resource record
       tags:
-      - UserAPI
-  /api/rbac/v1/users/{id}:
+      - ResourceAPI
+  /api/v1/resources/{id}:
     delete:
       parameters:
       - description: unique id
@@ -1105,9 +184,9 @@ paths:
             $ref: '#/definitions/utilx.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Delete user by id
+      summary: Delete resource record by ID
       tags:
-      - UserAPI
+      - ResourceAPI
     get:
       parameters:
       - description: unique id
@@ -1123,7 +202,7 @@ paths:
             - $ref: '#/definitions/utilx.ResponseResult'
             - properties:
                 data:
-                  $ref: '#/definitions/typed.User'
+                  $ref: '#/definitions/schema.Resource'
               type: object
         "401":
           description: Unauthorized
@@ -1135,45 +214,9 @@ paths:
             $ref: '#/definitions/utilx.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Get single user by id
+      summary: Get resource details by ID
       tags:
-      - UserAPI
-    put:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.UserCreate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Update user by id
-      tags:
-      - UserAPI
-  /api/rbac/v1/users/{id}/status:
+      - ResourceAPI
     put:
       parameters:
       - description: unique id
@@ -1181,12 +224,12 @@ paths:
         name: id
         required: true
         type: string
-      - description: request body
+      - description: Request body
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/typed.UserUpdateStatus'
+          $ref: '#/definitions/schema.ResourceCreate'
       responses:
         "200":
           description: OK
@@ -1206,175 +249,9 @@ paths:
             $ref: '#/definitions/utilx.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Update user status by id
+      summary: Update resource record by ID
       tags:
-      - UserAPI
-  /api/sys/v1/dictionaries:
-    get:
-      parameters:
-      - description: query key or path key (split by .)
-        in: query
-        name: key
-        type: string
-      - description: full text query value (key/value/remark)
-        in: query
-        name: queryValue
-        type: string
-      - description: 'parent id (-1: all, 0: root)'
-        in: query
-        name: parentID
-        type: string
-      responses:
-        "200":
-          description: query result
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/typed.Dictionary'
-                  type: array
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Query dictionary tree
-      tags:
-      - DictionaryAPI
-    post:
-      parameters:
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.DictionaryCreate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.Dictionary'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Create dictionary
-      tags:
-      - DictionaryAPI
-  /api/sys/v1/dictionaries/{id}:
-    delete:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete single dictionary by id
-      tags:
-      - DictionaryAPI
-    get:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/typed.Dictionary'
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Get single dictionary by id
-      tags:
-      - DictionaryAPI
-    put:
-      parameters:
-      - description: unique id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/typed.DictionaryUpdate'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utilx.ResponseResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Update dictionary by id
-      tags:
-      - DictionaryAPI
+      - ResourceAPI
 securityDefinitions:
   ApiKeyAuth:
     in: header

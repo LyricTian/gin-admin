@@ -1,13 +1,12 @@
 [General]
 AppName = "ginadmin"
-RunMode = "debug" # debug/test/release
+DebugMode = true
 PprofAddr = "localhost:6060"
 DisableSwagger = false
 DisablePrintConfig = false
-DisableInitMenu = false
 
 [General.HTTP]
-Addr = ":8080"
+Addr = ":8040"
 ReadTimeout = 60
 WriteTimeout = 60
 IdleTimeout = 10
@@ -16,9 +15,8 @@ CertFile = ""
 KeyFile = ""
 
 [Storage]
-
 [Storage.Cache]
-Type = "badger" # memory/badger/redis
+Type = "memory" # memory/badger/redis
 Delimiter = ":"
 
 [Storage.Cache.Memory]
@@ -28,32 +26,23 @@ CleanupInterval = 60
 Path = "data/cache"
 
 [Storage.Cache.Redis]
-Addr = ""
+Addr = "127.0.0.1:6379"
 Username = ""
 Password = ""
-DB = 0
+DB = 1
 
 [Storage.DB]
 Debug = true
-Type = "sqlite3"
+Type = "sqlite3" # sqlite3/mysql/postgres
 DSN = "data/sqlite/ginadmin.db"
 MaxLifetime = 86400
 MaxIdleTime = 3600
 MaxOpenConns = 100
 MaxIdleConns = 50
 TablePrefix = ""
+AutoMigrate = true
 
 [Middleware]
-
-[Middleware.CORS]
-Enable = false
-AllowOrigins = ["*"]
-AllowMethods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
-AllowHeaders = ["*"]
-MaxAge = 86400
-AllowWildcard = true
-AllowWebSockets = true
-AllowFiles = true
 
 [Middleware.Recovery]
 Skip = 3
@@ -66,37 +55,26 @@ ResponseTraceKey = "X-Trace-Id"
 MaxOutputRequestBodyLen = 4096 # bytes
 MaxOutputResponseBodyLen = 1024 # bytes
 
+[Middleware.TokenAuth]
+Enable = true
+
 [Middleware.CopyBody]
-MaxContentLen = 33554432 # 32M
+MaxContentLen = 134217728 # 128MB
 
-[Middleware.Auth]
-Disable = true
-SkippedPathPrefixes = ["/api/rbac/v1/login"]
-SigningMethod = "HS512"
-SigningKey = "XnEsT0S@"
-Expired = 86400 # seconds
-
-[Middleware.Auth.Store]
-Type = "badger" # memory/badger/redis
-Delimiter = ":"
-
-[Middleware.Auth.Store.Memory]
-CleanupInterval = 60
-
-[Middleware.Auth.Store.Badger]
-Path = "data/auth"
-
-[Middleware.Auth.Store.Redis]
-Addr = ""
-Username = ""
-Password = ""
-DB = 0
+[Middleware.CORS]
+Enable = false
+AllowOrigins = ["*"]
+AllowMethods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+AllowHeaders = ["*"]
+MaxAge = 86400
+AllowWildcard = true
+AllowWebSockets = true
+AllowFiles = true
 
 [Middleware.RateLimiter]
-Enable = true
-Period = 30 # seconds
-MaxRequestsPerIP = 120
-MaxRequestsPerUser = 120
+Enable = false
+MaxRequestsPerIP = 30
+MaxRequestsPerUser = 30
 
 [Middleware.RateLimiter.Store]
 Type = "memory" # memory/redis
@@ -109,37 +87,7 @@ CleanupInterval = 60
 Addr = ""
 Username = ""
 Password = ""
-DB = 0
-
-[Middleware.Casbin]
-Disable = false
-SkippedPathPrefixes = ["/api/rbac/v1/login", "/api/rbac/v1/current"]
-Debug = true
-AutoLoadInterval = 60 # seconds
+DB = 10
 
 [Middleware.Static]
 SkippedPathPrefixes = ["/api"]
-
-[Util]
-
-[Util.Captcha]
-Length = 4
-Width = 400
-Height = 160
-CacheType = "memory"
-
-[Util.Captcha.Redis]
-Addr = ""
-Username = ""
-Password = ""
-DB = 0
-KeyPrefix = "captcha:"
-
-[Dictionary]
-UserCacheExpire = 4 # Hours
-
-[Dictionary.RootUser]
-ID = "root"
-Username = "root"
-Password = "abc-123"
-Name = "Root"

@@ -9,7 +9,7 @@ import (
 
 var (
 	// Define aes secret key 2^5
-	SecretKey = []byte("GINADMINXXXXC7K0JNIS1S439RNJJP4G")
+	SecretKey = []byte("2985BCFDB5FE43129843DB59825F8647")
 )
 
 func PKCS5Padding(plaintext []byte, blockSize int) []byte {
