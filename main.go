@@ -12,7 +12,7 @@ var VERSION = "v10.0.0-beta"
 
 // @title GIN-ADMIN
 // @version v10.0.0-beta
-// @description RBAC scaffolding based on Gin + Gorm 2.0 + Casbin + Wire DI.
+// @description RBAC scaffolding based on GIN + Gorm 2.0 + Casbin + Wire DI.
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
@@ -22,7 +22,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "ginadmin"
 	app.Version = VERSION
-	app.Usage = "RBAC scaffolding based on Gin + Gorm 2.0 + Casbin + Wire DI."
+	app.Usage = "RBAC scaffolding based on GIN + Gorm 2.0 + Casbin + Wire DI."
 	app.Commands = []*cli.Command{
 		cmd.StartCmd(),
 		cmd.StopCmd(),

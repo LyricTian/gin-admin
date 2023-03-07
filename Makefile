@@ -30,9 +30,8 @@ swagger:
 	@swag init --parseDependency --generalInfo ./main.go --output ./internal/swagger
 
 # Dependency: https://github.com/OpenAPITools/openapi-generator
-# brew install openapi-generator
 openapi:
-	@openapi-generator generate -i ./internal/swagger/swagger.json -o ./internal/swagger/v3 -g openapi --minimal-update
+	docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/internal/swagger/swagger.yaml -g openapi -o /local/internal/swagger/v3
 
 clean:
 	rm -rf data $(SERVER_BIN)

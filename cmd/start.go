@@ -23,7 +23,7 @@ func StartCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:    "configdir",
 				Aliases: []string{"c"},
-				Usage:   "Configuration directory (config.toml)",
+				Usage:   "Configuration directory (logging.toml/config.toml)",
 				Value:   "configs",
 			},
 			&cli.StringFlag{

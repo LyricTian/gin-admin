@@ -1,0 +1,452 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "contact" : { },
+    "description" : "RBAC scaffolding based on GIN + Gorm 2.0 + Casbin + Wire DI.",
+    "title" : "GIN-ADMIN",
+    "version" : "v10.0.0-beta"
+  },
+  "servers" : [ {
+    "url" : "/"
+  } ],
+  "paths" : {
+    "/api/v1/resources" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "pagination index",
+          "in" : "query",
+          "name" : "current",
+          "required" : true,
+          "schema" : {
+            "default" : 1,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "pagination size",
+          "in" : "query",
+          "name" : "pageSize",
+          "required" : true,
+          "schema" : {
+            "default" : 10,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "resource code (fuzzy query)",
+          "in" : "query",
+          "name" : "code",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "resource status (enabled, disabled)",
+          "in" : "query",
+          "name" : "status",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_resources_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query paginated resource list",
+        "tags" : [ "ResourceAPI" ]
+      },
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/schema.ResourceCreate"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_resources_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Create resource record",
+        "tags" : [ "ResourceAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/v1/resources/{id}" : {
+      "delete" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Delete resource record by ID",
+        "tags" : [ "ResourceAPI" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_resources_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Get resource details by ID",
+        "tags" : [ "ResourceAPI" ]
+      },
+      "put" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/schema.ResourceCreate"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utilx.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Update resource record by ID",
+        "tags" : [ "ResourceAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "errors.Error" : {
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "detail" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "schema.Resource" : {
+        "properties" : {
+          "action" : {
+            "description" : "Resource action",
+            "type" : "string"
+          },
+          "code" : {
+            "description" : "Unique code (format: module.resource.action)",
+            "type" : "string"
+          },
+          "created_at" : {
+            "description" : "Create time",
+            "type" : "string"
+          },
+          "description" : {
+            "description" : "Description",
+            "type" : "string"
+          },
+          "id" : {
+            "description" : "Unique ID",
+            "type" : "string"
+          },
+          "object" : {
+            "description" : "Resource object",
+            "type" : "string"
+          },
+          "status" : {
+            "description" : "Status (enabled/disabled)",
+            "type" : "string"
+          },
+          "updated_at" : {
+            "description" : "Update time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "schema.ResourceCreate" : {
+        "properties" : {
+          "action" : {
+            "description" : "Resource action",
+            "type" : "string"
+          },
+          "code" : {
+            "description" : "Unique code (format: module.resource.action)",
+            "type" : "string"
+          },
+          "description" : {
+            "description" : "Description",
+            "type" : "string"
+          },
+          "object" : {
+            "description" : "Resource object",
+            "type" : "string"
+          },
+          "status" : {
+            "description" : "Status (enabled/disabled)",
+            "enum" : [ "enabled", "disabled" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "action", "object", "status" ],
+        "type" : "object"
+      },
+      "utilx.ResponseResult" : {
+        "properties" : {
+          "data" : {
+            "type" : "object"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/errors.Error"
+          },
+          "success" : {
+            "type" : "boolean"
+          },
+          "total" : {
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_v1_resources_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "items" : {
+              "$ref" : "#/components/schemas/schema.Resource"
+            },
+            "type" : "array"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_v1_resources_post_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/schema.Resource"
+          },
+          "utilx.ResponseResult" : {
+            "$ref" : "#/components/schemas/utilx.ResponseResult"
+          }
+        },
+        "type" : "object"
+      }
+    },
+    "securitySchemes" : {
+      "ApiKeyAuth" : {
+        "in" : "header",
+        "name" : "Authorization",
+        "type" : "apiKey"
+      }
+    }
+  },
+  "x-original-swagger-version" : "2.0"
+}

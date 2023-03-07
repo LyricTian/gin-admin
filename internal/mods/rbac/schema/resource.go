@@ -20,8 +20,8 @@ type Resource struct {
 
 type ResourceQueryParam struct {
 	utilx.PaginationParam
-	LikeCode string `form:"code"`                                        // Unique code
-	Status   string `form:"status" binding:"oneof='enabled' 'disabled'"` // Status (enabled/disabled)
+	LikeCode string `form:"code"`                                           // Unique code
+	Status   string `form:"status" binding:"oneof='enabled' 'disabled' ''"` // Status (enabled/disabled)
 }
 
 type ResourceQueryOptions struct {

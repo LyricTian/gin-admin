@@ -87,6 +87,11 @@ func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceC
 		}
 	}
 
+	oldResource.Code = uitem.Code
+	oldResource.Object = uitem.Object
+	oldResource.Action = uitem.Action
+	oldResource.Description = uitem.Description
+	oldResource.Status = uitem.Status
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.ResourceDAO.Update(ctx, oldResource); err != nil {
 			return err

@@ -12,6 +12,10 @@ import (
 )
 
 type Config struct {
+	Logger LoggerConfig
+}
+
+type LoggerConfig struct {
 	Debug      bool
 	Level      string // debug/info/warn/error/dpanic/panic/fatal
 	CallerSkip int
@@ -36,7 +40,7 @@ type HookConfig struct {
 
 type HookHandlerFunc func(ctx context.Context, hookCfg *HookConfig) (*Hook, error)
 
-func LoadConfigFromToml(filename string) (*Config, error) {
+func LoadConfigFromToml(filename string) (*LoggerConfig, error) {
 	cfg := &Config{}
 	tree, err := toml.LoadFile(filename)
 	if err != nil {
@@ -45,10 +49,10 @@ func LoadConfigFromToml(filename string) (*Config, error) {
 	if err = tree.Unmarshal(cfg); err != nil {
 		return nil, err
 	}
-	return cfg, nil
+	return &cfg.Logger, nil
 }
 
-func InitWithConfig(ctx context.Context, cfg *Config, hookHandle HookHandlerFunc) (func(), error) {
+func InitWithConfig(ctx context.Context, cfg *LoggerConfig, hookHandle HookHandlerFunc) (func(), error) {
 	var zconfig zap.Config
 	if cfg.Debug {
 		cfg.Level = "debug"

@@ -61,10 +61,10 @@ func registerAPIs(ctx context.Context, e *gin.Engine, injector *wirex.Injector) 
 	apiPrefix := "/api"
 	gAPI := e.Group(apiPrefix)
 
-	apiV1Prefix := apiPrefix + "/v1"
+	v1Prefix := "/v1"
 	gm := map[string]*gin.RouterGroup{
-		apiPrefix:   gAPI,
-		apiV1Prefix: gAPI.Group(apiV1Prefix),
+		apiPrefix:            gAPI,
+		apiPrefix + v1Prefix: gAPI.Group(v1Prefix),
 	}
 	if err := injector.M.RegisterAPIs(ctx, gm); err != nil {
 		return nil, err
@@ -148,6 +148,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector, registerAPIs
 
 	e.Use(middlewares.RateLimiterWithConfig(middlewares.RateLimiterConfig{
 		Enable:              config.C.Middleware.RateLimiter.Enable,
+		AllowedPathPrefixes: allowedPathPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.RateLimiter.SkippedPathPrefixes,
 		Period:              config.C.Middleware.RateLimiter.Period,
 		MaxRequestsPerIP:    config.C.Middleware.RateLimiter.MaxRequestsPerIP,

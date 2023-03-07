@@ -425,7 +425,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "GIN-ADMIN",
-	Description:      "RBAC scaffolding based on Gin + Gorm 2.0 + Casbin + Wire DI.",
+	Description:      "RBAC scaffolding based on GIN + Gorm 2.0 + Casbin + Wire DI.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

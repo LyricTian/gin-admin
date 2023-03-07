@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pelletier/go-toml"
 )
 
@@ -149,9 +150,9 @@ func (c *Config) IsDebug() bool {
 }
 
 func (c *Config) String() string {
-	b, err := toml.Marshal(c)
+	b, err := jsoniter.MarshalIndent(c, "", "  ")
 	if err != nil {
-		panic("Failed to marshal config with toml: " + err.Error())
+		panic("Failed to marshal config: " + err.Error())
 	}
 	return string(b)
 }

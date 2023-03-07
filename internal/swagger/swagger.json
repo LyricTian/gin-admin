@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "RBAC scaffolding based on Gin + Gorm 2.0 + Casbin + Wire DI.",
+        "description": "RBAC scaffolding based on GIN + Gorm 2.0 + Casbin + Wire DI.",
         "title": "GIN-ADMIN",
         "contact": {},
         "version": "v10.0.0-beta"
