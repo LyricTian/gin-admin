@@ -1,16 +1,16 @@
-package dao
+package dal
 
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"gorm.io/gorm"
 )
 
 func GetResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return utilx.GetDB(ctx, defDB).Model(new(schema.Resource))
+	return utils.GetDB(ctx, defDB).Model(new(schema.Resource))
 }
 
 type Resource struct {
@@ -33,7 +33,7 @@ func (a *Resource) Query(ctx context.Context, params schema.ResourceQueryParam, 
 	}
 
 	var list schema.Resources
-	pr, err := utilx.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
+	pr, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -53,7 +53,7 @@ func (a *Resource) Get(ctx context.Context, id string, opts ...schema.ResourceQu
 	}
 
 	item := new(schema.Resource)
-	ok, err := utilx.FindOne(ctx, GetResourceDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
+	ok, err := utils.FindOne(ctx, GetResourceDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -63,12 +63,12 @@ func (a *Resource) Get(ctx context.Context, id string, opts ...schema.ResourceQu
 }
 
 func (a *Resource) Exists(ctx context.Context, id string) (bool, error) {
-	ok, err := utilx.Exists(ctx, GetResourceDB(ctx, a.DB).Where("id=?", id))
+	ok, err := utils.Exists(ctx, GetResourceDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
 }
 
 func (a *Resource) ExistsCode(ctx context.Context, code string) (bool, error) {
-	ok, err := utilx.Exists(ctx, GetResourceDB(ctx, a.DB).Where("code=?", code))
+	ok, err := utils.Exists(ctx, GetResourceDB(ctx, a.DB).Where("code=?", code))
 	return ok, errors.WithStack(err)
 }
 
@@ -78,7 +78,7 @@ func (a *Resource) Create(ctx context.Context, item *schema.Resource) error {
 }
 
 func (a *Resource) Update(ctx context.Context, item *schema.Resource) error {
-	result := GetResourceDB(ctx, a.DB).Where("id=?", item.ID).Omit("created_at").Updates(item)
+	result := GetResourceDB(ctx, a.DB).Where("id=?", item.ID).Select("*").Omit("created_at").Updates(item)
 	return errors.WithStack(result.Error)
 }
 

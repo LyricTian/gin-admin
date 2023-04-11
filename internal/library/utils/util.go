@@ -1,4 +1,4 @@
-package utilx
+package utils
 
 import (
 	"encoding/binary"

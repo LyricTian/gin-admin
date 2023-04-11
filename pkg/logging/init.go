@@ -52,7 +52,7 @@ func LoadConfigFromToml(filename string) (*LoggerConfig, error) {
 	return &cfg.Logger, nil
 }
 
-func InitWithConfig(ctx context.Context, cfg *LoggerConfig, hookHandle HookHandlerFunc) (func(), error) {
+func InitWithConfig(ctx context.Context, cfg *LoggerConfig, hookHandle ...HookHandlerFunc) (func(), error) {
 	var zconfig zap.Config
 	if cfg.Debug {
 		cfg.Level = "debug"
@@ -113,11 +113,11 @@ func InitWithConfig(ctx context.Context, cfg *LoggerConfig, hookHandle HookHandl
 	)
 
 	for _, h := range cfg.Hooks {
-		if !h.Enable || hookHandle == nil {
+		if !h.Enable || len(hookHandle) == 0 {
 			continue
 		}
 
-		writer, err := hookHandle(ctx, h)
+		writer, err := hookHandle[0](ctx, h)
 		if err != nil {
 			return nil, err
 		} else if writer == nil {

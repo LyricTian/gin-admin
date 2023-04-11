@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 )
 
 type RecoveryConfig struct {
@@ -50,7 +50,7 @@ func RecoveryWithConfig(config RecoveryConfig) gin.HandlerFunc {
 				}
 
 				logging.Context(ctx).Error(fmt.Sprintf("[Recovery] %s panic recovered", time.Now().Format("2006/01/02 - 15:04:05")), fields...)
-				utilx.ResError(c, errors.InternalServerError("", "Internal server error, please try again later"))
+				utils.ResError(c, errors.InternalServerError("", "Internal server error, please try again later"))
 			}
 		}()
 

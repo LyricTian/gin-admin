@@ -54,7 +54,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                    "$ref": "#/definitions/utils.ResponseResult"
                                 },
                                 {
                                     "type": "object",
@@ -73,13 +73,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     }
                 }
@@ -101,7 +101,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schema.ResourceCreate"
+                            "$ref": "#/definitions/schema.ResourceSave"
                         }
                     }
                 ],
@@ -111,7 +111,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                    "$ref": "#/definitions/utils.ResponseResult"
                                 },
                                 {
                                     "type": "object",
@@ -127,19 +127,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     }
                 }
@@ -171,7 +171,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/utilx.ResponseResult"
+                                    "$ref": "#/definitions/utils.ResponseResult"
                                 },
                                 {
                                     "type": "object",
@@ -187,13 +187,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     }
                 }
@@ -222,7 +222,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schema.ResourceCreate"
+                            "$ref": "#/definitions/schema.ResourceSave"
                         }
                     }
                 ],
@@ -230,25 +230,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     }
                 }
@@ -276,19 +276,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/utilx.ResponseResult"
+                            "$ref": "#/definitions/utils.ResponseResult"
                         }
                     }
                 }
@@ -350,7 +350,7 @@
                 }
             }
         },
-        "schema.ResourceCreate": {
+        "schema.ResourceSave": {
             "type": "object",
             "required": [
                 "action",
@@ -384,7 +384,7 @@
                 }
             }
         },
-        "utilx.ResponseResult": {
+        "utils.ResponseResult": {
             "type": "object",
             "properties": {
                 "data": {},

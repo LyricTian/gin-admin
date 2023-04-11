@@ -8,12 +8,12 @@ package wirex
 
 import (
 	"context"
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 	"github.com/LyricTian/gin-admin/v10/internal/mods"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/api"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/biz"
-	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dao"
+	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 )
 
 // Injectors from wire.go:
@@ -28,18 +28,18 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	trans := &utilx.Trans{
+	trans := &utils.Trans{
 		DB: db,
 	}
-	resource := &dao.Resource{
+	resource := &dal.Resource{
 		DB: db,
 	}
 	bizResource := &biz.Resource{
 		Trans:       trans,
-		ResourceDAO: resource,
+		ResourceDAL: resource,
 	}
 	apiResource := &api.Resource{
-		ResourceBiz: bizResource,
+		ResourceBIZ: bizResource,
 	}
 	rbacRBAC := &rbac.RBAC{
 		DB:          db,

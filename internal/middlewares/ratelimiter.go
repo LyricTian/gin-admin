@@ -14,7 +14,7 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/LyricTian/gin-admin/v10/internal/library/contextx"
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 )
 
 type RateLimiterConfig struct {
@@ -63,11 +63,11 @@ func RateLimiterWithConfig(config RateLimiterConfig) gin.HandlerFunc {
 
 		if err != nil {
 			logging.Context(ctx).Error("Rate limiter middleware error", zap.Error(err))
-			utilx.ResError(c, errors.InternalServerError("", "Internal server error, please try again later."))
+			utils.ResError(c, errors.InternalServerError("", "Internal server error, please try again later."))
 		} else if allowed {
 			c.Next()
 		} else {
-			utilx.ResError(c, errors.TooManyRequests("", "Too many requests, please try again later."))
+			utils.ResError(c, errors.TooManyRequests("", "Too many requests, please try again later."))
 		}
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/gin-gonic/gin"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 )
 
 type CopyBodyConfig struct {
@@ -54,14 +54,14 @@ func CopyBodyWithConfig(config CopyBodyConfig) gin.HandlerFunc {
 		}
 
 		if err != nil {
-			utilx.ResError(c, errors.RequestEntityTooLarge("", "Request body too large, limit %d byte", config.MaxContentLen))
+			utils.ResError(c, errors.RequestEntityTooLarge("", "Request body too large, limit %d byte", config.MaxContentLen))
 			return
 		}
 
 		c.Request.Body.Close()
 		bf := bytes.NewBuffer(requestBody)
 		c.Request.Body = io.NopCloser(bf)
-		c.Set(utilx.RequestBodyKey, requestBody)
+		c.Set(utils.RequestBodyKey, requestBody)
 		c.Next()
 	}
 }

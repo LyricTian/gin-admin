@@ -3,8 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
-	"github.com/go-playground/validator/v10"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 )
 
 type Resource struct {
@@ -19,23 +18,23 @@ type Resource struct {
 }
 
 type ResourceQueryParam struct {
-	utilx.PaginationParam
+	utils.PaginationParam
 	LikeCode string `form:"code"`                                           // Unique code
 	Status   string `form:"status" binding:"oneof='enabled' 'disabled' ''"` // Status (enabled/disabled)
 }
 
 type ResourceQueryOptions struct {
-	utilx.QueryOptions
+	utils.QueryOptions
 }
 
 type ResourceQueryResult struct {
 	Data       Resources
-	PageResult *utilx.PaginationResult
+	PageResult *utils.PaginationResult
 }
 
 type Resources []*Resource
 
-type ResourceCreate struct {
+type ResourceSave struct {
 	Code        string `json:"code"`                                                 // Unique code (format: module.resource.action)
 	Object      string `json:"object" binding:"required"`                            // Resource object
 	Action      string `json:"action" binding:"required"`                            // Resource action
@@ -43,8 +42,6 @@ type ResourceCreate struct {
 	Status      string `json:"status" binding:"required,oneof='enabled' 'disabled'"` // Status (enabled/disabled)
 }
 
-func (a ResourceCreate) Validate() error {
-	v := validator.New()
-	v.SetTagName("binding")
-	return v.Struct(a)
+func (a ResourceSave) Validate() error {
+	return nil
 }

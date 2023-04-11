@@ -4,25 +4,25 @@ import (
 	"context"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
-	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dao"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
+	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/util/xid"
 )
 
 type Resource struct {
-	Trans       *utilx.Trans
-	ResourceDAO *dao.Resource
+	Trans       *utils.Trans
+	ResourceDAL *dal.Resource
 }
 
 func (a *Resource) Query(ctx context.Context, params schema.ResourceQueryParam) (*schema.ResourceQueryResult, error) {
 	params.Pagination = true
 
-	result, err := a.ResourceDAO.Query(ctx, params, schema.ResourceQueryOptions{
-		QueryOptions: utilx.QueryOptions{
-			OrderFields: []utilx.OrderByParam{
-				{Field: "created_at", Direction: utilx.DESC},
+	result, err := a.ResourceDAL.Query(ctx, params, schema.ResourceQueryOptions{
+		QueryOptions: utils.QueryOptions{
+			OrderFields: []utils.OrderByParam{
+				{Field: "created_at", Direction: utils.DESC},
 			},
 		},
 	})
@@ -34,7 +34,7 @@ func (a *Resource) Query(ctx context.Context, params schema.ResourceQueryParam) 
 }
 
 func (a *Resource) Get(ctx context.Context, id string) (*schema.Resource, error) {
-	resource, err := a.ResourceDAO.Get(ctx, id)
+	resource, err := a.ResourceDAL.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	} else if resource == nil {
@@ -44,8 +44,8 @@ func (a *Resource) Get(ctx context.Context, id string) (*schema.Resource, error)
 	return resource, nil
 }
 
-func (a *Resource) Create(ctx context.Context, citem schema.ResourceCreate) (*schema.Resource, error) {
-	if exists, err := a.ResourceDAO.ExistsCode(ctx, citem.Code); err != nil {
+func (a *Resource) Create(ctx context.Context, citem schema.ResourceSave) (*schema.Resource, error) {
+	if exists, err := a.ResourceDAL.ExistsCode(ctx, citem.Code); err != nil {
 		return nil, err
 	} else if exists {
 		return nil, errors.BadRequest("", "Resource code already exists")
@@ -62,7 +62,7 @@ func (a *Resource) Create(ctx context.Context, citem schema.ResourceCreate) (*sc
 	}
 
 	err := a.Trans.Exec(ctx, func(ctx context.Context) error {
-		if err := a.ResourceDAO.Create(ctx, resource); err != nil {
+		if err := a.ResourceDAL.Create(ctx, resource); err != nil {
 			return err
 		}
 		return nil
@@ -73,14 +73,14 @@ func (a *Resource) Create(ctx context.Context, citem schema.ResourceCreate) (*sc
 	return resource, nil
 }
 
-func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceCreate) error {
-	oldResource, err := a.ResourceDAO.Get(ctx, id)
+func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceSave) error {
+	oldResource, err := a.ResourceDAL.Get(ctx, id)
 	if err != nil {
 		return err
 	} else if oldResource == nil {
 		return errors.NotFound("", "Resource not found")
 	} else if oldResource.Code != uitem.Code {
-		if exists, err := a.ResourceDAO.ExistsCode(ctx, uitem.Code); err != nil {
+		if exists, err := a.ResourceDAL.ExistsCode(ctx, uitem.Code); err != nil {
 			return err
 		} else if exists {
 			return errors.BadRequest("", "Resource code already exists")
@@ -93,7 +93,7 @@ func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceC
 	oldResource.Description = uitem.Description
 	oldResource.Status = uitem.Status
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
-		if err := a.ResourceDAO.Update(ctx, oldResource); err != nil {
+		if err := a.ResourceDAL.Update(ctx, oldResource); err != nil {
 			return err
 		}
 		return nil
@@ -101,7 +101,7 @@ func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceC
 }
 
 func (a *Resource) Delete(ctx context.Context, id string) error {
-	exists, err := a.ResourceDAO.Exists(ctx, id)
+	exists, err := a.ResourceDAL.Exists(ctx, id)
 	if err != nil {
 		return err
 	} else if !exists {
@@ -109,7 +109,7 @@ func (a *Resource) Delete(ctx context.Context, id string) error {
 	}
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
-		if err := a.ResourceDAO.Delete(ctx, id); err != nil {
+		if err := a.ResourceDAL.Delete(ctx, id); err != nil {
 			return err
 		}
 		return nil

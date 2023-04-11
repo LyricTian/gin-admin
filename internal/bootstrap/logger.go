@@ -1,11 +1,11 @@
-package internal
+package bootstrap
 
 import (
 	"context"
 	"path/filepath"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/library/utilx"
+	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/LyricTian/gin-admin/v10/pkg/x/gormx"
 )
@@ -29,14 +29,14 @@ func initLoggerHook(ctx context.Context, cfg *logging.HookConfig) (*logging.Hook
 	switch cfg.Type {
 	case "gorm":
 		db, err := gormx.New(gormx.Config{
-			Debug:        utilx.DefaultStrToBool(cfg.Options["Debug"], false),
-			DBType:       utilx.DefaultStr(cfg.Options["DBType"], "sqlite3"),
-			DSN:          utilx.DefaultStr(cfg.Options["DSN"], "data/log.db"),
-			MaxLifetime:  utilx.DefaultStrToInt(cfg.Options["MaxLifetime"], 86400),
-			MaxIdleTime:  utilx.DefaultStrToInt(cfg.Options["MaxIdleTime"], 3600),
-			MaxOpenConns: utilx.DefaultStrToInt(cfg.Options["MaxOpenConns"], 8),
-			MaxIdleConns: utilx.DefaultStrToInt(cfg.Options["MaxIdleConns"], 4),
-			TablePrefix:  utilx.DefaultStr(cfg.Options["TablePrefix"], ""),
+			Debug:        utils.DefaultStrToBool(cfg.Options["Debug"], false),
+			DBType:       utils.DefaultStr(cfg.Options["DBType"], "sqlite3"),
+			DSN:          utils.DefaultStr(cfg.Options["DSN"], "data/log.db"),
+			MaxLifetime:  utils.DefaultStrToInt(cfg.Options["MaxLifetime"], 86400),
+			MaxIdleTime:  utils.DefaultStrToInt(cfg.Options["MaxIdleTime"], 3600),
+			MaxOpenConns: utils.DefaultStrToInt(cfg.Options["MaxOpenConns"], 8),
+			MaxIdleConns: utils.DefaultStrToInt(cfg.Options["MaxIdleConns"], 4),
+			TablePrefix:  utils.DefaultStr(cfg.Options["TablePrefix"], ""),
 		})
 		if err != nil {
 			return nil, err

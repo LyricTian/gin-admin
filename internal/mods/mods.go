@@ -14,6 +14,10 @@ var Set = wire.NewSet(
 	rbac.Set,
 ) // end
 
+const (
+	apiPrefix = "/api/"
+)
+
 type Mods struct {
 	RBAC *rbac.RBAC
 }
@@ -26,8 +30,17 @@ func (a *Mods) Init(ctx context.Context) error {
 	return nil
 }
 
-func (a *Mods) RegisterAPIs(ctx context.Context, gm map[string]*gin.RouterGroup) error {
-	if err := a.RBAC.RegisterAPIs(ctx, gm); err != nil {
+func (a *Mods) RouterPrefixes() []string {
+	return []string{
+		apiPrefix,
+	}
+}
+
+func (a *Mods) RegisterRouters(ctx context.Context, e *gin.Engine) error {
+	gAPI := e.Group(apiPrefix)
+
+	v1 := gAPI.Group("v1")
+	if err := a.RBAC.RegisterV1Routers(ctx, v1); err != nil {
 		return err
 	}
 

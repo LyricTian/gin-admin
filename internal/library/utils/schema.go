@@ -1,4 +1,4 @@
-package utilx
+package utils
 
 import "github.com/LyricTian/gin-admin/v10/pkg/errors"
 

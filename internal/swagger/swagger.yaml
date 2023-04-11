@@ -37,7 +37,7 @@ definitions:
         description: Update time
         type: string
     type: object
-  schema.ResourceCreate:
+  schema.ResourceSave:
     properties:
       action:
         description: Resource action
@@ -62,7 +62,7 @@ definitions:
     - object
     - status
     type: object
-  utilx.ResponseResult:
+  utils.ResponseResult:
     properties:
       data: {}
       error:
@@ -106,7 +106,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
+            - $ref: '#/definitions/utils.ResponseResult'
             - properties:
                 data:
                   items:
@@ -116,11 +116,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Query paginated resource list
@@ -133,13 +133,13 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/schema.ResourceCreate'
+          $ref: '#/definitions/schema.ResourceSave'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
+            - $ref: '#/definitions/utils.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.Resource'
@@ -147,15 +147,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Create resource record
@@ -173,15 +173,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Delete resource record by ID
@@ -199,7 +199,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utilx.ResponseResult'
+            - $ref: '#/definitions/utils.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.Resource'
@@ -207,11 +207,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Get resource details by ID
@@ -229,24 +229,24 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/schema.ResourceCreate'
+          $ref: '#/definitions/schema.ResourceSave'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utilx.ResponseResult'
+            $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Update resource record by ID
