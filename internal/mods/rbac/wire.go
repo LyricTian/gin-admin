@@ -13,4 +13,4 @@ var Set = wire.NewSet(
 	wire.Struct(new(dal.Resource), "*"),
 	wire.Struct(new(biz.Resource), "*"),
 	wire.Struct(new(api.Resource), "*"),
-) // end
+)

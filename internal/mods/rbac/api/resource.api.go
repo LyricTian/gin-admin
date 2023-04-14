@@ -7,13 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Resource api
 type Resource struct {
 	ResourceBIZ *biz.Resource
 }
 
 // @Tags ResourceAPI
 // @Security ApiKeyAuth
-// @Summary Query paginated resource list
+// @Summary Query resource list
 // @Param current query int true "pagination index" default(1)
 // @Param pageSize query int true "pagination size" default(10)
 // @Param code query string false "resource code (fuzzy query)"
@@ -40,7 +41,7 @@ func (a *Resource) Query(c *gin.Context) {
 
 // @Tags ResourceAPI
 // @Security ApiKeyAuth
-// @Summary Get resource details by ID
+// @Summary Get resource record by ID
 // @Param id path string true "unique id"
 // @Success 200 {object} utils.ResponseResult{data=schema.Resource}
 // @Failure 401 {object} utils.ResponseResult
@@ -69,6 +70,9 @@ func (a *Resource) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.ResourceSave
 	if err := utils.ParseJSON(c, &item); err != nil {
+		utils.ResError(c, err)
+		return
+	} else if err := item.Validate(); err != nil {
 		utils.ResError(c, err)
 		return
 	}

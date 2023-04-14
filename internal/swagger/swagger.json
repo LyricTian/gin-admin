@@ -17,7 +17,7 @@
                 "tags": [
                     "ResourceAPI"
                 ],
-                "summary": "Query paginated resource list",
+                "summary": "Query resource list",
                 "parameters": [
                     {
                         "type": "integer",
@@ -155,7 +155,7 @@
                 "tags": [
                     "ResourceAPI"
                 ],
-                "summary": "Get resource details by ID",
+                "summary": "Get resource record by ID",
                 "parameters": [
                     {
                         "type": "string",

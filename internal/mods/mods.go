@@ -8,14 +8,14 @@ import (
 	"github.com/google/wire"
 )
 
+const (
+	apiPrefix = "/api/"
+)
+
 // Collection of wire providers
 var Set = wire.NewSet(
 	wire.Struct(new(Mods), "*"),
 	rbac.Set,
-) // end
-
-const (
-	apiPrefix = "/api/"
 )
 
 type Mods struct {
@@ -38,8 +38,8 @@ func (a *Mods) RouterPrefixes() []string {
 
 func (a *Mods) RegisterRouters(ctx context.Context, e *gin.Engine) error {
 	gAPI := e.Group(apiPrefix)
-
 	v1 := gAPI.Group("v1")
+
 	if err := a.RBAC.RegisterV1Routers(ctx, v1); err != nil {
 		return err
 	}

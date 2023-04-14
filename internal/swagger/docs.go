@@ -26,7 +26,7 @@ const docTemplate = `{
                 "tags": [
                     "ResourceAPI"
                 ],
-                "summary": "Query paginated resource list",
+                "summary": "Query resource list",
                 "parameters": [
                     {
                         "type": "integer",
@@ -164,7 +164,7 @@ const docTemplate = `{
                 "tags": [
                     "ResourceAPI"
                 ],
-                "summary": "Get resource details by ID",
+                "summary": "Get resource record by ID",
                 "parameters": [
                     {
                         "type": "string",

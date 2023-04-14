@@ -11,11 +11,13 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/util/xid"
 )
 
+// Resource business logic
 type Resource struct {
 	Trans       *utils.Trans
 	ResourceDAL *dal.Resource
 }
 
+// Query resources from the data access object based on the provided parameters and options.
 func (a *Resource) Query(ctx context.Context, params schema.ResourceQueryParam) (*schema.ResourceQueryResult, error) {
 	params.Pagination = true
 
@@ -33,6 +35,7 @@ func (a *Resource) Query(ctx context.Context, params schema.ResourceQueryParam) 
 	return result, nil
 }
 
+// Get the specified resource from the data access object.
 func (a *Resource) Get(ctx context.Context, id string) (*schema.Resource, error) {
 	resource, err := a.ResourceDAL.Get(ctx, id)
 	if err != nil {
@@ -44,6 +47,7 @@ func (a *Resource) Get(ctx context.Context, id string) (*schema.Resource, error)
 	return resource, nil
 }
 
+// Create a new resource in the data access object.
 func (a *Resource) Create(ctx context.Context, citem schema.ResourceSave) (*schema.Resource, error) {
 	if exists, err := a.ResourceDAL.ExistsCode(ctx, citem.Code); err != nil {
 		return nil, err
@@ -73,6 +77,7 @@ func (a *Resource) Create(ctx context.Context, citem schema.ResourceSave) (*sche
 	return resource, nil
 }
 
+// Update the specified resource in the data access object.
 func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceSave) error {
 	oldResource, err := a.ResourceDAL.Get(ctx, id)
 	if err != nil {
@@ -92,6 +97,7 @@ func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceS
 	oldResource.Action = uitem.Action
 	oldResource.Description = uitem.Description
 	oldResource.Status = uitem.Status
+	oldResource.UpdatedAt = time.Now()
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.ResourceDAL.Update(ctx, oldResource); err != nil {
 			return err
@@ -100,6 +106,7 @@ func (a *Resource) Update(ctx context.Context, id string, uitem schema.ResourceS
 	})
 }
 
+// Delete the specified resource from the data access object.
 func (a *Resource) Delete(ctx context.Context, id string) error {
 	exists, err := a.ResourceDAL.Exists(ctx, id)
 	if err != nil {
