@@ -74,7 +74,8 @@ definitions:
     type: object
 info:
   contact: {}
-  description: RBAC scaffolding based on GIN + Gorm 2.0 + Casbin + Wire DI.
+  description: A lightweight, simple yet elegant RBAC solution based on GIN + Gorm
+    2.0 + Casbin + Wire.
   title: GIN-ADMIN
   version: v10.0.0-beta
 paths:
