@@ -23,6 +23,10 @@ func main() {
 	app.Name = "ginadmin"
 	app.Version = VERSION
 	app.Usage = "A lightweight, simple yet elegant RBAC solution based on GIN + Gorm 2.0 + Casbin + Wire."
+	app.Authors = append(app.Authors, &cli.Author{
+		Name:  "LyricTian",
+		Email: "tiannianshou@gmail.com",
+	})
 	app.Commands = []*cli.Command{
 		cmd.StartCmd(),
 		cmd.StopCmd(),
