@@ -5,8 +5,6 @@ import (
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-
-	"github.com/LyricTian/gin-admin/v10/internal/library/contextx"
 )
 
 type Trans struct {
@@ -16,21 +14,21 @@ type Trans struct {
 type TransFunc func(context.Context) error
 
 func (a *Trans) Exec(ctx context.Context, fn TransFunc) error {
-	if _, ok := contextx.FromTrans(ctx); ok {
+	if _, ok := FromTrans(ctx); ok {
 		return fn(ctx)
 	}
 
 	return a.DB.Transaction(func(db *gorm.DB) error {
-		return fn(contextx.NewTrans(ctx, db))
+		return fn(NewTrans(ctx, db))
 	})
 }
 
 func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	db := defDB
-	if tdb, ok := contextx.FromTrans(ctx); ok {
+	if tdb, ok := FromTrans(ctx); ok {
 		db = tdb
 	}
-	if contextx.FromRowLock(ctx) {
+	if FromRowLock(ctx) {
 		db = db.Clauses(clause.Locking{Strength: "UPDATE"})
 	}
 	return db.WithContext(ctx)

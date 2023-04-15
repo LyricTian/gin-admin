@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/gormx"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
-	"github.com/LyricTian/gin-admin/v10/pkg/x/gormx"
 )
 
 func InitLogger(ctx context.Context, cfgDir string) (func(), error) {

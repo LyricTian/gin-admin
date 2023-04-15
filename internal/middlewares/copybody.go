@@ -9,7 +9,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/gin-gonic/gin"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 type CopyBodyConfig struct {

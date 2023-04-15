@@ -13,8 +13,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/contextx"
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 type RateLimiterConfig struct {
@@ -55,7 +54,7 @@ func RateLimiterWithConfig(config RateLimiterConfig) gin.HandlerFunc {
 		)
 
 		ctx := c.Request.Context()
-		if userID := contextx.FromUserID(ctx); userID != "" {
+		if userID := utils.FromUserID(ctx); userID != "" {
 			allowed, err = store.Allow(ctx, userID, time.Second*time.Duration(config.Period), config.MaxRequestsPerUser)
 		} else {
 			allowed, err = store.Allow(ctx, c.ClientIP(), time.Second*time.Duration(config.Period), config.MaxRequestsPerIP)

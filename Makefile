@@ -23,7 +23,7 @@ build:
 
 # go install github.com/google/wire/cmd/wire@latest
 wire:
-	@wire gen ./internal/library/wirex
+	@wire gen ./internal/wirex
 
 # go install github.com/swaggo/swag/cmd/swag@latest
 swagger:

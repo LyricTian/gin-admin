@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
-	"github.com/LyricTian/gin-admin/v10/internal/library/wirex"
 	"github.com/LyricTian/gin-admin/v10/internal/middlewares"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/internal/wirex"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/gin-gonic/gin"

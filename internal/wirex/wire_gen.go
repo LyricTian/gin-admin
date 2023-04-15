@@ -8,12 +8,12 @@ package wirex
 
 import (
 	"context"
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 	"github.com/LyricTian/gin-admin/v10/internal/mods"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/api"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/biz"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 // Injectors from wire.go:

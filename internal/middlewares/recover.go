@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 type RecoveryConfig struct {

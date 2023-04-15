@@ -3,8 +3,8 @@ package dal
 import (
 	"context"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"gorm.io/gorm"
 )

@@ -1,4 +1,4 @@
-package prometheusx
+package promx
 
 import (
 	"fmt"

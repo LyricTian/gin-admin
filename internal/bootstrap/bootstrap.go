@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/library/wirex"
 	_ "github.com/LyricTian/gin-admin/v10/internal/swagger"
+	"github.com/LyricTian/gin-admin/v10/internal/wirex"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"go.uber.org/zap"
 )

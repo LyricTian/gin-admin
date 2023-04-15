@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 // Defining the `Resource` struct.

@@ -6,8 +6,8 @@ import (
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods"
-	"github.com/LyricTian/gin-admin/v10/pkg/x/cachex"
-	"github.com/LyricTian/gin-admin/v10/pkg/x/gormx"
+	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
+	"github.com/LyricTian/gin-admin/v10/pkg/gormx"
 	"gorm.io/gorm"
 )
 

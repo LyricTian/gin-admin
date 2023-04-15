@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/LyricTian/gin-admin/v10/internal/library/utils"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/biz"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 

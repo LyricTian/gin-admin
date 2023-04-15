@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
 
-	"github.com/LyricTian/gin-admin/v10/internal/library/contextx"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 type TraceConfig struct {
@@ -39,7 +39,7 @@ func TraceWithConfig(config TraceConfig) gin.HandlerFunc {
 			traceID = fmt.Sprintf("trace-%s", xid.New().String())
 		}
 
-		ctx := contextx.NewTraceID(c.Request.Context(), traceID)
+		ctx := utils.NewTraceID(c.Request.Context(), traceID)
 		ctx = logging.NewTraceID(ctx, traceID)
 		c.Request = c.Request.WithContext(ctx)
 		c.Writer.Header().Set(config.ResponseTraceKey, traceID)
