@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,6 @@ import (
 	"github.com/patrickmn/go-cache"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
-
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 type RateLimiterConfig struct {

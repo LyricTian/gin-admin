@@ -6,12 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 type RecoveryConfig struct {

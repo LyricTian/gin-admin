@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
-	"github.com/LyricTian/gin-admin/v10/pkg/util/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"go.uber.org/zap"
@@ -128,28 +128,11 @@ func ResError(c *gin.Context, err error, status ...int) {
 		code = status[0]
 	}
 
-	fields := []zap.Field{
-		zap.String("client_ip", c.ClientIP()),
-		zap.String("user_agent", c.Request.UserAgent()),
-		zap.String("referer", c.Request.Referer()),
-		zap.String("uri", c.Request.RequestURI),
-		zap.String("host", c.Request.Host),
-		zap.String("remote_addr", c.Request.RemoteAddr),
-		zap.String("proto", c.Request.Proto),
-		zap.Int64("content_length", c.Request.ContentLength),
-		zap.String("pragma", c.Request.Header.Get("Pragma")),
-		zap.Int("code", code),
-		zap.Error(err),
-	}
-
-	ctx = logging.NewTag(ctx, logging.TagKeySystem)
-	if code >= 400 && code < 500 {
-		logging.Context(ctx).Info(ierr.Detail, fields...)
-	} else if code >= 500 {
-		logging.Context(ctx).Error(ierr.Detail, fields...)
-	}
-
 	if code >= 500 {
+		ctx = logging.NewTag(ctx, logging.TagKeySystem)
+		logging.Context(ctx).Error("Internal server error", zap.Error(err))
+
+		// Use default error message for internal server error
 		ierr.Detail = http.StatusText(http.StatusInternalServerError)
 	}
 

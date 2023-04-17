@@ -6,11 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
-
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type LoggerConfig struct {

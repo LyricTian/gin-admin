@@ -3,11 +3,10 @@ package middlewares
 import (
 	"fmt"
 
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
-
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
 type TraceConfig struct {
