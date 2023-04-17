@@ -3,9 +3,9 @@ package utils
 import "github.com/LyricTian/gin-admin/v10/pkg/errors"
 
 const (
-	RequestBodyKey  = "request-body"
-	ResponseBodyKey = "response-body"
-	TreePathDelim   = "."
+	RequestBodyKey    = "request-body"
+	ResponseBodyKey   = "response-body"
+	TreePathDelimiter = "."
 )
 
 type ResponseResult struct {
