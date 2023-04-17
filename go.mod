@@ -13,7 +13,6 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/google/uuid v1.3.0
 	github.com/google/wire v0.5.0
-	github.com/jinzhu/copier v0.3.5
 	github.com/json-iterator/go v1.1.12
 	github.com/minio/minio-go/v7 v7.0.51
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -21,7 +20,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/rs/xid v1.4.0
-	github.com/sony/sonyflake v1.1.0
 	github.com/stretchr/testify v1.8.2
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
