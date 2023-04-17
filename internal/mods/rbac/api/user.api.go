@@ -7,31 +7,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Resource api
-type Resource struct {
-	ResourceBIZ *biz.Resource
+// User management for RBAC
+type User struct {
+	UserBIZ *biz.User
 }
 
-// @Tags ResourceAPI
+// @Tags UserAPI
 // @Security ApiKeyAuth
-// @Summary Query resource list
+// @Summary Query user list
 // @Param current query int true "pagination index" default(1)
 // @Param pageSize query int true "pagination size" default(10)
-// @Param code query string false "resource code (fuzzy query)"
-// @Param status query string false "resource status (enabled, disabled)"
-// @Success 200 {object} utils.ResponseResult{data=[]schema.Resource}
+// @Param username query string false "Username for login"
+// @Param name query string false "Name of user"
+// @Param status query string false "Status of user (activated, freezed)"
+// @Success 200 {object} utils.ResponseResult{data=[]schema.User}
 // @Failure 401 {object} utils.ResponseResult
 // @Failure 500 {object} utils.ResponseResult
-// @Router /api/v1/resources [get]
-func (a *Resource) Query(c *gin.Context) {
+// @Router /api/v1/users [get]
+func (a *User) Query(c *gin.Context) {
 	ctx := c.Request.Context()
-	var params schema.ResourceQueryParam
+	var params schema.UserQueryParam
 	if err := utils.ParseQuery(c, &params); err != nil {
 		utils.ResError(c, err)
 		return
 	}
 
-	result, err := a.ResourceBIZ.Query(ctx, params)
+	result, err := a.UserBIZ.Query(ctx, params)
 	if err != nil {
 		utils.ResError(c, err)
 		return
@@ -39,17 +40,17 @@ func (a *Resource) Query(c *gin.Context) {
 	utils.ResPage(c, result.Data, result.PageResult)
 }
 
-// @Tags ResourceAPI
+// @Tags UserAPI
 // @Security ApiKeyAuth
-// @Summary Get resource record by ID
+// @Summary Get user record by ID
 // @Param id path string true "unique id"
-// @Success 200 {object} utils.ResponseResult{data=schema.Resource}
+// @Success 200 {object} utils.ResponseResult{data=schema.User}
 // @Failure 401 {object} utils.ResponseResult
 // @Failure 500 {object} utils.ResponseResult
-// @Router /api/v1/resources/{id} [get]
-func (a *Resource) Get(c *gin.Context) {
+// @Router /api/v1/users/{id} [get]
+func (a *User) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.ResourceBIZ.Get(ctx, c.Param("id"))
+	item, err := a.UserBIZ.Get(ctx, c.Param("id"))
 	if err != nil {
 		utils.ResError(c, err)
 		return
@@ -57,19 +58,19 @@ func (a *Resource) Get(c *gin.Context) {
 	utils.ResSuccess(c, item)
 }
 
-// @Tags ResourceAPI
+// @Tags UserAPI
 // @Security ApiKeyAuth
-// @Summary Create resource record
-// @Param body body schema.ResourceSave true "Request body"
-// @Success 200 {object} utils.ResponseResult{data=schema.Resource}
+// @Summary Create user record
+// @Param body body schema.UserForm true "Request body"
+// @Success 200 {object} utils.ResponseResult{data=schema.User}
 // @Failure 400 {object} utils.ResponseResult
 // @Failure 401 {object} utils.ResponseResult
 // @Failure 500 {object} utils.ResponseResult
-// @Router /api/v1/resources [post]
-func (a *Resource) Create(c *gin.Context) {
+// @Router /api/v1/users [post]
+func (a *User) Create(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.ResourceSave
-	if err := utils.ParseJSON(c, &item); err != nil {
+	item := new(schema.UserForm)
+	if err := utils.ParseJSON(c, item); err != nil {
 		utils.ResError(c, err)
 		return
 	} else if err := item.Validate(); err != nil {
@@ -77,7 +78,7 @@ func (a *Resource) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := a.ResourceBIZ.Create(ctx, item)
+	result, err := a.UserBIZ.Create(ctx, item)
 	if err != nil {
 		utils.ResError(c, err)
 		return
@@ -85,25 +86,28 @@ func (a *Resource) Create(c *gin.Context) {
 	utils.ResSuccess(c, result)
 }
 
-// @Tags ResourceAPI
+// @Tags UserAPI
 // @Security ApiKeyAuth
-// @Summary Update resource record by ID
+// @Summary Update user record by ID
 // @Param id path string true "unique id"
-// @Param body body schema.ResourceSave true "Request body"
+// @Param body body schema.UserForm true "Request body"
 // @Success 200 {object} utils.ResponseResult
 // @Failure 400 {object} utils.ResponseResult
 // @Failure 401 {object} utils.ResponseResult
 // @Failure 500 {object} utils.ResponseResult
-// @Router /api/v1/resources/{id} [put]
-func (a *Resource) Update(c *gin.Context) {
+// @Router /api/v1/users/{id} [put]
+func (a *User) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.ResourceSave
-	if err := utils.ParseJSON(c, &item); err != nil {
+	item := new(schema.UserForm)
+	if err := utils.ParseJSON(c, item); err != nil {
+		utils.ResError(c, err)
+		return
+	} else if err := item.Validate(); err != nil {
 		utils.ResError(c, err)
 		return
 	}
 
-	err := a.ResourceBIZ.Update(ctx, c.Param("id"), item)
+	err := a.UserBIZ.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		utils.ResError(c, err)
 		return
@@ -111,17 +115,17 @@ func (a *Resource) Update(c *gin.Context) {
 	utils.ResOK(c)
 }
 
-// @Tags ResourceAPI
+// @Tags UserAPI
 // @Security ApiKeyAuth
-// @Summary Delete resource record by ID
+// @Summary Delete user record by ID
 // @Param id path string true "unique id"
 // @Success 200 {object} utils.ResponseResult
 // @Failure 401 {object} utils.ResponseResult
 // @Failure 500 {object} utils.ResponseResult
-// @Router /api/v1/resources/{id} [delete]
-func (a *Resource) Delete(c *gin.Context) {
+// @Router /api/v1/users/{id} [delete]
+func (a *User) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.ResourceBIZ.Delete(ctx, c.Param("id"))
+	err := a.UserBIZ.Delete(ctx, c.Param("id"))
 	if err != nil {
 		utils.ResError(c, err)
 		return

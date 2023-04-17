@@ -10,13 +10,22 @@ import (
 )
 
 type RBAC struct {
-	DB          *gorm.DB
-	ResourceAPI *api.Resource
+	DB *gorm.DB
+
+	MenuAPI *api.Menu
+	RoleAPI *api.Role
+	UserAPI *api.User
 }
 
 func (a *RBAC) AutoMigrate(ctx context.Context) error {
 	return a.DB.AutoMigrate(
-		new(schema.Resource),
+
+		new(schema.Menu),
+		new(schema.MenuResource),
+		new(schema.Role),
+		new(schema.RoleMenu),
+		new(schema.User),
+		new(schema.UserRole),
 	)
 }
 
@@ -28,13 +37,30 @@ func (a *RBAC) Init(ctx context.Context) error {
 }
 
 func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error {
-	resource := v1.Group("resources")
+
+	menu := v1.Group("/menus")
 	{
-		resource.GET("", a.ResourceAPI.Query)
-		resource.POST("", a.ResourceAPI.Create)
-		resource.GET(":id", a.ResourceAPI.Get)
-		resource.PUT(":id", a.ResourceAPI.Update)
-		resource.DELETE(":id", a.ResourceAPI.Delete)
+		menu.GET("", a.MenuAPI.Query)
+		menu.GET("/:id", a.MenuAPI.Get)
+		menu.POST("", a.MenuAPI.Create)
+		menu.PUT("", a.MenuAPI.Update)
+		menu.DELETE("/:id", a.MenuAPI.Delete)
+	}
+	role := v1.Group("/roles")
+	{
+		role.GET("", a.RoleAPI.Query)
+		role.GET("/:id", a.RoleAPI.Get)
+		role.POST("", a.RoleAPI.Create)
+		role.PUT("", a.RoleAPI.Update)
+		role.DELETE("/:id", a.RoleAPI.Delete)
+	}
+	user := v1.Group("/users")
+	{
+		user.GET("", a.UserAPI.Query)
+		user.GET("/:id", a.UserAPI.Get)
+		user.POST("", a.UserAPI.Create)
+		user.PUT("", a.UserAPI.Update)
+		user.DELETE("/:id", a.UserAPI.Delete)
 	}
 	return nil
 }

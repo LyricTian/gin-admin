@@ -10,57 +10,208 @@ definitions:
       status:
         type: string
     type: object
-  schema.Resource:
+  schema.Menu:
     properties:
-      action:
-        description: Resource action
-        type: string
+      children:
+        description: Child menus
+        items:
+          $ref: '#/definitions/schema.Menu'
+        type: array
       code:
-        description: 'Unique code (format: module.resource.action)'
+        description: Code of menu
         type: string
       created_at:
         description: Create time
         type: string
       description:
-        description: Description
+        description: Details about menu
         type: string
       id:
         description: Unique ID
         type: string
-      object:
-        description: Resource object
+      name:
+        description: Display name of menu
         type: string
+      parent_id:
+        description: Parent ID (From Menu.ID)
+        type: string
+      parent_path:
+        description: Parent path (split by .)
+        type: string
+      path:
+        description: Access path of menu
+        type: string
+      properties:
+        description: Properties of menu (JSON)
+        type: string
+      sequence:
+        description: Sequence for sorting
+        type: integer
       status:
-        description: Status (enabled/disabled)
+        description: Status of menu (disabled, enabled)
+        type: string
+      type:
+        description: Type of menu (group, page, button)
         type: string
       updated_at:
         description: Update time
         type: string
     type: object
-  schema.ResourceSave:
+  schema.MenuForm:
     properties:
-      action:
-        description: Resource action
-        type: string
       code:
-        description: 'Unique code (format: module.resource.action)'
+        description: Code of menu
+        maxLength: 32
         type: string
       description:
-        description: Description
+        description: Details about menu
         type: string
-      object:
-        description: Resource object
+      name:
+        description: Display name of menu
+        maxLength: 128
         type: string
+      parent_id:
+        description: Parent ID (From Menu.ID)
+        type: string
+      path:
+        description: Access path of menu
+        type: string
+      properties:
+        description: Properties of menu (JSON)
+        type: string
+      sequence:
+        description: Sequence for sorting
+        type: integer
       status:
-        description: Status (enabled/disabled)
+        description: Status of menu (disabled, enabled)
         enum:
-        - enabled
         - disabled
+        - enabled
+        type: string
+      type:
+        description: Type of menu (group, page, button)
+        enum:
+        - group
+        - menu
+        - button
         type: string
     required:
-    - action
-    - object
+    - code
+    - name
     - status
+    - type
+    type: object
+  schema.Role:
+    properties:
+      created_at:
+        description: Create time
+        type: string
+      description:
+        description: Details about role
+        type: string
+      id:
+        description: Unique ID
+        type: string
+      name:
+        description: Display name of role
+        type: string
+      sequence:
+        description: Sequence for sorting
+        type: integer
+      status:
+        description: Status of role (disabled, enabled)
+        type: string
+      updated_at:
+        description: Update time
+        type: string
+    type: object
+  schema.RoleForm:
+    properties:
+      description:
+        description: Details about role
+        type: string
+      name:
+        description: Display name of role
+        maxLength: 128
+        type: string
+      sequence:
+        description: Sequence for sorting
+        type: integer
+      status:
+        description: Status of role (disabled, enabled)
+        enum:
+        - disabled
+        - enabled
+        type: string
+    required:
+    - name
+    - status
+    type: object
+  schema.User:
+    properties:
+      created_at:
+        description: Create time
+        type: string
+      email:
+        description: Email of user
+        type: string
+      id:
+        description: Unique ID
+        type: string
+      name:
+        description: Name of user
+        type: string
+      password:
+        description: Password for login (encrypted)
+        type: string
+      phone:
+        description: Phone number of user
+        type: string
+      remark:
+        description: Remark of user
+        type: string
+      status:
+        description: Status of user (activated, freezed)
+        type: string
+      updated_at:
+        description: Update time
+        type: string
+      username:
+        description: Username for login
+        type: string
+    type: object
+  schema.UserForm:
+    properties:
+      email:
+        description: Email of user
+        type: string
+      name:
+        description: Name of user
+        maxLength: 64
+        type: string
+      password:
+        description: Password for login (encrypted)
+        type: string
+      phone:
+        description: Phone number of user
+        type: string
+      remark:
+        description: Remark of user
+        type: string
+      status:
+        description: Status of user (activated, freezed)
+        enum:
+        - activated
+        - freezed
+        type: string
+      username:
+        description: Username for login
+        maxLength: 64
+        type: string
+    required:
+    - name
+    - status
+    - username
     type: object
   utils.ResponseResult:
     properties:
@@ -79,28 +230,12 @@ info:
   title: GIN-ADMIN
   version: v10.0.0-beta
 paths:
-  /api/v1/resources:
+  /api/v1/menus:
     get:
       parameters:
-      - default: 1
-        description: pagination index
+      - description: Display name of menu
         in: query
-        name: current
-        required: true
-        type: integer
-      - default: 10
-        description: pagination size
-        in: query
-        name: pageSize
-        required: true
-        type: integer
-      - description: resource code (fuzzy query)
-        in: query
-        name: code
-        type: string
-      - description: resource status (enabled, disabled)
-        in: query
-        name: status
+        name: name
         type: string
       responses:
         "200":
@@ -111,7 +246,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/schema.Resource'
+                    $ref: '#/definitions/schema.Menu'
                   type: array
               type: object
         "401":
@@ -124,9 +259,9 @@ paths:
             $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Query resource list
+      summary: Query menu list
       tags:
-      - ResourceAPI
+      - MenuAPI
     post:
       parameters:
       - description: Request body
@@ -134,7 +269,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/schema.ResourceSave'
+          $ref: '#/definitions/schema.MenuForm'
       responses:
         "200":
           description: OK
@@ -143,7 +278,7 @@ paths:
             - $ref: '#/definitions/utils.ResponseResult'
             - properties:
                 data:
-                  $ref: '#/definitions/schema.Resource'
+                  $ref: '#/definitions/schema.Menu'
               type: object
         "400":
           description: Bad Request
@@ -159,10 +294,10 @@ paths:
             $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Create resource record
+      summary: Create menu record
       tags:
-      - ResourceAPI
-  /api/v1/resources/{id}:
+      - MenuAPI
+  /api/v1/menus/{id}:
     delete:
       parameters:
       - description: unique id
@@ -185,9 +320,9 @@ paths:
             $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Delete resource record by ID
+      summary: Delete menu record by ID
       tags:
-      - ResourceAPI
+      - MenuAPI
     get:
       parameters:
       - description: unique id
@@ -203,7 +338,7 @@ paths:
             - $ref: '#/definitions/utils.ResponseResult'
             - properties:
                 data:
-                  $ref: '#/definitions/schema.Resource'
+                  $ref: '#/definitions/schema.Menu'
               type: object
         "401":
           description: Unauthorized
@@ -215,9 +350,9 @@ paths:
             $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Get resource record by ID
+      summary: Get menu record by ID
       tags:
-      - ResourceAPI
+      - MenuAPI
     put:
       parameters:
       - description: unique id
@@ -230,7 +365,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/schema.ResourceSave'
+          $ref: '#/definitions/schema.MenuForm'
       responses:
         "200":
           description: OK
@@ -250,9 +385,361 @@ paths:
             $ref: '#/definitions/utils.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Update resource record by ID
+      summary: Update menu record by ID
       tags:
-      - ResourceAPI
+      - MenuAPI
+  /api/v1/roles:
+    get:
+      parameters:
+      - default: 1
+        description: pagination index
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: pagination size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: Display name of role
+        in: query
+        name: name
+        type: string
+      - description: Status of role (disabled, enabled)
+        in: query
+        name: status
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/schema.Role'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Query role list
+      tags:
+      - RoleAPI
+    post:
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.RoleForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.Role'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create role record
+      tags:
+      - RoleAPI
+  /api/v1/roles/{id}:
+    delete:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete role record by ID
+      tags:
+      - RoleAPI
+    get:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.Role'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get role record by ID
+      tags:
+      - RoleAPI
+    put:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.RoleForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update role record by ID
+      tags:
+      - RoleAPI
+  /api/v1/users:
+    get:
+      parameters:
+      - default: 1
+        description: pagination index
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: pagination size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: Username for login
+        in: query
+        name: username
+        type: string
+      - description: Name of user
+        in: query
+        name: name
+        type: string
+      - description: Status of user (activated, freezed)
+        in: query
+        name: status
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/schema.User'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Query user list
+      tags:
+      - UserAPI
+    post:
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.UserForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create user record
+      tags:
+      - UserAPI
+  /api/v1/users/{id}:
+    delete:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user record by ID
+      tags:
+      - UserAPI
+    get:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.User'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user record by ID
+      tags:
+      - UserAPI
+    put:
+      parameters:
+      - description: unique id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.UserForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user record by ID
+      tags:
+      - UserAPI
 securityDefinitions:
   ApiKeyAuth:
     in: header

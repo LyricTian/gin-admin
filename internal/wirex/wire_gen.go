@@ -31,19 +31,41 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	trans := &utils.Trans{
 		DB: db,
 	}
-	resource := &dal.Resource{
+	menu := &dal.Menu{
 		DB: db,
 	}
-	bizResource := &biz.Resource{
-		Trans:       trans,
-		ResourceDAL: resource,
+	bizMenu := &biz.Menu{
+		Trans:   trans,
+		MenuDAL: menu,
 	}
-	apiResource := &api.Resource{
-		ResourceBIZ: bizResource,
+	apiMenu := &api.Menu{
+		MenuBIZ: bizMenu,
+	}
+	role := &dal.Role{
+		DB: db,
+	}
+	bizRole := &biz.Role{
+		Trans:   trans,
+		RoleDAL: role,
+	}
+	apiRole := &api.Role{
+		RoleBIZ: bizRole,
+	}
+	user := &dal.User{
+		DB: db,
+	}
+	bizUser := &biz.User{
+		Trans:   trans,
+		UserDAL: user,
+	}
+	apiUser := &api.User{
+		UserBIZ: bizUser,
 	}
 	rbacRBAC := &rbac.RBAC{
-		DB:          db,
-		ResourceAPI: apiResource,
+		DB:      db,
+		MenuAPI: apiMenu,
+		RoleAPI: apiRole,
+		UserAPI: apiUser,
 	}
 	modsMods := &mods.Mods{
 		RBAC: rbacRBAC,

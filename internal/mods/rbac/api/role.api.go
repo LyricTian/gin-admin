@@ -1,0 +1,133 @@
+package api
+
+import (
+	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/biz"
+	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
+	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/gin-gonic/gin"
+)
+
+// Role management for RBAC
+type Role struct {
+	RoleBIZ *biz.Role
+}
+
+// @Tags RoleAPI
+// @Security ApiKeyAuth
+// @Summary Query role list
+// @Param current query int true "pagination index" default(1)
+// @Param pageSize query int true "pagination size" default(10)
+// @Param name query string false "Display name of role"
+// @Param status query string false "Status of role (disabled, enabled)"
+// @Success 200 {object} utils.ResponseResult{data=[]schema.Role}
+// @Failure 401 {object} utils.ResponseResult
+// @Failure 500 {object} utils.ResponseResult
+// @Router /api/v1/roles [get]
+func (a *Role) Query(c *gin.Context) {
+	ctx := c.Request.Context()
+	var params schema.RoleQueryParam
+	if err := utils.ParseQuery(c, &params); err != nil {
+		utils.ResError(c, err)
+		return
+	}
+
+	result, err := a.RoleBIZ.Query(ctx, params)
+	if err != nil {
+		utils.ResError(c, err)
+		return
+	}
+	utils.ResPage(c, result.Data, result.PageResult)
+}
+
+// @Tags RoleAPI
+// @Security ApiKeyAuth
+// @Summary Get role record by ID
+// @Param id path string true "unique id"
+// @Success 200 {object} utils.ResponseResult{data=schema.Role}
+// @Failure 401 {object} utils.ResponseResult
+// @Failure 500 {object} utils.ResponseResult
+// @Router /api/v1/roles/{id} [get]
+func (a *Role) Get(c *gin.Context) {
+	ctx := c.Request.Context()
+	item, err := a.RoleBIZ.Get(ctx, c.Param("id"))
+	if err != nil {
+		utils.ResError(c, err)
+		return
+	}
+	utils.ResSuccess(c, item)
+}
+
+// @Tags RoleAPI
+// @Security ApiKeyAuth
+// @Summary Create role record
+// @Param body body schema.RoleForm true "Request body"
+// @Success 200 {object} utils.ResponseResult{data=schema.Role}
+// @Failure 400 {object} utils.ResponseResult
+// @Failure 401 {object} utils.ResponseResult
+// @Failure 500 {object} utils.ResponseResult
+// @Router /api/v1/roles [post]
+func (a *Role) Create(c *gin.Context) {
+	ctx := c.Request.Context()
+	item := new(schema.RoleForm)
+	if err := utils.ParseJSON(c, item); err != nil {
+		utils.ResError(c, err)
+		return
+	} else if err := item.Validate(); err != nil {
+		utils.ResError(c, err)
+		return
+	}
+
+	result, err := a.RoleBIZ.Create(ctx, item)
+	if err != nil {
+		utils.ResError(c, err)
+		return
+	}
+	utils.ResSuccess(c, result)
+}
+
+// @Tags RoleAPI
+// @Security ApiKeyAuth
+// @Summary Update role record by ID
+// @Param id path string true "unique id"
+// @Param body body schema.RoleForm true "Request body"
+// @Success 200 {object} utils.ResponseResult
+// @Failure 400 {object} utils.ResponseResult
+// @Failure 401 {object} utils.ResponseResult
+// @Failure 500 {object} utils.ResponseResult
+// @Router /api/v1/roles/{id} [put]
+func (a *Role) Update(c *gin.Context) {
+	ctx := c.Request.Context()
+	item := new(schema.RoleForm)
+	if err := utils.ParseJSON(c, item); err != nil {
+		utils.ResError(c, err)
+		return
+	} else if err := item.Validate(); err != nil {
+		utils.ResError(c, err)
+		return
+	}
+
+	err := a.RoleBIZ.Update(ctx, c.Param("id"), item)
+	if err != nil {
+		utils.ResError(c, err)
+		return
+	}
+	utils.ResOK(c)
+}
+
+// @Tags RoleAPI
+// @Security ApiKeyAuth
+// @Summary Delete role record by ID
+// @Param id path string true "unique id"
+// @Success 200 {object} utils.ResponseResult
+// @Failure 401 {object} utils.ResponseResult
+// @Failure 500 {object} utils.ResponseResult
+// @Router /api/v1/roles/{id} [delete]
+func (a *Role) Delete(c *gin.Context) {
+	ctx := c.Request.Context()
+	err := a.RoleBIZ.Delete(ctx, c.Param("id"))
+	if err != nil {
+		utils.ResError(c, err)
+		return
+	}
+	utils.ResOK(c)
+}
