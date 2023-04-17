@@ -1,4 +1,4 @@
-package id
+package idx
 
 import (
 	"strings"

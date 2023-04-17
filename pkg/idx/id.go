@@ -1,4 +1,4 @@
-package id
+package idx
 
 import (
 	"github.com/google/uuid"

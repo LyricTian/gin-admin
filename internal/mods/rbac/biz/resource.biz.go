@@ -8,7 +8,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
-	"github.com/LyricTian/gin-admin/v10/pkg/id"
+	"github.com/LyricTian/gin-admin/v10/pkg/idx"
 )
 
 // Resource business logic
@@ -56,7 +56,7 @@ func (a *Resource) Create(ctx context.Context, citem schema.ResourceSave) (*sche
 	}
 
 	resource := &schema.Resource{
-		ID:          id.NewXID(),
+		ID:          idx.NewXID(),
 		Code:        citem.Code,
 		Object:      citem.Object,
 		Action:      citem.Action,
