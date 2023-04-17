@@ -5,6 +5,7 @@ import "github.com/LyricTian/gin-admin/v10/pkg/errors"
 const (
 	RequestBodyKey  = "request-body"
 	ResponseBodyKey = "response-body"
+	TreePathDelim   = "."
 )
 
 type ResponseResult struct {
