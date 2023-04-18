@@ -1181,12 +1181,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "v10.0.0-beta",
+	Version:          "v10.0.0",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "GIN-ADMIN",
-	Description:      "A lightweight, simple yet elegant RBAC solution based on GIN + Gorm 2.0 + Casbin + Wire.",
+	Description:      "A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

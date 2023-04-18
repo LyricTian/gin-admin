@@ -2,7 +2,7 @@
 
 NOW = $(shell date -u '+%Y%m%d%I%M%S')
 
-RELEASE_VERSION = v10.0.0-beta
+RELEASE_VERSION = v10.0.0
 
 APP 			= ginadmin
 SERVER_BIN  	= ${APP}

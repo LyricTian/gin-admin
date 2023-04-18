@@ -225,10 +225,10 @@ definitions:
     type: object
 info:
   contact: {}
-  description: A lightweight, simple yet elegant RBAC solution based on GIN + Gorm
-    2.0 + Casbin + Wire.
+  description: A lightweight, flexible, elegant and full-featured RBAC scaffolding
+    based on GIN + GORM 2.0 + Casbin + Wire DI.
   title: GIN-ADMIN
-  version: v10.0.0-beta
+  version: v10.0.0
 paths:
   /api/v1/menus:
     get:

@@ -1,7 +1,7 @@
 FROM golang:alpine as builder
 
 ARG APP=ginadmin
-ARG VERSION=v10.0.0-beta
+ARG VERSION=v10.0.0
 ARG RELEASE_TAG=$(VERSION)
 
 WORKDIR /go/src/${APP}

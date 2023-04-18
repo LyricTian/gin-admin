@@ -8,11 +8,11 @@ import (
 )
 
 // Usage: go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "v10.0.0-beta"
+var VERSION = "v10.0.0"
 
 // @title GIN-ADMIN
-// @version v10.0.0-beta
-// @description A lightweight, simple yet elegant RBAC solution based on GIN + Gorm 2.0 + Casbin + Wire.
+// @version v10.0.0
+// @description A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI.
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
@@ -22,7 +22,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "ginadmin"
 	app.Version = VERSION
-	app.Usage = "A lightweight, simple yet elegant RBAC solution based on GIN + Gorm 2.0 + Casbin + Wire."
+	app.Usage = "A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI."
 	app.Authors = append(app.Authors, &cli.Author{
 		Name:  "LyricTian",
 		Email: "tiannianshou@gmail.com",
