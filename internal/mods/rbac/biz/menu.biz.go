@@ -132,7 +132,9 @@ func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.M
 		}
 		menu.ParentPath = parent.ParentPath + parent.ID + utils.TreePathDelimiter
 	}
-	formItem.FillTo(menu)
+	if err := formItem.FillTo(menu); err != nil {
+		return nil, err
+	}
 
 	err := a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.MenuDAL.Create(ctx, menu); err != nil {
@@ -193,7 +195,9 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 		}
 		childData = childResult.Data
 	}
-	formItem.FillTo(menu)
+	if err := formItem.FillTo(menu); err != nil {
+		return err
+	}
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if oldStatus != formItem.Status {

@@ -2,6 +2,7 @@ package dal
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
@@ -19,19 +20,27 @@ type UserRole struct {
 	DB *gorm.DB
 }
 
-// Query userroles from the database based on the provided parameters and options.
+// Query user roles from the database based on the provided parameters and options.
 func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, opts ...schema.UserRoleQueryOptions) (*schema.UserRoleQueryResult, error) {
 	var opt schema.UserRoleQueryOptions
 	if len(opts) > 0 {
 		opt = opts[0]
 	}
 
-	db := GetUserRoleDB(ctx, a.DB)
+	db := a.DB.Table(fmt.Sprintf("%s a", schema.UserRole{}.TableName()))
+	if opt.JoinRole {
+		db = db.Joins(fmt.Sprintf("left join %s b on a.role_id=b.id", schema.Role{}.TableName()))
+		db = db.Select("a.*,b.name as role_name")
+	}
+
+	if v := params.InUserIDs; len(v) > 0 {
+		db = db.Where("a.user_id IN (?)", v)
+	}
 	if v := params.UserID; len(v) > 0 {
-		db = db.Where("user_id = ?", v)
+		db = db.Where("a.user_id = ?", v)
 	}
 	if v := params.RoleID; len(v) > 0 {
-		db = db.Where("role_id = ?", v)
+		db = db.Where("a.role_id = ?", v)
 	}
 
 	var list schema.UserRoles
@@ -85,5 +94,15 @@ func (a *UserRole) Update(ctx context.Context, item *schema.UserRole) error {
 // Delete the specified user role from the database.
 func (a *UserRole) Delete(ctx context.Context, id string) error {
 	result := GetUserRoleDB(ctx, a.DB).Where("id=?", id).Delete(new(schema.UserRole))
+	return errors.WithStack(result.Error)
+}
+
+func (a *UserRole) DeleteByUserID(ctx context.Context, userID string) error {
+	result := GetUserRoleDB(ctx, a.DB).Where("user_id=?", userID).Delete(new(schema.UserRole))
+	return errors.WithStack(result.Error)
+}
+
+func (a *UserRole) DeleteByRoleID(ctx context.Context, roleID string) error {
+	result := GetUserRoleDB(ctx, a.DB).Where("role_id=?", roleID).Delete(new(schema.UserRole))
 	return errors.WithStack(result.Error)
 }

@@ -13,8 +13,10 @@ import (
 
 // User management for RBAC
 type User struct {
-	Trans   *utils.Trans
-	UserDAL *dal.User
+	Trans       *utils.Trans
+	UserDAL     *dal.User
+	UserRoleDAL *dal.UserRole
+	RoleDAL     *dal.Role
 }
 
 // Query users from the data access object based on the provided parameters and options.
@@ -26,6 +28,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam) (*schema
 			OrderFields: []utils.OrderByParam{
 				{Field: "created_at", Direction: utils.DESC},
 			},
+			OmitFields: []string{"password"},
 		},
 	})
 	if err != nil {
@@ -36,12 +39,25 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam) (*schema
 
 // Get the specified user from the data access object.
 func (a *User) Get(ctx context.Context, id string) (*schema.User, error) {
-	user, err := a.UserDAL.Get(ctx, id)
+	user, err := a.UserDAL.Get(ctx, id, schema.UserQueryOptions{
+		QueryOptions: utils.QueryOptions{
+			OmitFields: []string{"password"},
+		},
+	})
 	if err != nil {
 		return nil, err
 	} else if user == nil {
 		return nil, errors.NotFound("", "User not found")
 	}
+
+	userRoleResult, err := a.UserRoleDAL.Query(ctx, schema.UserRoleQueryParam{
+		UserID: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	user.Roles = userRoleResult.Data
+
 	return user, nil
 }
 
@@ -51,7 +67,9 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 		ID:        idx.NewXID(),
 		CreatedAt: time.Now(),
 	}
-	formItem.FillTo(user)
+	if err := formItem.FillTo(user); err != nil {
+		return nil, err
+	}
 
 	err := a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.UserDAL.Create(ctx, user); err != nil {
@@ -73,7 +91,9 @@ func (a *User) Update(ctx context.Context, id string, formItem *schema.UserForm)
 	} else if user == nil {
 		return errors.NotFound("", "User not found")
 	}
-	formItem.FillTo(user)
+	if err := formItem.FillTo(user); err != nil {
+		return err
+	}
 	user.UpdatedAt = time.Now()
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {

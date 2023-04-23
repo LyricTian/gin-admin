@@ -1178,6 +1178,13 @@ const docTemplate = `{
                     "description": "Remark of user",
                     "type": "string"
                 },
+                "roles": {
+                    "description": "Roles of user",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.UserRole"
+                    }
+                },
                 "status": {
                     "description": "Status of user (activated, freezed)",
                     "type": "string"
@@ -1202,7 +1209,8 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "description": "Email of user",
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 128
                 },
                 "name": {
                     "description": "Name of user",
@@ -1210,16 +1218,19 @@ const docTemplate = `{
                     "maxLength": 64
                 },
                 "password": {
-                    "description": "Password for login (encrypted)",
-                    "type": "string"
+                    "description": "Password for login (md5 hash)",
+                    "type": "string",
+                    "maxLength": 64
                 },
                 "phone": {
                     "description": "Phone number of user",
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 32
                 },
                 "remark": {
                     "description": "Remark of user",
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 1024
                 },
                 "status": {
                     "description": "Status of user (activated, freezed)",
@@ -1233,6 +1244,35 @@ const docTemplate = `{
                     "description": "Username for login",
                     "type": "string",
                     "maxLength": 64
+                }
+            }
+        },
+        "schema.UserRole": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "Create time",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Unique ID",
+                    "type": "string"
+                },
+                "role_id": {
+                    "description": "From Role.ID",
+                    "type": "string"
+                },
+                "role_name": {
+                    "description": "From Role.Name",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "Update time",
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "From User.ID",
+                    "type": "string"
                 }
             }
         },

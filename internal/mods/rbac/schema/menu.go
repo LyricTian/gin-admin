@@ -26,6 +26,10 @@ type Menu struct {
 	Resources   MenuResources `json:"resources" gorm:"-"`                 // Resources of menu
 }
 
+func (a Menu) TableName() string {
+	return "menu"
+}
+
 // Defining the query parameters for the `Menu` struct.
 type MenuQueryParam struct {
 	utils.PaginationParam
@@ -136,7 +140,7 @@ func (a *MenuForm) Validate() error {
 	return nil
 }
 
-func (a *MenuForm) FillTo(menu *Menu) *Menu {
+func (a *MenuForm) FillTo(menu *Menu) error {
 	menu.Code = a.Code
 	menu.Name = a.Name
 	menu.Description = a.Description
@@ -146,5 +150,5 @@ func (a *MenuForm) FillTo(menu *Menu) *Menu {
 	menu.Properties = a.Properties
 	menu.Status = a.Status
 	menu.ParentID = a.ParentID
-	return menu
+	return nil
 }

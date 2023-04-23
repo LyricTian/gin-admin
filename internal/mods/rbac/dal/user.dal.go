@@ -28,10 +28,10 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 
 	db := GetUserDB(ctx, a.DB)
 	if v := params.LikeUsername; len(v) > 0 {
-		db = db.Where("like_username LIKE ?", "%"+v+"%")
+		db = db.Where("username LIKE ?", "%"+v+"%")
 	}
 	if v := params.LikeName; len(v) > 0 {
-		db = db.Where("like_name LIKE ?", "%"+v+"%")
+		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
 	if v := params.Status; len(v) > 0 {
 		db = db.Where("status = ?", v)
@@ -70,6 +70,11 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 // Exist checks if the specified user exists in the database.
 func (a *User) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := utils.Exists(ctx, GetUserDB(ctx, a.DB).Where("id=?", id))
+	return ok, errors.WithStack(err)
+}
+
+func (a *User) ExistsUsername(ctx context.Context, username string) (bool, error) {
+	ok, err := utils.Exists(ctx, GetUserDB(ctx, a.DB).Where("username=?", username))
 	return ok, errors.WithStack(err)
 }
 

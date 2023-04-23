@@ -52,10 +52,14 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	role := &dal.Role{
 		DB: db,
 	}
+	userRole := &dal.UserRole{
+		DB: db,
+	}
 	bizRole := &biz.Role{
 		Trans:       trans,
 		RoleDAL:     role,
 		RoleMenuDAL: roleMenu,
+		UserRoleDAL: userRole,
 	}
 	apiRole := &api.Role{
 		RoleBIZ: bizRole,
@@ -64,8 +68,10 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		DB: db,
 	}
 	bizUser := &biz.User{
-		Trans:   trans,
-		UserDAL: user,
+		Trans:       trans,
+		UserDAL:     user,
+		UserRoleDAL: userRole,
+		RoleDAL:     role,
 	}
 	apiUser := &api.User{
 		UserBIZ: bizUser,

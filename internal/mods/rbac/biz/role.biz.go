@@ -16,6 +16,7 @@ type Role struct {
 	Trans       *utils.Trans
 	RoleDAL     *dal.Role
 	RoleMenuDAL *dal.RoleMenu
+	UserRoleDAL *dal.UserRole
 }
 
 // Query roles from the data access object based on the provided parameters and options.
@@ -62,7 +63,9 @@ func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.R
 		ID:        idx.NewXID(),
 		CreatedAt: time.Now(),
 	}
-	formItem.FillTo(role)
+	if err := formItem.FillTo(role); err != nil {
+		return nil, err
+	}
 
 	err := a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.RoleDAL.Create(ctx, role); err != nil {
@@ -92,7 +95,9 @@ func (a *Role) Update(ctx context.Context, id string, formItem *schema.RoleForm)
 	} else if role == nil {
 		return errors.NotFound("", "Role not found")
 	}
-	formItem.FillTo(role)
+	if err := formItem.FillTo(role); err != nil {
+		return err
+	}
 	role.UpdatedAt = time.Now()
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
@@ -133,6 +138,9 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 			return err
 		}
 		if err := a.RoleMenuDAL.DeleteByRoleID(ctx, id); err != nil {
+			return err
+		}
+		if err := a.UserRoleDAL.DeleteByRoleID(ctx, id); err != nil {
 			return err
 		}
 		return nil

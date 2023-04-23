@@ -229,6 +229,11 @@ definitions:
       remark:
         description: Remark of user
         type: string
+      roles:
+        description: Roles of user
+        items:
+          $ref: '#/definitions/schema.UserRole'
+        type: array
       status:
         description: Status of user (activated, freezed)
         type: string
@@ -243,19 +248,23 @@ definitions:
     properties:
       email:
         description: Email of user
+        maxLength: 128
         type: string
       name:
         description: Name of user
         maxLength: 64
         type: string
       password:
-        description: Password for login (encrypted)
+        description: Password for login (md5 hash)
+        maxLength: 64
         type: string
       phone:
         description: Phone number of user
+        maxLength: 32
         type: string
       remark:
         description: Remark of user
+        maxLength: 1024
         type: string
       status:
         description: Status of user (activated, freezed)
@@ -271,6 +280,27 @@ definitions:
     - name
     - status
     - username
+    type: object
+  schema.UserRole:
+    properties:
+      created_at:
+        description: Create time
+        type: string
+      id:
+        description: Unique ID
+        type: string
+      role_id:
+        description: From Role.ID
+        type: string
+      role_name:
+        description: From Role.Name
+        type: string
+      updated_at:
+        description: Update time
+        type: string
+      user_id:
+        description: From User.ID
+        type: string
     type: object
   utils.ResponseResult:
     properties:

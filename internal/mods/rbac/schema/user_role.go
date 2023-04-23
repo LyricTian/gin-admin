@@ -12,18 +12,26 @@ type UserRole struct {
 	UserID    string    `json:"user_id" gorm:"size:20;index"` // From User.ID
 	RoleID    string    `json:"role_id" gorm:"size:20;index"` // From Role.ID
 	CreatedAt time.Time `json:"created_at" gorm:"index;"`     // Create time
+	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`     // Update time
+	RoleName  string    `json:"role_name" gorm:"<-:false"`    // From Role.Name
+}
+
+func (a UserRole) TableName() string {
+	return "user_role"
 }
 
 // Defining the query parameters for the `UserRole` struct.
 type UserRoleQueryParam struct {
 	utils.PaginationParam
-	UserID string `form:"-"` // From User.ID
-	RoleID string `form:"-"` // From Role.ID
+	InUserIDs []string `form:"-"` // From User.ID
+	UserID    string   `form:"-"` // From User.ID
+	RoleID    string   `form:"-"` // From Role.ID
 }
 
 // Defining the query options for the `UserRole` struct.
 type UserRoleQueryOptions struct {
 	utils.QueryOptions
+	JoinRole bool // Join role table
 }
 
 // Defining the query result for the `UserRole` struct.
@@ -35,6 +43,14 @@ type UserRoleQueryResult struct {
 // Defining the slice of `UserRole` struct.
 type UserRoles []*UserRole
 
+func (a UserRoles) ToUserIDMap() map[string]UserRoles {
+	m := make(map[string]UserRoles)
+	for _, userRole := range a {
+		m[userRole.UserID] = append(m[userRole.UserID], userRole)
+	}
+	return m
+}
+
 // Defining the data structure for creating a `UserRole` struct.
 type UserRoleForm struct {
 }
@@ -44,6 +60,6 @@ func (a *UserRoleForm) Validate() error {
 	return nil
 }
 
-func (a *UserRoleForm) FillTo(userRole *UserRole) *UserRole {
-	return userRole
+func (a *UserRoleForm) FillTo(userRole *UserRole) error {
+	return nil
 }

@@ -27,6 +27,9 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	}
 
 	db := GetRoleDB(ctx, a.DB)
+	if v := params.InIDs; len(v) > 0 {
+		db = db.Where("id IN (?)", v)
+	}
 	if v := params.LikeName; len(v) > 0 {
 		db = db.Where("name LIKE ?", "%"+v+"%")
 	}

@@ -16,6 +16,10 @@ type MenuResource struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`     // Update time
 }
 
+func (a MenuResource) TableName() string {
+	return "menu_resource"
+}
+
 // Defining the query parameters for the `MenuResource` struct.
 type MenuResourceQueryParam struct {
 	utils.PaginationParam
@@ -45,6 +49,6 @@ func (a *MenuResourceForm) Validate() error {
 	return nil
 }
 
-func (a *MenuResourceForm) FillTo(menuResource *MenuResource) *MenuResource {
-	return menuResource
+func (a *MenuResourceForm) FillTo(menuResource *MenuResource) error {
+	return nil
 }

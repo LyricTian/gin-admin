@@ -18,11 +18,16 @@ type Role struct {
 	Menus       RoleMenus `json:"menus" gorm:"-"`                // Role menu list
 }
 
+func (a Role) TableName() string {
+	return "role"
+}
+
 // Defining the query parameters for the `Role` struct.
 type RoleQueryParam struct {
 	utils.PaginationParam
-	LikeName string `form:"name"`                                       // Display name of role
-	Status   string `form:"status" binding:"oneof=disabled enabled ''"` // Status of role (disabled, enabled)
+	LikeName string   `form:"name"`                                       // Display name of role
+	Status   string   `form:"status" binding:"oneof=disabled enabled ''"` // Status of role (disabled, enabled)
+	InIDs    []string `form:"-"`                                          // ID list
 }
 
 // Defining the query options for the `Role` struct.
@@ -53,10 +58,10 @@ func (a *RoleForm) Validate() error {
 	return nil
 }
 
-func (a *RoleForm) FillTo(role *Role) *Role {
+func (a *RoleForm) FillTo(role *Role) error {
 	role.Name = a.Name
 	role.Description = a.Description
 	role.Sequence = a.Sequence
 	role.Status = a.Status
-	return role
+	return nil
 }
