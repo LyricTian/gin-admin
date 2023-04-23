@@ -44,6 +44,11 @@ definitions:
       properties:
         description: Properties of menu (JSON)
         type: string
+      resources:
+        description: Resources of menu
+        items:
+          $ref: '#/definitions/schema.MenuResource'
+        type: array
       sequence:
         description: Sequence for sorting
         type: integer
@@ -79,6 +84,11 @@ definitions:
       properties:
         description: Properties of menu (JSON)
         type: string
+      resources:
+        description: Resources of menu
+        items:
+          $ref: '#/definitions/schema.MenuResource'
+        type: array
       sequence:
         description: Sequence for sorting
         type: integer
@@ -100,6 +110,24 @@ definitions:
     - name
     - status
     - type
+    type: object
+  schema.MenuResource:
+    properties:
+      created_at:
+        description: Create time
+        type: string
+      id:
+        description: Unique ID
+        type: string
+      menu_id:
+        description: From Menu.ID
+        type: string
+      method:
+        description: HTTP method
+        type: string
+      path:
+        description: API request path (e.g. /api/v1/users/:id)
+        type: string
     type: object
   schema.Role:
     properties:
@@ -227,7 +255,7 @@ info:
   contact: {}
   description: A lightweight, flexible, elegant and full-featured RBAC scaffolding
     based on GIN + GORM 2.0 + Casbin + Wire DI.
-  title: GIN-ADMIN
+  title: Gin-Admin API
   version: v10.0.0
 paths:
   /api/v1/menus:

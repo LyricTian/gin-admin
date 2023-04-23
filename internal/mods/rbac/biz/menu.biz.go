@@ -15,8 +15,9 @@ import (
 
 // Menu management for RBAC
 type Menu struct {
-	Trans   *utils.Trans
-	MenuDAL *dal.Menu
+	Trans           *utils.Trans
+	MenuDAL         *dal.Menu
+	MenuResourceDAL *dal.MenuResource
 }
 
 // Query menus from the data access object based on the provided parameters and options.
@@ -27,12 +28,21 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema
 		QueryOptions: utils.QueryOptions{
 			OrderFields: []utils.OrderByParam{
 				{Field: "sequence", Direction: utils.DESC},
+				{Field: "created_at", Direction: utils.DESC},
 			},
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	if params.LikeName != "" {
+		result.Data, err = a.appendChildren(ctx, result.Data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	result.Data = result.Data.ToTree()
 	return result, nil
 }
@@ -66,8 +76,7 @@ func (a *Menu) appendChildren(ctx context.Context, data schema.Menus) (schema.Me
 		}
 	}
 
-	parentIDs := data.SplitParentIDs()
-	if len(parentIDs) > 0 {
+	if parentIDs := data.SplitParentIDs(); len(parentIDs) > 0 {
 		parentResult, err := a.MenuDAL.Query(ctx, schema.MenuQueryParam{
 			InIDs: parentIDs,
 		})
@@ -80,8 +89,8 @@ func (a *Menu) appendChildren(ctx context.Context, data schema.Menus) (schema.Me
 			}
 			data = append(data, p)
 		}
-		sort.Sort(data)
 	}
+	sort.Sort(data)
 
 	return data, nil
 }
@@ -94,6 +103,15 @@ func (a *Menu) Get(ctx context.Context, id string) (*schema.Menu, error) {
 	} else if menu == nil {
 		return nil, errors.NotFound("", "Menu not found")
 	}
+
+	menuResResult, err := a.MenuResourceDAL.Query(ctx, schema.MenuResourceQueryParam{
+		MenuID: menu.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	menu.Resources = menuResResult.Data
+
 	return menu, nil
 }
 
@@ -119,6 +137,16 @@ func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.M
 		if err := a.MenuDAL.Create(ctx, menu); err != nil {
 			return err
 		}
+
+		for _, res := range formItem.Resources {
+			res.ID = idx.NewXID()
+			res.MenuID = menu.ID
+			res.CreatedAt = time.Now()
+			if err := a.MenuResourceDAL.Create(ctx, res); err != nil {
+				return err
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -167,9 +195,6 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 	formItem.FillTo(menu)
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
-		if err := a.MenuDAL.Update(ctx, menu); err != nil {
-			return err
-		}
 		if oldStatus != formItem.Status {
 			opath := oldParentPath + menu.ID + utils.TreePathDelimiter
 			if err := a.MenuDAL.UpdateStatusByParentPath(ctx, opath, formItem.Status); err != nil {
@@ -182,6 +207,26 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 			npath := menu.ParentPath + menu.ID + utils.TreePathDelimiter
 			err := a.MenuDAL.UpdateParentPath(ctx, child.ID, strings.Replace(child.ParentPath, opath, npath, 1))
 			if err != nil {
+				return err
+			}
+		}
+
+		if err := a.MenuDAL.Update(ctx, menu); err != nil {
+			return err
+		}
+
+		if err := a.MenuResourceDAL.DeleteByMenuID(ctx, id); err != nil {
+			return err
+		}
+		for _, res := range formItem.Resources {
+			if res.ID == "" {
+				res.ID = idx.NewXID()
+			}
+			res.MenuID = id
+			if res.CreatedAt.IsZero() {
+				res.CreatedAt = time.Now()
+			}
+			if err := a.MenuResourceDAL.Create(ctx, res); err != nil {
 				return err
 			}
 		}
@@ -211,16 +256,26 @@ func (a *Menu) Delete(ctx context.Context, id string) error {
 	}
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
-		if err := a.MenuDAL.Delete(ctx, id); err != nil {
+		if err := a.delete(ctx, id); err != nil {
 			return err
 		}
 
 		for _, child := range childResult.Data {
-			if err := a.MenuDAL.Delete(ctx, child.ID); err != nil {
+			if err := a.delete(ctx, child.ID); err != nil {
 				return err
 			}
 		}
-
 		return nil
 	})
+}
+
+func (a *Menu) delete(ctx context.Context, id string) error {
+	if err := a.MenuDAL.Delete(ctx, id); err != nil {
+		return err
+	}
+	if err := a.MenuResourceDAL.DeleteByMenuID(ctx, id); err != nil {
+		return err
+	}
+
+	return nil
 }

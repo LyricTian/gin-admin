@@ -19,7 +19,7 @@ type MenuResource struct {
 	DB *gorm.DB
 }
 
-// Query menuresources from the database based on the provided parameters and options.
+// Query menu resources from the database based on the provided parameters and options.
 func (a *MenuResource) Query(ctx context.Context, params schema.MenuResourceQueryParam, opts ...schema.MenuResourceQueryOptions) (*schema.MenuResourceQueryResult, error) {
 	var opt schema.MenuResourceQueryOptions
 	if len(opts) > 0 {
@@ -82,5 +82,11 @@ func (a *MenuResource) Update(ctx context.Context, item *schema.MenuResource) er
 // Delete the specified menu resource from the database.
 func (a *MenuResource) Delete(ctx context.Context, id string) error {
 	result := GetMenuResourceDB(ctx, a.DB).Where("id=?", id).Delete(new(schema.MenuResource))
+	return errors.WithStack(result.Error)
+}
+
+// Deletes the menu resource by menu id.
+func (a *MenuResource) DeleteByMenuID(ctx context.Context, menuID string) error {
+	result := GetMenuResourceDB(ctx, a.DB).Where("menu_id=?", menuID).Delete(new(schema.MenuResource))
 	return errors.WithStack(result.Error)
 }

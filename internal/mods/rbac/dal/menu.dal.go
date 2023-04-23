@@ -32,7 +32,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 		db = db.Where("id IN ?", v)
 	}
 	if v := params.LikeName; len(v) > 0 {
-		db = db.Where("like_name LIKE ?", "%"+v+"%")
+		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
 	if v := params.Status; len(v) > 0 {
 		db = db.Where("status = ?", v)
@@ -41,7 +41,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 		db = db.Where("parent_id = ?", v)
 	}
 	if v := params.ParentPathPrefix; len(v) > 0 {
-		db = db.Where("parent_path_prefix LIKE ?", v+"%")
+		db = db.Where("parent_path LIKE ?", v+"%")
 	}
 
 	var list schema.Menus

@@ -9,20 +9,21 @@ import (
 
 // Menu management for RBAC
 type Menu struct {
-	ID          string    `json:"id" gorm:"size:20;primarykey;"`      // Unique ID
-	Code        string    `json:"code" gorm:"size:32;"`               // Code of menu
-	Name        string    `json:"name" gorm:"size:128;index"`         // Display name of menu
-	Description string    `json:"description" gorm:"size:1024"`       // Details about menu
-	Sequence    int       `json:"sequence"`                           // Sequence for sorting
-	Type        string    `json:"type" gorm:"size:20;index"`          // Type of menu (group, page, button)
-	Path        string    `json:"path" gorm:"size:255;"`              // Access path of menu
-	Properties  string    `json:"properties" gorm:"type:text;"`       // Properties of menu (JSON)
-	Status      string    `json:"status" gorm:"size:20;index"`        // Status of menu (disabled, enabled)
-	ParentID    string    `json:"parent_id" gorm:"size:20;index;"`    // Parent ID (From Menu.ID)
-	ParentPath  string    `json:"parent_path" gorm:"size:255;index;"` // Parent path (split by .)
-	Children    *Menus    `json:"children" gorm:"-"`                  // Child menus
-	CreatedAt   time.Time `json:"created_at" gorm:"index;"`           // Create time
-	UpdatedAt   time.Time `json:"updated_at" gorm:"index;"`           // Update time
+	ID          string        `json:"id" gorm:"size:20;primarykey;"`      // Unique ID
+	Code        string        `json:"code" gorm:"size:32;"`               // Code of menu
+	Name        string        `json:"name" gorm:"size:128;index"`         // Display name of menu
+	Description string        `json:"description" gorm:"size:1024"`       // Details about menu
+	Sequence    int           `json:"sequence"`                           // Sequence for sorting
+	Type        string        `json:"type" gorm:"size:20;index"`          // Type of menu (group, page, button)
+	Path        string        `json:"path" gorm:"size:255;"`              // Access path of menu
+	Properties  string        `json:"properties" gorm:"type:text;"`       // Properties of menu (JSON)
+	Status      string        `json:"status" gorm:"size:20;index"`        // Status of menu (disabled, enabled)
+	ParentID    string        `json:"parent_id" gorm:"size:20;index;"`    // Parent ID (From Menu.ID)
+	ParentPath  string        `json:"parent_path" gorm:"size:255;index;"` // Parent path (split by .)
+	Children    *Menus        `json:"children" gorm:"-"`                  // Child menus
+	CreatedAt   time.Time     `json:"created_at" gorm:"index;"`           // Create time
+	UpdatedAt   time.Time     `json:"updated_at" gorm:"index;"`           // Update time
+	Resources   MenuResources `json:"resources" gorm:"-"`                 // Resources of menu
 }
 
 // Defining the query parameters for the `Menu` struct.
@@ -118,15 +119,16 @@ func (a Menus) ToTree() Menus {
 
 // Defining the data structure for creating a `Menu` struct.
 type MenuForm struct {
-	Code        string `json:"code" binding:"required,max=32"`                   // Code of menu
-	Name        string `json:"name" binding:"required,max=128"`                  // Display name of menu
-	Description string `json:"description"`                                      // Details about menu
-	Sequence    int    `json:"sequence"`                                         // Sequence for sorting
-	Type        string `json:"type" binding:"required,oneof=group menu button"`  // Type of menu (group, page, button)
-	Path        string `json:"path"`                                             // Access path of menu
-	Properties  string `json:"properties"`                                       // Properties of menu (JSON)
-	Status      string `json:"status" binding:"required,oneof=disabled enabled"` // Status of menu (disabled, enabled)
-	ParentID    string `json:"parent_id"`                                        // Parent ID (From Menu.ID)
+	Code        string        `json:"code" binding:"required,max=32"`                   // Code of menu
+	Name        string        `json:"name" binding:"required,max=128"`                  // Display name of menu
+	Description string        `json:"description"`                                      // Details about menu
+	Sequence    int           `json:"sequence"`                                         // Sequence for sorting
+	Type        string        `json:"type" binding:"required,oneof=group menu button"`  // Type of menu (group, page, button)
+	Path        string        `json:"path"`                                             // Access path of menu
+	Properties  string        `json:"properties"`                                       // Properties of menu (JSON)
+	Status      string        `json:"status" binding:"required,oneof=disabled enabled"` // Status of menu (disabled, enabled)
+	ParentID    string        `json:"parent_id"`                                        // Parent ID (From Menu.ID)
+	Resources   MenuResources `json:"resources"`                                        // Resources of menu
 }
 
 // A validation function for the `MenuForm` struct.

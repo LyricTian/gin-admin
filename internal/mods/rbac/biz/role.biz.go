@@ -25,6 +25,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam) (*schema
 		QueryOptions: utils.QueryOptions{
 			OrderFields: []utils.OrderByParam{
 				{Field: "sequence", Direction: utils.DESC},
+				{Field: "created_at", Direction: utils.DESC},
 			},
 		},
 	})

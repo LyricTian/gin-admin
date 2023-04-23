@@ -10,8 +10,7 @@ import (
 )
 
 type RBAC struct {
-	DB *gorm.DB
-
+	DB      *gorm.DB
 	MenuAPI *api.Menu
 	RoleAPI *api.Role
 	UserAPI *api.User
@@ -19,7 +18,6 @@ type RBAC struct {
 
 func (a *RBAC) AutoMigrate(ctx context.Context) error {
 	return a.DB.AutoMigrate(
-
 		new(schema.Menu),
 		new(schema.MenuResource),
 		new(schema.Role),
@@ -37,7 +35,6 @@ func (a *RBAC) Init(ctx context.Context) error {
 }
 
 func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error {
-
 	menu := v1.Group("/menus")
 	{
 		menu.GET("", a.MenuAPI.Query)

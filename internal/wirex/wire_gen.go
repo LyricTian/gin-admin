@@ -34,9 +34,13 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	menu := &dal.Menu{
 		DB: db,
 	}
+	menuResource := &dal.MenuResource{
+		DB: db,
+	}
 	bizMenu := &biz.Menu{
-		Trans:   trans,
-		MenuDAL: menu,
+		Trans:           trans,
+		MenuDAL:         menu,
+		MenuResourceDAL: menuResource,
 	}
 	apiMenu := &api.Menu{
 		MenuBIZ: bizMenu,

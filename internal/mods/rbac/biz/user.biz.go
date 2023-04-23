@@ -23,7 +23,9 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam) (*schema
 
 	result, err := a.UserDAL.Query(ctx, params, schema.UserQueryOptions{
 		QueryOptions: utils.QueryOptions{
-			OrderFields: []utils.OrderByParam{},
+			OrderFields: []utils.OrderByParam{
+				{Field: "created_at", Direction: utils.DESC},
+			},
 		},
 	})
 	if err != nil {

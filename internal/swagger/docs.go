@@ -926,6 +926,13 @@ const docTemplate = `{
                     "description": "Properties of menu (JSON)",
                     "type": "string"
                 },
+                "resources": {
+                    "description": "Resources of menu",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuResource"
+                    }
+                },
                 "sequence": {
                     "description": "Sequence for sorting",
                     "type": "integer"
@@ -979,6 +986,13 @@ const docTemplate = `{
                     "description": "Properties of menu (JSON)",
                     "type": "string"
                 },
+                "resources": {
+                    "description": "Resources of menu",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.MenuResource"
+                    }
+                },
                 "sequence": {
                     "description": "Sequence for sorting",
                     "type": "integer"
@@ -999,6 +1013,31 @@ const docTemplate = `{
                         "menu",
                         "button"
                     ]
+                }
+            }
+        },
+        "schema.MenuResource": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "Create time",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Unique ID",
+                    "type": "string"
+                },
+                "menu_id": {
+                    "description": "From Menu.ID",
+                    "type": "string"
+                },
+                "method": {
+                    "description": "HTTP method",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "API request path (e.g. /api/v1/users/:id)",
+                    "type": "string"
                 }
             }
         },
@@ -1185,7 +1224,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "GIN-ADMIN",
+	Title:            "Gin-Admin API",
 	Description:      "A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
