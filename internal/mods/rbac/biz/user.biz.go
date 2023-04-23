@@ -16,7 +16,6 @@ type User struct {
 	Trans       *utils.Trans
 	UserDAL     *dal.User
 	UserRoleDAL *dal.UserRole
-	RoleDAL     *dal.Role
 }
 
 // Query users from the data access object based on the provided parameters and options.
@@ -34,6 +33,22 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam) (*schema
 	if err != nil {
 		return nil, err
 	}
+
+	if userIDs := result.Data.ToIDs(); len(userIDs) > 0 {
+		userRoleResult, err := a.UserRoleDAL.Query(ctx, schema.UserRoleQueryParam{
+			InUserIDs: userIDs,
+		}, schema.UserRoleQueryOptions{
+			JoinRole: true,
+		})
+		if err != nil {
+			return nil, err
+		}
+		userRolesMap := userRoleResult.Data.ToUserIDMap()
+		for _, user := range result.Data {
+			user.Roles = userRolesMap[user.ID]
+		}
+	}
+
 	return result, nil
 }
 
@@ -63,6 +78,17 @@ func (a *User) Get(ctx context.Context, id string) (*schema.User, error) {
 
 // Create a new user in the data access object.
 func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.User, error) {
+	if formItem.Password == "" {
+		return nil, errors.BadRequest("", "Password cannot be empty")
+	}
+
+	existsUsername, err := a.UserDAL.ExistsUsername(ctx, formItem.Username)
+	if err != nil {
+		return nil, err
+	} else if existsUsername {
+		return nil, errors.BadRequest("", "Username already exists")
+	}
+
 	user := &schema.User{
 		ID:        idx.NewXID(),
 		CreatedAt: time.Now(),
@@ -71,9 +97,17 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 		return nil, err
 	}
 
-	err := a.Trans.Exec(ctx, func(ctx context.Context) error {
+	err = a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.UserDAL.Create(ctx, user); err != nil {
 			return err
+		}
+		for _, userRole := range formItem.Roles {
+			userRole.ID = idx.NewXID()
+			userRole.UserID = user.ID
+			userRole.CreatedAt = time.Now()
+			if err := a.UserRoleDAL.Create(ctx, userRole); err != nil {
+				return err
+			}
 		}
 		return nil
 	})
@@ -90,7 +124,15 @@ func (a *User) Update(ctx context.Context, id string, formItem *schema.UserForm)
 		return err
 	} else if user == nil {
 		return errors.NotFound("", "User not found")
+	} else if user.Username != formItem.Username {
+		existsUsername, err := a.UserDAL.ExistsUsername(ctx, formItem.Username)
+		if err != nil {
+			return err
+		} else if existsUsername {
+			return errors.BadRequest("", "Username already exists")
+		}
 	}
+
 	if err := formItem.FillTo(user); err != nil {
 		return err
 	}
@@ -99,6 +141,23 @@ func (a *User) Update(ctx context.Context, id string, formItem *schema.UserForm)
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.UserDAL.Update(ctx, user); err != nil {
 			return err
+		}
+
+		if err := a.UserRoleDAL.DeleteByUserID(ctx, id); err != nil {
+			return err
+		}
+		for _, userRole := range formItem.Roles {
+			if userRole.ID == "" {
+				userRole.ID = idx.NewXID()
+			}
+			userRole.UserID = user.ID
+			if userRole.CreatedAt.IsZero() {
+				userRole.CreatedAt = time.Now()
+			}
+			userRole.UpdatedAt = time.Now()
+			if err := a.UserRoleDAL.Create(ctx, userRole); err != nil {
+				return err
+			}
 		}
 		return nil
 	})
@@ -115,6 +174,9 @@ func (a *User) Delete(ctx context.Context, id string) error {
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.UserDAL.Delete(ctx, id); err != nil {
+			return err
+		}
+		if err := a.UserRoleDAL.DeleteByUserID(ctx, id); err != nil {
 			return err
 		}
 		return nil

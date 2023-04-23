@@ -1203,6 +1203,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "name",
+                "roles",
                 "status",
                 "username"
             ],
@@ -1231,6 +1232,13 @@ const docTemplate = `{
                     "description": "Remark of user",
                     "type": "string",
                     "maxLength": 1024
+                },
+                "roles": {
+                    "description": "Roles of user",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.UserRole"
+                    }
                 },
                 "status": {
                     "description": "Status of user (activated, freezed)",

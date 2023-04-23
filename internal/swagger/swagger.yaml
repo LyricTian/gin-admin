@@ -266,6 +266,11 @@ definitions:
         description: Remark of user
         maxLength: 1024
         type: string
+      roles:
+        description: Roles of user
+        items:
+          $ref: '#/definitions/schema.UserRole'
+        type: array
       status:
         description: Status of user (activated, freezed)
         enum:
@@ -278,6 +283,7 @@ definitions:
         type: string
     required:
     - name
+    - roles
     - status
     - username
     type: object

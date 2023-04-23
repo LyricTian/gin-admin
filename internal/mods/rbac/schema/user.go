@@ -49,15 +49,24 @@ type UserQueryResult struct {
 // Defining the slice of `User` struct.
 type Users []*User
 
+func (a Users) ToIDs() []string {
+	var ids []string
+	for _, item := range a {
+		ids = append(ids, item.ID)
+	}
+	return ids
+}
+
 // Defining the data structure for creating a `User` struct.
 type UserForm struct {
-	Username string `json:"username" binding:"required,max=64"`                // Username for login
-	Name     string `json:"name" binding:"required,max=64"`                    // Name of user
-	Password string `json:"password" binding:"email,max=64"`                   // Password for login (md5 hash)
-	Phone    string `json:"phone" binding:"email,max=32"`                      // Phone number of user
-	Email    string `json:"email" binding:"email,max=128"`                     // Email of user
-	Remark   string `json:"remark" binding:"max=1024"`                         // Remark of user
-	Status   string `json:"status" binding:"required,oneof=activated freezed"` // Status of user (activated, freezed)
+	Username string    `json:"username" binding:"required,max=64"`                // Username for login
+	Name     string    `json:"name" binding:"required,max=64"`                    // Name of user
+	Password string    `json:"password" binding:"email,max=64"`                   // Password for login (md5 hash)
+	Phone    string    `json:"phone" binding:"email,max=32"`                      // Phone number of user
+	Email    string    `json:"email" binding:"email,max=128"`                     // Email of user
+	Remark   string    `json:"remark" binding:"max=1024"`                         // Remark of user
+	Status   string    `json:"status" binding:"required,oneof=activated freezed"` // Status of user (activated, freezed)
+	Roles    UserRoles `json:"roles" binding:"required"`                          // Roles of user
 }
 
 // A validation function for the `UserForm` struct.
@@ -65,6 +74,7 @@ func (a *UserForm) Validate() error {
 	return nil
 }
 
+// Convert `UserForm` to `User` object.
 func (a *UserForm) FillTo(user *User) error {
 	user.Username = a.Username
 	user.Name = a.Name
