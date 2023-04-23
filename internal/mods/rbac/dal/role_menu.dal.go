@@ -19,7 +19,7 @@ type RoleMenu struct {
 	DB *gorm.DB
 }
 
-// Query rolemenus from the database based on the provided parameters and options.
+// Query role menus from the database based on the provided parameters and options.
 func (a *RoleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenuQueryResult, error) {
 	var opt schema.RoleMenuQueryOptions
 	if len(opts) > 0 {
@@ -29,9 +29,6 @@ func (a *RoleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 	db := GetRoleMenuDB(ctx, a.DB)
 	if v := params.RoleID; len(v) > 0 {
 		db = db.Where("role_id = ?", v)
-	}
-	if v := params.MenuID; len(v) > 0 {
-		db = db.Where("menu_id = ?", v)
 	}
 
 	var list schema.RoleMenus
@@ -85,5 +82,17 @@ func (a *RoleMenu) Update(ctx context.Context, item *schema.RoleMenu) error {
 // Delete the specified role menu from the database.
 func (a *RoleMenu) Delete(ctx context.Context, id string) error {
 	result := GetRoleMenuDB(ctx, a.DB).Where("id=?", id).Delete(new(schema.RoleMenu))
+	return errors.WithStack(result.Error)
+}
+
+// Deletes role menus by role id.
+func (a *RoleMenu) DeleteByRoleID(ctx context.Context, roleID string) error {
+	result := GetRoleMenuDB(ctx, a.DB).Where("role_id=?", roleID).Delete(new(schema.RoleMenu))
+	return errors.WithStack(result.Error)
+}
+
+// Deletes role menus by menu id.
+func (a *RoleMenu) DeleteByMenuID(ctx context.Context, menuID string) error {
+	result := GetRoleMenuDB(ctx, a.DB).Where("menu_id=?", menuID).Delete(new(schema.RoleMenu))
 	return errors.WithStack(result.Error)
 }

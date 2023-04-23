@@ -18,6 +18,7 @@ type Menu struct {
 	Trans           *utils.Trans
 	MenuDAL         *dal.Menu
 	MenuResourceDAL *dal.MenuResource
+	RoleMenuDAL     *dal.RoleMenu
 }
 
 // Query menus from the data access object based on the provided parameters and options.
@@ -226,6 +227,7 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 			if res.CreatedAt.IsZero() {
 				res.CreatedAt = time.Now()
 			}
+			res.UpdatedAt = time.Now()
 			if err := a.MenuResourceDAL.Create(ctx, res); err != nil {
 				return err
 			}
@@ -276,6 +278,8 @@ func (a *Menu) delete(ctx context.Context, id string) error {
 	if err := a.MenuResourceDAL.DeleteByMenuID(ctx, id); err != nil {
 		return err
 	}
-
+	if err := a.RoleMenuDAL.DeleteByMenuID(ctx, id); err != nil {
+		return err
+	}
 	return nil
 }

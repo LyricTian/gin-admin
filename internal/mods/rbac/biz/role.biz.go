@@ -13,13 +13,14 @@ import (
 
 // Role management for RBAC
 type Role struct {
-	Trans   *utils.Trans
-	RoleDAL *dal.Role
+	Trans       *utils.Trans
+	RoleDAL     *dal.Role
+	RoleMenuDAL *dal.RoleMenu
 }
 
 // Query roles from the data access object based on the provided parameters and options.
 func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam) (*schema.RoleQueryResult, error) {
-	params.Pagination = true
+	params.Pagination = false
 
 	result, err := a.RoleDAL.Query(ctx, params, schema.RoleQueryOptions{
 		QueryOptions: utils.QueryOptions{
@@ -43,6 +44,15 @@ func (a *Role) Get(ctx context.Context, id string) (*schema.Role, error) {
 	} else if role == nil {
 		return nil, errors.NotFound("", "Role not found")
 	}
+
+	roleMenuResult, err := a.RoleMenuDAL.Query(ctx, schema.RoleMenuQueryParam{
+		RoleID: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	role.Menus = roleMenuResult.Data
+
 	return role, nil
 }
 
@@ -57,6 +67,14 @@ func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.R
 	err := a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.RoleDAL.Create(ctx, role); err != nil {
 			return err
+		}
+		for _, roleMenu := range formItem.Menus {
+			roleMenu.ID = idx.NewXID()
+			roleMenu.RoleID = role.ID
+			roleMenu.CreatedAt = time.Now()
+			if err := a.RoleMenuDAL.Create(ctx, roleMenu); err != nil {
+				return err
+			}
 		}
 		return nil
 	})
@@ -81,6 +99,22 @@ func (a *Role) Update(ctx context.Context, id string, formItem *schema.RoleForm)
 		if err := a.RoleDAL.Update(ctx, role); err != nil {
 			return err
 		}
+		if err := a.RoleMenuDAL.DeleteByRoleID(ctx, id); err != nil {
+			return err
+		}
+		for _, roleMenu := range formItem.Menus {
+			if roleMenu.ID == "" {
+				roleMenu.ID = idx.NewXID()
+			}
+			roleMenu.RoleID = role.ID
+			if roleMenu.CreatedAt.IsZero() {
+				roleMenu.CreatedAt = time.Now()
+			}
+			roleMenu.UpdatedAt = time.Now()
+			if err := a.RoleMenuDAL.Create(ctx, roleMenu); err != nil {
+				return err
+			}
+		}
 		return nil
 	})
 }
@@ -96,6 +130,9 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if err := a.RoleDAL.Delete(ctx, id); err != nil {
+			return err
+		}
+		if err := a.RoleMenuDAL.DeleteByRoleID(ctx, id); err != nil {
 			return err
 		}
 		return nil

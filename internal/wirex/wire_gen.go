@@ -37,10 +37,14 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	menuResource := &dal.MenuResource{
 		DB: db,
 	}
+	roleMenu := &dal.RoleMenu{
+		DB: db,
+	}
 	bizMenu := &biz.Menu{
 		Trans:           trans,
 		MenuDAL:         menu,
 		MenuResourceDAL: menuResource,
+		RoleMenuDAL:     roleMenu,
 	}
 	apiMenu := &api.Menu{
 		MenuBIZ: bizMenu,
@@ -49,8 +53,9 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		DB: db,
 	}
 	bizRole := &biz.Role{
-		Trans:   trans,
-		RoleDAL: role,
+		Trans:       trans,
+		RoleDAL:     role,
+		RoleMenuDAL: roleMenu,
 	}
 	apiRole := &api.Role{
 		RoleBIZ: bizRole,

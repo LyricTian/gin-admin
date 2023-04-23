@@ -12,13 +12,13 @@ type RoleMenu struct {
 	RoleID    string    `json:"role_id" gorm:"size:20;index"` // From Role.ID
 	MenuID    string    `json:"menu_id" gorm:"size:20;index"` // From Menu.ID
 	CreatedAt time.Time `json:"created_at" gorm:"index;"`     // Create time
+	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`     // Update time
 }
 
 // Defining the query parameters for the `RoleMenu` struct.
 type RoleMenuQueryParam struct {
 	utils.PaginationParam
 	RoleID string `form:"-"` // From Role.ID
-	MenuID string `form:"-"` // From Menu.ID
 }
 
 // Defining the query options for the `RoleMenu` struct.

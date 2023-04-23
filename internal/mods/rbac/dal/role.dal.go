@@ -28,7 +28,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 
 	db := GetRoleDB(ctx, a.DB)
 	if v := params.LikeName; len(v) > 0 {
-		db = db.Where("like_name LIKE ?", "%"+v+"%")
+		db = db.Where("name LIKE ?", "%"+v+"%")
 	}
 	if v := params.Status; len(v) > 0 {
 		db = db.Where("status = ?", v)

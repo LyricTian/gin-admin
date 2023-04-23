@@ -1038,6 +1038,10 @@ const docTemplate = `{
                 "path": {
                     "description": "API request path (e.g. /api/v1/users/:id)",
                     "type": "string"
+                },
+                "updated_at": {
+                    "description": "Update time",
+                    "type": "string"
                 }
             }
         },
@@ -1055,6 +1059,13 @@ const docTemplate = `{
                 "id": {
                     "description": "Unique ID",
                     "type": "string"
+                },
+                "menus": {
+                    "description": "Role menu list",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.RoleMenu"
+                    }
                 },
                 "name": {
                     "description": "Display name of role",
@@ -1085,6 +1096,13 @@ const docTemplate = `{
                     "description": "Details about role",
                     "type": "string"
                 },
+                "menus": {
+                    "description": "Role menu list",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.RoleMenu"
+                    }
+                },
                 "name": {
                     "description": "Display name of role",
                     "type": "string",
@@ -1101,6 +1119,31 @@ const docTemplate = `{
                         "disabled",
                         "enabled"
                     ]
+                }
+            }
+        },
+        "schema.RoleMenu": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "Create time",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Unique ID",
+                    "type": "string"
+                },
+                "menu_id": {
+                    "description": "From Menu.ID",
+                    "type": "string"
+                },
+                "role_id": {
+                    "description": "From Role.ID",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "Update time",
+                    "type": "string"
                 }
             }
         },
