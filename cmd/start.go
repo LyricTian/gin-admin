@@ -15,13 +15,13 @@ func StartCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:    "config",
 				Aliases: []string{"c"},
-				Usage:   "Configuration directory",
+				Usage:   "Configurations directory (config.toml/logger.toml)",
 				Value:   "configs",
 			},
 			&cli.StringFlag{
 				Name:    "static",
 				Aliases: []string{"s"},
-				Usage:   "Static site directory",
+				Usage:   "Static files directory",
 			},
 			&cli.BoolFlag{
 				Name:    "daemon",
