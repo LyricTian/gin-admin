@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/BurntSushi/toml v1.2.1
+	github.com/LyricTian/captcha v1.2.0
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.0
@@ -40,7 +41,6 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/LyricTian/captcha v1.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.8.7 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
