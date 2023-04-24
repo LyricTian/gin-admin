@@ -17,9 +17,10 @@ import (
 )
 
 type RunConfig struct {
-	ConfigDir string
-	StaticDir string
-	Daemon    bool
+	ConfigDir  string
+	ConfigFile string
+	StaticDir  string
+	Daemon     bool
 }
 
 func Run(ctx context.Context, cfg RunConfig) error {
@@ -27,7 +28,7 @@ func Run(ctx context.Context, cfg RunConfig) error {
 
 	cfgDir := cfg.ConfigDir
 	staticDir := cfg.StaticDir
-	config.MustLoad(filepath.Join(cfgDir, "config.toml"))
+	config.MustLoad(filepath.Join(cfgDir, cfg.ConfigFile))
 	config.C.General.ConfigDir = cfgDir
 	config.C.Middleware.Static.Dir = staticDir
 

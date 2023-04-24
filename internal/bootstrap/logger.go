@@ -11,7 +11,7 @@ import (
 )
 
 func InitLogger(ctx context.Context, cfgDir string) (func(), error) {
-	cfg, err := logging.LoadConfigFromToml(filepath.Join(cfgDir, "logging.toml"))
+	cfg, err := logging.LoadConfigFromToml(filepath.Join(cfgDir, config.C.General.LoggerConfigFile))
 	if err != nil {
 		return nil, err
 	}

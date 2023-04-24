@@ -62,6 +62,7 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		DB: db,
 	}
 	bizRole := &biz.Role{
+		Cache:       cacher,
 		Trans:       trans,
 		RoleDAL:     role,
 		RoleMenuDAL: roleMenu,
@@ -74,6 +75,7 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		DB: db,
 	}
 	bizUser := &biz.User{
+		Cache:       cacher,
 		Trans:       trans,
 		UserDAL:     user,
 		UserRoleDAL: userRole,

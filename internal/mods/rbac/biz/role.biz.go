@@ -2,17 +2,21 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/consts"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/idx"
 )
 
 // Role management for RBAC
 type Role struct {
+	Cache       cachex.Cacher
 	Trans       *utils.Trans
 	RoleDAL     *dal.Role
 	RoleMenuDAL *dal.RoleMenu
@@ -143,6 +147,8 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 		if err := a.UserRoleDAL.DeleteByRoleID(ctx, id); err != nil {
 			return err
 		}
-		return nil
+
+		// Set role deleted cache for reload casbin
+		return a.Cache.Set(ctx, consts.CacheNSForRole, consts.CacheKeyForRoleDeleted, fmt.Sprintf("%d", time.Now().Unix()))
 	})
 }

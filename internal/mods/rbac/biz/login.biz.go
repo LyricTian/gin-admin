@@ -117,19 +117,13 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 	userID := user.ID
 	ctx = logging.NewUserID(ctx, userID)
 
-	// set cache
-	userRoleResult, err := a.UserRoleDAL.Query(ctx, schema.UserRoleQueryParam{
-		UserID: userID,
-	}, schema.UserRoleQueryOptions{
-		QueryOptions: utils.QueryOptions{
-			SelectFields: []string{"role_id"},
-		},
-	})
+	// set user cache with role ids
+	roleIDs, err := a.UserBIZ.GetRoleIDs(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	userCache := consts.UserCache{RoleIDs: userRoleResult.Data.ToRoleIDs()}
+	userCache := consts.UserCache{RoleIDs: roleIDs}
 	err = a.Cache.Set(ctx, consts.CacheNSForUser, userID, userCache.String(),
 		time.Duration(config.C.Dictionary.UserCacheExp)*time.Hour)
 	if err != nil {

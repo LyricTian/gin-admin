@@ -5,9 +5,11 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
+	"github.com/LyricTian/gin-admin/v10/internal/consts"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
 	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/idx"
@@ -15,6 +17,7 @@ import (
 
 // User management for RBAC
 type User struct {
+	Cache       cachex.Cacher
 	Trans       *utils.Trans
 	UserDAL     *dal.User
 	UserRoleDAL *dal.UserRole
@@ -163,7 +166,8 @@ func (a *User) Update(ctx context.Context, id string, formItem *schema.UserForm)
 				return err
 			}
 		}
-		return nil
+
+		return a.Cache.Delete(ctx, consts.CacheNSForUser, id)
 	})
 }
 
@@ -183,7 +187,7 @@ func (a *User) Delete(ctx context.Context, id string) error {
 		if err := a.UserRoleDAL.DeleteByUserID(ctx, id); err != nil {
 			return err
 		}
-		return nil
+		return a.Cache.Delete(ctx, consts.CacheNSForUser, id)
 	})
 }
 
@@ -206,4 +210,18 @@ func (a *User) ResetPassword(ctx context.Context, id string) error {
 		}
 		return nil
 	})
+}
+
+func (a *User) GetRoleIDs(ctx context.Context, id string) ([]string, error) {
+	userRoleResult, err := a.UserRoleDAL.Query(ctx, schema.UserRoleQueryParam{
+		UserID: id,
+	}, schema.UserRoleQueryOptions{
+		QueryOptions: utils.QueryOptions{
+			SelectFields: []string{"role_id"},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return userRoleResult.Data.ToRoleIDs(), nil
 }

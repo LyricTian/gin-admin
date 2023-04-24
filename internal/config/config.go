@@ -51,7 +51,6 @@ type General struct {
 	PprofAddr          string
 	DisableSwagger     bool
 	DisablePrintConfig bool
-	ConfigDir          string // From command arguments
 	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // abc-123
 	Root               struct {
 		ID       string `default:"root"`
@@ -59,6 +58,9 @@ type General struct {
 		Name     string `default:"Administrator"`
 		Password string
 	}
+	LoggerConfigFile string `default:"logger.toml"`
+	MenuYamlFile     string `default:"menu.yaml"`
+	ConfigDir        string // From command arguments
 }
 
 type Storage struct {
@@ -170,8 +172,14 @@ type Middleware struct {
 			}
 		}
 	}
+	Casbin struct {
+		Disable             bool
+		SkippedPathPrefixes []string
+		AutoLoadInterval    int    `default:"3"` // seconds
+		ModelFile           string `default:"rbac_model.conf"`
+	}
 	Static struct {
-		Dir string // static directory (from command arguments)
+		Dir string // Static files directory (From command arguments)
 	}
 }
 
