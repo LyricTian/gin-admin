@@ -7,6 +7,337 @@
         "version": "v10.0.0"
     },
     "paths": {
+        "/api/v1/current/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Logout system",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/current/menus": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Query current user menus based on the current user role",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.Menu"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/current/password": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Change current user password",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.UpdateLoginPassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/current/refresh-token": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Refresh current access token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.LoginToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/current/user": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Get current user info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Login system with username and password",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.LoginToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login/captcha": {
+            "get": {
+                "produces": [
+                    "image/png"
+                ],
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Response captcha image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Captcha ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Reload captcha image (reload=1)",
+                        "name": "reload",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Captcha image"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login/verify": {
+            "get": {
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Get login verify info (captcha id)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.LoginVerify"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/menus": {
             "get": {
                 "security": [
@@ -851,6 +1182,48 @@
                     }
                 }
             }
+        },
+        "/api/v1/users/{id}/reset-pwd": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "UserAPI"
+                ],
+                "summary": "Reset user password by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "unique id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseResult"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -867,6 +1240,59 @@
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.LoginForm": {
+            "type": "object",
+            "required": [
+                "captcha_code",
+                "captcha_id",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "captcha_code": {
+                    "description": "Captcha verify code",
+                    "type": "string"
+                },
+                "captcha_id": {
+                    "description": "Captcha verify id",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Login password (md5 hash)",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Login name",
+                    "type": "string"
+                }
+            }
+        },
+        "schema.LoginToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "description": "Access token (JWT)",
+                    "type": "string"
+                },
+                "expires_at": {
+                    "description": "Expired time (Unit: second)",
+                    "type": "integer"
+                },
+                "token_type": {
+                    "description": "Token type (Usage: Authorization=${token_type} ${access_token})",
+                    "type": "string"
+                }
+            }
+        },
+        "schema.LoginVerify": {
+            "type": "object",
+            "properties": {
+                "captcha_id": {
+                    "description": "Captcha verify id",
                     "type": "string"
                 }
             }
@@ -1138,6 +1564,23 @@
                 }
             }
         },
+        "schema.UpdateLoginPassword": {
+            "type": "object",
+            "required": [
+                "new_password",
+                "old_password"
+            ],
+            "properties": {
+                "new_password": {
+                    "description": "New password (md5 hash)",
+                    "type": "string"
+                },
+                "old_password": {
+                    "description": "Old password (md5 hash)",
+                    "type": "string"
+                }
+            }
+        },
         "schema.User": {
             "type": "object",
             "properties": {
@@ -1155,10 +1598,6 @@
                 },
                 "name": {
                     "description": "Name of user",
-                    "type": "string"
-                },
-                "password": {
-                    "description": "Password for login (encrypted)",
                     "type": "string"
                 },
                 "phone": {

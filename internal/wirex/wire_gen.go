@@ -19,12 +19,18 @@ import (
 // Injectors from wire.go:
 
 func BuildInjector(ctx context.Context) (*Injector, func(), error) {
-	cacher, cleanup, err := InitCacher(ctx)
+	db, cleanup, err := InitDB(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
-	db, cleanup2, err := InitDB(ctx)
+	cacher, cleanup2, err := InitCacher(ctx)
 	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	auther, cleanup3, err := InitAuth(ctx)
+	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
@@ -75,21 +81,35 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	apiUser := &api.User{
 		UserBIZ: bizUser,
 	}
+	login := &biz.Login{
+		Cache:       cacher,
+		Auth:        auther,
+		UserDAL:     user,
+		UserRoleDAL: userRole,
+		MenuDAL:     menu,
+		UserBIZ:     bizUser,
+	}
+	apiLogin := &api.Login{
+		LoginBIZ: login,
+	}
 	rbacRBAC := &rbac.RBAC{
-		DB:      db,
-		MenuAPI: apiMenu,
-		RoleAPI: apiRole,
-		UserAPI: apiUser,
+		DB:       db,
+		MenuAPI:  apiMenu,
+		RoleAPI:  apiRole,
+		UserAPI:  apiUser,
+		LoginAPI: apiLogin,
 	}
 	modsMods := &mods.Mods{
 		RBAC: rbacRBAC,
 	}
 	injector := &Injector{
-		Cache: cacher,
 		DB:    db,
+		Cache: cacher,
+		Auth:  auther,
 		M:     modsMods,
 	}
 	return injector, func() {
+		cleanup3()
 		cleanup2()
 		cleanup()
 	}, nil

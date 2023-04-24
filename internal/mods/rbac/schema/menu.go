@@ -7,6 +7,18 @@ import (
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
+const (
+	MenuStatusDisabled = "disabled"
+	MenuStatusEnabled  = "enabled"
+)
+
+var (
+	MenusOrderParams = []utils.OrderByParam{
+		{Field: "sequence", Direction: utils.DESC},
+		{Field: "created_at", Direction: utils.DESC},
+	}
+)
+
 // Menu management for RBAC
 type Menu struct {
 	ID          string        `json:"id" gorm:"size:20;primarykey;"`      // Unique ID
@@ -38,6 +50,7 @@ type MenuQueryParam struct {
 	Status           string   `form:"-"`    // Status of menu (disabled, enabled)
 	ParentID         string   `form:"-"`    // Parent ID (From Menu.ID)
 	ParentPathPrefix string   `form:"-"`    // Parent path (split by .)
+	UserID           string   `form:"-"`    // User ID
 }
 
 // Defining the query options for the `Menu` struct.

@@ -27,10 +27,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema
 
 	result, err := a.MenuDAL.Query(ctx, params, schema.MenuQueryOptions{
 		QueryOptions: utils.QueryOptions{
-			OrderFields: []utils.OrderByParam{
-				{Field: "sequence", Direction: utils.DESC},
-				{Field: "created_at", Direction: utils.DESC},
-			},
+			OrderFields: schema.MenusOrderParams,
 		},
 	})
 	if err != nil {
@@ -132,6 +129,13 @@ func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.M
 		}
 		menu.ParentPath = parent.ParentPath + parent.ID + utils.TreePathDelimiter
 	}
+
+	if exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, menu.Code, menu.ParentID); err != nil {
+		return nil, err
+	} else if exists {
+		return nil, errors.BadRequest("", "Menu code already exists at the same level")
+	}
+
 	if err := formItem.FillTo(menu); err != nil {
 		return nil, err
 	}
@@ -195,6 +199,15 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 		}
 		childData = childResult.Data
 	}
+
+	if menu.Code != formItem.Code {
+		if exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, formItem.Code, formItem.ParentID); err != nil {
+			return err
+		} else if exists {
+			return errors.BadRequest("", "Menu code already exists at the same level")
+		}
+	}
+
 	if err := formItem.FillTo(menu); err != nil {
 		return err
 	}

@@ -132,3 +132,21 @@ func (a *User) Delete(c *gin.Context) {
 	}
 	utils.ResOK(c)
 }
+
+// @Tags UserAPI
+// @Security ApiKeyAuth
+// @Summary Reset user password by ID
+// @Param id path string true "unique id"
+// @Success 200 {object} utils.ResponseResult
+// @Failure 401 {object} utils.ResponseResult
+// @Failure 500 {object} utils.ResponseResult
+// @Router /api/v1/users/{id}/reset-pwd [patch]
+func (a *User) ResetPassword(c *gin.Context) {
+	ctx := c.Request.Context()
+	err := a.UserBIZ.ResetPassword(ctx, c.Param("id"))
+	if err != nil {
+		utils.ResError(c, err)
+		return
+	}
+	utils.ResOK(c)
+}

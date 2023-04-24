@@ -10,7 +10,6 @@ import (
 // Collection of wire providers
 var Set = wire.NewSet(
 	wire.Struct(new(RBAC), "*"),
-
 	wire.Struct(new(dal.Menu), "*"),
 	wire.Struct(new(biz.Menu), "*"),
 	wire.Struct(new(api.Menu), "*"),
@@ -23,4 +22,6 @@ var Set = wire.NewSet(
 	wire.Struct(new(biz.User), "*"),
 	wire.Struct(new(api.User), "*"),
 	wire.Struct(new(dal.UserRole), "*"),
+	wire.Struct(new(biz.Login), "*"),
+	wire.Struct(new(api.Login), "*"),
 )

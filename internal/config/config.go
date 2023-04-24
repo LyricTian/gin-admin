@@ -32,6 +32,8 @@ type Config struct {
 	General    General
 	Storage    Storage
 	Middleware Middleware
+	Util       Util
+	Dictionary Dictionary
 }
 
 type General struct {
@@ -49,7 +51,14 @@ type General struct {
 	PprofAddr          string
 	DisableSwagger     bool
 	DisablePrintConfig bool
-	ConfigDir          string // configuration directory (from command arguments)
+	ConfigDir          string // From command arguments
+	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // abc-123
+	Root               struct {
+		ID       string `default:"root"`
+		Username string `default:"admin"`
+		Name     string `default:"Administrator"`
+		Password string
+	}
 }
 
 type Storage struct {
@@ -120,6 +129,27 @@ type Middleware struct {
 		SkippedPathPrefixes []string
 		MaxContentLen       int64 `default:"33554432"` // max content length (default 32MB)
 	}
+	Auth struct {
+		Disable             bool
+		SkippedPathPrefixes []string
+		SigningMethod       string `default:"HS512"`    // HS256/HS384/HS512
+		SigningKey          string `default:"XnEsT0S@"` // secret key
+		OldSigningKey       string // old secret key (for migration)
+		Expired             int    `default:"86400"` // seconds
+		Store               struct {
+			Type      string `default:"badger"` // badger/redis
+			Delimiter string `default:":"`      // delimiter for key
+			Badger    struct {
+				Path string `default:"data/auth"`
+			}
+			Redis struct {
+				Addr     string
+				Username string
+				Password string
+				DB       int
+			}
+		}
+	}
 	RateLimiter struct {
 		Enable              bool
 		SkippedPathPrefixes []string
@@ -143,6 +173,26 @@ type Middleware struct {
 	Static struct {
 		Dir string // static directory (from command arguments)
 	}
+}
+
+type Util struct {
+	Captcha struct {
+		Length    int    `default:"4"`
+		Width     int    `default:"400"`
+		Height    int    `default:"160"`
+		CacheType string `default:"memory"` // memory/redis
+		Redis     struct {
+			Addr      string
+			Username  string
+			Password  string
+			DB        int
+			KeyPrefix string `default:"captcha:"`
+		}
+	}
+}
+
+type Dictionary struct {
+	UserCacheExp int `default:"4"` // hours
 }
 
 func (c *Config) IsDebug() bool {

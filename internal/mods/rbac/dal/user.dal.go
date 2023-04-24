@@ -67,6 +67,22 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 	return item, nil
 }
 
+func (a *User) GetByUsername(ctx context.Context, username string, opts ...schema.UserQueryOptions) (*schema.User, error) {
+	var opt schema.UserQueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+
+	item := new(schema.User)
+	ok, err := utils.FindOne(ctx, GetUserDB(ctx, a.DB).Where("username=?", username), opt.QueryOptions, item)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	} else if !ok {
+		return nil, nil
+	}
+	return item, nil
+}
+
 // Exist checks if the specified user exists in the database.
 func (a *User) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := utils.Exists(ctx, GetUserDB(ctx, a.DB).Where("id=?", id))
@@ -93,5 +109,10 @@ func (a *User) Update(ctx context.Context, item *schema.User) error {
 // Delete the specified user from the database.
 func (a *User) Delete(ctx context.Context, id string) error {
 	result := GetUserDB(ctx, a.DB).Where("id=?", id).Delete(new(schema.User))
+	return errors.WithStack(result.Error)
+}
+
+func (a *User) UpdatePasswordByID(ctx context.Context, id string, password string) error {
+	result := GetUserDB(ctx, a.DB).Where("id=?", id).Select("password").Updates(schema.User{Password: password})
 	return errors.WithStack(result.Error)
 }

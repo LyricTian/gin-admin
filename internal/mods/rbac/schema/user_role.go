@@ -51,6 +51,14 @@ func (a UserRoles) ToUserIDMap() map[string]UserRoles {
 	return m
 }
 
+func (a UserRoles) ToRoleIDs() []string {
+	var ids []string
+	for _, item := range a {
+		ids = append(ids, item.RoleID)
+	}
+	return ids
+}
+
 // Defining the data structure for creating a `UserRole` struct.
 type UserRoleForm struct {
 }

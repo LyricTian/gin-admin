@@ -43,6 +43,11 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	if v := params.ParentPathPrefix; len(v) > 0 {
 		db = db.Where("parent_path LIKE ?", v+"%")
 	}
+	if v := params.UserID; len(v) > 0 {
+		userRoleQuery := GetUserRoleDB(ctx, a.DB).Where("user_id = ?", v).Select("role_id")
+		roleMenuQuery := GetRoleMenuDB(ctx, a.DB).Where("role_id IN (?)", userRoleQuery).Select("menu_id")
+		db = db.Where("id IN (?)", roleMenuQuery)
+	}
 
 	var list schema.Menus
 	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
@@ -74,9 +79,15 @@ func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 	return item, nil
 }
 
-// Exist checks if the specified menu exists in the database.
+// Checks if the specified menu exists in the database.
 func (a *Menu) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := utils.Exists(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id))
+	return ok, errors.WithStack(err)
+}
+
+// Checks if the specified menu code exists under the specified parent ID in the database.
+func (a *Menu) ExistsCodeByParentID(ctx context.Context, parentID, code string) (bool, error) {
+	ok, err := utils.Exists(ctx, GetMenuDB(ctx, a.DB).Where("parent_id=? AND code=?", parentID, code))
 	return ok, errors.WithStack(err)
 }
 

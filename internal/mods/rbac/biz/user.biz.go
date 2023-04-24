@@ -4,9 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/idx"
 )
@@ -78,10 +80,6 @@ func (a *User) Get(ctx context.Context, id string) (*schema.User, error) {
 
 // Create a new user in the data access object.
 func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.User, error) {
-	if formItem.Password == "" {
-		return nil, errors.BadRequest("", "Password cannot be empty")
-	}
-
 	existsUsername, err := a.UserDAL.ExistsUsername(ctx, formItem.Username)
 	if err != nil {
 		return nil, err
@@ -93,6 +91,11 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 		ID:        idx.NewXID(),
 		CreatedAt: time.Now(),
 	}
+
+	if formItem.Password == "" {
+		formItem.Password = config.C.General.DefaultLoginPwd
+	}
+
 	if err := formItem.FillTo(user); err != nil {
 		return nil, err
 	}
@@ -114,6 +117,7 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 	if err != nil {
 		return nil, err
 	}
+
 	return user, nil
 }
 
@@ -177,6 +181,27 @@ func (a *User) Delete(ctx context.Context, id string) error {
 			return err
 		}
 		if err := a.UserRoleDAL.DeleteByUserID(ctx, id); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func (a *User) ResetPassword(ctx context.Context, id string) error {
+	exists, err := a.UserDAL.Exists(ctx, id)
+	if err != nil {
+		return err
+	} else if !exists {
+		return errors.NotFound("", "User not found")
+	}
+
+	hashPass, err := hash.GeneratePassword(config.C.General.DefaultLoginPwd)
+	if err != nil {
+		return errors.BadRequest("", "Failed to generate hash password: %s", err.Error())
+	}
+
+	return a.Trans.Exec(ctx, func(ctx context.Context) error {
+		if err := a.UserDAL.UpdatePasswordByID(ctx, id, hashPass); err != nil {
 			return err
 		}
 		return nil
