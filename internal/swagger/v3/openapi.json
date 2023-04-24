@@ -3,13 +3,336 @@
   "info" : {
     "contact" : { },
     "description" : "A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI.",
-    "title" : "GIN-ADMIN",
+    "title" : "Gin-Admin API",
     "version" : "v10.0.0"
   },
   "servers" : [ {
     "url" : "/"
   } ],
   "paths" : {
+    "/api/v1/current/logout" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Logout system",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/current/menus" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_current_menus_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query current user menus based on the current user role",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/current/password" : {
+      "put" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/schema.UpdateLoginPassword"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Change current user password",
+        "tags" : [ "LoginAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/v1/current/refresh-token" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_current_refresh_token_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Refresh current access token",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/current/user" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_current_user_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Get current user info",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/login" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/schema.LoginForm"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_current_refresh_token_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "summary" : "Login system with username and password",
+        "tags" : [ "LoginAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/v1/login/captcha" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "Captcha ID",
+          "in" : "query",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "Reload captcha image (reload=1)",
+          "in" : "query",
+          "name" : "reload",
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : { },
+            "description" : "Captcha image"
+          },
+          "404" : {
+            "content" : {
+              "image/png" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Not Found"
+          }
+        },
+        "summary" : "Response captcha image",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/login/verify" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_login_verify_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Get login verify info (captcha id)",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
     "/api/v1/menus" : {
       "get" : {
         "parameters" : [ {
@@ -25,7 +348,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_menus_get_200_response"
+                  "$ref" : "#/components/schemas/_api_v1_current_menus_get_200_response"
                 }
               }
             },
@@ -688,7 +1011,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_users_post_200_response"
+                  "$ref" : "#/components/schemas/_api_v1_current_user_get_200_response"
                 }
               }
             },
@@ -797,7 +1120,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_users_post_200_response"
+                  "$ref" : "#/components/schemas/_api_v1_current_user_get_200_response"
                 }
               }
             },
@@ -900,6 +1223,56 @@
         "tags" : [ "UserAPI" ],
         "x-codegen-request-body-name" : "body"
       }
+    },
+    "/api/v1/users/{id}/reset-pwd" : {
+      "patch" : {
+        "parameters" : [ {
+          "description" : "unique id",
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Reset user password by ID",
+        "tags" : [ "UserAPI" ]
+      }
     }
   },
   "components" : {
@@ -916,6 +1289,54 @@
             "type" : "string"
           },
           "status" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "schema.LoginForm" : {
+        "properties" : {
+          "captcha_code" : {
+            "description" : "Captcha verify code",
+            "type" : "string"
+          },
+          "captcha_id" : {
+            "description" : "Captcha verify id",
+            "type" : "string"
+          },
+          "password" : {
+            "description" : "Login password (md5 hash)",
+            "type" : "string"
+          },
+          "username" : {
+            "description" : "Login name",
+            "type" : "string"
+          }
+        },
+        "required" : [ "captcha_code", "captcha_id", "password", "username" ],
+        "type" : "object"
+      },
+      "schema.LoginToken" : {
+        "properties" : {
+          "access_token" : {
+            "description" : "Access token (JWT)",
+            "type" : "string"
+          },
+          "expires_at" : {
+            "description" : "Expired time (Unit: second)",
+            "type" : "integer"
+          },
+          "token_type" : {
+            "description" : "Token type (Usage: Authorization=${token_type} ${access_token})",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "schema.LoginVerify" : {
+        "properties" : {
+          "captcha_id" : {
+            "description" : "Captcha verify id",
             "type" : "string"
           }
         },
@@ -966,6 +1387,13 @@
             "description" : "Properties of menu (JSON)",
             "type" : "string"
           },
+          "resources" : {
+            "description" : "Resources of menu",
+            "items" : {
+              "$ref" : "#/components/schemas/schema.MenuResource"
+            },
+            "type" : "array"
+          },
           "sequence" : {
             "description" : "Sequence for sorting",
             "type" : "integer"
@@ -1013,6 +1441,13 @@
             "description" : "Properties of menu (JSON)",
             "type" : "string"
           },
+          "resources" : {
+            "description" : "Resources of menu",
+            "items" : {
+              "$ref" : "#/components/schemas/schema.MenuResource"
+            },
+            "type" : "array"
+          },
           "sequence" : {
             "description" : "Sequence for sorting",
             "type" : "integer"
@@ -1031,6 +1466,35 @@
         "required" : [ "code", "name", "status", "type" ],
         "type" : "object"
       },
+      "schema.MenuResource" : {
+        "properties" : {
+          "created_at" : {
+            "description" : "Create time",
+            "type" : "string"
+          },
+          "id" : {
+            "description" : "Unique ID",
+            "type" : "string"
+          },
+          "menu_id" : {
+            "description" : "From Menu.ID",
+            "type" : "string"
+          },
+          "method" : {
+            "description" : "HTTP method",
+            "type" : "string"
+          },
+          "path" : {
+            "description" : "API request path (e.g. /api/v1/users/:id)",
+            "type" : "string"
+          },
+          "updated_at" : {
+            "description" : "Update time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
       "schema.Role" : {
         "properties" : {
           "created_at" : {
@@ -1044,6 +1508,13 @@
           "id" : {
             "description" : "Unique ID",
             "type" : "string"
+          },
+          "menus" : {
+            "description" : "Role menu list",
+            "items" : {
+              "$ref" : "#/components/schemas/schema.RoleMenu"
+            },
+            "type" : "array"
           },
           "name" : {
             "description" : "Display name of role",
@@ -1070,6 +1541,13 @@
             "description" : "Details about role",
             "type" : "string"
           },
+          "menus" : {
+            "description" : "Role menu list",
+            "items" : {
+              "$ref" : "#/components/schemas/schema.RoleMenu"
+            },
+            "type" : "array"
+          },
           "name" : {
             "description" : "Display name of role",
             "maxLength" : 128,
@@ -1086,6 +1564,45 @@
           }
         },
         "required" : [ "name", "status" ],
+        "type" : "object"
+      },
+      "schema.RoleMenu" : {
+        "properties" : {
+          "created_at" : {
+            "description" : "Create time",
+            "type" : "string"
+          },
+          "id" : {
+            "description" : "Unique ID",
+            "type" : "string"
+          },
+          "menu_id" : {
+            "description" : "From Menu.ID",
+            "type" : "string"
+          },
+          "role_id" : {
+            "description" : "From Role.ID",
+            "type" : "string"
+          },
+          "updated_at" : {
+            "description" : "Update time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "schema.UpdateLoginPassword" : {
+        "properties" : {
+          "new_password" : {
+            "description" : "New password (md5 hash)",
+            "type" : "string"
+          },
+          "old_password" : {
+            "description" : "Old password (md5 hash)",
+            "type" : "string"
+          }
+        },
+        "required" : [ "new_password", "old_password" ],
         "type" : "object"
       },
       "schema.User" : {
@@ -1106,10 +1623,6 @@
             "description" : "Name of user",
             "type" : "string"
           },
-          "password" : {
-            "description" : "Password for login (encrypted)",
-            "type" : "string"
-          },
           "phone" : {
             "description" : "Phone number of user",
             "type" : "string"
@@ -1117,6 +1630,13 @@
           "remark" : {
             "description" : "Remark of user",
             "type" : "string"
+          },
+          "roles" : {
+            "description" : "Roles of user",
+            "items" : {
+              "$ref" : "#/components/schemas/schema.UserRole"
+            },
+            "type" : "array"
           },
           "status" : {
             "description" : "Status of user (activated, freezed)",
@@ -1137,6 +1657,7 @@
         "properties" : {
           "email" : {
             "description" : "Email of user",
+            "maxLength" : 128,
             "type" : "string"
           },
           "name" : {
@@ -1145,16 +1666,26 @@
             "type" : "string"
           },
           "password" : {
-            "description" : "Password for login (encrypted)",
+            "description" : "Password for login (md5 hash)",
+            "maxLength" : 64,
             "type" : "string"
           },
           "phone" : {
             "description" : "Phone number of user",
+            "maxLength" : 32,
             "type" : "string"
           },
           "remark" : {
             "description" : "Remark of user",
+            "maxLength" : 1024,
             "type" : "string"
+          },
+          "roles" : {
+            "description" : "Roles of user",
+            "items" : {
+              "$ref" : "#/components/schemas/schema.UserRole"
+            },
+            "type" : "array"
           },
           "status" : {
             "description" : "Status of user (activated, freezed)",
@@ -1167,7 +1698,36 @@
             "type" : "string"
           }
         },
-        "required" : [ "name", "status", "username" ],
+        "required" : [ "name", "roles", "status", "username" ],
+        "type" : "object"
+      },
+      "schema.UserRole" : {
+        "properties" : {
+          "created_at" : {
+            "description" : "Create time",
+            "type" : "string"
+          },
+          "id" : {
+            "description" : "Unique ID",
+            "type" : "string"
+          },
+          "role_id" : {
+            "description" : "From Role.ID",
+            "type" : "string"
+          },
+          "role_name" : {
+            "description" : "From Role.Name",
+            "type" : "string"
+          },
+          "updated_at" : {
+            "description" : "Update time",
+            "type" : "string"
+          },
+          "user_id" : {
+            "description" : "From User.ID",
+            "type" : "string"
+          }
+        },
         "type" : "object"
       },
       "utils.ResponseResult" : {
@@ -1187,13 +1747,46 @@
         },
         "type" : "object"
       },
-      "_api_v1_menus_get_200_response" : {
+      "_api_v1_current_menus_get_200_response" : {
         "properties" : {
           "data" : {
             "items" : {
               "$ref" : "#/components/schemas/schema.Menu"
             },
             "type" : "array"
+          },
+          "utils.ResponseResult" : {
+            "$ref" : "#/components/schemas/utils.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_v1_current_refresh_token_post_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/schema.LoginToken"
+          },
+          "utils.ResponseResult" : {
+            "$ref" : "#/components/schemas/utils.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_v1_current_user_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/schema.User"
+          },
+          "utils.ResponseResult" : {
+            "$ref" : "#/components/schemas/utils.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_v1_login_verify_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/schema.LoginVerify"
           },
           "utils.ResponseResult" : {
             "$ref" : "#/components/schemas/utils.ResponseResult"
@@ -1244,17 +1837,6 @@
               "$ref" : "#/components/schemas/schema.User"
             },
             "type" : "array"
-          },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
-          }
-        },
-        "type" : "object"
-      },
-      "_api_v1_users_post_200_response" : {
-        "properties" : {
-          "data" : {
-            "$ref" : "#/components/schemas/schema.User"
           },
           "utils.ResponseResult" : {
             "$ref" : "#/components/schemas/utils.ResponseResult"
