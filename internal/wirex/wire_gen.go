@@ -94,12 +94,19 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 	apiLogin := &api.Login{
 		LoginBIZ: login,
 	}
+	casbinx := &rbac.Casbinx{
+		Cache:           cacher,
+		MenuDAL:         menu,
+		MenuResourceDAL: menuResource,
+		RoleDAL:         role,
+	}
 	rbacRBAC := &rbac.RBAC{
 		DB:       db,
 		MenuAPI:  apiMenu,
 		RoleAPI:  apiRole,
 		UserAPI:  apiUser,
 		LoginAPI: apiLogin,
+		Casbinx:  casbinx,
 	}
 	modsMods := &mods.Mods{
 		RBAC: rbacRBAC,

@@ -9,11 +9,15 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
+	"github.com/LyricTian/gin-admin/v10/internal/consts"
 	"github.com/LyricTian/gin-admin/v10/internal/middlewares"
+	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/internal/wirex"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/jwtx"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -62,23 +66,89 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 
 	allowedPathPrefixes := injector.M.RouterPrefixes()
 	e.Use(middlewares.TraceWithConfig(middlewares.TraceConfig{
-		SkippedPathPrefixes: config.C.Middleware.Trace.SkippedPathPrefixes,
 		AllowedPathPrefixes: allowedPathPrefixes,
+		SkippedPathPrefixes: config.C.Middleware.Trace.SkippedPathPrefixes,
 		RequestHeaderKey:    config.C.Middleware.Trace.RequestHeaderKey,
 		ResponseTraceKey:    config.C.Middleware.Trace.ResponseTraceKey,
 	}))
 
 	e.Use(middlewares.LoggerWithConfig(middlewares.LoggerConfig{
-		SkippedPathPrefixes:      config.C.Middleware.Logger.SkippedPathPrefixes,
 		AllowedPathPrefixes:      allowedPathPrefixes,
+		SkippedPathPrefixes:      config.C.Middleware.Logger.SkippedPathPrefixes,
 		MaxOutputRequestBodyLen:  config.C.Middleware.Logger.MaxOutputRequestBodyLen,
 		MaxOutputResponseBodyLen: config.C.Middleware.Logger.MaxOutputResponseBodyLen,
 	}))
 
 	e.Use(middlewares.CopyBodyWithConfig(middlewares.CopyBodyConfig{
-		SkippedPathPrefixes: config.C.Middleware.CopyBody.SkippedPathPrefixes,
 		AllowedPathPrefixes: allowedPathPrefixes,
+		SkippedPathPrefixes: config.C.Middleware.CopyBody.SkippedPathPrefixes,
 		MaxContentLen:       config.C.Middleware.CopyBody.MaxContentLen,
+	}))
+
+	e.Use(middlewares.AuthWithConfig(middlewares.AuthConfig{
+		AllowedPathPrefixes: allowedPathPrefixes,
+		SkippedPathPrefixes: config.C.Middleware.Auth.SkippedPathPrefixes,
+		ParseUserID: func(c *gin.Context) (string, error) {
+			rootID := config.C.General.Root.ID
+			if config.C.Middleware.Auth.Disable {
+				return rootID, nil
+			}
+
+			errInvalidToken := errors.Unauthorized("com.invalid.token", "Invalid access token")
+			token := utils.GetToken(c)
+			if token == "" {
+				return "", errInvalidToken
+			}
+
+			ctx := c.Request.Context()
+			ctx = utils.NewUserToken(ctx, token)
+
+			userID, err := injector.Auth.ParseSubject(ctx, token)
+			if err != nil {
+				if err == jwtx.ErrInvalidToken {
+					return "", errInvalidToken
+				}
+				return "", err
+			} else if userID == rootID {
+				c.Request = c.Request.WithContext(utils.NewIsRootUser(ctx))
+				return userID, nil
+			}
+
+			userCacheVal, ok, err := injector.Cache.Get(ctx, consts.CacheNSForUser, userID)
+			if err != nil {
+				return "", err
+			} else if ok {
+				userCache := utils.ParseUserCache(userCacheVal)
+				c.Request = c.Request.WithContext(utils.NewUserCache(ctx, userCache))
+				return userID, nil
+			}
+
+			// Check user status, if not activated, force to logout
+			user, err := injector.M.RBAC.UserAPI.UserBIZ.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
+				QueryOptions: utils.QueryOptions{SelectFields: []string{"status"}},
+			})
+			if err != nil {
+				return "", err
+			} else if user == nil || user.Status != schema.UserStatusActivated {
+				return "", errInvalidToken
+			}
+
+			roleIDs, err := injector.M.RBAC.UserAPI.UserBIZ.GetRoleIDs(ctx, userID)
+			if err != nil {
+				return "", err
+			}
+
+			userCache := utils.UserCache{
+				RoleIDs: roleIDs,
+			}
+			err = injector.Cache.Set(ctx, consts.CacheNSForUser, userID, userCache.String())
+			if err != nil {
+				return "", err
+			}
+
+			c.Request = c.Request.WithContext(utils.NewUserCache(ctx, userCache))
+			return userID, nil
+		},
 	}))
 
 	e.Use(middlewares.RateLimiterWithConfig(middlewares.RateLimiterConfig{
@@ -98,6 +168,24 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 			Password: config.C.Middleware.RateLimiter.Store.Redis.Password,
 			DB:       config.C.Middleware.RateLimiter.Store.Redis.DB,
 			Username: config.C.Middleware.RateLimiter.Store.Redis.Username,
+		},
+	}))
+
+	e.Use(middlewares.CasbinWithConfig(middlewares.CasbinConfig{
+		AllowedPathPrefixes: allowedPathPrefixes,
+		SkippedPathPrefixes: config.C.Middleware.Casbin.SkippedPathPrefixes,
+		Skipper: func(c *gin.Context) bool {
+			if config.C.Middleware.Casbin.Disable ||
+				utils.FromIsRootUser(c.Request.Context()) {
+				return true
+			}
+			return false
+		},
+		GetEnforcer: func(c *gin.Context) *casbin.Enforcer {
+			return injector.M.RBAC.Casbinx.GetEnforcer()
+		},
+		GetSubjects: func(c *gin.Context) []string {
+			return utils.FromUserCache(c.Request.Context()).RoleIDs
 		},
 	}))
 

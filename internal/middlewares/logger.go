@@ -13,8 +13,8 @@ import (
 )
 
 type LoggerConfig struct {
-	SkippedPathPrefixes      []string
 	AllowedPathPrefixes      []string
+	SkippedPathPrefixes      []string
 	MaxOutputRequestBodyLen  int
 	MaxOutputResponseBodyLen int
 }
@@ -31,8 +31,8 @@ func Logger() gin.HandlerFunc {
 
 func LoggerWithConfig(config LoggerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if SkippedPathPrefixes(c, config.SkippedPathPrefixes...) ||
-			!AllowedPathPrefixes(c, config.AllowedPathPrefixes...) {
+		if !AllowedPathPrefixes(c, config.AllowedPathPrefixes...) ||
+			SkippedPathPrefixes(c, config.SkippedPathPrefixes...) {
 			c.Next()
 			return
 		}

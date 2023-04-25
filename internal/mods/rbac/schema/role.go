@@ -6,6 +6,11 @@ import (
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
 )
 
+const (
+	RoleStatusEnabled  = "enabled"  // Enabled
+	RoleStatusDisabled = "disabled" // Disabled
+)
+
 // Role management for RBAC
 type Role struct {
 	ID          string    `json:"id" gorm:"size:20;primarykey;"` // Unique ID
@@ -25,9 +30,10 @@ func (a Role) TableName() string {
 // Defining the query parameters for the `Role` struct.
 type RoleQueryParam struct {
 	utils.PaginationParam
-	LikeName string   `form:"name"`                                       // Display name of role
-	Status   string   `form:"status" binding:"oneof=disabled enabled ''"` // Status of role (disabled, enabled)
-	InIDs    []string `form:"-"`                                          // ID list
+	LikeName    string     `form:"name"`                                       // Display name of role
+	Status      string     `form:"status" binding:"oneof=disabled enabled ''"` // Status of role (disabled, enabled)
+	InIDs       []string   `form:"-"`                                          // ID list
+	GtUpdatedAt *time.Time `form:"-"`                                          // Update time is greater than
 }
 
 // Defining the query options for the `Role` struct.

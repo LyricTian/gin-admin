@@ -36,6 +36,9 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	if v := params.Status; len(v) > 0 {
 		db = db.Where("status = ?", v)
 	}
+	if v := params.GtUpdatedAt; v != nil {
+		db = db.Where("updated_at > ?", v)
+	}
 
 	var list schema.Roles
 	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)

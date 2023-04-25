@@ -30,6 +30,9 @@ func (a *MenuResource) Query(ctx context.Context, params schema.MenuResourceQuer
 	if v := params.MenuID; len(v) > 0 {
 		db = db.Where("menu_id = ?", v)
 	}
+	if v := params.MenuIDs; len(v) > 0 {
+		db = db.Where("menu_id IN ?", v)
+	}
 
 	var list schema.MenuResources
 	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)

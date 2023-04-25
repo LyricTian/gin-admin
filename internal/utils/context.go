@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
 	"gorm.io/gorm"
 )
 
@@ -13,6 +14,7 @@ type (
 	userIDCtx     struct{}
 	userTokenCtx  struct{}
 	isRootUserCtx struct{}
+	userCacheCtx  struct{}
 )
 
 func NewTraceID(ctx context.Context, traceID string) context.Context {
@@ -79,4 +81,35 @@ func NewIsRootUser(ctx context.Context) context.Context {
 func FromIsRootUser(ctx context.Context) bool {
 	v := ctx.Value(isRootUserCtx{})
 	return v != nil && v.(bool)
+}
+
+// Set user cache object
+type UserCache struct {
+	RoleIDs []string `json:"rids"`
+}
+
+func ParseUserCache(s string) UserCache {
+	var a UserCache
+	if s == "" {
+		return a
+	}
+
+	_ = json.Unmarshal([]byte(s), &a)
+	return a
+}
+
+func (a UserCache) String() string {
+	return json.MarshalToString(a)
+}
+
+func NewUserCache(ctx context.Context, userCache UserCache) context.Context {
+	return context.WithValue(ctx, userCacheCtx{}, userCache)
+}
+
+func FromUserCache(ctx context.Context) UserCache {
+	v := ctx.Value(userCacheCtx{})
+	if v != nil {
+		return v.(UserCache)
+	}
+	return UserCache{}
 }

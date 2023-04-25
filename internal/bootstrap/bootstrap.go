@@ -110,6 +110,10 @@ func Start(ctx context.Context) (func(), error) {
 	}
 
 	return func() {
+		if err := injector.M.Release(ctx); err != nil {
+			logging.Context(ctx).Error("Failed to release mods", zap.Error(err))
+		}
+
 		if cleanHTTPServerFn != nil {
 			cleanHTTPServerFn()
 		}

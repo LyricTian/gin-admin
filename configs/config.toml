@@ -15,8 +15,9 @@ CertFile = ""
 KeyFile = ""
 
 [Storage]
+
 [Storage.Cache]
-Type = "memory" # memory/badger/redis
+Type = "badger" # badger/redis
 Delimiter = ":"
 
 [Storage.Cache.Memory]
@@ -71,6 +72,13 @@ AllowWildcard = true
 AllowWebSockets = true
 AllowFiles = true
 
+[Middleware.Auth]
+Disable = true
+SkippedPathPrefixes = ["/api/v1/auth/"]
+
+[Middleware.Auth.Store]
+Type = "badger" # badger/redis
+
 [Middleware.RateLimiter]
 Enable = false
 MaxRequestsPerIP = 30
@@ -88,6 +96,10 @@ Addr = ""
 Username = ""
 Password = ""
 DB = 10
+
+[Middleware.Casbin]
+Disable = true
+SkippedPathPrefixes = ["/api/v1/auth/", "/api/v1/current/"]
 
 [Middleware.Static]
 SkippedPathPrefixes = ["/api"]

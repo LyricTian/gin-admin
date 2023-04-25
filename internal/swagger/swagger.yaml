@@ -372,6 +372,75 @@ info:
   title: Gin-Admin API
   version: v10.0.0
 paths:
+  /api/v1/auth/captcha:
+    get:
+      parameters:
+      - description: Captcha ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Reload captcha image (reload=1)
+        in: query
+        name: reload
+        type: number
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: Captcha image
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      summary: Response captcha image
+      tags:
+      - LoginAPI
+  /api/v1/auth/login:
+    post:
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.LoginForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.LoginToken'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ResponseResult'
+      summary: Login system with username and password
+      tags:
+      - LoginAPI
+  /api/v1/auth/verify:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.LoginVerify'
+              type: object
+      summary: Get login verify info (captcha id)
+      tags:
+      - LoginAPI
   /api/v1/current/logout:
     post:
       responses:
@@ -494,75 +563,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get current user info
-      tags:
-      - LoginAPI
-  /api/v1/login:
-    post:
-      parameters:
-      - description: Request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/schema.LoginForm'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/schema.LoginToken'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.ResponseResult'
-      summary: Login system with username and password
-      tags:
-      - LoginAPI
-  /api/v1/login/captcha:
-    get:
-      parameters:
-      - description: Captcha ID
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: Reload captcha image (reload=1)
-        in: query
-        name: reload
-        type: number
-      produces:
-      - image/png
-      responses:
-        "200":
-          description: Captcha image
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.ResponseResult'
-      summary: Response captcha image
-      tags:
-      - LoginAPI
-  /api/v1/login/verify:
-    get:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/schema.LoginVerify'
-              type: object
-      summary: Get login verify info (captcha id)
       tags:
       - LoginAPI
   /api/v1/menus:

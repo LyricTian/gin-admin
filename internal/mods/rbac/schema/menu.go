@@ -51,6 +51,7 @@ type MenuQueryParam struct {
 	ParentID         string   `form:"-"`    // Parent ID (From Menu.ID)
 	ParentPathPrefix string   `form:"-"`    // Parent path (split by .)
 	UserID           string   `form:"-"`    // User ID
+	RoleID           string   `form:"-"`    // Role ID
 }
 
 // Defining the query options for the `Menu` struct.

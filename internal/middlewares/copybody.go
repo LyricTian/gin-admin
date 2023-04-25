@@ -12,8 +12,8 @@ import (
 )
 
 type CopyBodyConfig struct {
-	SkippedPathPrefixes []string
 	AllowedPathPrefixes []string
+	SkippedPathPrefixes []string
 	MaxContentLen       int64
 }
 
@@ -27,8 +27,8 @@ func CopyBody() gin.HandlerFunc {
 
 func CopyBodyWithConfig(config CopyBodyConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if SkippedPathPrefixes(c, config.SkippedPathPrefixes...) ||
-			!AllowedPathPrefixes(c, config.AllowedPathPrefixes...) ||
+		if !AllowedPathPrefixes(c, config.AllowedPathPrefixes...) ||
+			SkippedPathPrefixes(c, config.SkippedPathPrefixes...) ||
 			c.Request.Body == nil {
 			c.Next()
 			return

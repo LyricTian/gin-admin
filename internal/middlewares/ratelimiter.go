@@ -17,8 +17,8 @@ import (
 
 type RateLimiterConfig struct {
 	Enable              bool
-	SkippedPathPrefixes []string
 	AllowedPathPrefixes []string
+	SkippedPathPrefixes []string
 	Period              int
 	MaxRequestsPerIP    int
 	MaxRequestsPerUser  int
@@ -41,8 +41,8 @@ func RateLimiterWithConfig(config RateLimiterConfig) gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		if SkippedPathPrefixes(c, config.SkippedPathPrefixes...) ||
-			!AllowedPathPrefixes(c, config.AllowedPathPrefixes...) {
+		if !AllowedPathPrefixes(c, config.AllowedPathPrefixes...) ||
+			SkippedPathPrefixes(c, config.SkippedPathPrefixes...) {
 			c.Next()
 			return
 		}

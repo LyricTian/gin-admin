@@ -123,7 +123,7 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 		return nil, err
 	}
 
-	userCache := consts.UserCache{RoleIDs: roleIDs}
+	userCache := utils.UserCache{RoleIDs: roleIDs}
 	err = a.Cache.Set(ctx, consts.CacheNSForUser, userID, userCache.String(),
 		time.Duration(config.C.Dictionary.UserCacheExp)*time.Hour)
 	if err != nil {
@@ -263,9 +263,9 @@ func (a *Login) QueryMenus(ctx context.Context) (schema.Menus, error) {
 	}
 
 	// fill parent menus
-	menuIDMapper := menuResult.Data.ToMap()
 	if parentIDs := menuResult.Data.SplitParentIDs(); len(parentIDs) > 0 {
 		var missMenusIDs []string
+		menuIDMapper := menuResult.Data.ToMap()
 		for _, parentID := range parentIDs {
 			if _, ok := menuIDMapper[parentID]; !ok {
 				missMenusIDs = append(missMenusIDs, parentID)

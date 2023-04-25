@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
@@ -10,8 +11,8 @@ import (
 )
 
 type TraceConfig struct {
-	SkippedPathPrefixes []string
 	AllowedPathPrefixes []string
+	SkippedPathPrefixes []string
 	RequestHeaderKey    string
 	ResponseTraceKey    string
 }
@@ -27,15 +28,15 @@ func Trace() gin.HandlerFunc {
 
 func TraceWithConfig(config TraceConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if SkippedPathPrefixes(c, config.SkippedPathPrefixes...) ||
-			!AllowedPathPrefixes(c, config.AllowedPathPrefixes...) {
+		if !AllowedPathPrefixes(c, config.AllowedPathPrefixes...) ||
+			SkippedPathPrefixes(c, config.SkippedPathPrefixes...) {
 			c.Next()
 			return
 		}
 
 		traceID := c.GetHeader(config.RequestHeaderKey)
 		if traceID == "" {
-			traceID = fmt.Sprintf("trace-%s", xid.New().String())
+			traceID = fmt.Sprintf("TRACE-%s", strings.ToUpper(xid.New().String()))
 		}
 
 		ctx := utils.NewTraceID(c.Request.Context(), traceID)

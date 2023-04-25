@@ -7,15 +7,16 @@ import (
 )
 
 type AuthConfig struct {
+	AllowedPathPrefixes []string
 	SkippedPathPrefixes []string
 	Skipper             func(c *gin.Context) bool
-	DefaultUserID       func(c *gin.Context) string
 	ParseUserID         func(c *gin.Context) (string, error)
 }
 
 func AuthWithConfig(config AuthConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if SkippedPathPrefixes(c, config.SkippedPathPrefixes...) ||
+		if !AllowedPathPrefixes(c, config.AllowedPathPrefixes...) ||
+			SkippedPathPrefixes(c, config.SkippedPathPrefixes...) ||
 			(config.Skipper != nil && config.Skipper(c)) {
 			c.Next()
 			return
@@ -28,9 +29,6 @@ func AuthWithConfig(config AuthConfig) gin.HandlerFunc {
 		}
 
 		ctx := utils.NewUserID(c.Request.Context(), userID)
-		if userID == config.DefaultUserID(c) {
-			ctx = utils.NewIsRootUser(ctx)
-		}
 		ctx = logging.NewUserID(ctx, userID)
 		c.Request = c.Request.WithContext(ctx)
 		c.Next()

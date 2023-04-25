@@ -83,7 +83,7 @@ func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.R
 				return err
 			}
 		}
-		return nil
+		return a.syncToCasbin(ctx)
 	})
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (a *Role) Update(ctx context.Context, id string, formItem *schema.RoleForm)
 				return err
 			}
 		}
-		return nil
+		return a.syncToCasbin(ctx)
 	})
 }
 
@@ -148,7 +148,10 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 			return err
 		}
 
-		// Set role deleted cache for reload casbin
-		return a.Cache.Set(ctx, consts.CacheNSForRole, consts.CacheKeyForRoleDeleted, fmt.Sprintf("%d", time.Now().Unix()))
+		return a.syncToCasbin(ctx)
 	})
+}
+
+func (a *Role) syncToCasbin(ctx context.Context) error {
+	return a.Cache.Set(ctx, consts.CacheNSForRole, consts.CacheKeyForSyncToCasbin, fmt.Sprintf("%d", time.Now().Unix()))
 }

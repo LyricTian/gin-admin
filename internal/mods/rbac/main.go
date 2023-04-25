@@ -15,6 +15,7 @@ type RBAC struct {
 	RoleAPI  *api.Role
 	UserAPI  *api.User
 	LoginAPI *api.Login
+	Casbinx  *Casbinx
 }
 
 func (a *RBAC) AutoMigrate(ctx context.Context) error {
@@ -32,15 +33,18 @@ func (a *RBAC) Init(ctx context.Context) error {
 	if err := a.AutoMigrate(ctx); err != nil {
 		return err
 	}
+	if err := a.Casbinx.Load(ctx); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error {
-	login := v1.Group("login")
+	auth := v1.Group("auth")
 	{
-		login.GET("verify", a.LoginAPI.GetVerify)
-		login.GET("captcha", a.LoginAPI.ResCaptcha)
-		login.POST("", a.LoginAPI.Login)
+		auth.GET("verify", a.LoginAPI.GetVerify)
+		auth.GET("captcha", a.LoginAPI.ResCaptcha)
+		auth.POST("login", a.LoginAPI.Login)
 	}
 	current := v1.Group("current")
 	{
@@ -74,6 +78,13 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		user.PUT("", a.UserAPI.Update)
 		user.DELETE(":id", a.UserAPI.Delete)
 		user.PATCH(":id/reset-pwd", a.UserAPI.ResetPassword)
+	}
+	return nil
+}
+
+func (a *RBAC) Release(ctx context.Context) error {
+	if err := a.Casbinx.Release(ctx); err != nil {
+		return err
 	}
 	return nil
 }

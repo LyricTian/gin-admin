@@ -26,7 +26,6 @@ func (a *Mods) Init(ctx context.Context) error {
 	if err := a.RBAC.Init(ctx); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -44,5 +43,12 @@ func (a *Mods) RegisterRouters(ctx context.Context, e *gin.Engine) error {
 		return err
 	}
 
+	return nil
+}
+
+func (a *Mods) Release(ctx context.Context) error {
+	if err := a.RBAC.Release(ctx); err != nil {
+		return err
+	}
 	return nil
 }

@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"sync"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/pelletier/go-toml"
+	"github.com/pelletier/go-toml/v2"
 )
 
 var (
@@ -15,14 +16,14 @@ var (
 
 func MustLoad(name string) {
 	once.Do(func() {
-		tree, err := toml.LoadFile(name)
+		buf, err := os.ReadFile(name)
 		if err != nil {
 			panic(fmt.Sprintf("Failed to load config file %s: %s", name, err.Error()))
 		}
-		if err = tree.Unmarshal(C); err != nil {
+		if err := toml.Unmarshal(buf, C); err != nil {
 			panic(fmt.Sprintf("Failed to unmarshal config %s: %s", name, err.Error()))
 		}
-		if err = C.PreLoad(); err != nil {
+		if err := C.PreLoad(); err != nil {
 			panic(fmt.Sprintf("Failed to preload config %s: %s", name, err.Error()))
 		}
 	})
@@ -175,8 +176,10 @@ type Middleware struct {
 	Casbin struct {
 		Disable             bool
 		SkippedPathPrefixes []string
+		LoadThread          int    `default:"2"`
 		AutoLoadInterval    int    `default:"3"` // seconds
 		ModelFile           string `default:"rbac_model.conf"`
+		GenPolicyFile       string `default:"gen_rbac_policy.csv"`
 	}
 	Static struct {
 		Dir string // Static files directory (From command arguments)
@@ -219,10 +222,17 @@ func (c *Config) PreLoad() error {
 	if addr := c.Storage.Cache.Redis.Addr; addr != "" {
 		username := c.Storage.Cache.Redis.Username
 		password := c.Storage.Cache.Redis.Password
-		if c.Middleware.RateLimiter.Store.Redis.Addr == "" {
+		if c.Middleware.RateLimiter.Store.Type == "redis" &&
+			c.Middleware.RateLimiter.Store.Redis.Addr == "" {
 			c.Middleware.RateLimiter.Store.Redis.Addr = addr
 			c.Middleware.RateLimiter.Store.Redis.Username = username
 			c.Middleware.RateLimiter.Store.Redis.Password = password
+		}
+		if c.Middleware.Auth.Store.Type == "redis" &&
+			c.Middleware.Auth.Store.Redis.Addr == "" {
+			c.Middleware.Auth.Store.Redis.Addr = addr
+			c.Middleware.Auth.Store.Redis.Username = username
+			c.Middleware.Auth.Store.Redis.Password = password
 		}
 	}
 	return nil

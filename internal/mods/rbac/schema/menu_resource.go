@@ -23,7 +23,8 @@ func (a MenuResource) TableName() string {
 // Defining the query parameters for the `MenuResource` struct.
 type MenuResourceQueryParam struct {
 	utils.PaginationParam
-	MenuID string `form:"-"` // From Menu.ID
+	MenuID  string   `form:"-"` // From Menu.ID
+	MenuIDs []string `form:"-"` // From Menu.ID
 }
 
 // Defining the query options for the `MenuResource` struct.
