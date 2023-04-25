@@ -13,10 +13,9 @@ func StartCmd() *cli.Command {
 		Usage: "Start server",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "dir",
-				Aliases: []string{"d"},
-				Usage:   "Configurations directory",
-				Value:   "configs",
+				Name:  "configdir",
+				Usage: "Configurations directory",
+				Value: "configs",
 			},
 			&cli.StringFlag{
 				Name:    "config",
@@ -25,9 +24,8 @@ func StartCmd() *cli.Command {
 				Value:   "config.toml",
 			},
 			&cli.StringFlag{
-				Name:    "static",
-				Aliases: []string{"s"},
-				Usage:   "Static files directory",
+				Name:  "staticdir",
+				Usage: "Static files directory",
 			},
 			&cli.BoolFlag{
 				Name:    "daemon",
@@ -37,9 +35,9 @@ func StartCmd() *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			err := bootstrap.Run(context.Background(), bootstrap.RunConfig{
-				ConfigDir:  c.String("dir"),
+				ConfigDir:  c.String("configdir"),
 				ConfigFile: c.String("config"),
-				StaticDir:  c.String("static"),
+				StaticDir:  c.String("staticdir"),
 				Daemon:     c.Bool("daemon"),
 			})
 			if err != nil {

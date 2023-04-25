@@ -11,12 +11,13 @@ GIT_HASH        = $(shell git rev-parse --short HEAD)
 RELEASE_TAG     = $(RELEASE_VERSION).$(GIT_COUNT).$(GIT_HASH)
 
 CONFIG_DIR      = ./configs
+CONFIG_FILE     = config.toml
 STATIC_DIR      = ./build/dist
 
 all: start
 
 start:
-	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" main.go start -c $(CONFIG_DIR) -s $(STATIC_DIR)
+	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" main.go start --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR)
 
 build:
 	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)
@@ -37,10 +38,10 @@ clean:
 	rm -rf data $(SERVER_BIN)
 
 serve: build
-	./$(SERVER_BIN) start -c $(CONFIG_DIR) -s $(STATIC_DIR)
+	./$(SERVER_BIN) start --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR)
 
 serve-d: build
-	./$(SERVER_BIN) start -c $(CONFIG_DIR) -s $(STATIC_DIR) -d
+	./$(SERVER_BIN) start --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR) -d
 
 stop:
 	./$(SERVER_BIN) stop

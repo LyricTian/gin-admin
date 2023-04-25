@@ -39,7 +39,7 @@ func Run(ctx context.Context, cfg RunConfig) error {
 			return err
 		}
 
-		command := exec.Command(bin, "start", "--config", cfgDir, "--static", staticDir)
+		command := exec.Command(bin, "start", "--configdir", cfgDir, "--config", cfg.ConfigFile, "--staticdir", staticDir)
 		err = command.Start()
 		if err != nil {
 			os.Stderr.WriteString(fmt.Sprintf("Failed to start daemon thread: %s", err.Error()))

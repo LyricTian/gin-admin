@@ -42,11 +42,11 @@ type HookHandlerFunc func(ctx context.Context, hookCfg *HookConfig) (*Hook, erro
 
 func LoadConfigFromToml(filename string) (*LoggerConfig, error) {
 	cfg := &Config{}
-	tree, err := toml.LoadFile(filename)
+	buf, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	if err = tree.Unmarshal(cfg); err != nil {
+	if err := toml.Unmarshal(buf, cfg); err != nil {
 		return nil, err
 	}
 	return &cfg.Logger, nil

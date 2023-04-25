@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/pelletier/go-toml/v2"
+	"github.com/pelletier/go-toml"
 )
 
 var (
@@ -59,7 +59,7 @@ type General struct {
 		Name     string `default:"Administrator"`
 		Password string
 	}
-	LoggerConfigFile string `default:"logger.toml"`
+	LoggerConfigFile string `default:"logging.toml"`
 	MenuYamlFile     string `default:"menu.yaml"`
 	ConfigDir        string // From command arguments
 }
