@@ -63,6 +63,12 @@ func (a *Role) Get(ctx context.Context, id string) (*schema.Role, error) {
 
 // Create a new role in the data access object.
 func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.Role, error) {
+	if exists, err := a.RoleDAL.ExistsCode(ctx, formItem.Code); err != nil {
+		return nil, err
+	} else if exists {
+		return nil, errors.BadRequest("", "Role code already exists")
+	}
+
 	role := &schema.Role{
 		ID:        idx.NewXID(),
 		CreatedAt: time.Now(),
@@ -98,7 +104,14 @@ func (a *Role) Update(ctx context.Context, id string, formItem *schema.RoleForm)
 		return err
 	} else if role == nil {
 		return errors.NotFound("", "Role not found")
+	} else if role.Code != formItem.Code {
+		if exists, err := a.RoleDAL.ExistsCode(ctx, formItem.Code); err != nil {
+			return err
+		} else if exists {
+			return errors.BadRequest("", "Role code already exists")
+		}
 	}
+
 	if err := formItem.FillTo(role); err != nil {
 		return err
 	}

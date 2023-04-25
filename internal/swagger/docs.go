@@ -1317,7 +1317,7 @@ const docTemplate = `{
                     }
                 },
                 "code": {
-                    "description": "Code of menu",
+                    "description": "Code of menu (unique for each level)",
                     "type": "string"
                 },
                 "created_at": {
@@ -1387,7 +1387,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "code": {
-                    "description": "Code of menu",
+                    "description": "Code of menu (unique for each level)",
                     "type": "string",
                     "maxLength": 32
                 },
@@ -1474,6 +1474,10 @@ const docTemplate = `{
         "schema.Role": {
             "type": "object",
             "properties": {
+                "code": {
+                    "description": "Code of role (unique)",
+                    "type": "string"
+                },
                 "created_at": {
                     "description": "Create time",
                     "type": "string"
@@ -1514,10 +1518,16 @@ const docTemplate = `{
         "schema.RoleForm": {
             "type": "object",
             "required": [
+                "code",
                 "name",
                 "status"
             ],
             "properties": {
+                "code": {
+                    "description": "Code of role (unique)",
+                    "type": "string",
+                    "maxLength": 32
+                },
                 "description": {
                     "description": "Details about role",
                     "type": "string"

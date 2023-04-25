@@ -76,6 +76,11 @@ func (a *Role) Exists(ctx context.Context, id string) (bool, error) {
 	return ok, errors.WithStack(err)
 }
 
+func (a *Role) ExistsCode(ctx context.Context, code string) (bool, error) {
+	ok, err := utils.Exists(ctx, GetRoleDB(ctx, a.DB).Where("code=?", code))
+	return ok, errors.WithStack(err)
+}
+
 // Create a new role.
 func (a *Role) Create(ctx context.Context, item *schema.Role) error {
 	result := GetRoleDB(ctx, a.DB).Create(item)

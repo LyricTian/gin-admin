@@ -14,6 +14,7 @@ const (
 // Role management for RBAC
 type Role struct {
 	ID          string    `json:"id" gorm:"size:20;primarykey;"` // Unique ID
+	Code        string    `json:"code" gorm:"size:32;index;"`    // Code of role (unique)
 	Name        string    `json:"name" gorm:"size:128;index"`    // Display name of role
 	Description string    `json:"description" gorm:"size:1024"`  // Details about role
 	Sequence    int       `json:"sequence"`                      // Sequence for sorting
@@ -52,6 +53,7 @@ type Roles []*Role
 
 // Defining the data structure for creating a `Role` struct.
 type RoleForm struct {
+	Code        string    `json:"code" binding:"required,max=32"`                   // Code of role (unique)
 	Name        string    `json:"name" binding:"required,max=128"`                  // Display name of role
 	Description string    `json:"description"`                                      // Details about role
 	Sequence    int       `json:"sequence"`                                         // Sequence for sorting
@@ -65,6 +67,7 @@ func (a *RoleForm) Validate() error {
 }
 
 func (a *RoleForm) FillTo(role *Role) error {
+	role.Code = a.Code
 	role.Name = a.Name
 	role.Description = a.Description
 	role.Sequence = a.Sequence

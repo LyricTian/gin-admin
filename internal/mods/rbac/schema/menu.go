@@ -22,10 +22,10 @@ var (
 // Menu management for RBAC
 type Menu struct {
 	ID          string        `json:"id" gorm:"size:20;primarykey;"`      // Unique ID
-	Code        string        `json:"code" gorm:"size:32;"`               // Code of menu
+	Code        string        `json:"code" gorm:"size:32;index;"`         // Code of menu (unique for each level)
 	Name        string        `json:"name" gorm:"size:128;index"`         // Display name of menu
 	Description string        `json:"description" gorm:"size:1024"`       // Details about menu
-	Sequence    int           `json:"sequence"`                           // Sequence for sorting
+	Sequence    int           `json:"sequence" gorm:"index;"`             // Sequence for sorting
 	Type        string        `json:"type" gorm:"size:20;index"`          // Type of menu (group, page, button)
 	Path        string        `json:"path" gorm:"size:255;"`              // Access path of menu
 	Properties  string        `json:"properties" gorm:"type:text;"`       // Properties of menu (JSON)
@@ -137,7 +137,7 @@ func (a Menus) ToTree() Menus {
 
 // Defining the data structure for creating a `Menu` struct.
 type MenuForm struct {
-	Code        string        `json:"code" binding:"required,max=32"`                   // Code of menu
+	Code        string        `json:"code" binding:"required,max=32"`                   // Code of menu (unique for each level)
 	Name        string        `json:"name" binding:"required,max=128"`                  // Display name of menu
 	Description string        `json:"description"`                                      // Details about menu
 	Sequence    int           `json:"sequence"`                                         // Sequence for sorting

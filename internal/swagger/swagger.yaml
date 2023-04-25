@@ -56,7 +56,7 @@ definitions:
           $ref: '#/definitions/schema.Menu'
         type: array
       code:
-        description: Code of menu
+        description: Code of menu (unique for each level)
         type: string
       created_at:
         description: Create time
@@ -103,7 +103,7 @@ definitions:
   schema.MenuForm:
     properties:
       code:
-        description: Code of menu
+        description: Code of menu (unique for each level)
         maxLength: 32
         type: string
       description:
@@ -172,6 +172,9 @@ definitions:
     type: object
   schema.Role:
     properties:
+      code:
+        description: Code of role (unique)
+        type: string
       created_at:
         description: Create time
         type: string
@@ -201,6 +204,10 @@ definitions:
     type: object
   schema.RoleForm:
     properties:
+      code:
+        description: Code of role (unique)
+        maxLength: 32
+        type: string
       description:
         description: Details about role
         type: string
@@ -223,6 +230,7 @@ definitions:
         - enabled
         type: string
     required:
+    - code
     - name
     - status
     type: object
