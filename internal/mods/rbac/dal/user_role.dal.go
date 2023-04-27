@@ -27,7 +27,7 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 		opt = opts[0]
 	}
 
-	db := a.DB.Table(fmt.Sprintf("%s a", schema.UserRole{}.TableName()))
+	db := a.DB.Table(fmt.Sprintf("%s AS a", schema.UserRole{}.TableName()))
 	if opt.JoinRole {
 		db = db.Joins(fmt.Sprintf("left join %s b on a.role_id=b.id", schema.Role{}.TableName()))
 		db = db.Select("a.*,b.name as role_name")
