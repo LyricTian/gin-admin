@@ -11,7 +11,7 @@ import (
 	"github.com/google/wire"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 func BuildInjector(ctx context.Context) (*Injector, func(), error) {
@@ -19,7 +19,7 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		InitCacher,
 		InitDB,
 		InitAuth,
-		wire.NewSet(wire.Struct(new(utils.Trans), "*")),
+		wire.NewSet(wire.Struct(new(util.Trans), "*")),
 		wire.NewSet(wire.Struct(new(Injector), "*")),
 		mods.Set,
 	) // end

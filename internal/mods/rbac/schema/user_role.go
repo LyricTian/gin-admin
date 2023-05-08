@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 // User roles for RBAC
@@ -22,7 +22,7 @@ func (a UserRole) TableName() string {
 
 // Defining the query parameters for the `UserRole` struct.
 type UserRoleQueryParam struct {
-	utils.PaginationParam
+	util.PaginationParam
 	InUserIDs []string `form:"-"` // From User.ID
 	UserID    string   `form:"-"` // From User.ID
 	RoleID    string   `form:"-"` // From Role.ID
@@ -30,14 +30,14 @@ type UserRoleQueryParam struct {
 
 // Defining the query options for the `UserRole` struct.
 type UserRoleQueryOptions struct {
-	utils.QueryOptions
+	util.QueryOptions
 	JoinRole bool // Join role table
 }
 
 // Defining the query result for the `UserRole` struct.
 type UserRoleQueryResult struct {
 	Data       UserRoles
-	PageResult *utils.PaginationResult
+	PageResult *util.PaginationResult
 }
 
 // Defining the slice of `UserRole` struct.

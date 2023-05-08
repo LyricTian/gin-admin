@@ -13,7 +13,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/api"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/biz"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 // Injectors from wire.go:
@@ -34,7 +34,7 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	trans := &utils.Trans{
+	trans := &util.Trans{
 		DB: db,
 	}
 	menu := &dal.Menu{

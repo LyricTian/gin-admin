@@ -1,8 +1,8 @@
-package middlewares
+package middleware
 
 import (
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,11 +24,11 @@ func AuthWithConfig(config AuthConfig) gin.HandlerFunc {
 
 		userID, err := config.ParseUserID(c)
 		if err != nil {
-			utils.ResError(c, err)
+			util.ResError(c, err)
 			return
 		}
 
-		ctx := utils.NewUserID(c.Request.Context(), userID)
+		ctx := util.NewUserID(c.Request.Context(), userID)
 		ctx = logging.NewUserID(ctx, userID)
 		c.Request = c.Request.WithContext(ctx)
 		c.Next()

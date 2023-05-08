@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"gorm.io/gorm"
 )
 
 // Get user storage instance
 func GetUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return utils.GetDB(ctx, defDB).Model(new(schema.User))
+	return util.GetDB(ctx, defDB).Model(new(schema.User))
 }
 
 // User management for RBAC
@@ -38,7 +38,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 	}
 
 	var list schema.Users
-	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
+	pageResult, err := util.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -58,7 +58,7 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 	}
 
 	item := new(schema.User)
-	ok, err := utils.FindOne(ctx, GetUserDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
+	ok, err := util.FindOne(ctx, GetUserDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -74,7 +74,7 @@ func (a *User) GetByUsername(ctx context.Context, username string, opts ...schem
 	}
 
 	item := new(schema.User)
-	ok, err := utils.FindOne(ctx, GetUserDB(ctx, a.DB).Where("username=?", username), opt.QueryOptions, item)
+	ok, err := util.FindOne(ctx, GetUserDB(ctx, a.DB).Where("username=?", username), opt.QueryOptions, item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -85,12 +85,12 @@ func (a *User) GetByUsername(ctx context.Context, username string, opts ...schem
 
 // Exist checks if the specified user exists in the database.
 func (a *User) Exists(ctx context.Context, id string) (bool, error) {
-	ok, err := utils.Exists(ctx, GetUserDB(ctx, a.DB).Where("id=?", id))
+	ok, err := util.Exists(ctx, GetUserDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
 }
 
 func (a *User) ExistsUsername(ctx context.Context, username string) (bool, error) {
-	ok, err := utils.Exists(ctx, GetUserDB(ctx, a.DB).Where("username=?", username))
+	ok, err := util.Exists(ctx, GetUserDB(ctx, a.DB).Where("username=?", username))
 	return ok, errors.WithStack(err)
 }
 

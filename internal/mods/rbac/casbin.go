@@ -13,12 +13,11 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/consts"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"github.com/casbin/casbin/v2"
 	"go.uber.org/zap"
 )
@@ -63,7 +62,7 @@ func (a *Casbinx) load(ctx context.Context) error {
 	roleResult, err := a.RoleDAL.Query(ctx, schema.RoleQueryParam{
 		Status: schema.RoleStatusEnabled,
 	}, schema.RoleQueryOptions{
-		QueryOptions: utils.QueryOptions{SelectFields: []string{"id"}},
+		QueryOptions: util.QueryOptions{SelectFields: []string{"id"}},
 	})
 	if err != nil {
 		return err
@@ -144,7 +143,7 @@ func (a *Casbinx) queryRoleResources(ctx context.Context, roleID string) (schema
 		RoleID: roleID,
 		Status: schema.MenuStatusEnabled,
 	}, schema.MenuQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			SelectFields: []string{"id", "parent_id", "parent_path"},
 		},
 	})
@@ -163,7 +162,7 @@ func (a *Casbinx) queryRoleResources(ctx context.Context, roleID string) (schema
 		menuIDs = append(menuIDs, item.ID)
 		menuIDMapper[item.ID] = struct{}{}
 		if pp := item.ParentPath; pp != "" {
-			for _, pid := range strings.Split(pp, utils.TreePathDelimiter) {
+			for _, pid := range strings.Split(pp, util.TreePathDelimiter) {
 				if pid == "" {
 					continue
 				}
@@ -190,9 +189,9 @@ func (a *Casbinx) autoLoad(ctx context.Context) {
 	var lastUpdated int64
 	a.ticker = time.NewTicker(time.Duration(config.C.Middleware.Casbin.AutoLoadInterval) * time.Second)
 	for range a.ticker.C {
-		val, ok, err := a.Cache.Get(ctx, consts.CacheNSForRole, consts.CacheKeyForSyncToCasbin)
+		val, ok, err := a.Cache.Get(ctx, config.CacheNSForRole, config.CacheKeyForSyncToCasbin)
 		if err != nil {
-			logging.Context(ctx).Error("Failed to get cache", zap.Error(err), zap.String("key", consts.CacheKeyForSyncToCasbin))
+			logging.Context(ctx).Error("Failed to get cache", zap.Error(err), zap.String("key", config.CacheKeyForSyncToCasbin))
 			continue
 		} else if !ok {
 			continue

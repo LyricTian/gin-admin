@@ -5,19 +5,18 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/consts"
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
-	"github.com/LyricTian/gin-admin/v10/pkg/idx"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 // Role management for RBAC
 type Role struct {
 	Cache       cachex.Cacher
-	Trans       *utils.Trans
+	Trans       *util.Trans
 	RoleDAL     *dal.Role
 	RoleMenuDAL *dal.RoleMenu
 	UserRoleDAL *dal.UserRole
@@ -28,10 +27,10 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam) (*schema
 	params.Pagination = false
 
 	result, err := a.RoleDAL.Query(ctx, params, schema.RoleQueryOptions{
-		QueryOptions: utils.QueryOptions{
-			OrderFields: []utils.OrderByParam{
-				{Field: "sequence", Direction: utils.DESC},
-				{Field: "created_at", Direction: utils.DESC},
+		QueryOptions: util.QueryOptions{
+			OrderFields: []util.OrderByParam{
+				{Field: "sequence", Direction: util.DESC},
+				{Field: "created_at", Direction: util.DESC},
 			},
 		},
 	})
@@ -70,7 +69,7 @@ func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.R
 	}
 
 	role := &schema.Role{
-		ID:        idx.NewXID(),
+		ID:        util.NewXID(),
 		CreatedAt: time.Now(),
 	}
 	if err := formItem.FillTo(role); err != nil {
@@ -82,7 +81,7 @@ func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.R
 			return err
 		}
 		for _, roleMenu := range formItem.Menus {
-			roleMenu.ID = idx.NewXID()
+			roleMenu.ID = util.NewXID()
 			roleMenu.RoleID = role.ID
 			roleMenu.CreatedAt = time.Now()
 			if err := a.RoleMenuDAL.Create(ctx, roleMenu); err != nil {
@@ -126,7 +125,7 @@ func (a *Role) Update(ctx context.Context, id string, formItem *schema.RoleForm)
 		}
 		for _, roleMenu := range formItem.Menus {
 			if roleMenu.ID == "" {
-				roleMenu.ID = idx.NewXID()
+				roleMenu.ID = util.NewXID()
 			}
 			roleMenu.RoleID = role.ID
 			if roleMenu.CreatedAt.IsZero() {
@@ -166,5 +165,5 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 }
 
 func (a *Role) syncToCasbin(ctx context.Context) error {
-	return a.Cache.Set(ctx, consts.CacheNSForRole, consts.CacheKeyForSyncToCasbin, fmt.Sprintf("%d", time.Now().Unix()))
+	return a.Cache.Set(ctx, config.CacheNSForRole, config.CacheKeyForSyncToCasbin, fmt.Sprintf("%d", time.Now().Unix()))
 }

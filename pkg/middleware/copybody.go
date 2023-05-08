@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"bytes"
@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,14 +53,14 @@ func CopyBodyWithConfig(config CopyBodyConfig) gin.HandlerFunc {
 		}
 
 		if err != nil {
-			utils.ResError(c, errors.RequestEntityTooLarge("", "Request body too large, limit %d byte", config.MaxContentLen))
+			util.ResError(c, errors.RequestEntityTooLarge("", "Request body too large, limit %d byte", config.MaxContentLen))
 			return
 		}
 
 		c.Request.Body.Close()
 		bf := bytes.NewBuffer(requestBody)
 		c.Request.Body = io.NopCloser(bf)
-		c.Set(utils.RequestBodyKey, requestBody)
+		c.Set(util.ReqBodyKey, requestBody)
 		c.Next()
 	}
 }

@@ -1,12 +1,12 @@
-package middlewares
+package middleware
 
 import (
 	"context"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redis_rate/v9"
@@ -53,7 +53,7 @@ func RateLimiterWithConfig(config RateLimiterConfig) gin.HandlerFunc {
 		)
 
 		ctx := c.Request.Context()
-		if userID := utils.FromUserID(ctx); userID != "" {
+		if userID := util.FromUserID(ctx); userID != "" {
 			allowed, err = store.Allow(ctx, userID, time.Second*time.Duration(config.Period), config.MaxRequestsPerUser)
 		} else {
 			allowed, err = store.Allow(ctx, c.ClientIP(), time.Second*time.Duration(config.Period), config.MaxRequestsPerIP)
@@ -61,11 +61,11 @@ func RateLimiterWithConfig(config RateLimiterConfig) gin.HandlerFunc {
 
 		if err != nil {
 			logging.Context(ctx).Error("Rate limiter middleware error", zap.Error(err))
-			utils.ResError(c, errors.InternalServerError("", "Internal server error, please try again later."))
+			util.ResError(c, errors.InternalServerError("", "Internal server error, please try again later."))
 		} else if allowed {
 			c.Next()
 		} else {
-			utils.ResError(c, errors.TooManyRequests("", "Too many requests, please try again later."))
+			util.ResError(c, errors.TooManyRequests("", "Too many requests, please try again later."))
 		}
 	}
 }

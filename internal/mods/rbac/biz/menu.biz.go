@@ -8,14 +8,13 @@ import (
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
-	"github.com/LyricTian/gin-admin/v10/pkg/idx"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 // Menu management for RBAC
 type Menu struct {
-	Trans           *utils.Trans
+	Trans           *util.Trans
 	MenuDAL         *dal.Menu
 	MenuResourceDAL *dal.MenuResource
 	RoleMenuDAL     *dal.RoleMenu
@@ -26,7 +25,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema
 	params.Pagination = false
 
 	result, err := a.MenuDAL.Query(ctx, params, schema.MenuQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			OrderFields: schema.MenusOrderParams,
 		},
 	})
@@ -61,7 +60,7 @@ func (a *Menu) appendChildren(ctx context.Context, data schema.Menus) (schema.Me
 
 	for _, item := range data {
 		childResult, err := a.MenuDAL.Query(ctx, schema.MenuQueryParam{
-			ParentPathPrefix: item.ParentPath + item.ID + utils.TreePathDelimiter,
+			ParentPathPrefix: item.ParentPath + item.ID + util.TreePathDelimiter,
 		})
 		if err != nil {
 			return nil, err
@@ -116,7 +115,7 @@ func (a *Menu) Get(ctx context.Context, id string) (*schema.Menu, error) {
 // Create a new menu in the data access object.
 func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.Menu, error) {
 	menu := &schema.Menu{
-		ID:        idx.NewXID(),
+		ID:        util.NewXID(),
 		CreatedAt: time.Now(),
 	}
 
@@ -127,7 +126,7 @@ func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.M
 		} else if parent == nil {
 			return nil, errors.NotFound("", "Parent not found")
 		}
-		menu.ParentPath = parent.ParentPath + parent.ID + utils.TreePathDelimiter
+		menu.ParentPath = parent.ParentPath + parent.ID + util.TreePathDelimiter
 	}
 
 	if exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, menu.Code, menu.ParentID); err != nil {
@@ -146,7 +145,7 @@ func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.M
 		}
 
 		for _, res := range formItem.Resources {
-			res.ID = idx.NewXID()
+			res.ID = util.NewXID()
 			res.MenuID = menu.ID
 			res.CreatedAt = time.Now()
 			if err := a.MenuResourceDAL.Create(ctx, res); err != nil {
@@ -182,15 +181,15 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 			} else if parent == nil {
 				return errors.NotFound("", "Parent not found")
 			}
-			menu.ParentPath = parent.ParentPath + parent.ID + utils.TreePathDelimiter
+			menu.ParentPath = parent.ParentPath + parent.ID + util.TreePathDelimiter
 		} else {
 			menu.ParentPath = ""
 		}
 
 		childResult, err := a.MenuDAL.Query(ctx, schema.MenuQueryParam{
-			ParentPathPrefix: oldParentPath + menu.ID + utils.TreePathDelimiter,
+			ParentPathPrefix: oldParentPath + menu.ID + util.TreePathDelimiter,
 		}, schema.MenuQueryOptions{
-			QueryOptions: utils.QueryOptions{
+			QueryOptions: util.QueryOptions{
 				SelectFields: []string{"id", "parent_path"},
 			},
 		})
@@ -214,15 +213,15 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if oldStatus != formItem.Status {
-			opath := oldParentPath + menu.ID + utils.TreePathDelimiter
+			opath := oldParentPath + menu.ID + util.TreePathDelimiter
 			if err := a.MenuDAL.UpdateStatusByParentPath(ctx, opath, formItem.Status); err != nil {
 				return err
 			}
 		}
 
 		for _, child := range childData {
-			opath := oldParentPath + menu.ID + utils.TreePathDelimiter
-			npath := menu.ParentPath + menu.ID + utils.TreePathDelimiter
+			opath := oldParentPath + menu.ID + util.TreePathDelimiter
+			npath := menu.ParentPath + menu.ID + util.TreePathDelimiter
 			err := a.MenuDAL.UpdateParentPath(ctx, child.ID, strings.Replace(child.ParentPath, opath, npath, 1))
 			if err != nil {
 				return err
@@ -238,7 +237,7 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 		}
 		for _, res := range formItem.Resources {
 			if res.ID == "" {
-				res.ID = idx.NewXID()
+				res.ID = util.NewXID()
 			}
 			res.MenuID = id
 			if res.CreatedAt.IsZero() {
@@ -264,9 +263,9 @@ func (a *Menu) Delete(ctx context.Context, id string) error {
 	}
 
 	childResult, err := a.MenuDAL.Query(ctx, schema.MenuQueryParam{
-		ParentPathPrefix: menu.ParentPath + menu.ID + utils.TreePathDelimiter,
+		ParentPathPrefix: menu.ParentPath + menu.ID + util.TreePathDelimiter,
 	}, schema.MenuQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			SelectFields: []string{"id"},
 		},
 	})

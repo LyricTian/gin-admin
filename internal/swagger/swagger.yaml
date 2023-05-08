@@ -363,7 +363,7 @@ definitions:
         description: From User.ID
         type: string
     type: object
-  utils.ResponseResult:
+  util.ResponseResult:
     properties:
       data: {}
       error:
@@ -400,7 +400,7 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       summary: Response captcha image
       tags:
       - LoginAPI
@@ -418,7 +418,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.LoginToken'
@@ -426,11 +426,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       summary: Login system with username and password
       tags:
       - LoginAPI
@@ -441,7 +441,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.LoginVerify'
@@ -455,11 +455,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Logout system
@@ -472,7 +472,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   items:
@@ -482,11 +482,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Query current user menus based on the current user role
@@ -505,19 +505,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Change current user password
@@ -530,7 +530,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.LoginToken'
@@ -538,11 +538,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Refresh current access token
@@ -555,7 +555,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.User'
@@ -563,11 +563,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Get current user info
@@ -585,7 +585,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   items:
@@ -595,11 +595,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Query menu list
@@ -618,7 +618,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.Menu'
@@ -626,15 +626,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Create menu record
@@ -652,15 +652,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Delete menu record by ID
@@ -678,7 +678,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.Menu'
@@ -686,11 +686,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Get menu record by ID
@@ -713,19 +713,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Update menu record by ID
@@ -759,7 +759,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   items:
@@ -769,11 +769,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Query role list
@@ -792,7 +792,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.Role'
@@ -800,15 +800,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Create role record
@@ -826,15 +826,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Delete role record by ID
@@ -852,7 +852,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.Role'
@@ -860,11 +860,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Get role record by ID
@@ -887,19 +887,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Update role record by ID
@@ -937,7 +937,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   items:
@@ -947,11 +947,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Query user list
@@ -970,7 +970,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.User'
@@ -978,15 +978,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Create user record
@@ -1004,15 +1004,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Delete user record by ID
@@ -1030,7 +1030,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseResult'
+            - $ref: '#/definitions/util.ResponseResult'
             - properties:
                 data:
                   $ref: '#/definitions/schema.User'
@@ -1038,11 +1038,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Get user record by ID
@@ -1065,19 +1065,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Update user record by ID
@@ -1095,15 +1095,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.ResponseResult'
+            $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
       summary: Reset user password by ID

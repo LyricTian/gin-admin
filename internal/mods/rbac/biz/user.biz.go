@@ -5,20 +5,18 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/consts"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
 	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
-	"github.com/LyricTian/gin-admin/v10/pkg/idx"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 // User management for RBAC
 type User struct {
 	Cache       cachex.Cacher
-	Trans       *utils.Trans
+	Trans       *util.Trans
 	UserDAL     *dal.User
 	UserRoleDAL *dal.UserRole
 }
@@ -28,9 +26,9 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam) (*schema
 	params.Pagination = true
 
 	result, err := a.UserDAL.Query(ctx, params, schema.UserQueryOptions{
-		QueryOptions: utils.QueryOptions{
-			OrderFields: []utils.OrderByParam{
-				{Field: "created_at", Direction: utils.DESC},
+		QueryOptions: util.QueryOptions{
+			OrderFields: []util.OrderByParam{
+				{Field: "created_at", Direction: util.DESC},
 			},
 			OmitFields: []string{"password"},
 		},
@@ -60,7 +58,7 @@ func (a *User) Query(ctx context.Context, params schema.UserQueryParam) (*schema
 // Get the specified user from the data access object.
 func (a *User) Get(ctx context.Context, id string) (*schema.User, error) {
 	user, err := a.UserDAL.Get(ctx, id, schema.UserQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			OmitFields: []string{"password"},
 		},
 	})
@@ -91,7 +89,7 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 	}
 
 	user := &schema.User{
-		ID:        idx.NewXID(),
+		ID:        util.NewXID(),
 		CreatedAt: time.Now(),
 	}
 
@@ -108,7 +106,7 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 			return err
 		}
 		for _, userRole := range formItem.Roles {
-			userRole.ID = idx.NewXID()
+			userRole.ID = util.NewXID()
 			userRole.UserID = user.ID
 			userRole.CreatedAt = time.Now()
 			if err := a.UserRoleDAL.Create(ctx, userRole); err != nil {
@@ -155,7 +153,7 @@ func (a *User) Update(ctx context.Context, id string, formItem *schema.UserForm)
 		}
 		for _, userRole := range formItem.Roles {
 			if userRole.ID == "" {
-				userRole.ID = idx.NewXID()
+				userRole.ID = util.NewXID()
 			}
 			userRole.UserID = user.ID
 			if userRole.CreatedAt.IsZero() {
@@ -167,7 +165,7 @@ func (a *User) Update(ctx context.Context, id string, formItem *schema.UserForm)
 			}
 		}
 
-		return a.Cache.Delete(ctx, consts.CacheNSForUser, id)
+		return a.Cache.Delete(ctx, config.CacheNSForUser, id)
 	})
 }
 
@@ -187,7 +185,7 @@ func (a *User) Delete(ctx context.Context, id string) error {
 		if err := a.UserRoleDAL.DeleteByUserID(ctx, id); err != nil {
 			return err
 		}
-		return a.Cache.Delete(ctx, consts.CacheNSForUser, id)
+		return a.Cache.Delete(ctx, config.CacheNSForUser, id)
 	})
 }
 
@@ -216,7 +214,7 @@ func (a *User) GetRoleIDs(ctx context.Context, id string) ([]string, error) {
 	userRoleResult, err := a.UserRoleDAL.Query(ctx, schema.UserRoleQueryParam{
 		UserID: id,
 	}, schema.UserRoleQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			SelectFields: []string{"role_id"},
 		},
 	})

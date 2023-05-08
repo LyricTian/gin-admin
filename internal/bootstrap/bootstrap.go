@@ -10,9 +10,9 @@ import (
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
 	_ "github.com/LyricTian/gin-admin/v10/internal/swagger"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/internal/wirex"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"go.uber.org/zap"
 )
 
@@ -64,7 +64,7 @@ func Run(ctx context.Context, cfg RunConfig) error {
 		zap.Int("pid", os.Getpid()),
 	)
 
-	return utils.Run(ctx, func(ctx context.Context) (func(), error) {
+	return util.Run(ctx, func(ctx context.Context) (func(), error) {
 		cleanStartFn, err := Start(ctx)
 		if err != nil {
 			return nil, err

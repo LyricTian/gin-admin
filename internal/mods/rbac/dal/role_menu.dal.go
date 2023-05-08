@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"gorm.io/gorm"
 )
 
 // Get role menu storage instance
 func GetRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return utils.GetDB(ctx, defDB).Model(new(schema.RoleMenu))
+	return util.GetDB(ctx, defDB).Model(new(schema.RoleMenu))
 }
 
 // Role permissions for RBAC
@@ -32,7 +32,7 @@ func (a *RoleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 	}
 
 	var list schema.RoleMenus
-	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
+	pageResult, err := util.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -52,7 +52,7 @@ func (a *RoleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQu
 	}
 
 	item := new(schema.RoleMenu)
-	ok, err := utils.FindOne(ctx, GetRoleMenuDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
+	ok, err := util.FindOne(ctx, GetRoleMenuDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -63,7 +63,7 @@ func (a *RoleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQu
 
 // Exist checks if the specified role menu exists in the database.
 func (a *RoleMenu) Exists(ctx context.Context, id string) (bool, error) {
-	ok, err := utils.Exists(ctx, GetRoleMenuDB(ctx, a.DB).Where("id=?", id))
+	ok, err := util.Exists(ctx, GetRoleMenuDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
 }
 

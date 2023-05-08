@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"gorm.io/gorm"
 )
 
 // Get user role storage instance
 func GetUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return utils.GetDB(ctx, defDB).Model(new(schema.UserRole))
+	return util.GetDB(ctx, defDB).Model(new(schema.UserRole))
 }
 
 // User roles for RBAC
@@ -44,7 +44,7 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 	}
 
 	var list schema.UserRoles
-	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
+	pageResult, err := util.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -64,7 +64,7 @@ func (a *UserRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQu
 	}
 
 	item := new(schema.UserRole)
-	ok, err := utils.FindOne(ctx, GetUserRoleDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
+	ok, err := util.FindOne(ctx, GetUserRoleDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -75,7 +75,7 @@ func (a *UserRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQu
 
 // Exist checks if the specified user role exists in the database.
 func (a *UserRole) Exists(ctx context.Context, id string) (bool, error) {
-	ok, err := utils.Exists(ctx, GetUserRoleDB(ctx, a.DB).Where("id=?", id))
+	ok, err := util.Exists(ctx, GetUserRoleDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
 }
 

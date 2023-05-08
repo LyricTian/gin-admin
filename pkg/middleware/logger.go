@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -60,7 +60,7 @@ func LoggerWithConfig(config LoggerConfig) gin.HandlerFunc {
 		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut {
 			mediaType, _, _ := mime.ParseMediaType(contentType)
 			if mediaType == "application/json" {
-				if v, ok := c.Get(utils.RequestBodyKey); ok {
+				if v, ok := c.Get(util.ReqBodyKey); ok {
 					if b, ok := v.([]byte); ok && len(b) <= config.MaxOutputRequestBodyLen {
 						fields = append(fields, zap.String("body", string(b)))
 					}
@@ -74,7 +74,7 @@ func LoggerWithConfig(config LoggerConfig) gin.HandlerFunc {
 		fields = append(fields, zap.String("res_time", time.Now().Format("2006-01-02 15:04:05.999")))
 		fields = append(fields, zap.Int("res_size", c.Writer.Size()))
 
-		if v, ok := c.Get(utils.ResponseBodyKey); ok {
+		if v, ok := c.Get(util.ResBodyKey); ok {
 			if b, ok := v.([]byte); ok && len(b) <= config.MaxOutputResponseBodyLen {
 				fields = append(fields, zap.String("res_body", string(b)))
 			}

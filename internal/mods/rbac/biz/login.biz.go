@@ -8,15 +8,14 @@ import (
 
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/consts"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
 	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/jwtx"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"go.uber.org/zap"
 )
 
@@ -97,7 +96,7 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 
 	// get user info
 	user, err := a.UserDAL.GetByUsername(ctx, formItem.Username, schema.UserQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			SelectFields: []string{"id", "password", "status"},
 		},
 	})
@@ -123,8 +122,8 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 		return nil, err
 	}
 
-	userCache := utils.UserCache{RoleIDs: roleIDs}
-	err = a.Cache.Set(ctx, consts.CacheNSForUser, userID, userCache.String(),
+	userCache := util.UserCache{RoleIDs: roleIDs}
+	err = a.Cache.Set(ctx, config.CacheNSForUser, userID, userCache.String(),
 		time.Duration(config.C.Dictionary.UserCacheExp)*time.Hour)
 	if err != nil {
 		logging.Context(ctx).Error("Failed to set cache", zap.Error(err))
@@ -136,10 +135,10 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 }
 
 func (a *Login) RefreshToken(ctx context.Context) (*schema.LoginToken, error) {
-	userID := utils.FromUserID(ctx)
+	userID := util.FromUserID(ctx)
 
 	user, err := a.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			SelectFields: []string{"status"},
 		},
 	})
@@ -155,7 +154,7 @@ func (a *Login) RefreshToken(ctx context.Context) (*schema.LoginToken, error) {
 }
 
 func (a *Login) Logout(ctx context.Context) error {
-	userToken := utils.FromUserToken(ctx)
+	userToken := util.FromUserToken(ctx)
 	if userToken == "" {
 		return nil
 	}
@@ -165,8 +164,8 @@ func (a *Login) Logout(ctx context.Context) error {
 		return err
 	}
 
-	userID := utils.FromUserID(ctx)
-	err := a.Cache.Delete(ctx, consts.CacheNSForUser, userID)
+	userID := util.FromUserID(ctx)
+	err := a.Cache.Delete(ctx, config.CacheNSForUser, userID)
 	if err != nil {
 		logging.Context(ctx).Error("Failed to delete user cache", zap.Error(err))
 	}
@@ -177,7 +176,7 @@ func (a *Login) Logout(ctx context.Context) error {
 
 // Get user info
 func (a *Login) GetUserInfo(ctx context.Context) (*schema.User, error) {
-	if utils.FromIsRootUser(ctx) {
+	if util.FromIsRootUser(ctx) {
 		return &schema.User{
 			ID:       config.C.General.Root.ID,
 			Username: config.C.General.Root.Username,
@@ -185,9 +184,9 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.User, error) {
 		}, nil
 	}
 
-	userID := utils.FromUserID(ctx)
+	userID := util.FromUserID(ctx)
 	user, err := a.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			OmitFields: []string{"password"},
 		},
 	})
@@ -212,13 +211,13 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.User, error) {
 
 // Change login password
 func (a *Login) UpdatePassword(ctx context.Context, updateItem *schema.UpdateLoginPassword) error {
-	if utils.FromIsRootUser(ctx) {
+	if util.FromIsRootUser(ctx) {
 		return errors.BadRequest("", "Root user cannot change password")
 	}
 
-	userID := utils.FromUserID(ctx)
+	userID := util.FromUserID(ctx)
 	user, err := a.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			SelectFields: []string{"password"},
 		},
 	})
@@ -247,12 +246,12 @@ func (a *Login) QueryMenus(ctx context.Context) (schema.Menus, error) {
 		Status: schema.MenuStatusEnabled,
 	}
 
-	isRoot := utils.FromIsRootUser(ctx)
+	isRoot := util.FromIsRootUser(ctx)
 	if !isRoot {
-		menuQueryParams.UserID = utils.FromUserID(ctx)
+		menuQueryParams.UserID = util.FromUserID(ctx)
 	}
 	menuResult, err := a.MenuDAL.Query(ctx, menuQueryParams, schema.MenuQueryOptions{
-		QueryOptions: utils.QueryOptions{
+		QueryOptions: util.QueryOptions{
 			OrderFields: schema.MenusOrderParams,
 		},
 	})

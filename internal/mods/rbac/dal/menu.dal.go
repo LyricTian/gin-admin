@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"gorm.io/gorm"
 )
 
 // Get menu storage instance
 func GetMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return utils.GetDB(ctx, defDB).Model(new(schema.Menu))
+	return util.GetDB(ctx, defDB).Model(new(schema.Menu))
 }
 
 // Menu management for RBAC
@@ -54,7 +54,7 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	}
 
 	var list schema.Menus
-	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
+	pageResult, err := util.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -74,7 +74,7 @@ func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 	}
 
 	item := new(schema.Menu)
-	ok, err := utils.FindOne(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
+	ok, err := util.FindOne(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -85,13 +85,13 @@ func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 
 // Checks if the specified menu exists in the database.
 func (a *Menu) Exists(ctx context.Context, id string) (bool, error) {
-	ok, err := utils.Exists(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id))
+	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
 }
 
 // Checks if the specified menu code exists under the specified parent ID in the database.
 func (a *Menu) ExistsCodeByParentID(ctx context.Context, parentID, code string) (bool, error) {
-	ok, err := utils.Exists(ctx, GetMenuDB(ctx, a.DB).Where("parent_id=? AND code=?", parentID, code))
+	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("parent_id=? AND code=?", parentID, code))
 	return ok, errors.WithStack(err)
 }
 

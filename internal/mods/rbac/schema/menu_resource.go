@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 // Menu resource management for RBAC
@@ -22,20 +22,20 @@ func (a MenuResource) TableName() string {
 
 // Defining the query parameters for the `MenuResource` struct.
 type MenuResourceQueryParam struct {
-	utils.PaginationParam
+	util.PaginationParam
 	MenuID  string   `form:"-"` // From Menu.ID
 	MenuIDs []string `form:"-"` // From Menu.ID
 }
 
 // Defining the query options for the `MenuResource` struct.
 type MenuResourceQueryOptions struct {
-	utils.QueryOptions
+	util.QueryOptions
 }
 
 // Defining the query result for the `MenuResource` struct.
 type MenuResourceQueryResult struct {
 	Data       MenuResources
-	PageResult *utils.PaginationResult
+	PageResult *util.PaginationResult
 }
 
 // Defining the slice of `MenuResource` struct.

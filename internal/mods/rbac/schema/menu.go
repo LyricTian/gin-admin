@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 const (
@@ -13,9 +13,9 @@ const (
 )
 
 var (
-	MenusOrderParams = []utils.OrderByParam{
-		{Field: "sequence", Direction: utils.DESC},
-		{Field: "created_at", Direction: utils.DESC},
+	MenusOrderParams = []util.OrderByParam{
+		{Field: "sequence", Direction: util.DESC},
+		{Field: "created_at", Direction: util.DESC},
 	}
 )
 
@@ -44,7 +44,7 @@ func (a Menu) TableName() string {
 
 // Defining the query parameters for the `Menu` struct.
 type MenuQueryParam struct {
-	utils.PaginationParam
+	util.PaginationParam
 	InIDs            []string `form:"-"`
 	LikeName         string   `form:"name"` // Display name of menu
 	Status           string   `form:"-"`    // Status of menu (disabled, enabled)
@@ -56,13 +56,13 @@ type MenuQueryParam struct {
 
 // Defining the query options for the `Menu` struct.
 type MenuQueryOptions struct {
-	utils.QueryOptions
+	util.QueryOptions
 }
 
 // Defining the query result for the `Menu` struct.
 type MenuQueryResult struct {
 	Data       Menus
-	PageResult *utils.PaginationResult
+	PageResult *util.PaginationResult
 }
 
 // Defining the slice of `Menu` struct.
@@ -100,7 +100,7 @@ func (a Menus) SplitParentIDs() []string {
 		}
 		idMapper[item.ID] = struct{}{}
 		if pp := item.ParentPath; pp != "" {
-			for _, pid := range strings.Split(pp, utils.TreePathDelimiter) {
+			for _, pid := range strings.Split(pp, util.TreePathDelimiter) {
 				if pid == "" {
 					continue
 				}

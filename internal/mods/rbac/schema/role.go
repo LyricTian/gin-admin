@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 const (
@@ -30,7 +30,7 @@ func (a Role) TableName() string {
 
 // Defining the query parameters for the `Role` struct.
 type RoleQueryParam struct {
-	utils.PaginationParam
+	util.PaginationParam
 	LikeName    string     `form:"name"`                                       // Display name of role
 	Status      string     `form:"status" binding:"oneof=disabled enabled ''"` // Status of role (disabled, enabled)
 	InIDs       []string   `form:"-"`                                          // ID list
@@ -39,13 +39,13 @@ type RoleQueryParam struct {
 
 // Defining the query options for the `Role` struct.
 type RoleQueryOptions struct {
-	utils.QueryOptions
+	util.QueryOptions
 }
 
 // Defining the query result for the `Role` struct.
 type RoleQueryResult struct {
 	Data       Roles
-	PageResult *utils.PaginationResult
+	PageResult *util.PaginationResult
 }
 
 // Defining the slice of `Role` struct.

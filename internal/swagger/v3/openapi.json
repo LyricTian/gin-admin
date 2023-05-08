@@ -10,6 +10,112 @@
     "url" : "/"
   } ],
   "paths" : {
+    "/api/v1/auth/captcha" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "Captcha ID",
+          "in" : "query",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "Reload captcha image (reload=1)",
+          "in" : "query",
+          "name" : "reload",
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : { },
+            "description" : "Captcha image"
+          },
+          "404" : {
+            "content" : {
+              "image/png" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/util.ResponseResult"
+                }
+              }
+            },
+            "description" : "Not Found"
+          }
+        },
+        "summary" : "Response captcha image",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/auth/login" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/schema.LoginForm"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_auth_login_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/util.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/util.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "summary" : "Login system with username and password",
+        "tags" : [ "LoginAPI" ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/api/v1/auth/verify" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_auth_verify_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Get login verify info (captcha id)",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
     "/api/v1/current/logout" : {
       "post" : {
         "responses" : {
@@ -17,7 +123,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -27,7 +133,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -58,7 +164,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -68,7 +174,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -100,7 +206,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -110,7 +216,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -120,7 +226,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -130,7 +236,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -152,7 +258,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_current_refresh_token_post_200_response"
+                  "$ref" : "#/components/schemas/_api_v1_auth_login_post_200_response"
                 }
               }
             },
@@ -162,7 +268,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -172,7 +278,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -203,7 +309,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -213,7 +319,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -224,112 +330,6 @@
           "ApiKeyAuth" : [ ]
         } ],
         "summary" : "Get current user info",
-        "tags" : [ "LoginAPI" ]
-      }
-    },
-    "/api/v1/login" : {
-      "post" : {
-        "requestBody" : {
-          "content" : {
-            "*/*" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/schema.LoginForm"
-              }
-            }
-          },
-          "description" : "Request body",
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_current_refresh_token_post_200_response"
-                }
-              }
-            },
-            "description" : "OK"
-          },
-          "400" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
-                }
-              }
-            },
-            "description" : "Bad Request"
-          },
-          "500" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
-                }
-              }
-            },
-            "description" : "Internal Server Error"
-          }
-        },
-        "summary" : "Login system with username and password",
-        "tags" : [ "LoginAPI" ],
-        "x-codegen-request-body-name" : "body"
-      }
-    },
-    "/api/v1/login/captcha" : {
-      "get" : {
-        "parameters" : [ {
-          "description" : "Captcha ID",
-          "in" : "query",
-          "name" : "id",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "description" : "Reload captcha image (reload=1)",
-          "in" : "query",
-          "name" : "reload",
-          "schema" : {
-            "type" : "number"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "content" : { },
-            "description" : "Captcha image"
-          },
-          "404" : {
-            "content" : {
-              "image/png" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
-                }
-              }
-            },
-            "description" : "Not Found"
-          }
-        },
-        "summary" : "Response captcha image",
-        "tags" : [ "LoginAPI" ]
-      }
-    },
-    "/api/v1/login/verify" : {
-      "get" : {
-        "responses" : {
-          "200" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_login_verify_get_200_response"
-                }
-              }
-            },
-            "description" : "OK"
-          }
-        },
-        "summary" : "Get login verify info (captcha id)",
         "tags" : [ "LoginAPI" ]
       }
     },
@@ -358,7 +358,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -368,7 +368,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -408,7 +408,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -418,7 +418,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -428,7 +428,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -459,7 +459,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -469,7 +469,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -479,7 +479,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -517,7 +517,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -527,7 +527,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -566,7 +566,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -576,7 +576,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -586,7 +586,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -596,7 +596,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -661,7 +661,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -671,7 +671,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -711,7 +711,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -721,7 +721,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -731,7 +731,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -762,7 +762,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -772,7 +772,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -782,7 +782,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -820,7 +820,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -830,7 +830,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -869,7 +869,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -879,7 +879,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -889,7 +889,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -899,7 +899,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -971,7 +971,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -981,7 +981,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1021,7 +1021,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1031,7 +1031,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1041,7 +1041,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1072,7 +1072,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1082,7 +1082,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1092,7 +1092,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1130,7 +1130,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1140,7 +1140,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1179,7 +1179,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1189,7 +1189,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1199,7 +1199,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1209,7 +1209,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1240,7 +1240,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1250,7 +1250,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1260,7 +1260,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/utils.ResponseResult"
+                  "$ref" : "#/components/schemas/util.ResponseResult"
                 }
               }
             },
@@ -1352,7 +1352,7 @@
             "type" : "array"
           },
           "code" : {
-            "description" : "Code of menu",
+            "description" : "Code of menu (unique for each level)",
             "type" : "string"
           },
           "created_at" : {
@@ -1416,7 +1416,7 @@
       "schema.MenuForm" : {
         "properties" : {
           "code" : {
-            "description" : "Code of menu",
+            "description" : "Code of menu (unique for each level)",
             "maxLength" : 32,
             "type" : "string"
           },
@@ -1497,6 +1497,10 @@
       },
       "schema.Role" : {
         "properties" : {
+          "code" : {
+            "description" : "Code of role (unique)",
+            "type" : "string"
+          },
           "created_at" : {
             "description" : "Create time",
             "type" : "string"
@@ -1537,6 +1541,11 @@
       },
       "schema.RoleForm" : {
         "properties" : {
+          "code" : {
+            "description" : "Code of role (unique)",
+            "maxLength" : 32,
+            "type" : "string"
+          },
           "description" : {
             "description" : "Details about role",
             "type" : "string"
@@ -1563,7 +1572,7 @@
             "type" : "string"
           }
         },
-        "required" : [ "name", "status" ],
+        "required" : [ "code", "name", "status" ],
         "type" : "object"
       },
       "schema.RoleMenu" : {
@@ -1730,7 +1739,7 @@
         },
         "type" : "object"
       },
-      "utils.ResponseResult" : {
+      "util.ResponseResult" : {
         "properties" : {
           "data" : {
             "type" : "object"
@@ -1747,6 +1756,28 @@
         },
         "type" : "object"
       },
+      "_api_v1_auth_login_post_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/schema.LoginToken"
+          },
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_v1_auth_verify_get_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/schema.LoginVerify"
+          },
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
       "_api_v1_current_menus_get_200_response" : {
         "properties" : {
           "data" : {
@@ -1755,19 +1786,8 @@
             },
             "type" : "array"
           },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
-          }
-        },
-        "type" : "object"
-      },
-      "_api_v1_current_refresh_token_post_200_response" : {
-        "properties" : {
-          "data" : {
-            "$ref" : "#/components/schemas/schema.LoginToken"
-          },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
           }
         },
         "type" : "object"
@@ -1777,19 +1797,8 @@
           "data" : {
             "$ref" : "#/components/schemas/schema.User"
           },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
-          }
-        },
-        "type" : "object"
-      },
-      "_api_v1_login_verify_get_200_response" : {
-        "properties" : {
-          "data" : {
-            "$ref" : "#/components/schemas/schema.LoginVerify"
-          },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
           }
         },
         "type" : "object"
@@ -1799,8 +1808,8 @@
           "data" : {
             "$ref" : "#/components/schemas/schema.Menu"
           },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
           }
         },
         "type" : "object"
@@ -1813,8 +1822,8 @@
             },
             "type" : "array"
           },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
           }
         },
         "type" : "object"
@@ -1824,8 +1833,8 @@
           "data" : {
             "$ref" : "#/components/schemas/schema.Role"
           },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
           }
         },
         "type" : "object"
@@ -1838,8 +1847,8 @@
             },
             "type" : "array"
           },
-          "utils.ResponseResult" : {
-            "$ref" : "#/components/schemas/utils.ResponseResult"
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
           }
         },
         "type" : "object"

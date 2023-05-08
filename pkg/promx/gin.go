@@ -16,7 +16,7 @@ func NewAdapterGin(p *PrometheusWrapper) *AdapterGin {
 	return &AdapterGin{prom: p}
 }
 
-func (a *AdapterGin) Middleware(enable bool) gin.HandlerFunc {
+func (a *AdapterGin) Middleware(enable bool, reqKey string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if !enable {
 			ctx.Next()
@@ -25,18 +25,12 @@ func (a *AdapterGin) Middleware(enable bool) gin.HandlerFunc {
 
 		b := time.Now()
 		recevedBytes := 0
-		if v, ok := ctx.Get("bobcatminer/req-body"); ok {
+		if v, ok := ctx.Get(reqKey); ok {
 			if b, ok := v.([]byte); ok {
 				recevedBytes = len(b)
 			}
 		}
-
 		ctx.Next()
-
-		if ctx.Writer.Status() == 404 {
-			return
-		}
-
 		latency := float64(time.Since(b).Milliseconds())
 		p := ctx.Request.URL.Path
 		for _, param := range ctx.Params {

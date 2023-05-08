@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"fmt"
@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -49,7 +49,7 @@ func RecoveryWithConfig(config RecoveryConfig) gin.HandlerFunc {
 				}
 
 				logging.Context(ctx).Error(fmt.Sprintf("[Recovery] %s panic recovered", time.Now().Format("2006/01/02 - 15:04:05")), fields...)
-				utils.ResError(c, errors.InternalServerError("", "Internal server error, please try again later"))
+				util.ResError(c, errors.InternalServerError("", "Internal server error, please try again later"))
 			}
 		}()
 

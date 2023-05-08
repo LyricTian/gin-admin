@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 // Role permissions for RBAC
@@ -21,19 +21,19 @@ func (a RoleMenu) TableName() string {
 
 // Defining the query parameters for the `RoleMenu` struct.
 type RoleMenuQueryParam struct {
-	utils.PaginationParam
+	util.PaginationParam
 	RoleID string `form:"-"` // From Role.ID
 }
 
 // Defining the query options for the `RoleMenu` struct.
 type RoleMenuQueryOptions struct {
-	utils.QueryOptions
+	util.QueryOptions
 }
 
 // Defining the query result for the `RoleMenu` struct.
 type RoleMenuQueryResult struct {
 	Data       RoleMenus
-	PageResult *utils.PaginationResult
+	PageResult *util.PaginationResult
 }
 
 // Defining the slice of `RoleMenu` struct.

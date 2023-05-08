@@ -3,9 +3,9 @@ package schema
 import (
 	"time"
 
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
 const (
@@ -34,7 +34,7 @@ func (a User) TableName() string {
 
 // Defining the query parameters for the `User` struct.
 type UserQueryParam struct {
-	utils.PaginationParam
+	util.PaginationParam
 	LikeUsername string `form:"username"`                                    // Username for login
 	LikeName     string `form:"name"`                                        // Name of user
 	Status       string `form:"status" binding:"oneof=activated freezed ''"` // Status of user (activated, freezed)
@@ -42,13 +42,13 @@ type UserQueryParam struct {
 
 // Defining the query options for the `User` struct.
 type UserQueryOptions struct {
-	utils.QueryOptions
+	util.QueryOptions
 }
 
 // Defining the query result for the `User` struct.
 type UserQueryResult struct {
 	Data       Users
-	PageResult *utils.PaginationResult
+	PageResult *util.PaginationResult
 }
 
 // Defining the slice of `User` struct.

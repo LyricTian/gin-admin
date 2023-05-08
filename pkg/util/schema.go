@@ -1,10 +1,10 @@
-package utils
+package util
 
 import "github.com/LyricTian/gin-admin/v10/pkg/errors"
 
 const (
-	RequestBodyKey    = "request-body"
-	ResponseBodyKey   = "response-body"
+	ReqBodyKey        = "req-body"
+	ResBodyKey        = "res-body"
 	TreePathDelimiter = "."
 )
 

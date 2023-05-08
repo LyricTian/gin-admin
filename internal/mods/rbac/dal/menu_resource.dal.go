@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"gorm.io/gorm"
 )
 
 // Get menu resource storage instance
 func GetMenuResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return utils.GetDB(ctx, defDB).Model(new(schema.MenuResource))
+	return util.GetDB(ctx, defDB).Model(new(schema.MenuResource))
 }
 
 // Menu resource management for RBAC
@@ -35,7 +35,7 @@ func (a *MenuResource) Query(ctx context.Context, params schema.MenuResourceQuer
 	}
 
 	var list schema.MenuResources
-	pageResult, err := utils.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
+	pageResult, err := util.WrapPageQuery(ctx, db, params.PaginationParam, opt.QueryOptions, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -55,7 +55,7 @@ func (a *MenuResource) Get(ctx context.Context, id string, opts ...schema.MenuRe
 	}
 
 	item := new(schema.MenuResource)
-	ok, err := utils.FindOne(ctx, GetMenuResourceDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
+	ok, err := util.FindOne(ctx, GetMenuResourceDB(ctx, a.DB).Where("id=?", id), opt.QueryOptions, item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	} else if !ok {
@@ -66,7 +66,7 @@ func (a *MenuResource) Get(ctx context.Context, id string, opts ...schema.MenuRe
 
 // Exist checks if the specified menu resource exists in the database.
 func (a *MenuResource) Exists(ctx context.Context, id string) (bool, error) {
-	ok, err := utils.Exists(ctx, GetMenuResourceDB(ctx, a.DB).Where("id=?", id))
+	ok, err := util.Exists(ctx, GetMenuResourceDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
 }
 

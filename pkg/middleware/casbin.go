@@ -1,8 +1,8 @@
-package middlewares
+package middleware
 
 import (
-	"github.com/LyricTian/gin-admin/v10/internal/utils"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
@@ -27,13 +27,13 @@ func CasbinWithConfig(config CasbinConfig) gin.HandlerFunc {
 		enforcer := config.GetEnforcer(c)
 		for _, sub := range config.GetSubjects(c) {
 			if b, err := enforcer.Enforce(sub, c.Request.URL.Path, c.Request.Method); err != nil {
-				utils.ResError(c, err)
+				util.ResError(c, err)
 				return
 			} else if b {
 				c.Next()
 				return
 			}
 		}
-		utils.ResError(c, errors.Unauthorized("com.perm.denied", "Permission denied, please contact the administrator"))
+		util.ResError(c, errors.Unauthorized("com.perm.denied", "Permission denied, please contact the administrator"))
 	}
 }
