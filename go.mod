@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/LyricTian/captcha v1.2.0
 	github.com/casbin/casbin/v2 v2.68.0
+	github.com/creasty/defaults v1.7.0
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.0

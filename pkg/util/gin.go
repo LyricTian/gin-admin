@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
 	"strings"
@@ -109,7 +110,6 @@ func ResPage(c *gin.Context, v interface{}, pr *PaginationResult) {
 	})
 }
 
-// Response error and parse status code
 func ResError(c *gin.Context, err error, status ...int) {
 	var ierr *errors.Error
 	if e, ok := errors.As(err); ok {
@@ -126,6 +126,7 @@ func ResError(c *gin.Context, err error, status ...int) {
 	if code >= 500 {
 		ctx := c.Request.Context()
 		ctx = logging.NewTag(ctx, logging.TagKeySystem)
+		ctx = logging.NewStack(ctx, fmt.Sprintf("%+v", err))
 		logging.Context(ctx).Error("Internal server error", zap.Error(err))
 		ierr.Detail = http.StatusText(http.StatusInternalServerError)
 	}

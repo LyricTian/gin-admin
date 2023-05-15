@@ -81,18 +81,18 @@ func FromTag(ctx context.Context) string {
 	return ""
 }
 
-func NewStack(ctx context.Context, stack error) context.Context {
+func NewStack(ctx context.Context, stack string) context.Context {
 	return context.WithValue(ctx, ctxStackKey{}, stack)
 }
 
-func FromStack(ctx context.Context) error {
+func FromStack(ctx context.Context) string {
 	v := ctx.Value(ctxStackKey{})
 	if v != nil {
-		if s, ok := v.(error); ok {
+		if s, ok := v.(string); ok {
 			return s
 		}
 	}
-	return nil
+	return ""
 }
 
 func Context(ctx context.Context) *zap.Logger {
@@ -106,8 +106,8 @@ func Context(ctx context.Context) *zap.Logger {
 	if v := FromTag(ctx); v != "" {
 		fields = append(fields, zap.String("tag", v))
 	}
-	if v := FromStack(ctx); v != nil {
-		fields = append(fields, zap.Error(v))
+	if v := FromStack(ctx); v != "" {
+		fields = append(fields, zap.String("stack", v))
 	}
 	return FromLogger(ctx).With(fields...)
 }

@@ -15,6 +15,7 @@ type Logger struct {
 	UserID    string    `gorm:"size:20;index;"`
 	Tag       string    `gorm:"size:32;index;"`
 	Message   string    `gorm:"size:1024;"`
+	Stack     string    `gorm:"type:text;"`
 	Data      string    `gorm:"type:text;"`
 	CreatedAt time.Time `gorm:"index;"`
 }
@@ -68,6 +69,10 @@ func (h *GormHook) Exec(extra map[string]string, b []byte) error {
 	if v, ok := data["level"]; ok {
 		msg.Level = v.(string)
 		delete(data, "level")
+	}
+	if v, ok := data["stack"]; ok {
+		msg.Stack = v.(string)
+		delete(data, "stack")
 	}
 
 	for k, v := range extra {

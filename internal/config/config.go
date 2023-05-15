@@ -3,33 +3,89 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 
-	jsoniter "github.com/json-iterator/go"
-	"github.com/pelletier/go-toml"
+	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
+	"github.com/LyricTian/gin-admin/v10/pkg/encoding/toml"
+	"github.com/LyricTian/gin-admin/v10/pkg/encoding/yaml"
+	"github.com/LyricTian/gin-admin/v10/pkg/logging"
+	"github.com/creasty/defaults"
+	"github.com/pkg/errors"
 )
 
 var (
-	C    = new(Config)
 	once sync.Once
+	C    = new(Config)
 )
 
-func MustLoad(name string) {
+func MustLoad(dir string, names ...string) {
 	once.Do(func() {
-		buf, err := os.ReadFile(name)
-		if err != nil {
-			panic(fmt.Sprintf("Failed to load config file %s: %s", name, err.Error()))
-		}
-		if err := toml.Unmarshal(buf, C); err != nil {
-			panic(fmt.Sprintf("Failed to unmarshal config %s: %s", name, err.Error()))
-		}
-		if err := C.PreLoad(); err != nil {
-			panic(fmt.Sprintf("Failed to preload config %s: %s", name, err.Error()))
+		if err := Load(dir, names...); err != nil {
+			panic(err)
 		}
 	})
+
+}
+
+func Load(dir string, names ...string) error {
+	if err := defaults.Set(C); err != nil {
+		return err
+	}
+
+	parseFile := func(name string) error {
+		ext := filepath.Ext(name)
+		if !(ext == ".json" || ext == ".yaml" || ext == ".yml" || ext == ".toml") {
+			return nil
+		}
+
+		buf, err := os.ReadFile(name)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to read config file %s", name)
+		}
+
+		switch ext {
+		case ".json":
+			err = json.Unmarshal(buf, C)
+		case ".yaml", ".yml":
+			err = yaml.Unmarshal(buf, C)
+		case ".toml":
+			err = toml.Unmarshal(buf, C)
+		}
+		return errors.Wrapf(err, "Failed to unmarshal config %s", name)
+	}
+
+	for _, name := range names {
+		fullname := filepath.Join(dir, name)
+		info, err := os.Stat(fullname)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to get config file %s", name)
+		}
+
+		if info.IsDir() {
+			err := filepath.WalkDir(fullname, func(path string, d os.DirEntry, err error) error {
+				if err != nil {
+					return err
+				} else if d.IsDir() {
+					return nil
+				}
+				return parseFile(path)
+			})
+			if err != nil {
+				return errors.Wrapf(err, "Failed to walk config dir %s", name)
+			}
+			continue
+		}
+		if err := parseFile(fullname); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 type Config struct {
+	Logger     logging.LoggerConfig
 	General    General
 	Storage    Storage
 	Middleware Middleware
@@ -211,7 +267,7 @@ func (c *Config) IsDebug() bool {
 }
 
 func (c *Config) String() string {
-	b, err := jsoniter.MarshalIndent(c, "", "  ")
+	b, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		panic("Failed to marshal config: " + err.Error())
 	}

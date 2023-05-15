@@ -24,7 +24,6 @@ tmp
 /test/data
 /internal/swagger/v3/.openapi-generator
 
-
 # IDE configs
 .idea
 .vscode

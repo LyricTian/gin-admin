@@ -2,22 +2,12 @@ package bootstrap
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/pkg/gormx"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
-
-func InitLogger(ctx context.Context, cfgDir string) (func(), error) {
-	cfg, err := logging.LoadConfigFromToml(filepath.Join(cfgDir, config.C.General.LoggerConfigFile))
-	if err != nil {
-		return nil, err
-	}
-
-	return logging.InitWithConfig(ctx, cfg, initLoggerHook)
-}
 
 func initLoggerHook(ctx context.Context, cfg *logging.HookConfig) (*logging.Hook, error) {
 	extra := cfg.Extra

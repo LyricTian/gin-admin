@@ -1,7 +1,10 @@
 package cmd
 
 import (
-	"github.com/LyricTian/gin-admin/v10/internal/bootstrap"
+	"fmt"
+	"os"
+	"os/exec"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -10,9 +13,25 @@ func StopCmd() *cli.Command {
 		Name:  "stop",
 		Usage: "Stop server",
 		Action: func(c *cli.Context) error {
-			if err := bootstrap.StopDaemon(); err != nil {
-				panic(err)
+			appName := c.App.Name
+			lockName := fmt.Sprintf("%s.lock", appName)
+			pid, err := os.ReadFile(lockName)
+			if err != nil {
+				return err
 			}
+
+			command := exec.Command("kill", string(pid))
+			err = command.Start()
+			if err != nil {
+				return err
+			}
+
+			err = os.Remove(lockName)
+			if err != nil {
+				return fmt.Errorf("Can't remove %s.lock. %s", appName, err.Error())
+			}
+
+			fmt.Printf("Service %s stopped \n", appName)
 			return nil
 		},
 	}
