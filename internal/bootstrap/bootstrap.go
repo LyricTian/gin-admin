@@ -67,7 +67,6 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 	}
 
 	return util.Run(ctx, func(ctx context.Context) (func(), error) {
-
 		cleanHTTPServerFn, err := startHTTPServer(ctx, injector)
 		if err != nil {
 			return cleanInjectorFn, err
