@@ -24,7 +24,7 @@ import (
 )
 
 func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), error) {
-	if config.C.General.DebugMode {
+	if config.C.IsDebug() {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -48,6 +48,65 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 		util.ResError(c, errors.NotFound("", "Not found"))
 	})
 
+	allowedPathPrefixes := injector.M.RouterPrefixes()
+
+	// Register middlewares
+	if err := useGinMiddlewares(ctx, e, injector, allowedPathPrefixes); err != nil {
+		return nil, err
+	}
+
+	// Register routers
+	if err := injector.M.RegisterRouters(ctx, e); err != nil {
+		return nil, err
+	}
+
+	if !config.C.General.DisableSwagger {
+		e.StaticFile("/openapi.json", filepath.Join(config.C.General.ConfigDir, "openapi.json"))
+		e.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
+
+	if dir := config.C.Middleware.Static.Dir; dir != "" {
+		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+			Root:                dir,
+			SkippedPathPrefixes: allowedPathPrefixes,
+		}))
+	}
+
+	srv := &http.Server{
+		Addr:         config.C.General.HTTP.Addr,
+		Handler:      e,
+		ReadTimeout:  time.Second * time.Duration(config.C.General.HTTP.ReadTimeout),
+		WriteTimeout: time.Second * time.Duration(config.C.General.HTTP.WriteTimeout),
+		IdleTimeout:  time.Second * time.Duration(config.C.General.HTTP.IdleTimeout),
+	}
+
+	logging.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", srv.Addr))
+	go func() {
+		var err error
+		if config.C.General.HTTP.CertFile != "" && config.C.General.HTTP.KeyFile != "" {
+			srv.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
+			err = srv.ListenAndServeTLS(config.C.General.HTTP.CertFile, config.C.General.HTTP.KeyFile)
+		} else {
+			err = srv.ListenAndServe()
+		}
+
+		if err != nil && err != http.ErrServerClosed {
+			logging.Context(ctx).Error("Failed to listen http server", zap.Error(err))
+		}
+	}()
+
+	return func() {
+		ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(config.C.General.HTTP.ShutdownTimeout))
+		defer cancel()
+
+		srv.SetKeepAlivesEnabled(false)
+		if err := srv.Shutdown(ctx); err != nil {
+			logging.Context(ctx).Error("Failed to shutdown http server", zap.Error(err))
+		}
+	}, nil
+}
+
+func useGinMiddlewares(ctx context.Context, e *gin.Engine, injector *wirex.Injector, allowedPathPrefixes []string) error {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Enable:                 config.C.Middleware.CORS.Enable,
 		AllowAllOrigins:        config.C.Middleware.CORS.AllowAllOrigins,
@@ -63,7 +122,6 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 		AllowFiles:             config.C.Middleware.CORS.AllowFiles,
 	}))
 
-	allowedPathPrefixes := injector.M.RouterPrefixes()
 	e.Use(middleware.TraceWithConfig(middleware.TraceConfig{
 		AllowedPathPrefixes: allowedPathPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.Trace.SkippedPathPrefixes,
@@ -93,7 +151,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 				return rootID, nil
 			}
 
-			errInvalidToken := errors.Unauthorized("com.invalid.token", "Invalid access token")
+			errInvalidToken := config.ErrInvalidToken
 			token := util.GetToken(c)
 			if token == "" {
 				return "", errInvalidToken
@@ -188,53 +246,5 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 		},
 	}))
 
-	// register routers
-	if err := injector.M.RegisterRouters(ctx, e); err != nil {
-		return nil, err
-	}
-
-	if !config.C.General.DisableSwagger {
-		e.StaticFile("/openapi.json", filepath.Join(config.C.General.ConfigDir, "openapi.json"))
-		e.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	}
-
-	if dir := config.C.Middleware.Static.Dir; dir != "" {
-		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-			Root:                dir,
-			SkippedPathPrefixes: allowedPathPrefixes,
-		}))
-	}
-
-	srv := &http.Server{
-		Addr:         config.C.General.HTTP.Addr,
-		Handler:      e,
-		ReadTimeout:  time.Second * time.Duration(config.C.General.HTTP.ReadTimeout),
-		WriteTimeout: time.Second * time.Duration(config.C.General.HTTP.WriteTimeout),
-		IdleTimeout:  time.Second * time.Duration(config.C.General.HTTP.IdleTimeout),
-	}
-
-	logging.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", srv.Addr))
-	go func() {
-		var err error
-		if config.C.General.HTTP.CertFile != "" && config.C.General.HTTP.KeyFile != "" {
-			srv.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
-			err = srv.ListenAndServeTLS(config.C.General.HTTP.CertFile, config.C.General.HTTP.KeyFile)
-		} else {
-			err = srv.ListenAndServe()
-		}
-
-		if err != nil && err != http.ErrServerClosed {
-			logging.Context(ctx).Error("Failed to listen http server", zap.Error(err))
-		}
-	}()
-
-	return func() {
-		ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(config.C.General.HTTP.ShutdownTimeout))
-		defer cancel()
-
-		srv.SetKeepAlivesEnabled(false)
-		if err := srv.Shutdown(ctx); err != nil {
-			logging.Context(ctx).Error("Failed to shutdown http server", zap.Error(err))
-		}
-	}, nil
+	return nil
 }

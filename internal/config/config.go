@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
@@ -25,7 +26,6 @@ func MustLoad(dir string, names ...string) {
 			panic(err)
 		}
 	})
-
 }
 
 func Load(dir string, names ...string) error {
@@ -33,9 +33,10 @@ func Load(dir string, names ...string) error {
 		return err
 	}
 
+	supportExts := []string{".json", ".yaml", ".yml", ".toml"}
 	parseFile := func(name string) error {
 		ext := filepath.Ext(name)
-		if !(ext == ".json" || ext == ".yaml" || ext == ".yml" || ext == ".toml") {
+		if ext == "" || !strings.Contains(strings.Join(supportExts, ","), ext) {
 			return nil
 		}
 
@@ -94,9 +95,15 @@ type Config struct {
 }
 
 type General struct {
-	AppName   string `default:"ginadmin"`
-	DebugMode bool
-	HTTP      struct {
+	AppName            string `default:"ginadmin"`
+	Debug              bool
+	PprofAddr          string
+	DisableSwagger     bool
+	DisablePrintConfig bool
+	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // abc-123
+	InitMenuFile       string `default:"menu.yaml"`
+	ConfigDir          string // From command arguments
+	HTTP               struct {
 		Addr            string `default:":8080"`
 		ShutdownTimeout int    `default:"10"` // seconds
 		ReadTimeout     int    `default:"60"` // seconds
@@ -105,19 +112,12 @@ type General struct {
 		CertFile        string
 		KeyFile         string
 	}
-	PprofAddr          string
-	DisableSwagger     bool
-	DisablePrintConfig bool
-	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // abc-123
-	Root               struct {
+	Root struct {
 		ID       string `default:"root"`
 		Username string `default:"admin"`
-		Name     string `default:"Administrator"`
 		Password string
+		Name     string `default:"Admin"`
 	}
-	LoggerConfigFile string `default:"logging.toml"`
-	MenuYamlFile     string `default:"menu.yaml"`
-	ConfigDir        string // From command arguments
 }
 
 type Storage struct {
@@ -156,92 +156,6 @@ type Storage struct {
 	}
 }
 
-type Middleware struct {
-	Recovery struct {
-		Skip int `default:"3"` // skip the first n stack frames
-	}
-	CORS struct {
-		Enable                 bool
-		AllowAllOrigins        bool
-		AllowOrigins           []string
-		AllowMethods           []string
-		AllowHeaders           []string
-		AllowCredentials       bool
-		ExposeHeaders          []string
-		MaxAge                 int
-		AllowWildcard          bool
-		AllowBrowserExtensions bool
-		AllowWebSockets        bool
-		AllowFiles             bool
-	}
-	Trace struct {
-		SkippedPathPrefixes []string
-		RequestHeaderKey    string `default:"X-Request-Id"`
-		ResponseTraceKey    string `default:"X-Trace-Id"`
-	}
-	Logger struct {
-		SkippedPathPrefixes      []string
-		MaxOutputRequestBodyLen  int `default:"4096"`
-		MaxOutputResponseBodyLen int `default:"1024"`
-	}
-	CopyBody struct {
-		SkippedPathPrefixes []string
-		MaxContentLen       int64 `default:"33554432"` // max content length (default 32MB)
-	}
-	Auth struct {
-		Disable             bool
-		SkippedPathPrefixes []string
-		SigningMethod       string `default:"HS512"`    // HS256/HS384/HS512
-		SigningKey          string `default:"XnEsT0S@"` // secret key
-		OldSigningKey       string // old secret key (for migration)
-		Expired             int    `default:"86400"` // seconds
-		Store               struct {
-			Type      string `default:"badger"` // badger/redis
-			Delimiter string `default:":"`      // delimiter for key
-			Badger    struct {
-				Path string `default:"data/auth"`
-			}
-			Redis struct {
-				Addr     string
-				Username string
-				Password string
-				DB       int
-			}
-		}
-	}
-	RateLimiter struct {
-		Enable              bool
-		SkippedPathPrefixes []string
-		Period              int // seconds
-		MaxRequestsPerIP    int
-		MaxRequestsPerUser  int
-		Store               struct {
-			Type   string // memory/redis
-			Memory struct {
-				Expiration      int `default:"3600"` // seconds
-				CleanupInterval int `default:"60"`   // seconds
-			}
-			Redis struct {
-				Addr     string
-				Username string
-				Password string
-				DB       int
-			}
-		}
-	}
-	Casbin struct {
-		Disable             bool
-		SkippedPathPrefixes []string
-		LoadThread          int    `default:"2"`
-		AutoLoadInterval    int    `default:"3"` // seconds
-		ModelFile           string `default:"rbac_model.conf"`
-		GenPolicyFile       string `default:"gen_rbac_policy.csv"`
-	}
-	Static struct {
-		Dir string // Static files directory (From command arguments)
-	}
-}
-
 type Util struct {
 	Captcha struct {
 		Length    int    `default:"4"`
@@ -263,7 +177,7 @@ type Dictionary struct {
 }
 
 func (c *Config) IsDebug() bool {
-	return c.General.DebugMode
+	return c.General.Debug
 }
 
 func (c *Config) String() string {
