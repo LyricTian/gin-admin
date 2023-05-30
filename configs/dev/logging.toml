@@ -4,7 +4,7 @@ Level = "debug"
 CallerSkip = 1
 
 [Logger.File]
-Enable = true
+Enable = false
 Path = "data/log/ginadmin.log"
 MaxBackups = 20 # Files
 MaxSize = 64 # MB

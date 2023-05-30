@@ -11,7 +11,7 @@ GIT_HASH        = $(shell git rev-parse --short HEAD)
 RELEASE_TAG     = $(RELEASE_VERSION).$(GIT_COUNT).$(GIT_HASH)
 
 CONFIG_DIR      = ./configs
-CONFIG_FILE     = config.toml
+CONFIG_FILE     = dev
 STATIC_DIR      = ./build/dist
 
 all: start
@@ -30,7 +30,7 @@ wire:
 swagger:
 	@swag init --parseDependency --generalInfo ./main.go --output ./internal/swagger
 
-# Dependency: https://github.com/OpenAPITools/openapi-generator
+# https://github.com/OpenAPITools/openapi-generator
 openapi:
 	docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/internal/swagger/swagger.yaml -g openapi -o /local/internal/swagger/v3
 
