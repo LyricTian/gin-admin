@@ -25,7 +25,7 @@ type RunConfig struct {
 func Run(ctx context.Context, runCfg RunConfig) error {
 	defer func() {
 		if err := zap.L().Sync(); err != nil {
-			os.Stderr.WriteString(fmt.Sprintf("Failed to sync zap logger: %v\n", err))
+			fmt.Printf("Failed to sync zap logger: %s \n", err.Error())
 		}
 	}()
 

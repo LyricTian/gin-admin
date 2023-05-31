@@ -1,7 +1,7 @@
 package json
 
 import (
-	"os"
+	"fmt"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -18,7 +18,7 @@ var (
 func MarshalToString(v interface{}) string {
 	s, err := jsoniter.MarshalToString(v)
 	if err != nil {
-		os.Stderr.WriteString("Failed to marshal json string: " + err.Error())
+		fmt.Println("Failed to marshal json string: " + err.Error())
 		return ""
 	}
 	return s

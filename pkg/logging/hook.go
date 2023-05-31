@@ -2,7 +2,6 @@ package logging
 
 import (
 	"fmt"
-	"os"
 	"sync"
 	"sync/atomic"
 )
@@ -81,14 +80,14 @@ func (h *Hook) dispatch() {
 			defer func() {
 				h.wg.Done()
 				if r := recover(); r != nil {
-					fmt.Fprintln(os.Stderr, "Recovered from panic in logger hook:", r)
+					fmt.Println("Recovered from panic in logger hook:", r)
 				}
 			}()
 
 			for data := range h.q {
 				err := h.e.Exec(h.opts.extra, data)
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Failed to write entry:", err.Error())
+					fmt.Println("Failed to write entry:", err.Error())
 				}
 			}
 		}()
@@ -100,7 +99,7 @@ func (h *Hook) Write(p []byte) (int, error) {
 		return len(p), nil
 	}
 	if len(h.q) == h.opts.maxJobs {
-		fmt.Fprintln(os.Stderr, "Too many jobs, waiting for queue to be empty, discard")
+		fmt.Println("Too many jobs, waiting for queue to be empty, discard")
 		return len(p), nil
 	}
 
@@ -121,6 +120,6 @@ func (h *Hook) Flush() {
 	h.wg.Wait()
 	err := h.e.Close()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to close logger hook:", err.Error())
+		fmt.Println("Failed to close logger hook:", err.Error())
 	}
 }

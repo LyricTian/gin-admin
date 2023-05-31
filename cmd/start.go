@@ -45,7 +45,7 @@ func StartCmd() *cli.Command {
 			if c.Bool("daemon") {
 				bin, err := filepath.Abs(os.Args[0])
 				if err != nil {
-					os.Stderr.WriteString(fmt.Sprintf("Failed to get absolute path for command: %s", err.Error()))
+					fmt.Printf("Failed to get absolute path for command: %s \n", err.Error())
 					return err
 				}
 
@@ -61,13 +61,13 @@ func StartCmd() *cli.Command {
 				command := exec.Command(bin, args...)
 				err = command.Start()
 				if err != nil {
-					os.Stderr.WriteString(fmt.Sprintf("Failed to start daemon thread: %s", err.Error()))
+					fmt.Printf("Failed to start daemon thread: %s \n", err.Error())
 					return err
 				}
 
 				pid := command.Process.Pid
 				_ = os.WriteFile(fmt.Sprintf("%s.lock", c.App.Name), []byte(fmt.Sprintf("%d", pid)), 0666)
-				os.Stdout.WriteString(fmt.Sprintf("Service %s daemon thread started with pid %d\n", config.C.General.AppName, pid))
+				fmt.Printf("Service %s daemon thread started with pid %d \n", config.C.General.AppName, pid)
 				os.Exit(0)
 			}
 
