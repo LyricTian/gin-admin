@@ -7,7 +7,7 @@ ARG RELEASE_TAG=$(VERSION)
 WORKDIR /go/src/${APP}
 COPY . .
 RUN apk add --no-cache gcc musl-dev
-# ENV GOPROXY="https://goproxy.cn"
+ENV GOPROXY="https://goproxy.cn"
 RUN go build -ldflags "-w -s -X main.VERSION=${RELEASE_TAG}" -o ./${APP} .
 
 FROM alpine
@@ -16,5 +16,5 @@ WORKDIR /go/src/${APP}
 COPY --from=builder /go/src/${APP}/${APP} /usr/bin/
 COPY --from=builder /go/src/${APP}/build/configs /usr/bin/configs
 COPY --from=builder /go/src/${APP}/build/dist /usr/bin/dist
-ENTRYPOINT ["ginadmin", "start", "-c", "/usr/bin/configs", "-s", "/usr/bin/dist"]
+ENTRYPOINT ["ginadmin", "start", "--configdir", "/usr/bin/configs", "--config", "prod", "--staticdir", "/usr/bin/dist"]
 EXPOSE 8040

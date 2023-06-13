@@ -13,6 +13,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// The function defines a CLI command to start a server with various flags and options, including the
+// ability to run as a daemon.
 func StartCmd() *cli.Command {
 	return &cli.Command{
 		Name:  "start",
@@ -27,7 +29,7 @@ func StartCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:        "config",
 				Aliases:     []string{"c"},
-				Usage:       "Configuration directory or files (multiple separated by commas)",
+				Usage:       "Directory or files (multiple separated by commas)",
 				DefaultText: "dev",
 				Value:       "dev",
 			},
@@ -72,9 +74,9 @@ func StartCmd() *cli.Command {
 			}
 
 			err := bootstrap.Run(context.Background(), bootstrap.RunConfig{
-				ConfigDir:  c.String("configdir"),
-				ConfigFile: c.String("config"),
-				StaticDir:  c.String("staticdir"),
+				ConfigDir: c.String("configdir"),
+				Config:    c.String("config"),
+				StaticDir: c.String("staticdir"),
 			})
 			if err != nil {
 				panic(err)

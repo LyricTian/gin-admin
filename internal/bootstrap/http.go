@@ -81,6 +81,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 	}
 
 	logging.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", srv.Addr))
+
 	go func() {
 		var err error
 		if config.C.General.HTTP.CertFile != "" && config.C.General.HTTP.KeyFile != "" {
@@ -106,7 +107,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 	}, nil
 }
 
-func useGinMiddlewares(ctx context.Context, e *gin.Engine, injector *wirex.Injector, allowedPathPrefixes []string) error {
+func useGinMiddlewares(_ context.Context, e *gin.Engine, injector *wirex.Injector, allowedPathPrefixes []string) error {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Enable:                 config.C.Middleware.CORS.Enable,
 		AllowAllOrigins:        config.C.Middleware.CORS.AllowAllOrigins,
@@ -151,10 +152,10 @@ func useGinMiddlewares(ctx context.Context, e *gin.Engine, injector *wirex.Injec
 				return rootID, nil
 			}
 
-			errInvalidToken := config.ErrInvalidToken
+			invalidToken := errors.Unauthorized(config.ErrInvalidTokenID, "Invalid access token")
 			token := util.GetToken(c)
 			if token == "" {
-				return "", errInvalidToken
+				return "", invalidToken
 			}
 
 			ctx := c.Request.Context()
@@ -163,7 +164,7 @@ func useGinMiddlewares(ctx context.Context, e *gin.Engine, injector *wirex.Injec
 			userID, err := injector.Auth.ParseSubject(ctx, token)
 			if err != nil {
 				if err == jwtx.ErrInvalidToken {
-					return "", errInvalidToken
+					return "", invalidToken
 				}
 				return "", err
 			} else if userID == rootID {
@@ -187,7 +188,7 @@ func useGinMiddlewares(ctx context.Context, e *gin.Engine, injector *wirex.Injec
 			if err != nil {
 				return "", err
 			} else if user == nil || user.Status != schema.UserStatusActivated {
-				return "", errInvalidToken
+				return "", invalidToken
 			}
 
 			roleIDs, err := injector.M.RBAC.UserAPI.UserBIZ.GetRoleIDs(ctx, userID)

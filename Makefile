@@ -13,11 +13,12 @@ RELEASE_TAG     = $(RELEASE_VERSION).$(GIT_COUNT).$(GIT_HASH)
 CONFIG_DIR      = ./configs
 CONFIG_FILE     = dev
 STATIC_DIR      = ./build/dist
+START_ARGS      = --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR)
 
 all: start
 
 start:
-	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" main.go start --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR)
+	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" main.go start $(START_ARGS)
 
 build:
 	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)
@@ -38,10 +39,10 @@ clean:
 	rm -rf data $(SERVER_BIN)
 
 serve: build
-	./$(SERVER_BIN) start --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR)
+	./$(SERVER_BIN) start $(START_ARGS)
 
 serve-d: build
-	./$(SERVER_BIN) start --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR) -d
+	./$(SERVER_BIN) start $(START_ARGS) -d
 
 stop:
 	./$(SERVER_BIN) stop

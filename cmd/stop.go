@@ -8,14 +8,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// The function defines a CLI command to stop a server by reading a lock file, killing the process with
+// the corresponding PID, and removing the lock file.
 func StopCmd() *cli.Command {
 	return &cli.Command{
 		Name:  "stop",
-		Usage: "Stop server",
+		Usage: "stop server",
 		Action: func(c *cli.Context) error {
 			appName := c.App.Name
-			lockName := fmt.Sprintf("%s.lock", appName)
-			pid, err := os.ReadFile(lockName)
+			lockFile := fmt.Sprintf("%s.lock", appName)
+			pid, err := os.ReadFile(lockFile)
 			if err != nil {
 				return err
 			}
@@ -26,12 +28,12 @@ func StopCmd() *cli.Command {
 				return err
 			}
 
-			err = os.Remove(lockName)
+			err = os.Remove(lockFile)
 			if err != nil {
-				return fmt.Errorf("Can't remove %s.lock. %s", appName, err.Error())
+				return fmt.Errorf("can't remove %s.lock. %s", appName, err.Error())
 			}
 
-			fmt.Printf("Service %s stopped \n", appName)
+			fmt.Printf("service %s stopped \n", appName)
 			return nil
 		},
 	}

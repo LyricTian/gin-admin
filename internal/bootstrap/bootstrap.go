@@ -15,13 +15,15 @@ import (
 	"go.uber.org/zap"
 )
 
+// RunConfig defines the config for run command.
 type RunConfig struct {
-	ConfigDir  string
-	ConfigFile string
-	StaticDir  string
+	ConfigDir string // Configurations directory
+	Config    string // Directory or files (multiple separated by commas)
+	StaticDir string // Static files directory
 }
 
-// The Run function initializes and starts a service with configuration and logging.
+// The Run function initializes and starts a service with configuration and logging, and handles
+// cleanup upon exit.
 func Run(ctx context.Context, runCfg RunConfig) error {
 	defer func() {
 		if err := zap.L().Sync(); err != nil {
@@ -31,7 +33,7 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 
 	cfgDir := runCfg.ConfigDir
 	staticDir := runCfg.StaticDir
-	config.MustLoad(cfgDir, strings.Split(runCfg.ConfigFile, ",")...)
+	config.MustLoad(cfgDir, strings.Split(runCfg.Config, ",")...)
 	config.C.General.ConfigDir = cfgDir
 	config.C.Middleware.Static.Dir = staticDir
 	config.C.Print()

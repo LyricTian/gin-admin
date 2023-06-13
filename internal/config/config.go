@@ -28,6 +28,8 @@ func MustLoad(dir string, names ...string) {
 	})
 }
 
+// The Load function loads configuration files in various formats from a directory and parses them into
+// a struct.
 func Load(dir string, names ...string) error {
 	if err := defaults.Set(C); err != nil {
 		return err

@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-func initLoggerHook(ctx context.Context, cfg *logging.HookConfig) (*logging.Hook, error) {
+func initLoggerHook(_ context.Context, cfg *logging.HookConfig) (*logging.Hook, error) {
 	extra := cfg.Extra
 	if extra == nil {
 		extra = make(map[string]string)
