@@ -40,12 +40,12 @@ func (a *RBAC) Init(ctx context.Context) error {
 }
 
 func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error {
-	auth := v1.Group("auth")
+	captcha := v1.Group("captcha")
 	{
-		auth.GET("verify", a.LoginAPI.GetVerify)
-		auth.GET("captcha", a.LoginAPI.ResCaptcha)
-		auth.POST("login", a.LoginAPI.Login)
+		captcha.GET("id", a.LoginAPI.GetCaptcha)
+		captcha.GET("image", a.LoginAPI.ResponseCaptcha)
 	}
+	v1.POST("login", a.LoginAPI.Login)
 	current := v1.Group("current")
 	{
 		current.POST("refresh-token", a.LoginAPI.RefreshToken)

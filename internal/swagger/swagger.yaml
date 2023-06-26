@@ -10,6 +10,12 @@ definitions:
       status:
         type: string
     type: object
+  schema.Captcha:
+    properties:
+      captcha_id:
+        description: Captcha ID
+        type: string
+    type: object
   schema.LoginForm:
     properties:
       captcha_code:
@@ -40,12 +46,6 @@ definitions:
         type: integer
       token_type:
         description: 'Token type (Usage: Authorization=${token_type} ${access_token})'
-        type: string
-    type: object
-  schema.LoginVerify:
-    properties:
-      captcha_id:
-        description: Captcha verify id
         type: string
     type: object
   schema.Menu:
@@ -380,7 +380,22 @@ info:
   title: Gin-Admin API
   version: v10.0.0
 paths:
-  /api/v1/auth/captcha:
+  /api/v1/captcha/id:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.Captcha'
+              type: object
+      summary: Get captcha ID
+      tags:
+      - LoginAPI
+  /api/v1/captcha/image:
     get:
       parameters:
       - description: Captcha ID
@@ -402,51 +417,6 @@ paths:
           schema:
             $ref: '#/definitions/util.ResponseResult'
       summary: Response captcha image
-      tags:
-      - LoginAPI
-  /api/v1/auth/login:
-    post:
-      parameters:
-      - description: Request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/schema.LoginForm'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/util.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/schema.LoginToken'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/util.ResponseResult'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/util.ResponseResult'
-      summary: Login system with username and password
-      tags:
-      - LoginAPI
-  /api/v1/auth/verify:
-    get:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/util.ResponseResult'
-            - properties:
-                data:
-                  $ref: '#/definitions/schema.LoginVerify'
-              type: object
-      summary: Get login verify info (captcha id)
       tags:
       - LoginAPI
   /api/v1/current/logout:
@@ -571,6 +541,36 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get current user info
+      tags:
+      - LoginAPI
+  /api/v1/login:
+    post:
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.LoginForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.ResponseResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.LoginToken'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+      summary: Login system with username and password
       tags:
       - LoginAPI
   /api/v1/menus:

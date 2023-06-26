@@ -2,8 +2,8 @@ package schema
 
 import "strings"
 
-type LoginVerify struct {
-	CaptchaID string `json:"captcha_id"` // Captcha verify id
+type Captcha struct {
+	CaptchaID string `json:"captcha_id"` // Captcha ID
 }
 
 type LoginForm struct {

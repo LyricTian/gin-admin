@@ -8,7 +8,7 @@ RequestHeaderKey = "X-Request-Id"
 ResponseTraceKey = "X-Trace-Id"
 
 [Middleware.Logger]
-MaxOutputRequestBodyLen = 4096 # bytes
+MaxOutputRequestBodyLen = 4096  # bytes
 MaxOutputResponseBodyLen = 1024 # bytes
 
 [Middleware.TokenAuth]
@@ -29,7 +29,7 @@ AllowFiles = true
 
 [Middleware.Auth]
 Disable = true
-SkippedPathPrefixes = ["/api/v1/auth/"]
+SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login"]
 
 [Middleware.Auth.Store]
 Type = "badger" # badger/redis
@@ -54,7 +54,7 @@ DB = 10
 
 [Middleware.Casbin]
 Disable = true
-SkippedPathPrefixes = ["/api/v1/auth/", "/api/v1/current/"]
+SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login", "/api/v1/current/"]
 
 [Middleware.Static]
 SkippedPathPrefixes = ["/api"]

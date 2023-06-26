@@ -12,12 +12,12 @@ type Login struct {
 }
 
 // @Tags LoginAPI
-// @Summary Get login verify info (captcha id)
-// @Success 200 {object} util.ResponseResult{data=schema.LoginVerify}
-// @Router /api/v1/auth/verify [get]
-func (a *Login) GetVerify(c *gin.Context) {
+// @Summary Get captcha ID
+// @Success 200 {object} util.ResponseResult{data=schema.Captcha}
+// @Router /api/v1/captcha/id [get]
+func (a *Login) GetCaptcha(c *gin.Context) {
 	ctx := c.Request.Context()
-	data, err := a.LoginBIZ.GetVerify(ctx)
+	data, err := a.LoginBIZ.GetCaptcha(ctx)
 	if err != nil {
 		util.ResError(c, err)
 		return
@@ -32,10 +32,10 @@ func (a *Login) GetVerify(c *gin.Context) {
 // @Produce image/png
 // @Success 200 "Captcha image"
 // @Failure 404 {object} util.ResponseResult
-// @Router /api/v1/auth/captcha [get]
-func (a *Login) ResCaptcha(c *gin.Context) {
+// @Router /api/v1/captcha/image [get]
+func (a *Login) ResponseCaptcha(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.LoginBIZ.ResCaptcha(ctx, c.Writer, c.Query("id"), c.Query("reload") == "1")
+	err := a.LoginBIZ.ResponseCaptcha(ctx, c.Writer, c.Query("id"), c.Query("reload") == "1")
 	if err != nil {
 		util.ResError(c, err)
 	}
@@ -47,7 +47,7 @@ func (a *Login) ResCaptcha(c *gin.Context) {
 // @Success 200 {object} util.ResponseResult{data=schema.LoginToken}
 // @Failure 400 {object} util.ResponseResult
 // @Failure 500 {object} util.ResponseResult
-// @Router /api/v1/auth/login [post]
+// @Router /api/v1/login [post]
 func (a *Login) Login(c *gin.Context) {
 	ctx := c.Request.Context()
 	item := new(schema.LoginForm)

@@ -29,20 +29,21 @@ type Login struct {
 	UserBIZ     *User
 }
 
-// Get login verify info (captcha id)
-func (a *Login) GetVerify(ctx context.Context) (*schema.LoginVerify, error) {
-	return &schema.LoginVerify{
+// This function generates a new captcha ID and returns it as a `schema.Captcha` struct. The length of
+// the captcha is determined by the `config.C.Util.Captcha.Length` configuration value.
+func (a *Login) GetCaptcha(ctx context.Context) (*schema.Captcha, error) {
+	return &schema.Captcha{
 		CaptchaID: captcha.NewLen(config.C.Util.Captcha.Length),
 	}, nil
 }
 
 // Response captcha image
-func (a *Login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, reload bool) error {
-	if reload && !captcha.Reload(captchaID) {
+func (a *Login) ResponseCaptcha(ctx context.Context, w http.ResponseWriter, id string, reload bool) error {
+	if reload && !captcha.Reload(id) {
 		return errors.NotFound("", "Captcha id not found")
 	}
 
-	err := captcha.WriteImage(w, captchaID, config.C.Util.Captcha.Width, config.C.Util.Captcha.Height)
+	err := captcha.WriteImage(w, id, config.C.Util.Captcha.Width, config.C.Util.Captcha.Height)
 	if err != nil {
 		if err == captcha.ErrNotFound {
 			return errors.NotFound("", "Captcha id not found")
