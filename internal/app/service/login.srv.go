@@ -67,7 +67,7 @@ func (a *LoginSrv) Verify(ctx context.Context, userName, password string) (*sche
 	}
 
 	item := result.Data[0]
-	if item.Password != hash.SHA1String(password) {
+	if hash.SHA1String(item.Password) != hash.SHA1String(password) {
 		return nil, errors.New400Response("password incorrect")
 	} else if item.Status != 1 {
 		return nil, errors.ErrUserDisable
