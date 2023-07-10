@@ -15,32 +15,33 @@ import (
 
 // The function defines a CLI command to start a server with various flags and options, including the
 // ability to run as a daemon.
-func StartCmd() *cli.Command {
+func StartCmd(ver string) *cli.Command {
 	return &cli.Command{
 		Name:  "start",
 		Usage: "Start server",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "configdir",
-				Usage:       "Configurations directory",
+				Name:        "config-dir",
+				Aliases:     []string{"d"},
+				Usage:       "Configuration files directory",
 				DefaultText: "configs",
 				Value:       "configs",
 			},
 			&cli.StringFlag{
 				Name:        "config",
 				Aliases:     []string{"c"},
-				Usage:       "Directory or files (multiple separated by commas)",
+				Usage:       "Runtime configuration files or directory (relative to config-dir, multiple separated by commas, such as: logging.yaml,server.toml)",
 				DefaultText: "dev",
 				Value:       "dev",
 			},
 			&cli.StringFlag{
-				Name:  "staticdir",
-				Usage: "Static files directory",
+				Name:    "static-dir",
+				Aliases: []string{"s"},
+				Usage:   "Static files directory",
 			},
 			&cli.BoolFlag{
-				Name:    "daemon",
-				Aliases: []string{"d"},
-				Usage:   "Run as a daemon",
+				Name:  "daemon",
+				Usage: "Run as a daemon",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -56,9 +57,9 @@ func StartCmd() *cli.Command {
 				}
 
 				args := []string{"start"}
-				args = append(args, "--configdir", c.String("configdir"))
-				args = append(args, "--config", c.String("config"))
-				args = append(args, "--staticdir", c.String("staticdir"))
+				args = append(args, "-d", c.String("config-dir"))
+				args = append(args, "-c", c.String("config"))
+				args = append(args, "-s", c.String("static-dir"))
 				fmt.Printf("Execute command: %s %s\n", bin, strings.Join(args, " "))
 				command := exec.Command(bin, args...)
 				err = command.Start()
@@ -74,9 +75,10 @@ func StartCmd() *cli.Command {
 			}
 
 			err := bootstrap.Run(context.Background(), bootstrap.RunConfig{
-				ConfigDir: c.String("configdir"),
+				ConfigDir: c.String("config-dir"),
 				Config:    c.String("config"),
-				StaticDir: c.String("staticdir"),
+				StaticDir: c.String("static-dir"),
+				Version:   ver,
 			})
 			if err != nil {
 				panic(err)

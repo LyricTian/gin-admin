@@ -46,6 +46,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		captcha.GET("image", a.LoginAPI.ResponseCaptcha)
 	}
 	v1.POST("login", a.LoginAPI.Login)
+
 	current := v1.Group("current")
 	{
 		current.POST("refresh-token", a.LoginAPI.RefreshToken)

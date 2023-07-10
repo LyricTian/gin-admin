@@ -98,6 +98,7 @@ type Config struct {
 
 type General struct {
 	AppName            string `default:"ginadmin"`
+	Version            string
 	Debug              bool
 	PprofAddr          string
 	DisableSwagger     bool

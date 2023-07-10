@@ -48,10 +48,10 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 		util.ResError(c, errors.NotFound("", "Not found"))
 	})
 
-	allowedPathPrefixes := injector.M.RouterPrefixes()
+	allowedPrefixes := injector.M.RouterPrefixes()
 
 	// Register middlewares
-	if err := useGinMiddlewares(ctx, e, injector, allowedPathPrefixes); err != nil {
+	if err := useGinMiddlewares(ctx, e, injector, allowedPrefixes); err != nil {
 		return nil, err
 	}
 
@@ -68,7 +68,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 	if dir := config.C.Middleware.Static.Dir; dir != "" {
 		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 			Root:                dir,
-			SkippedPathPrefixes: allowedPathPrefixes,
+			SkippedPathPrefixes: allowedPrefixes,
 		}))
 	}
 

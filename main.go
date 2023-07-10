@@ -24,7 +24,7 @@ func main() {
 	app.Version = VERSION
 	app.Usage = "A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI."
 	app.Commands = []*cli.Command{
-		cmd.StartCmd(),
+		cmd.StartCmd(VERSION),
 		cmd.StopCmd(),
 		cmd.VersionCmd(VERSION),
 	}

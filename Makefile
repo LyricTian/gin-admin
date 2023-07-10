@@ -10,10 +10,10 @@ GIT_COUNT 		= $(shell git rev-list --all --count)
 GIT_HASH        = $(shell git rev-parse --short HEAD)
 RELEASE_TAG     = $(RELEASE_VERSION).$(GIT_COUNT).$(GIT_HASH)
 
-CONFIG_DIR      = ./configs
-CONFIG_FILE     = dev
-STATIC_DIR      = ./build/dist
-START_ARGS      = --configdir $(CONFIG_DIR) --config $(CONFIG_FILE) --staticdir $(STATIC_DIR)
+CONFIG_DIR       = ./configs
+CONFIG_FILES     = dev
+STATIC_DIR       = ./build/dist
+START_ARGS       = -d $(CONFIG_DIR) -c $(CONFIG_FILES) -s $(STATIC_DIR)
 
 all: start
 
