@@ -10,5 +10,6 @@ const (
 )
 
 const (
-	ErrInvalidTokenID = "com.invalid.token"
+	ErrInvalidTokenID   = "com.invalid.token"
+	ErrInvalidCaptchaID = "com.invalid.captcha"
 )

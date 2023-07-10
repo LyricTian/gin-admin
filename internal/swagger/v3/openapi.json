@@ -10,7 +10,25 @@
     "url" : "/"
   } ],
   "paths" : {
-    "/api/v1/auth/captcha" : {
+    "/api/v1/captcha/id" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_captcha_id_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Get captcha ID",
+        "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/captcha/image" : {
       "get" : {
         "parameters" : [ {
           "description" : "Captcha ID",
@@ -45,74 +63,6 @@
           }
         },
         "summary" : "Response captcha image",
-        "tags" : [ "LoginAPI" ]
-      }
-    },
-    "/api/v1/auth/login" : {
-      "post" : {
-        "requestBody" : {
-          "content" : {
-            "*/*" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/schema.LoginForm"
-              }
-            }
-          },
-          "description" : "Request body",
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_auth_login_post_200_response"
-                }
-              }
-            },
-            "description" : "OK"
-          },
-          "400" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/util.ResponseResult"
-                }
-              }
-            },
-            "description" : "Bad Request"
-          },
-          "500" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/util.ResponseResult"
-                }
-              }
-            },
-            "description" : "Internal Server Error"
-          }
-        },
-        "summary" : "Login system with username and password",
-        "tags" : [ "LoginAPI" ],
-        "x-codegen-request-body-name" : "body"
-      }
-    },
-    "/api/v1/auth/verify" : {
-      "get" : {
-        "responses" : {
-          "200" : {
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_auth_verify_get_200_response"
-                }
-              }
-            },
-            "description" : "OK"
-          }
-        },
-        "summary" : "Get login verify info (captcha id)",
         "tags" : [ "LoginAPI" ]
       }
     },
@@ -258,7 +208,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/_api_v1_auth_login_post_200_response"
+                  "$ref" : "#/components/schemas/_api_v1_current_refresh_token_post_200_response"
                 }
               }
             },
@@ -331,6 +281,56 @@
         } ],
         "summary" : "Get current user info",
         "tags" : [ "LoginAPI" ]
+      }
+    },
+    "/api/v1/login" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/schema.LoginForm"
+              }
+            }
+          },
+          "description" : "Request body",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_current_refresh_token_post_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/util.ResponseResult"
+                }
+              }
+            },
+            "description" : "Bad Request"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/util.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "summary" : "Login system with username and password",
+        "tags" : [ "LoginAPI" ],
+        "x-codegen-request-body-name" : "body"
       }
     },
     "/api/v1/menus" : {
@@ -1294,6 +1294,15 @@
         },
         "type" : "object"
       },
+      "schema.Captcha" : {
+        "properties" : {
+          "captcha_id" : {
+            "description" : "Captcha ID",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
       "schema.LoginForm" : {
         "properties" : {
           "captcha_code" : {
@@ -1328,15 +1337,6 @@
           },
           "token_type" : {
             "description" : "Token type (Usage: Authorization=${token_type} ${access_token})",
-            "type" : "string"
-          }
-        },
-        "type" : "object"
-      },
-      "schema.LoginVerify" : {
-        "properties" : {
-          "captcha_id" : {
-            "description" : "Captcha verify id",
             "type" : "string"
           }
         },
@@ -1756,21 +1756,10 @@
         },
         "type" : "object"
       },
-      "_api_v1_auth_login_post_200_response" : {
+      "_api_v1_captcha_id_get_200_response" : {
         "properties" : {
           "data" : {
-            "$ref" : "#/components/schemas/schema.LoginToken"
-          },
-          "util.ResponseResult" : {
-            "$ref" : "#/components/schemas/util.ResponseResult"
-          }
-        },
-        "type" : "object"
-      },
-      "_api_v1_auth_verify_get_200_response" : {
-        "properties" : {
-          "data" : {
-            "$ref" : "#/components/schemas/schema.LoginVerify"
+            "$ref" : "#/components/schemas/schema.Captcha"
           },
           "util.ResponseResult" : {
             "$ref" : "#/components/schemas/util.ResponseResult"
@@ -1785,6 +1774,17 @@
               "$ref" : "#/components/schemas/schema.Menu"
             },
             "type" : "array"
+          },
+          "util.ResponseResult" : {
+            "$ref" : "#/components/schemas/util.ResponseResult"
+          }
+        },
+        "type" : "object"
+      },
+      "_api_v1_current_refresh_token_post_200_response" : {
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/schema.LoginToken"
           },
           "util.ResponseResult" : {
             "$ref" : "#/components/schemas/util.ResponseResult"

@@ -80,7 +80,7 @@ func (a *Login) genUserToken(ctx context.Context, userID string) (*schema.LoginT
 func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.LoginToken, error) {
 	// verify captcha
 	if !captcha.VerifyString(formItem.CaptchaID, formItem.CaptchaCode) {
-		return nil, errors.BadRequest("", "Incorrect captcha")
+		return nil, errors.BadRequest(config.ErrInvalidCaptchaID, "Incorrect captcha")
 	}
 
 	ctx = logging.NewTag(ctx, logging.TagKeyLogin)
