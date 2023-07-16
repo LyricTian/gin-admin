@@ -79,6 +79,7 @@ func WrapPageQuery(ctx context.Context, db *gorm.DB, pp PaginationParam, opts Qu
 }
 
 func FindPage(ctx context.Context, db *gorm.DB, pp PaginationParam, opts QueryOptions, out interface{}) (int64, error) {
+	db = db.WithContext(ctx)
 	var count int64
 	err := db.Count(&count).Error
 	if err != nil {
@@ -100,6 +101,7 @@ func FindPage(ctx context.Context, db *gorm.DB, pp PaginationParam, opts QueryOp
 }
 
 func FindOne(ctx context.Context, db *gorm.DB, opts QueryOptions, out interface{}) (bool, error) {
+	db = db.WithContext(ctx)
 	db = wrapQueryOptions(db, opts)
 	result := db.Limit(1).Scan(out)
 	if err := result.Error; err != nil {
@@ -112,6 +114,7 @@ func FindOne(ctx context.Context, db *gorm.DB, opts QueryOptions, out interface{
 }
 
 func Exists(ctx context.Context, db *gorm.DB) (bool, error) {
+	db = db.WithContext(ctx)
 	var count int64
 	result := db.Count(&count)
 	if err := result.Error; err != nil {

@@ -16,7 +16,9 @@ type MinioClientConfig struct {
 	BucketName      string
 }
 
-func NewMinioClient(config MinioClientConfig) (Clienter, error) {
+var _ Clienter = (*MinioClient)(nil)
+
+func NewMinioClient(config MinioClientConfig) (*MinioClient, error) {
 	client, err := minio.New(config.Endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
 	})
@@ -33,18 +35,18 @@ func NewMinioClient(config MinioClientConfig) (Clienter, error) {
 		}
 	}
 
-	return &minioClient{
+	return &MinioClient{
 		config: config,
 		client: client,
 	}, nil
 }
 
-type minioClient struct {
+type MinioClient struct {
 	config MinioClientConfig
 	client *minio.Client
 }
 
-func (c *minioClient) PutObject(ctx context.Context, bucketName, objectName string, reader io.ReadSeeker, objectSize int64, options ...PutObjectOptions) (*PutObjectResult, error) {
+func (c *MinioClient) PutObject(ctx context.Context, bucketName, objectName string, reader io.ReadSeeker, objectSize int64, options ...PutObjectOptions) (*PutObjectResult, error) {
 	if bucketName == "" {
 		bucketName = c.config.BucketName
 	}
@@ -69,7 +71,7 @@ func (c *minioClient) PutObject(ctx context.Context, bucketName, objectName stri
 	}, nil
 }
 
-func (c *minioClient) GetObject(ctx context.Context, bucketName, objectName string) (io.ReadCloser, error) {
+func (c *MinioClient) GetObject(ctx context.Context, bucketName, objectName string) (io.ReadCloser, error) {
 	if bucketName == "" {
 		bucketName = c.config.BucketName
 	}
@@ -78,7 +80,7 @@ func (c *minioClient) GetObject(ctx context.Context, bucketName, objectName stri
 	return c.client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
 }
 
-func (c *minioClient) RemoveObject(ctx context.Context, bucketName, objectName string) error {
+func (c *MinioClient) RemoveObject(ctx context.Context, bucketName, objectName string) error {
 	if bucketName == "" {
 		bucketName = c.config.BucketName
 	}
@@ -87,7 +89,7 @@ func (c *minioClient) RemoveObject(ctx context.Context, bucketName, objectName s
 	return c.client.RemoveObject(ctx, bucketName, objectName, minio.RemoveObjectOptions{})
 }
 
-func (c *minioClient) StatObject(ctx context.Context, bucketName, objectName string) (*ObjectStat, error) {
+func (c *MinioClient) StatObject(ctx context.Context, bucketName, objectName string) (*ObjectStat, error) {
 	if bucketName == "" {
 		bucketName = c.config.BucketName
 	}

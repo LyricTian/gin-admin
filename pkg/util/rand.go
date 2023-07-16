@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// The function generates a random IP address in string format.
+// The RandomizedIPAddr function generates a random IP address.
 func RandomizedIPAddr() string {
 	raw := make([]byte, 4)
 	rd := rand.New(rand.NewSource(time.Now().UnixNano()))
