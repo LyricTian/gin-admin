@@ -88,7 +88,7 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 	// login by root
 	if formItem.Username == config.C.General.Root.Username {
 		if formItem.Password != hash.MD5String(config.C.General.Root.Password) {
-			return nil, errors.BadRequest("", "Incorrect password")
+			return nil, errors.BadRequest(config.ErrInvalidUsernameOrPassword, "Incorrect password")
 		}
 
 		logging.Context(ctx).Info("Login by root")
@@ -104,14 +104,14 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 	if err != nil {
 		return nil, err
 	} else if user == nil {
-		return nil, errors.BadRequest("", "Incorrect username")
+		return nil, errors.BadRequest(config.ErrInvalidUsernameOrPassword, "Incorrect username")
 	} else if user.Status != schema.UserStatusActivated {
 		return nil, errors.BadRequest("", "User status is not activated, please contact the administrator")
 	}
 
 	// check password
 	if err := hash.CompareHashAndPassword(user.Password, formItem.Password); err != nil {
-		return nil, errors.BadRequest("", "Incorrect password")
+		return nil, errors.BadRequest(config.ErrInvalidUsernameOrPassword, "Incorrect password")
 	}
 
 	userID := user.ID
