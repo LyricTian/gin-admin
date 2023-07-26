@@ -12,7 +12,7 @@ var VERSION = "v10.0.0"
 
 // @title Gin-Admin API
 // @version v10.0.0
-// @description A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI.
+// @description A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin 2.0 + Wire DI.
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization

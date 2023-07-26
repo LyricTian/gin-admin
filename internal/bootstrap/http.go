@@ -9,10 +9,8 @@ import (
 	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
-	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/internal/wirex"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
-	"github.com/LyricTian/gin-admin/v10/pkg/jwtx"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/LyricTian/gin-admin/v10/pkg/middleware"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
@@ -51,7 +49,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 	allowedPrefixes := injector.M.RouterPrefixes()
 
 	// Register middlewares
-	if err := useGinMiddlewares(ctx, e, injector, allowedPrefixes); err != nil {
+	if err := useHTTPMiddlewares(ctx, e, injector, allowedPrefixes); err != nil {
 		return nil, err
 	}
 
@@ -107,7 +105,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 	}, nil
 }
 
-func useGinMiddlewares(_ context.Context, e *gin.Engine, injector *wirex.Injector, allowedPathPrefixes []string) error {
+func useHTTPMiddlewares(_ context.Context, e *gin.Engine, injector *wirex.Injector, allowedPrefixes []string) error {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Enable:                 config.C.Middleware.CORS.Enable,
 		AllowAllOrigins:        config.C.Middleware.CORS.AllowAllOrigins,
@@ -124,94 +122,34 @@ func useGinMiddlewares(_ context.Context, e *gin.Engine, injector *wirex.Injecto
 	}))
 
 	e.Use(middleware.TraceWithConfig(middleware.TraceConfig{
-		AllowedPathPrefixes: allowedPathPrefixes,
+		AllowedPathPrefixes: allowedPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.Trace.SkippedPathPrefixes,
 		RequestHeaderKey:    config.C.Middleware.Trace.RequestHeaderKey,
 		ResponseTraceKey:    config.C.Middleware.Trace.ResponseTraceKey,
 	}))
 
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		AllowedPathPrefixes:      allowedPathPrefixes,
+		AllowedPathPrefixes:      allowedPrefixes,
 		SkippedPathPrefixes:      config.C.Middleware.Logger.SkippedPathPrefixes,
 		MaxOutputRequestBodyLen:  config.C.Middleware.Logger.MaxOutputRequestBodyLen,
 		MaxOutputResponseBodyLen: config.C.Middleware.Logger.MaxOutputResponseBodyLen,
 	}))
 
 	e.Use(middleware.CopyBodyWithConfig(middleware.CopyBodyConfig{
-		AllowedPathPrefixes: allowedPathPrefixes,
+		AllowedPathPrefixes: allowedPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.CopyBody.SkippedPathPrefixes,
 		MaxContentLen:       config.C.Middleware.CopyBody.MaxContentLen,
 	}))
 
 	e.Use(middleware.AuthWithConfig(middleware.AuthConfig{
-		AllowedPathPrefixes: allowedPathPrefixes,
+		AllowedPathPrefixes: allowedPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.Auth.SkippedPathPrefixes,
-		ParseUserID: func(c *gin.Context) (string, error) {
-			rootID := config.C.General.Root.ID
-			if config.C.Middleware.Auth.Disable {
-				return rootID, nil
-			}
-
-			invalidToken := errors.Unauthorized(config.ErrInvalidTokenID, "Invalid access token")
-			token := util.GetToken(c)
-			if token == "" {
-				return "", invalidToken
-			}
-
-			ctx := c.Request.Context()
-			ctx = util.NewUserToken(ctx, token)
-
-			userID, err := injector.Auth.ParseSubject(ctx, token)
-			if err != nil {
-				if err == jwtx.ErrInvalidToken {
-					return "", invalidToken
-				}
-				return "", err
-			} else if userID == rootID {
-				c.Request = c.Request.WithContext(util.NewIsRootUser(ctx))
-				return userID, nil
-			}
-
-			userCacheVal, ok, err := injector.Cache.Get(ctx, config.CacheNSForUser, userID)
-			if err != nil {
-				return "", err
-			} else if ok {
-				userCache := util.ParseUserCache(userCacheVal)
-				c.Request = c.Request.WithContext(util.NewUserCache(ctx, userCache))
-				return userID, nil
-			}
-
-			// Check user status, if not activated, force to logout
-			user, err := injector.M.RBAC.UserAPI.UserBIZ.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
-				QueryOptions: util.QueryOptions{SelectFields: []string{"status"}},
-			})
-			if err != nil {
-				return "", err
-			} else if user == nil || user.Status != schema.UserStatusActivated {
-				return "", invalidToken
-			}
-
-			roleIDs, err := injector.M.RBAC.UserAPI.UserBIZ.GetRoleIDs(ctx, userID)
-			if err != nil {
-				return "", err
-			}
-
-			userCache := util.UserCache{
-				RoleIDs: roleIDs,
-			}
-			err = injector.Cache.Set(ctx, config.CacheNSForUser, userID, userCache.String())
-			if err != nil {
-				return "", err
-			}
-
-			c.Request = c.Request.WithContext(util.NewUserCache(ctx, userCache))
-			return userID, nil
-		},
+		ParseUserID:         injector.M.RBAC.LoginAPI.LoginBIZ.ParseUserID,
 	}))
 
 	e.Use(middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
 		Enable:              config.C.Middleware.RateLimiter.Enable,
-		AllowedPathPrefixes: allowedPathPrefixes,
+		AllowedPathPrefixes: allowedPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.RateLimiter.SkippedPathPrefixes,
 		Period:              config.C.Middleware.RateLimiter.Period,
 		MaxRequestsPerIP:    config.C.Middleware.RateLimiter.MaxRequestsPerIP,
@@ -230,7 +168,7 @@ func useGinMiddlewares(_ context.Context, e *gin.Engine, injector *wirex.Injecto
 	}))
 
 	e.Use(middleware.CasbinWithConfig(middleware.CasbinConfig{
-		AllowedPathPrefixes: allowedPathPrefixes,
+		AllowedPathPrefixes: allowedPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.Casbin.SkippedPathPrefixes,
 		Skipper: func(c *gin.Context) bool {
 			if config.C.Middleware.Casbin.Disable ||

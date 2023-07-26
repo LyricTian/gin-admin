@@ -26,6 +26,7 @@ func StartCmd(ver string) *cli.Command {
 				Usage:       "Configuration files directory",
 				DefaultText: "configs",
 				Value:       "configs",
+				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:        "config",
@@ -45,6 +46,10 @@ func StartCmd(ver string) *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
+			configDir := c.String("config-dir")
+			staticDir := c.String("static-dir")
+			configFiles := c.String("config")
+
 			if c.Bool("daemon") {
 				bin, err := filepath.Abs(os.Args[0])
 				if err != nil {
@@ -57,9 +62,9 @@ func StartCmd(ver string) *cli.Command {
 				}
 
 				args := []string{"start"}
-				args = append(args, "-d", c.String("config-dir"))
-				args = append(args, "-c", c.String("config"))
-				args = append(args, "-s", c.String("static-dir"))
+				args = append(args, "-d", configDir)
+				args = append(args, "-c", configFiles)
+				args = append(args, "-s", staticDir)
 				fmt.Printf("Execute command: %s %s\n", bin, strings.Join(args, " "))
 				command := exec.Command(bin, args...)
 				err = command.Start()
@@ -75,9 +80,9 @@ func StartCmd(ver string) *cli.Command {
 			}
 
 			err := bootstrap.Run(context.Background(), bootstrap.RunConfig{
-				ConfigDir: c.String("config-dir"),
-				Config:    c.String("config"),
-				StaticDir: c.String("static-dir"),
+				ConfigDir: configDir,
+				Config:    configFiles,
+				StaticDir: staticDir,
 				Version:   ver,
 			})
 			if err != nil {

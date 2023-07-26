@@ -64,16 +64,17 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 		}()
 	}
 
+	// Initialize injector
 	injector, cleanInjectorFn, err := wirex.BuildInjector(ctx)
 	if err != nil {
 		return err
 	}
-
 	if err := injector.M.Init(ctx); err != nil {
 		return err
 	}
 
 	return util.Run(ctx, func(ctx context.Context) (func(), error) {
+		// Start HTTP server
 		cleanHTTPServerFn, err := startHTTPServer(ctx, injector)
 		if err != nil {
 			return cleanInjectorFn, err
@@ -83,6 +84,7 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 			if err := injector.M.Release(ctx); err != nil {
 				logging.Context(ctx).Error("Failed to release mods", zap.Error(err))
 			}
+
 			if cleanHTTPServerFn != nil {
 				cleanHTTPServerFn()
 			}

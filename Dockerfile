@@ -16,5 +16,5 @@ WORKDIR /go/src/${APP}
 COPY --from=builder /go/src/${APP}/${APP} /usr/bin/
 COPY --from=builder /go/src/${APP}/build/configs /usr/bin/configs
 COPY --from=builder /go/src/${APP}/build/dist /usr/bin/dist
-ENTRYPOINT ["ginadmin", "start", "--configdir", "/usr/bin/configs", "--config", "prod", "--staticdir", "/usr/bin/dist"]
+ENTRYPOINT ["ginadmin", "start", "--config-dir", "/usr/bin/configs", "--config", "prod", "--static-dir", "/usr/bin/dist"]
 EXPOSE 8040

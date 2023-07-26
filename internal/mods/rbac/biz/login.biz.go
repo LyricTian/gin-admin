@@ -16,6 +16,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/jwtx"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -27,6 +28,68 @@ type Login struct {
 	UserRoleDAL *dal.UserRole
 	MenuDAL     *dal.Menu
 	UserBIZ     *User
+}
+
+func (a *Login) ParseUserID(c *gin.Context) (string, error) {
+	rootID := config.C.General.Root.ID
+	if config.C.Middleware.Auth.Disable {
+		return rootID, nil
+	}
+
+	invalidToken := errors.Unauthorized(config.ErrInvalidTokenID, "Invalid access token")
+	token := util.GetToken(c)
+	if token == "" {
+		return "", invalidToken
+	}
+
+	ctx := c.Request.Context()
+	ctx = util.NewUserToken(ctx, token)
+
+	userID, err := a.Auth.ParseSubject(ctx, token)
+	if err != nil {
+		if err == jwtx.ErrInvalidToken {
+			return "", invalidToken
+		}
+		return "", err
+	} else if userID == rootID {
+		c.Request = c.Request.WithContext(util.NewIsRootUser(ctx))
+		return userID, nil
+	}
+
+	userCacheVal, ok, err := a.Cache.Get(ctx, config.CacheNSForUser, userID)
+	if err != nil {
+		return "", err
+	} else if ok {
+		userCache := util.ParseUserCache(userCacheVal)
+		c.Request = c.Request.WithContext(util.NewUserCache(ctx, userCache))
+		return userID, nil
+	}
+
+	// Check user status, if not activated, force to logout
+	user, err := a.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
+		QueryOptions: util.QueryOptions{SelectFields: []string{"status"}},
+	})
+	if err != nil {
+		return "", err
+	} else if user == nil || user.Status != schema.UserStatusActivated {
+		return "", invalidToken
+	}
+
+	roleIDs, err := a.UserBIZ.GetRoleIDs(ctx, userID)
+	if err != nil {
+		return "", err
+	}
+
+	userCache := util.UserCache{
+		RoleIDs: roleIDs,
+	}
+	err = a.Cache.Set(ctx, config.CacheNSForUser, userID, userCache.String())
+	if err != nil {
+		return "", err
+	}
+
+	c.Request = c.Request.WithContext(util.NewUserCache(ctx, userCache))
+	return userID, nil
 }
 
 // This function generates a new captcha ID and returns it as a `schema.Captcha` struct. The length of
