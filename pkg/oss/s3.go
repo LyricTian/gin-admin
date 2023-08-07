@@ -17,9 +17,10 @@ type S3ClientConfig struct {
 	AccessKeyID     string
 	SecretAccessKey string
 	BucketName      string
+	Prefix          string
 }
 
-var _ Clienter = (*S3Client)(nil)
+var _ IClient = (*S3Client)(nil)
 
 type S3Client struct {
 	config  S3ClientConfig
@@ -53,7 +54,7 @@ func (c *S3Client) PutObject(ctx context.Context, bucketName, objectName string,
 		opt = options[0]
 	}
 
-	objectName = formatObjectName(objectName)
+	objectName = formatObjectName(c.config.Prefix, objectName)
 	input := &s3.PutObjectInput{
 		Bucket:             aws.String(bucketName),
 		Key:                aws.String(objectName),
@@ -86,7 +87,7 @@ func (c *S3Client) GetObject(ctx context.Context, bucketName, objectName string)
 		bucketName = c.config.BucketName
 	}
 
-	objectName = formatObjectName(objectName)
+	objectName = formatObjectName(c.config.Prefix, objectName)
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(objectName),
@@ -105,7 +106,7 @@ func (c *S3Client) RemoveObject(ctx context.Context, bucketName, objectName stri
 		bucketName = c.config.BucketName
 	}
 
-	objectName = formatObjectName(objectName)
+	objectName = formatObjectName(c.config.Prefix, objectName)
 	input := &s3.DeleteObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(objectName),
@@ -131,12 +132,22 @@ func (c *S3Client) RemoveObjectByURL(ctx context.Context, urlStr string) error {
 	return err
 }
 
+func (c *S3Client) StatObjectByURL(ctx context.Context, urlStr string) (*ObjectStat, error) {
+	prefix := c.config.Domain + "/"
+	if !strings.HasPrefix(urlStr, prefix) {
+		return nil, nil
+	}
+
+	objectName := strings.TrimPrefix(urlStr, prefix)
+	return c.StatObject(ctx, c.config.BucketName, objectName)
+}
+
 func (c *S3Client) StatObject(ctx context.Context, bucketName, objectName string) (*ObjectStat, error) {
 	if bucketName == "" {
 		bucketName = c.config.BucketName
 	}
 
-	objectName = formatObjectName(objectName)
+	objectName = formatObjectName(c.config.Prefix, objectName)
 	input := &s3.HeadObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(objectName),
