@@ -10,7 +10,7 @@ import (
 // Usage: go build -ldflags "-X main.VERSION=x.x.x"
 var VERSION = "v10.0.0"
 
-// @title Gin-Admin API
+// @title ginadmin
 // @version v10.0.0
 // @description A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin 2.0 + Wire DI.
 // @securityDefinitions.apikey ApiKeyAuth
