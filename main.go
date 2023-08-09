@@ -22,7 +22,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "ginadmin"
 	app.Version = VERSION
-	app.Usage = "A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin + Wire DI."
+	app.Usage = "A lightweight, flexible, elegant and full-featured RBAC scaffolding based on GIN + GORM 2.0 + Casbin 2.0 + Wire DI."
 	app.Commands = []*cli.Command{
 		cmd.StartCmd(VERSION),
 		cmd.StopCmd(),
