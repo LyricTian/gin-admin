@@ -107,6 +107,7 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		UserAPI:  apiUser,
 		LoginAPI: apiLogin,
 		Casbinx:  casbinx,
+		MenuBiz:  bizMenu,
 	}
 	modsMods := &mods.Mods{
 		RBAC: rbacRBAC,

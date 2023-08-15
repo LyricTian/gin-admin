@@ -2,12 +2,16 @@ package biz
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
+	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
+	"github.com/LyricTian/gin-admin/v10/pkg/encoding/yaml"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
@@ -20,9 +24,118 @@ type Menu struct {
 	RoleMenuDAL     *dal.RoleMenu
 }
 
+func (a *Menu) InitFromFile(ctx context.Context, menuFile string) error {
+	f, err := os.ReadFile(menuFile)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+
+	var menus schema.Menus
+	if ext := filepath.Ext(menuFile); ext == ".json" {
+		if err := json.Unmarshal(f, &menus); err != nil {
+			return errors.Wrapf(err, "Unmarshal JSON file '%s' failed", menuFile)
+		}
+	} else if ext == ".yaml" || ext == ".yml" {
+		if err := yaml.Unmarshal(f, &menus); err != nil {
+			return errors.Wrapf(err, "Unmarshal YAML file '%s' failed", menuFile)
+		}
+	} else {
+		return errors.Errorf("Unsupported file type '%s'", ext)
+	}
+
+	return a.Trans.Exec(ctx, func(ctx context.Context) error {
+		return a.createInBatchByParent(ctx, menus, nil)
+	})
+}
+
+func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, parent *schema.Menu) error {
+	total := len(items)
+	for i, item := range items {
+		var parentID string
+		if parent != nil {
+			parentID = parent.ID
+		}
+
+		if item.ID != "" {
+			exists, err := a.MenuDAL.Exists(ctx, item.ID)
+			if err != nil {
+				return err
+			} else if exists {
+				continue
+			}
+		} else if item.Code != "" {
+			exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, item.Code, parentID)
+			if err != nil {
+				return err
+			} else if exists {
+				continue
+			}
+		} else if item.Name != "" {
+			exists, err := a.MenuDAL.ExistsNameByParentID(ctx, item.Name, parentID)
+			if err != nil {
+				return err
+			} else if exists {
+				continue
+			}
+		}
+
+		if item.ID == "" {
+			item.ID = util.NewXID()
+		}
+		if item.Status == "" {
+			item.Status = schema.MenuStatusEnabled
+		}
+		if item.Sequence == 0 {
+			item.Sequence = total - i
+		}
+
+		item.ParentID = parentID
+		if parent != nil {
+			item.ParentPath = parent.ParentPath + parentID + util.TreePathDelimiter
+		}
+		item.CreatedAt = time.Now()
+		if err := a.MenuDAL.Create(ctx, item); err != nil {
+			return err
+		}
+
+		for _, res := range item.Resources {
+			if res.ID != "" {
+				exists, err := a.MenuResourceDAL.Exists(ctx, res.ID)
+				if err != nil {
+					return err
+				} else if exists {
+					continue
+				}
+			}
+			if res.ID == "" {
+				res.ID = util.NewXID()
+			}
+			res.MenuID = item.ID
+			res.CreatedAt = time.Now()
+			if err := a.MenuResourceDAL.Create(ctx, res); err != nil {
+				return err
+			}
+		}
+
+		if item.Children != nil {
+			if err := a.createInBatchByParent(ctx, *item.Children, item); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // Query menus from the data access object based on the provided parameters and options.
 func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema.MenuQueryResult, error) {
 	params.Pagination = false
+
+	if err := a.fillQueryParam(ctx, &params); err != nil {
+		return nil, err
+	}
 
 	result, err := a.MenuDAL.Query(ctx, params, schema.MenuQueryOptions{
 		QueryOptions: util.QueryOptions{
@@ -42,6 +155,34 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema
 
 	result.Data = result.Data.ToTree()
 	return result, nil
+}
+
+func (a *Menu) fillQueryParam(ctx context.Context, params *schema.MenuQueryParam) error {
+	if params.CodePath != "" {
+		var (
+			codes    []string
+			lastMenu schema.Menu
+		)
+		for _, code := range strings.Split(params.CodePath, util.TreePathDelimiter) {
+			if code == "" {
+				continue
+			}
+			codes = append(codes, code)
+			menu, err := a.MenuDAL.GetByCodeAndParentID(ctx, code, lastMenu.ParentID, schema.MenuQueryOptions{
+				QueryOptions: util.QueryOptions{
+					SelectFields: []string{"id", "parent_id", "parent_path"},
+				},
+			})
+			if err != nil {
+				return err
+			} else if menu == nil {
+				return errors.NotFound("", "Menu not found by code '%s'", strings.Join(codes, util.TreePathDelimiter))
+			}
+			lastMenu = *menu
+		}
+		params.ParentPathPrefix = lastMenu.ParentPath + lastMenu.ID + util.TreePathDelimiter
+	}
+	return nil
 }
 
 func (a *Menu) appendChildren(ctx context.Context, data schema.Menus) (schema.Menus, error) {

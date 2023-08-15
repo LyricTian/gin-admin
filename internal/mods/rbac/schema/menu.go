@@ -45,8 +45,9 @@ func (a Menu) TableName() string {
 // Defining the query parameters for the `Menu` struct.
 type MenuQueryParam struct {
 	util.PaginationParam
-	InIDs            []string `form:"-"`
+	CodePath         string   `form:"code"` // Code path (like xxx.xxx.xxx)
 	LikeName         string   `form:"name"` // Display name of menu
+	InIDs            []string `form:"-"`    // Include menu IDs
 	Status           string   `form:"-"`    // Status of menu (disabled, enabled)
 	ParentID         string   `form:"-"`    // Parent ID (From Menu.ID)
 	ParentPathPrefix string   `form:"-"`    // Parent path (split by .)
@@ -141,7 +142,7 @@ type MenuForm struct {
 	Name        string        `json:"name" binding:"required,max=128"`                  // Display name of menu
 	Description string        `json:"description"`                                      // Details about menu
 	Sequence    int           `json:"sequence"`                                         // Sequence for sorting
-	Type        string        `json:"type" binding:"required,oneof=group menu button"`  // Type of menu (group, page, button)
+	Type        string        `json:"type" binding:"required,oneof=group page button"`  // Type of menu (group, page, button)
 	Path        string        `json:"path"`                                             // Access path of menu
 	Properties  string        `json:"properties"`                                       // Properties of menu (JSON)
 	Status      string        `json:"status" binding:"required,oneof=disabled enabled"` // Status of menu (disabled, enabled)

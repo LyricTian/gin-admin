@@ -2,10 +2,15 @@ package rbac
 
 import (
 	"context"
+	"path/filepath"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/api"
+	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/biz"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
+	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +21,7 @@ type RBAC struct {
 	UserAPI  *api.User
 	LoginAPI *api.Login
 	Casbinx  *Casbinx
+	MenuBiz  *biz.Menu
 }
 
 func (a *RBAC) AutoMigrate(ctx context.Context) error {
@@ -36,6 +42,17 @@ func (a *RBAC) Init(ctx context.Context) error {
 	if err := a.Casbinx.Load(ctx); err != nil {
 		return err
 	}
+
+	if v := config.C.General.MenuDataFile; v != "" {
+		v, err := filepath.Abs(v)
+		if err != nil {
+			return err
+		}
+		if err := a.MenuBiz.InitFromFile(ctx, v); err != nil {
+			logging.Context(ctx).Error("Failed to init menu data from file", zap.Error(err), zap.String("file", v))
+		}
+	}
+
 	return nil
 }
 

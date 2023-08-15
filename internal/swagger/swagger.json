@@ -348,11 +348,17 @@
                 "tags": [
                     "MenuAPI"
                 ],
-                "summary": "Query menu list",
+                "summary": "Query menu tree data",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Display name of menu",
+                        "description": "Code path of menu (like xxx.xxx.xxx)",
+                        "name": "code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name of menu",
                         "name": "name",
                         "in": "query"
                     }
@@ -1427,7 +1433,7 @@
                     "type": "string",
                     "enum": [
                         "group",
-                        "menu",
+                        "page",
                         "button"
                     ]
                 }

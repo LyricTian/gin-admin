@@ -9,9 +9,13 @@ import (
 )
 
 type Auther interface {
+	// Generate a JWT (JSON Web Token) with the provided subject.
 	GenerateToken(ctx context.Context, subject string) (TokenInfo, error)
+	// Invalidate a token by removing it from the token store.
 	DestroyToken(ctx context.Context, accessToken string) error
+	// Parse the subject (or user identifier) from a given access token.
 	ParseSubject(ctx context.Context, accessToken string) (string, error)
+	// Release any resources held by the JWTAuth instance.
 	Release(ctx context.Context) error
 }
 
@@ -79,18 +83,18 @@ func New(store Storer, opts ...Option) Auther {
 		})
 	}
 
-	return &jwtAuth{
+	return &JWTAuth{
 		opts:  &o,
 		store: store,
 	}
 }
 
-type jwtAuth struct {
+type JWTAuth struct {
 	opts  *options
 	store Storer
 }
 
-func (a *jwtAuth) GenerateToken(ctx context.Context, subject string) (TokenInfo, error) {
+func (a *JWTAuth) GenerateToken(ctx context.Context, subject string) (TokenInfo, error) {
 	now := time.Now()
 	expiresAt := now.Add(time.Duration(a.opts.expired) * time.Second).Unix()
 
@@ -114,7 +118,7 @@ func (a *jwtAuth) GenerateToken(ctx context.Context, subject string) (TokenInfo,
 	return tokenInfo, nil
 }
 
-func (a *jwtAuth) parseToken(tokenStr string) (*jwt.StandardClaims, error) {
+func (a *JWTAuth) parseToken(tokenStr string) (*jwt.StandardClaims, error) {
 	var (
 		token *jwt.Token
 		err   error
@@ -135,14 +139,14 @@ func (a *jwtAuth) parseToken(tokenStr string) (*jwt.StandardClaims, error) {
 	return token.Claims.(*jwt.StandardClaims), nil
 }
 
-func (a *jwtAuth) callStore(fn func(Storer) error) error {
+func (a *JWTAuth) callStore(fn func(Storer) error) error {
 	if store := a.store; store != nil {
 		return fn(store)
 	}
 	return nil
 }
 
-func (a *jwtAuth) DestroyToken(ctx context.Context, tokenStr string) error {
+func (a *JWTAuth) DestroyToken(ctx context.Context, tokenStr string) error {
 	claims, err := a.parseToken(tokenStr)
 	if err != nil {
 		return err
@@ -154,7 +158,7 @@ func (a *jwtAuth) DestroyToken(ctx context.Context, tokenStr string) error {
 	})
 }
 
-func (a *jwtAuth) ParseSubject(ctx context.Context, tokenStr string) (string, error) {
+func (a *JWTAuth) ParseSubject(ctx context.Context, tokenStr string) (string, error) {
 	if tokenStr == "" {
 		return "", ErrInvalidToken
 	}
@@ -179,7 +183,7 @@ func (a *jwtAuth) ParseSubject(ctx context.Context, tokenStr string) (string, er
 	return claims.Subject, nil
 }
 
-func (a *jwtAuth) Release(ctx context.Context) error {
+func (a *JWTAuth) Release(ctx context.Context) error {
 	return a.callStore(func(store Storer) error {
 		return store.Close(ctx)
 	})

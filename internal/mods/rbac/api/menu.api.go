@@ -14,8 +14,9 @@ type Menu struct {
 
 // @Tags MenuAPI
 // @Security ApiKeyAuth
-// @Summary Query menu list
-// @Param name query string false "Display name of menu"
+// @Summary Query menu tree data
+// @Param code query string false "Code path of menu (like xxx.xxx.xxx)"
+// @Param name query string false "Name of menu"
 // @Success 200 {object} util.ResponseResult{data=[]schema.Menu}
 // @Failure 401 {object} util.ResponseResult
 // @Failure 500 {object} util.ResponseResult

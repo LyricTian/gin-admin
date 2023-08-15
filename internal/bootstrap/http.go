@@ -29,25 +29,20 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 	}
 
 	e := gin.New()
-
 	e.GET("/health", func(c *gin.Context) {
 		util.ResOK(c)
 	})
-
 	e.Use(middleware.RecoveryWithConfig(middleware.RecoveryConfig{
 		Skip: config.C.Middleware.Recovery.Skip,
 	}))
-
 	e.NoMethod(func(c *gin.Context) {
 		util.ResError(c, errors.MethodNotAllowed("", "Method not allowed"))
 	})
-
 	e.NoRoute(func(c *gin.Context) {
 		util.ResError(c, errors.NotFound("", "Not found"))
 	})
 
 	allowedPrefixes := injector.M.RouterPrefixes()
-
 	// Register middlewares
 	if err := useHTTPMiddlewares(ctx, e, injector, allowedPrefixes); err != nil {
 		return nil, err
@@ -70,15 +65,15 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 		}))
 	}
 
+	addr := config.C.General.HTTP.Addr
+	logging.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", addr))
 	srv := &http.Server{
-		Addr:         config.C.General.HTTP.Addr,
+		Addr:         addr,
 		Handler:      e,
 		ReadTimeout:  time.Second * time.Duration(config.C.General.HTTP.ReadTimeout),
 		WriteTimeout: time.Second * time.Duration(config.C.General.HTTP.WriteTimeout),
 		IdleTimeout:  time.Second * time.Duration(config.C.General.HTTP.IdleTimeout),
 	}
-
-	logging.Context(ctx).Info(fmt.Sprintf("HTTP server is listening on %s", srv.Addr))
 
 	go func() {
 		var err error

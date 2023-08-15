@@ -140,7 +140,7 @@ definitions:
         description: Type of menu (group, page, button)
         enum:
         - group
-        - menu
+        - page
         - button
         type: string
     required:
@@ -576,7 +576,11 @@ paths:
   /api/v1/menus:
     get:
       parameters:
-      - description: Display name of menu
+      - description: Code path of menu (like xxx.xxx.xxx)
+        in: query
+        name: code
+        type: string
+      - description: Name of menu
         in: query
         name: name
         type: string
@@ -602,7 +606,7 @@ paths:
             $ref: '#/definitions/util.ResponseResult'
       security:
       - ApiKeyAuth: []
-      summary: Query menu list
+      summary: Query menu tree data
       tags:
       - MenuAPI
     post:
