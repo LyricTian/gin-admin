@@ -66,14 +66,16 @@ func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, pa
 			} else if exists {
 				continue
 			}
-		} else if item.Code != "" {
+		}
+		if item.Code != "" {
 			exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, item.Code, parentID)
 			if err != nil {
 				return err
 			} else if exists {
 				continue
 			}
-		} else if item.Name != "" {
+		}
+		if item.Name != "" {
 			exists, err := a.MenuDAL.ExistsNameByParentID(ctx, item.Name, parentID)
 			if err != nil {
 				return err
