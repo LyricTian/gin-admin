@@ -17,8 +17,8 @@ import (
 
 // RunConfig defines the config for run command.
 type RunConfig struct {
-	ConfigDir string // Configurations directory
-	Config    string // Directory or files (multiple separated by commas)
+	WorkDir   string // Working directory
+	Configs   string // Directory or files (multiple separated by commas)
 	StaticDir string // Static files directory
 	Version   string
 }
@@ -28,14 +28,14 @@ type RunConfig struct {
 func Run(ctx context.Context, runCfg RunConfig) error {
 	defer func() {
 		if err := zap.L().Sync(); err != nil {
-			fmt.Printf("Failed to sync zap logger: %s \n", err.Error())
+			fmt.Printf("failed to sync zap logger: %s \n", err.Error())
 		}
 	}()
 
-	cfgDir := runCfg.ConfigDir
+	workDir := runCfg.WorkDir
 	staticDir := runCfg.StaticDir
-	config.MustLoad(cfgDir, strings.Split(runCfg.Config, ",")...)
-	config.C.General.ConfigDir = cfgDir
+	config.MustLoad(workDir, strings.Split(runCfg.Configs, ",")...)
+	config.C.General.WorkDir = workDir
 	config.C.Middleware.Static.Dir = staticDir
 	config.C.General.Version = runCfg.Version
 	config.C.Print()
@@ -46,20 +46,20 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 	}
 	ctx = logging.NewTag(ctx, logging.TagKeyMain)
 
-	logging.Context(ctx).Info("Starting service ...",
+	logging.Context(ctx).Info("starting service ...",
 		zap.String("version", runCfg.Version),
 		zap.Int("pid", os.Getpid()),
-		zap.String("config_dir", cfgDir),
-		zap.String("config", runCfg.Config),
+		zap.String("work_dir", workDir),
+		zap.String("config", runCfg.Configs),
 		zap.String("static_dir", staticDir),
 	)
 
 	if addr := config.C.General.PprofAddr; addr != "" {
-		logging.Context(ctx).Info("Pprof server is listening on " + addr)
+		logging.Context(ctx).Info("pprof server is listening on " + addr)
 		go func() {
 			err := http.ListenAndServe(addr, nil)
 			if err != nil {
-				logging.Context(ctx).Error("Failed to listen pprof server", zap.Error(err))
+				logging.Context(ctx).Error("failed to listen pprof server", zap.Error(err))
 			}
 		}()
 	}
@@ -82,7 +82,7 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 
 		return func() {
 			if err := injector.M.Release(ctx); err != nil {
-				logging.Context(ctx).Error("Failed to release mods", zap.Error(err))
+				logging.Context(ctx).Error("failed to release injector", zap.Error(err))
 			}
 
 			if cleanHTTPServerFn != nil {

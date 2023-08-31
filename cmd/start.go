@@ -21,9 +21,9 @@ func StartCmd(ver string) *cli.Command {
 		Usage: "Start server",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "config-dir",
+				Name:        "work-dir",
 				Aliases:     []string{"d"},
-				Usage:       "Configuration files directory",
+				Usage:       "Working directory",
 				DefaultText: "configs",
 				Value:       "configs",
 				Required:    true,
@@ -31,7 +31,7 @@ func StartCmd(ver string) *cli.Command {
 			&cli.StringFlag{
 				Name:        "config",
 				Aliases:     []string{"c"},
-				Usage:       "Runtime configuration files or directory (relative to config-dir, multiple separated by commas, such as: logging.yaml,server.toml)",
+				Usage:       "Runtime configuration files or directory (relative to work-dir, multiple separated by commas, such as: logging.yaml,server.toml)",
 				DefaultText: "dev",
 				Value:       "dev",
 			},
@@ -46,9 +46,9 @@ func StartCmd(ver string) *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			configDir := c.String("config-dir")
+			workDir := c.String("work-dir")
 			staticDir := c.String("static-dir")
-			configFiles := c.String("config")
+			configs := c.String("config")
 
 			if c.Bool("daemon") {
 				bin, err := filepath.Abs(os.Args[0])
@@ -62,10 +62,10 @@ func StartCmd(ver string) *cli.Command {
 				}
 
 				args := []string{"start"}
-				args = append(args, "-d", configDir)
-				args = append(args, "-c", configFiles)
+				args = append(args, "-d", workDir)
+				args = append(args, "-c", configs)
 				args = append(args, "-s", staticDir)
-				fmt.Printf("Execute command: %s %s\n", bin, strings.Join(args, " "))
+				fmt.Printf("execute command: %s %s\n", bin, strings.Join(args, " "))
 				command := exec.Command(bin, args...)
 				err = command.Start()
 				if err != nil {
@@ -80,8 +80,8 @@ func StartCmd(ver string) *cli.Command {
 			}
 
 			err := bootstrap.Run(context.Background(), bootstrap.RunConfig{
-				ConfigDir: configDir,
-				Config:    configFiles,
+				WorkDir:   workDir,
+				Configs:   configs,
 				StaticDir: staticDir,
 				Version:   ver,
 			})

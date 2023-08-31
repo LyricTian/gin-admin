@@ -24,7 +24,7 @@ type General struct {
 	DisableSwagger     bool
 	DisablePrintConfig bool
 	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // abc-123
-	ConfigDir          string // From command arguments
+	WorkDir            string // From command arguments
 	MenuDataFile       string `default:"menu.json"` // From schema.Menus (JSON/YAML)
 	HTTP               struct {
 		Addr            string `default:":8080"`

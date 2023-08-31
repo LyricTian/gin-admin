@@ -54,7 +54,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 	}
 
 	if !config.C.General.DisableSwagger {
-		e.StaticFile("/openapi.json", filepath.Join(config.C.General.ConfigDir, "openapi.json"))
+		e.StaticFile("/openapi.json", filepath.Join(config.C.General.WorkDir, "openapi.json"))
 		e.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 

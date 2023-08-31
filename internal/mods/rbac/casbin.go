@@ -109,7 +109,7 @@ func (a *Casbinx) load(ctx context.Context) error {
 	wg.Wait()
 
 	if buf.Len() > 0 {
-		policyFile := filepath.Join(config.C.General.ConfigDir, config.C.Middleware.Casbin.GenPolicyFile)
+		policyFile := filepath.Join(config.C.General.WorkDir, config.C.Middleware.Casbin.GenPolicyFile)
 		_ = os.Rename(policyFile, policyFile+".bak")
 		_ = os.MkdirAll(filepath.Dir(policyFile), 0755)
 		if err := os.WriteFile(policyFile, buf.Bytes(), 0666); err != nil {
@@ -119,7 +119,7 @@ func (a *Casbinx) load(ctx context.Context) error {
 		// set readonly
 		_ = os.Chmod(policyFile, 0444)
 
-		modelFile := filepath.Join(config.C.General.ConfigDir, config.C.Middleware.Casbin.ModelFile)
+		modelFile := filepath.Join(config.C.General.WorkDir, config.C.Middleware.Casbin.ModelFile)
 		e, err := casbin.NewEnforcer(modelFile, policyFile)
 		if err != nil {
 			logging.Context(ctx).Error("Failed to create casbin enforcer", zap.Error(err))
