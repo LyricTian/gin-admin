@@ -38,10 +38,6 @@ type Menu struct {
 	Resources   MenuResources `json:"resources" gorm:"-"`                 // Resources of menu
 }
 
-func (a Menu) TableName() string {
-	return "menu"
-}
-
 // Defining the query parameters for the `Menu` struct.
 type MenuQueryParam struct {
 	util.PaginationParam

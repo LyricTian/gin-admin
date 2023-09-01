@@ -28,10 +28,6 @@ type User struct {
 	Roles     UserRoles `json:"roles" gorm:"-"`                // Roles of user
 }
 
-func (a User) TableName() string {
-	return "user"
-}
-
 // Defining the query parameters for the `User` struct.
 type UserQueryParam struct {
 	util.PaginationParam

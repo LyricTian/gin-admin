@@ -20,7 +20,6 @@ type RunConfig struct {
 	WorkDir   string // Working directory
 	Configs   string // Directory or files (multiple separated by commas)
 	StaticDir string // Static files directory
-	Version   string
 }
 
 // The Run function initializes and starts a service with configuration and logging, and handles
@@ -37,7 +36,6 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 	config.MustLoad(workDir, strings.Split(runCfg.Configs, ",")...)
 	config.C.General.WorkDir = workDir
 	config.C.Middleware.Static.Dir = staticDir
-	config.C.General.Version = runCfg.Version
 	config.C.Print()
 
 	cleanLoggerFn, err := logging.InitWithConfig(ctx, &config.C.Logger, initLoggerHook)
@@ -47,7 +45,7 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 	ctx = logging.NewTag(ctx, logging.TagKeyMain)
 
 	logging.Context(ctx).Info("starting service ...",
-		zap.String("version", runCfg.Version),
+		zap.String("version", config.C.General.Version),
 		zap.Int("pid", os.Getpid()),
 		zap.String("work_dir", workDir),
 		zap.String("config", runCfg.Configs),
@@ -74,7 +72,6 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 	}
 
 	return util.Run(ctx, func(ctx context.Context) (func(), error) {
-		// Start HTTP server
 		cleanHTTPServerFn, err := startHTTPServer(ctx, injector)
 		if err != nil {
 			return cleanInjectorFn, err

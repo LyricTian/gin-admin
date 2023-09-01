@@ -16,10 +16,6 @@ type MenuResource struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`     // Update time
 }
 
-func (a MenuResource) TableName() string {
-	return "menu_resource"
-}
-
 // Defining the query parameters for the `MenuResource` struct.
 type MenuResourceQueryParam struct {
 	util.PaginationParam

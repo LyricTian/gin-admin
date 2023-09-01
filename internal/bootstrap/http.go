@@ -36,13 +36,14 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 		Skip: config.C.Middleware.Recovery.Skip,
 	}))
 	e.NoMethod(func(c *gin.Context) {
-		util.ResError(c, errors.MethodNotAllowed("", "Method not allowed"))
+		util.ResError(c, errors.MethodNotAllowed("", "Method Not Allowed"))
 	})
 	e.NoRoute(func(c *gin.Context) {
-		util.ResError(c, errors.NotFound("", "Not found"))
+		util.ResError(c, errors.NotFound("", "Not Found"))
 	})
 
 	allowedPrefixes := injector.M.RouterPrefixes()
+
 	// Register middlewares
 	if err := useHTTPMiddlewares(ctx, e, injector, allowedPrefixes); err != nil {
 		return nil, err
@@ -53,6 +54,7 @@ func startHTTPServer(ctx context.Context, injector *wirex.Injector) (func(), err
 		return nil, err
 	}
 
+	// Register swagger
 	if !config.C.General.DisableSwagger {
 		e.StaticFile("/openapi.json", filepath.Join(config.C.General.WorkDir, "openapi.json"))
 		e.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

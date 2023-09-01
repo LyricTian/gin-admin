@@ -38,46 +38,45 @@ type Config struct {
 	Resolver     []ResolverConfig
 }
 
-func New(c Config) (*gorm.DB, error) {
+func New(cfg Config) (*gorm.DB, error) {
 	var dialector gorm.Dialector
 
-	switch strings.ToLower(c.DBType) {
+	switch strings.ToLower(cfg.DBType) {
 	case "mysql":
-		if err := createDatabaseWithMySQL(c.DSN); err != nil {
+		if err := createDatabaseWithMySQL(cfg.DSN); err != nil {
 			return nil, err
 		}
-		dialector = mysql.Open(c.DSN)
+		dialector = mysql.Open(cfg.DSN)
 	case "postgres":
-		dialector = postgres.Open(c.DSN)
+		dialector = postgres.Open(cfg.DSN)
 	case "sqlite3":
-		_ = os.MkdirAll(filepath.Dir(c.DSN), os.ModePerm)
-		dialector = sqlite.Open(c.DSN)
+		_ = os.MkdirAll(filepath.Dir(cfg.DSN), os.ModePerm)
+		dialector = sqlite.Open(cfg.DSN)
 	default:
-		return nil, fmt.Errorf("unsupported database type: %s", c.DBType)
+		return nil, fmt.Errorf("unsupported database type: %s", cfg.DBType)
 	}
 
-	gconfig := &gorm.Config{
+	ormCfg := &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   c.TablePrefix,
+			TablePrefix:   cfg.TablePrefix,
 			SingularTable: true,
 		},
 		Logger: logger.Discard,
 	}
 
-	if c.Debug {
-		gconfig.Logger = logger.Default
+	if cfg.Debug {
+		ormCfg.Logger = logger.Default
 	}
 
-	db, err := gorm.Open(dialector, gconfig)
+	db, err := gorm.Open(dialector, ormCfg)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(c.Resolver) > 0 {
+	if len(cfg.Resolver) > 0 {
 		resolver := &dbresolver.DBResolver{}
-		for _, r := range c.Resolver {
-			rcfg := dbresolver.Config{}
-
+		for _, r := range cfg.Resolver {
+			resolverCfg := dbresolver.Config{}
 			var open func(dsn string) gorm.Dialector
 			dbType := strings.ToLower(r.DBType)
 			switch dbType {
@@ -93,32 +92,32 @@ func New(c Config) (*gorm.DB, error) {
 
 			for _, replica := range r.Replicas {
 				if dbType == "sqlite3" {
-					_ = os.MkdirAll(filepath.Dir(c.DSN), os.ModePerm)
+					_ = os.MkdirAll(filepath.Dir(cfg.DSN), os.ModePerm)
 				}
-				rcfg.Replicas = append(rcfg.Replicas, open(replica))
+				resolverCfg.Replicas = append(resolverCfg.Replicas, open(replica))
 			}
 			for _, source := range r.Sources {
 				if dbType == "sqlite3" {
-					_ = os.MkdirAll(filepath.Dir(c.DSN), os.ModePerm)
+					_ = os.MkdirAll(filepath.Dir(cfg.DSN), os.ModePerm)
 				}
-				rcfg.Sources = append(rcfg.Sources, open(source))
+				resolverCfg.Sources = append(resolverCfg.Sources, open(source))
 			}
 			tables := stringSliceToInterfaceSlice(r.Tables)
-			resolver.Register(rcfg, tables...)
+			resolver.Register(resolverCfg, tables...)
 			zap.L().Info(fmt.Sprintf("Use resolver, #tables: %v, #replicas: %v, #sources: %v \n",
 				tables, r.Replicas, r.Sources))
 		}
 
-		resolver.SetMaxIdleConns(c.MaxIdleConns).
-			SetMaxOpenConns(c.MaxOpenConns).
-			SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second).
-			SetConnMaxIdleTime(time.Duration(c.MaxIdleTime) * time.Second)
+		resolver.SetMaxIdleConns(cfg.MaxIdleConns).
+			SetMaxOpenConns(cfg.MaxOpenConns).
+			SetConnMaxLifetime(time.Duration(cfg.MaxLifetime) * time.Second).
+			SetConnMaxIdleTime(time.Duration(cfg.MaxIdleTime) * time.Second)
 		if err := db.Use(resolver); err != nil {
 			return nil, err
 		}
 	}
 
-	if c.Debug {
+	if cfg.Debug {
 		db = db.Debug()
 	}
 
@@ -127,10 +126,10 @@ func New(c Config) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
-	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
-	sqlDB.SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
-	sqlDB.SetConnMaxIdleTime(time.Duration(c.MaxIdleTime) * time.Second)
+	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(cfg.MaxLifetime) * time.Second)
+	sqlDB.SetConnMaxIdleTime(time.Duration(cfg.MaxIdleTime) * time.Second)
 
 	return db, nil
 }

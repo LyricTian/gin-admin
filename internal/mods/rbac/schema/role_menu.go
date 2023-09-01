@@ -15,10 +15,6 @@ type RoleMenu struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`     // Update time
 }
 
-func (a RoleMenu) TableName() string {
-	return "role_menu"
-}
-
 // Defining the query parameters for the `RoleMenu` struct.
 type RoleMenuQueryParam struct {
 	util.PaginationParam

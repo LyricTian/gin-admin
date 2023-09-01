@@ -24,10 +24,6 @@ type Role struct {
 	Menus       RoleMenus `json:"menus" gorm:"-"`                // Role menu list
 }
 
-func (a Role) TableName() string {
-	return "role"
-}
-
 // Defining the query parameters for the `Role` struct.
 type RoleQueryParam struct {
 	util.PaginationParam
