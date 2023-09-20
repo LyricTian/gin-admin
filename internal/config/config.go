@@ -93,6 +93,15 @@ type Util struct {
 			KeyPrefix string `default:"captcha:"`
 		}
 	}
+	Prometheus struct {
+		Enable         bool
+		Port           int    `default:"9100"`
+		BasicUsername  string `default:"admin"`
+		BasicPassword  string `default:"admin"`
+		LogApis        []string
+		LogMethods     []string
+		DefaultCollect bool
+	}
 }
 
 type Dictionary struct {

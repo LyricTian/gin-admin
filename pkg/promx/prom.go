@@ -258,9 +258,8 @@ func (p *PrometheusWrapper) RegCustomCollector(c prometheus.Collector) {
 
 func NewPrometheusWrapper(conf *Config) *PrometheusWrapper {
 	if conf.App == "" {
-		panic("app name is empty")
+		conf.App = "app"
 	}
-
 	if conf.Enable && conf.ListenPort == 0 {
 		conf.ListenPort = 9100
 	}

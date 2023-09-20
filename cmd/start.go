@@ -21,7 +21,7 @@ func StartCmd() *cli.Command {
 		Usage: "Start server",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "work-dir",
+				Name:        "workdir",
 				Aliases:     []string{"d"},
 				Usage:       "Working directory",
 				DefaultText: "configs",
@@ -31,12 +31,12 @@ func StartCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:        "config",
 				Aliases:     []string{"c"},
-				Usage:       "Runtime configuration files or directory (relative to work-dir, multiple separated by commas, such as: logging.yaml,server.toml)",
+				Usage:       "Runtime configuration files or directory (relative to workdir, multiple separated by commas)",
 				DefaultText: "dev",
 				Value:       "dev",
 			},
 			&cli.StringFlag{
-				Name:    "static-dir",
+				Name:    "static",
 				Aliases: []string{"s"},
 				Usage:   "Static files directory",
 			},
@@ -46,8 +46,8 @@ func StartCmd() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			workDir := c.String("work-dir")
-			staticDir := c.String("static-dir")
+			workDir := c.String("workdir")
+			staticDir := c.String("static")
 			configs := c.String("config")
 
 			if c.Bool("daemon") {

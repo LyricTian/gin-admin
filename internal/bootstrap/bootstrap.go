@@ -9,6 +9,7 @@ import (
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
 	_ "github.com/LyricTian/gin-admin/v10/internal/swagger"
+	"github.com/LyricTian/gin-admin/v10/internal/utility/prom"
 	"github.com/LyricTian/gin-admin/v10/internal/wirex"
 	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
@@ -31,6 +32,7 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 		}
 	}()
 
+	// Load configuration.
 	workDir := runCfg.WorkDir
 	staticDir := runCfg.StaticDir
 	config.MustLoad(workDir, strings.Split(runCfg.Configs, ",")...)
@@ -38,6 +40,7 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 	config.C.Middleware.Static.Dir = staticDir
 	config.C.Print()
 
+	// Initialize logger.
 	cleanLoggerFn, err := logging.InitWithConfig(ctx, &config.C.Logger, initLoggerHook)
 	if err != nil {
 		return err
@@ -47,11 +50,12 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 	logging.Context(ctx).Info("starting service ...",
 		zap.String("version", config.C.General.Version),
 		zap.Int("pid", os.Getpid()),
-		zap.String("work_dir", workDir),
+		zap.String("workdir", workDir),
 		zap.String("config", runCfg.Configs),
-		zap.String("static_dir", staticDir),
+		zap.String("static", staticDir),
 	)
 
+	// Start pprof server.
 	if addr := config.C.General.PprofAddr; addr != "" {
 		logging.Context(ctx).Info("pprof server is listening on " + addr)
 		go func() {
@@ -62,14 +66,18 @@ func Run(ctx context.Context, runCfg RunConfig) error {
 		}()
 	}
 
-	// Initialize injector
+	// Build injector.
 	injector, cleanInjectorFn, err := wirex.BuildInjector(ctx)
 	if err != nil {
 		return err
 	}
+
 	if err := injector.M.Init(ctx); err != nil {
 		return err
 	}
+
+	// Initialize global prometheus metrics.
+	prom.Init()
 
 	return util.Run(ctx, func(ctx context.Context) (func(), error) {
 		cleanHTTPServerFn, err := startHTTPServer(ctx, injector)
