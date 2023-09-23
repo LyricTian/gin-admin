@@ -25,7 +25,7 @@ type General struct {
 	DisablePrintConfig bool
 	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // abc-123
 	WorkDir            string // From command arguments
-	MenuDataFile       string `default:"menu.json"` // From schema.Menus (JSON/YAML)
+	MenuFile           string // From schema.Menus (JSON/YAML)
 	HTTP               struct {
 		Addr            string `default:":8080"`
 		ShutdownTimeout int    `default:"10"` // seconds

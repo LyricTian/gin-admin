@@ -13,7 +13,9 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
 	"github.com/LyricTian/gin-admin/v10/pkg/encoding/yaml"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
+	"github.com/LyricTian/gin-admin/v10/pkg/logging"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
+	"go.uber.org/zap"
 )
 
 // Menu management for RBAC
@@ -28,6 +30,7 @@ func (a *Menu) InitFromFile(ctx context.Context, menuFile string) error {
 	f, err := os.ReadFile(menuFile)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
+			logging.Context(ctx).Warn("Menu data file not found, skip init menu data from file", zap.String("file", menuFile))
 			return nil
 		}
 		return err
