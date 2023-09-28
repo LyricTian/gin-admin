@@ -17,6 +17,7 @@ type Menu struct {
 // @Summary Query menu tree data
 // @Param code query string false "Code path of menu (like xxx.xxx.xxx)"
 // @Param name query string false "Name of menu"
+// @Param includeResources query bool false "Whether to include menu resources"
 // @Success 200 {object} util.ResponseResult{data=[]schema.Menu}
 // @Failure 401 {object} util.ResponseResult
 // @Failure 500 {object} util.ResponseResult

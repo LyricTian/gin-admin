@@ -1,0 +1,318 @@
+[
+    {
+        "id": "ckamt3332jla3vdvpscg",
+        "code": "home",
+        "name": "Home",
+        "description": "",
+        "sequence": 9,
+        "type": "page",
+        "path": "/home",
+        "properties": "",
+        "status": "enabled",
+        "parent_id": "",
+        "parent_path": "",
+        "children": null,
+        "resources": []
+    },
+    {
+        "id": "ckamtpb32jla3vdvpsdg",
+        "code": "system",
+        "name": "System",
+        "description": "",
+        "sequence": 8,
+        "type": "group",
+        "path": "/system",
+        "properties": "",
+        "status": "enabled",
+        "parent_id": "",
+        "parent_path": "",
+        "children": [
+            {
+                "id": "ckamv9r32jla3vdvpsf0",
+                "code": "menu",
+                "name": "Menu management",
+                "description": "",
+                "sequence": 9,
+                "type": "page",
+                "path": "/system/menu",
+                "properties": "",
+                "status": "enabled",
+                "parent_id": "ckamtpb32jla3vdvpsdg",
+                "parent_path": "ckamtpb32jla3vdvpsdg.",
+                "children": [
+                    {
+                        "id": "ckan82j32jlallbtc2tg",
+                        "code": "add",
+                        "name": "Add",
+                        "description": "",
+                        "sequence": 9,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamv9r32jla3vdvpsf0",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamv9r32jla3vdvpsf0.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckan82j32jlallbtc2u0",
+                                "menu_id": "ckan82j32jlallbtc2tg",
+                                "method": "POST",
+                                "path": "/api/v1/menus"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ckan84b32jlallbtc2v0",
+                        "code": "edit",
+                        "name": "Edit",
+                        "description": "",
+                        "sequence": 8,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamv9r32jla3vdvpsf0",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamv9r32jla3vdvpsf0.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckan84b32jlallbtc2vg",
+                                "menu_id": "ckan84b32jlallbtc2v0",
+                                "method": "PUT",
+                                "path": "/api/v1/menus/{id}"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ckan86332jlallbtc30g",
+                        "code": "delete",
+                        "name": "Delete",
+                        "description": "",
+                        "sequence": 7,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamv9r32jla3vdvpsf0",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamv9r32jla3vdvpsf0.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckan86332jlallbtc310",
+                                "menu_id": "ckan86332jlallbtc30g",
+                                "method": "DELETE",
+                                "path": "/api/v1/menus/{id}"
+                            }
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "id": "ckanbar32jlaqi1lb3g0",
+                        "menu_id": "ckamv9r32jla3vdvpsf0",
+                        "method": "GET",
+                        "path": "/api/v1/menus"
+                    },
+                    {
+                        "id": "ckamv9r32jla3vdvpsfg",
+                        "menu_id": "ckamv9r32jla3vdvpsf0",
+                        "method": "GET",
+                        "path": "/api/v1/menus/{id}"
+                    }
+                ]
+            },
+            {
+                "id": "ckamvf332jla3vdvpsgg",
+                "code": "role",
+                "name": "Role management",
+                "description": "",
+                "sequence": 8,
+                "type": "page",
+                "path": "/system/role",
+                "properties": "",
+                "status": "enabled",
+                "parent_id": "ckamtpb32jla3vdvpsdg",
+                "parent_path": "ckamtpb32jla3vdvpsdg.",
+                "children": [
+                    {
+                        "id": "ckanbs332jlaqi1lb3i0",
+                        "code": "add",
+                        "name": "Add",
+                        "description": "",
+                        "sequence": 9,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamvf332jla3vdvpsgg",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamvf332jla3vdvpsgg.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckanbs332jlaqi1lb3ig",
+                                "menu_id": "ckanbs332jlaqi1lb3i0",
+                                "method": "POST",
+                                "path": "/api/v1/roles"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ckanbuj32jlaqi1lb3jg",
+                        "code": "edit",
+                        "name": "Edit",
+                        "description": "",
+                        "sequence": 8,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamvf332jla3vdvpsgg",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamvf332jla3vdvpsgg.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckanbuj32jlaqi1lb3k0",
+                                "menu_id": "ckanbuj32jlaqi1lb3jg",
+                                "method": "PUT",
+                                "path": "/api/v1/roles/{id}"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ckanc0r32jlaqi1lb3l0",
+                        "code": "delete",
+                        "name": "Delete",
+                        "description": "",
+                        "sequence": 7,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamvf332jla3vdvpsgg",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamvf332jla3vdvpsgg.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckanc0r32jlaqi1lb3lg",
+                                "menu_id": "ckanc0r32jlaqi1lb3l0",
+                                "method": "DELETE",
+                                "path": "/api/v1/roles/{id}"
+                            }
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "id": "ckandir32jlaqi1lb3tg",
+                        "menu_id": "ckamvf332jla3vdvpsgg",
+                        "method": "GET",
+                        "path": "/api/v1/roles"
+                    },
+                    {
+                        "id": "ckamvf332jla3vdvpsh0",
+                        "menu_id": "ckamvf332jla3vdvpsgg",
+                        "method": "GET",
+                        "path": "/api/v1/roles/{id}"
+                    }
+                ]
+            },
+            {
+                "id": "ckamvir32jla3vdvpsi0",
+                "code": "user",
+                "name": "User management",
+                "description": "",
+                "sequence": 7,
+                "type": "page",
+                "path": "/system/user",
+                "properties": "",
+                "status": "enabled",
+                "parent_id": "ckamtpb32jla3vdvpsdg",
+                "parent_path": "ckamtpb32jla3vdvpsdg.",
+                "children": [
+                    {
+                        "id": "ckanchb32jlaqi1lb3n0",
+                        "code": "add",
+                        "name": "Add",
+                        "description": "",
+                        "sequence": 9,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamvir32jla3vdvpsi0",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamvir32jla3vdvpsi0.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckanchb32jlaqi1lb3ng",
+                                "menu_id": "ckanchb32jlaqi1lb3n0",
+                                "method": "POST",
+                                "path": "/api/v1/users"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ckancir32jlaqi1lb3og",
+                        "code": "edit",
+                        "name": "Edit",
+                        "description": "",
+                        "sequence": 8,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamvir32jla3vdvpsi0",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamvir32jla3vdvpsi0.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckancir32jlaqi1lb3p0",
+                                "menu_id": "ckancir32jlaqi1lb3og",
+                                "method": "PUT",
+                                "path": "/api/v1/users/{id}"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ckanckb32jlaqi1lb3q0",
+                        "code": "delete",
+                        "name": "Delete",
+                        "description": "",
+                        "sequence": 7,
+                        "type": "button",
+                        "path": "",
+                        "properties": "",
+                        "status": "enabled",
+                        "parent_id": "ckamvir32jla3vdvpsi0",
+                        "parent_path": "ckamtpb32jla3vdvpsdg.ckamvir32jla3vdvpsi0.",
+                        "children": null,
+                        "resources": [
+                            {
+                                "id": "ckanckb32jlaqi1lb3qg",
+                                "menu_id": "ckanckb32jlaqi1lb3q0",
+                                "method": "DELETE",
+                                "path": "/api/v1/users/{id}"
+                            }
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "id": "ckand1b32jlaqi1lb3s0",
+                        "menu_id": "ckamvir32jla3vdvpsi0",
+                        "method": "GET",
+                        "path": "/api/v1/users"
+                    },
+                    {
+                        "id": "ckamvir32jla3vdvpsig",
+                        "menu_id": "ckamvir32jla3vdvpsi0",
+                        "method": "GET",
+                        "path": "/api/v1/users/{id}"
+                    }
+                ]
+            }
+        ],
+        "resources": []
+    }
+]

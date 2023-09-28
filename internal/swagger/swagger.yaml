@@ -88,7 +88,7 @@ definitions:
           $ref: '#/definitions/schema.MenuResource'
         type: array
       sequence:
-        description: Sequence for sorting
+        description: Sequence for sorting (Order by desc)
         type: integer
       status:
         description: Status of menu (disabled, enabled)
@@ -128,7 +128,7 @@ definitions:
           $ref: '#/definitions/schema.MenuResource'
         type: array
       sequence:
-        description: Sequence for sorting
+        description: Sequence for sorting (Order by desc)
         type: integer
       status:
         description: Status of menu (disabled, enabled)
@@ -584,6 +584,10 @@ paths:
         in: query
         name: name
         type: string
+      - description: Whether to include menu resources
+        in: query
+        name: includeResources
+        type: boolean
       responses:
         "200":
           description: OK

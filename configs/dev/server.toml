@@ -4,6 +4,7 @@ DebugMode = true
 PprofAddr = "localhost:6060"
 DisableSwagger = false
 DisablePrintConfig = false
+MenuFile = "menu.json"
 
 [General.HTTP]
 Addr = ":8040"

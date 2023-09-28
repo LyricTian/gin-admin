@@ -151,10 +151,22 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema
 		return nil, err
 	}
 
-	if params.LikeName != "" {
+	if params.LikeName != "" || params.CodePath != "" {
 		result.Data, err = a.appendChildren(ctx, result.Data)
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	if params.IncludeResources {
+		for i, item := range result.Data {
+			resResult, err := a.MenuResourceDAL.Query(ctx, schema.MenuResourceQueryParam{
+				MenuID: item.ID,
+			})
+			if err != nil {
+				return nil, err
+			}
+			result.Data[i].Resources = resResult.Data
 		}
 	}
 
@@ -359,16 +371,16 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 
 	return a.Trans.Exec(ctx, func(ctx context.Context) error {
 		if oldStatus != formItem.Status {
-			opath := oldParentPath + menu.ID + util.TreePathDelimiter
-			if err := a.MenuDAL.UpdateStatusByParentPath(ctx, opath, formItem.Status); err != nil {
+			oldPath := oldParentPath + menu.ID + util.TreePathDelimiter
+			if err := a.MenuDAL.UpdateStatusByParentPath(ctx, oldPath, formItem.Status); err != nil {
 				return err
 			}
 		}
 
 		for _, child := range childData {
-			opath := oldParentPath + menu.ID + util.TreePathDelimiter
-			npath := menu.ParentPath + menu.ID + util.TreePathDelimiter
-			err := a.MenuDAL.UpdateParentPath(ctx, child.ID, strings.Replace(child.ParentPath, opath, npath, 1))
+			oldPath := oldParentPath + menu.ID + util.TreePathDelimiter
+			newPath := menu.ParentPath + menu.ID + util.TreePathDelimiter
+			err := a.MenuDAL.UpdateParentPath(ctx, child.ID, strings.Replace(child.ParentPath, oldPath, newPath, 1))
 			if err != nil {
 				return err
 			}

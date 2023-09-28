@@ -369,6 +369,12 @@ const docTemplate = `{
                         "description": "Name of menu",
                         "name": "name",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether to include menu resources",
+                        "name": "includeResources",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1365,7 +1371,7 @@ const docTemplate = `{
                     }
                 },
                 "sequence": {
-                    "description": "Sequence for sorting",
+                    "description": "Sequence for sorting (Order by desc)",
                     "type": "integer"
                 },
                 "status": {
@@ -1425,7 +1431,7 @@ const docTemplate = `{
                     }
                 },
                 "sequence": {
-                    "description": "Sequence for sorting",
+                    "description": "Sequence for sorting (Order by desc)",
                     "type": "integer"
                 },
                 "status": {

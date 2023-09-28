@@ -45,7 +45,7 @@ func (a *RBAC) Init(ctx context.Context) error {
 	if name := config.C.General.MenuFile; name != "" {
 		fullPath := filepath.Join(config.C.General.WorkDir, name)
 		if err := a.MenuAPI.MenuBIZ.InitFromFile(ctx, fullPath); err != nil {
-			logging.Context(ctx).Error("Failed to init menu data from file", zap.Error(err), zap.String("file", fullPath))
+			logging.Context(ctx).Error("failed to init menu data", zap.Error(err), zap.String("file", fullPath))
 		}
 	}
 
@@ -73,7 +73,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		menu.GET("", a.MenuAPI.Query)
 		menu.GET(":id", a.MenuAPI.Get)
 		menu.POST("", a.MenuAPI.Create)
-		menu.PUT("", a.MenuAPI.Update)
+		menu.PUT(":id", a.MenuAPI.Update)
 		menu.DELETE(":id", a.MenuAPI.Delete)
 	}
 	role := v1.Group("roles")
@@ -81,7 +81,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		role.GET("", a.RoleAPI.Query)
 		role.GET(":id", a.RoleAPI.Get)
 		role.POST("", a.RoleAPI.Create)
-		role.PUT("", a.RoleAPI.Update)
+		role.PUT(":id", a.RoleAPI.Update)
 		role.DELETE(":id", a.RoleAPI.Delete)
 	}
 	user := v1.Group("users")
@@ -89,7 +89,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		user.GET("", a.UserAPI.Query)
 		user.GET(":id", a.UserAPI.Get)
 		user.POST("", a.UserAPI.Create)
-		user.PUT("", a.UserAPI.Update)
+		user.PUT(":id", a.UserAPI.Update)
 		user.DELETE(":id", a.UserAPI.Delete)
 		user.PATCH(":id/reset-pwd", a.UserAPI.ResetPassword)
 	}

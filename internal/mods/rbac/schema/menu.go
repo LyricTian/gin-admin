@@ -1,9 +1,11 @@
 package schema
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
@@ -25,7 +27,7 @@ type Menu struct {
 	Code        string        `json:"code" gorm:"size:32;index;"`         // Code of menu (unique for each level)
 	Name        string        `json:"name" gorm:"size:128;index"`         // Display name of menu
 	Description string        `json:"description" gorm:"size:1024"`       // Details about menu
-	Sequence    int           `json:"sequence" gorm:"index;"`             // Sequence for sorting
+	Sequence    int           `json:"sequence" gorm:"index;"`             // Sequence for sorting (Order by desc)
 	Type        string        `json:"type" gorm:"size:20;index"`          // Type of menu (group, page, button)
 	Path        string        `json:"path" gorm:"size:255;"`              // Access path of menu
 	Properties  string        `json:"properties" gorm:"type:text;"`       // Properties of menu (JSON)
@@ -41,14 +43,15 @@ type Menu struct {
 // Defining the query parameters for the `Menu` struct.
 type MenuQueryParam struct {
 	util.PaginationParam
-	CodePath         string   `form:"code"` // Code path (like xxx.xxx.xxx)
-	LikeName         string   `form:"name"` // Display name of menu
-	InIDs            []string `form:"-"`    // Include menu IDs
-	Status           string   `form:"-"`    // Status of menu (disabled, enabled)
-	ParentID         string   `form:"-"`    // Parent ID (From Menu.ID)
-	ParentPathPrefix string   `form:"-"`    // Parent path (split by .)
-	UserID           string   `form:"-"`    // User ID
-	RoleID           string   `form:"-"`    // Role ID
+	CodePath         string   `form:"code"`             // Code path (like xxx.xxx.xxx)
+	LikeName         string   `form:"name"`             // Display name of menu
+	IncludeResources bool     `form:"includeResources"` // Include resources
+	InIDs            []string `form:"-"`                // Include menu IDs
+	Status           string   `form:"-"`                // Status of menu (disabled, enabled)
+	ParentID         string   `form:"-"`                // Parent ID (From Menu.ID)
+	ParentPathPrefix string   `form:"-"`                // Parent path (split by .)
+	UserID           string   `form:"-"`                // User ID
+	RoleID           string   `form:"-"`                // Role ID
 }
 
 // Defining the query options for the `Menu` struct.
@@ -116,11 +119,11 @@ func (a Menus) ToTree() Menus {
 	var list Menus
 	m := a.ToMap()
 	for _, item := range a {
-		if item.ParentPath == "" {
+		if item.ParentID == "" {
 			list = append(list, item)
 			continue
 		}
-		if parent, ok := m[item.ParentPath]; ok {
+		if parent, ok := m[item.ParentID]; ok {
 			if parent.Children == nil {
 				children := Menus{item}
 				parent.Children = &children
@@ -137,7 +140,7 @@ type MenuForm struct {
 	Code        string        `json:"code" binding:"required,max=32"`                   // Code of menu (unique for each level)
 	Name        string        `json:"name" binding:"required,max=128"`                  // Display name of menu
 	Description string        `json:"description"`                                      // Details about menu
-	Sequence    int           `json:"sequence"`                                         // Sequence for sorting
+	Sequence    int           `json:"sequence"`                                         // Sequence for sorting (Order by desc)
 	Type        string        `json:"type" binding:"required,oneof=group page button"`  // Type of menu (group, page, button)
 	Path        string        `json:"path"`                                             // Access path of menu
 	Properties  string        `json:"properties"`                                       // Properties of menu (JSON)
@@ -148,6 +151,11 @@ type MenuForm struct {
 
 // A validation function for the `MenuForm` struct.
 func (a *MenuForm) Validate() error {
+	if v := a.Properties; v != "" {
+		if !json.Valid([]byte(v)) {
+			return errors.BadRequest("", "invalid properties")
+		}
+	}
 	return nil
 }
 
