@@ -20,6 +20,7 @@
 tmp
 /vendor
 /configs/gen_rbac_policy.csv
+/configs/gen_rbac_policy.csv.bak
 /configs/rbac_policy.csv.bak
 /test/data
 /internal/swagger/v3/.openapi-generator

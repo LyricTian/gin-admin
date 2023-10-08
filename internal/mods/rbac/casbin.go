@@ -24,8 +24,8 @@ import (
 
 // Load rbac permissions to casbin
 type Casbinx struct {
-	enforcer        atomic.Value `wire:"-"`
-	ticker          *time.Ticker `wire:"-"`
+	enforcer        *atomic.Value `wire:"-"`
+	ticker          *time.Ticker  `wire:"-"`
 	Cache           cachex.Cacher
 	MenuDAL         *dal.Menu
 	MenuResourceDAL *dal.MenuResource
@@ -49,6 +49,7 @@ func (a *Casbinx) Load(ctx context.Context) error {
 		return nil
 	}
 
+	a.enforcer = new(atomic.Value)
 	if err := a.load(ctx); err != nil {
 		return err
 	}

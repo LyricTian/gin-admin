@@ -18,7 +18,7 @@ func GetUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 // Get user role table name
 func GetUserRoleTableName(defDB *gorm.DB) string {
 	stat := gorm.Statement{DB: defDB}
-	stat.Parse(&schema.UserRole{})
+	_ = stat.Parse(&schema.UserRole{})
 	return stat.Table
 }
 

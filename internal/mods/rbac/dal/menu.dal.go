@@ -17,7 +17,7 @@ func GetMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 // Get menu table name
 func GetMenuTableName(defDB *gorm.DB) string {
 	stat := gorm.Statement{DB: defDB}
-	stat.Parse(&schema.Menu{})
+	_ = stat.Parse(&schema.Menu{})
 	return stat.Table
 }
 

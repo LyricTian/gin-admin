@@ -6,6 +6,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -64,7 +65,7 @@ type UserForm struct {
 	Name     string    `json:"name" binding:"required,max=64"`                    // Name of user
 	Password string    `json:"password" binding:"max=64"`                         // Password for login (md5 hash)
 	Phone    string    `json:"phone" binding:"max=32"`                            // Phone number of user
-	Email    string    `json:"email" binding:"email,max=128"`                     // Email of user
+	Email    string    `json:"email" binding:"max=128"`                           // Email of user
 	Remark   string    `json:"remark" binding:"max=1024"`                         // Remark of user
 	Status   string    `json:"status" binding:"required,oneof=activated freezed"` // Status of user (activated, freezed)
 	Roles    UserRoles `json:"roles" binding:"required"`                          // Roles of user
@@ -72,6 +73,9 @@ type UserForm struct {
 
 // A validation function for the `UserForm` struct.
 func (a *UserForm) Validate() error {
+	if a.Email != "" && validator.New().Var(a.Email, "email") != nil {
+		return errors.BadRequest("", "Invalid email address")
+	}
 	return nil
 }
 

@@ -28,7 +28,7 @@ AllowWebSockets = true
 AllowFiles = true
 
 [Middleware.Auth]
-Disable = true
+Disable = false
 SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login"]
 
 [Middleware.Auth.Store]

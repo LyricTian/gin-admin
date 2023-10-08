@@ -10,17 +10,17 @@ MaxBackups = 20 # Files
 MaxSize = 64 # MB
 
 [[Logger.Hooks]]
-Enable = false
+Enable = true
 Level = "info"
 Type = "gorm" # gorm
-MaxBuffer = 4096
-MaxThread = 4
+MaxBuffer = 1024
+MaxThread = 2
 
 [Logger.Hooks.Options]
-Debug = "true"
+Debug = "false"
 DBType = "sqlite3" # sqlite3/mysql/postgres
-DSN = "data/sqlite/ginadmin.db"
+DSN = "data/ginadmin.db"
 MaxOpenConns = "16"
-MaxIdleConns = "8"
+MaxIdleConns = "4"
 MaxLifetime = "86400"
 MaxIdleTime = "7200"

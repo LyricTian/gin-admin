@@ -17,7 +17,7 @@ func GetRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 // Get role menu table name
 func GetRoleMenuTableName(defDB *gorm.DB) string {
 	stat := gorm.Statement{DB: defDB}
-	stat.Parse(&schema.RoleMenu{})
+	_ = stat.Parse(&schema.RoleMenu{})
 	return stat.Table
 }
 

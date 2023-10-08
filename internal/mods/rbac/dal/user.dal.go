@@ -17,7 +17,7 @@ func GetUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 // Get user table name
 func GetUserTableName(defDB *gorm.DB) string {
 	stat := gorm.Statement{DB: defDB}
-	stat.Parse(&schema.User{})
+	_ = stat.Parse(&schema.User{})
 	return stat.Table
 }
 
