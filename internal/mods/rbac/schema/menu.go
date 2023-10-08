@@ -31,7 +31,7 @@ type Menu struct {
 	Type        string        `json:"type" gorm:"size:20;index"`          // Type of menu (group, page, button)
 	Path        string        `json:"path" gorm:"size:255;"`              // Access path of menu
 	Properties  string        `json:"properties" gorm:"type:text;"`       // Properties of menu (JSON)
-	Status      string        `json:"status" gorm:"size:20;index"`        // Status of menu (disabled, enabled)
+	Status      string        `json:"status" gorm:"size:20;index"`        // Status of menu (enabled, disabled)
 	ParentID    string        `json:"parent_id" gorm:"size:20;index;"`    // Parent ID (From Menu.ID)
 	ParentPath  string        `json:"parent_path" gorm:"size:255;index;"` // Parent path (split by .)
 	Children    *Menus        `json:"children" gorm:"-"`                  // Child menus
@@ -144,7 +144,7 @@ type MenuForm struct {
 	Type        string        `json:"type" binding:"required,oneof=group page button"`  // Type of menu (group, page, button)
 	Path        string        `json:"path"`                                             // Access path of menu
 	Properties  string        `json:"properties"`                                       // Properties of menu (JSON)
-	Status      string        `json:"status" binding:"required,oneof=disabled enabled"` // Status of menu (disabled, enabled)
+	Status      string        `json:"status" binding:"required,oneof=disabled enabled"` // Status of menu (enabled, disabled)
 	ParentID    string        `json:"parent_id"`                                        // Parent ID (From Menu.ID)
 	Resources   MenuResources `json:"resources"`                                        // Resources of menu
 }

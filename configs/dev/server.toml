@@ -42,7 +42,7 @@ DB = 1
 [Storage.DB]
 Debug = true
 Type = "sqlite3" # sqlite3/mysql/postgres
-DSN = "data/sqlite/ginadmin.db"
+DSN = "data/ginadmin.db"
 MaxLifetime = 86400
 MaxIdleTime = 3600
 MaxOpenConns = 100

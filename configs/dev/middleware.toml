@@ -53,7 +53,7 @@ Password = ""
 DB = 10
 
 [Middleware.Casbin]
-Disable = true
+Disable = false
 SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login", "/api/v1/current/"]
 
 [Middleware.Static]

@@ -103,7 +103,7 @@ func FindPage(ctx context.Context, db *gorm.DB, pp PaginationParam, opts QueryOp
 func FindOne(ctx context.Context, db *gorm.DB, opts QueryOptions, out interface{}) (bool, error) {
 	db = db.WithContext(ctx)
 	db = wrapQueryOptions(db, opts)
-	result := db.Limit(1).Scan(out)
+	result := db.First(out)
 	if err := result.Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return false, nil

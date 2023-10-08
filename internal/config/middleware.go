@@ -40,9 +40,12 @@ type Middleware struct {
 		OldSigningKey       string // old secret key (for migration)
 		Expired             int    `default:"86400"` // seconds
 		Store               struct {
-			Type      string `default:"badger"` // badger/redis
+			Type      string `default:"memory"` // memory/badger/redis
 			Delimiter string `default:":"`      // delimiter for key
-			Badger    struct {
+			Memory    struct {
+				CleanupInterval int `default:"60"` // seconds
+			}
+			Badger struct {
 				Path string `default:"data/auth"`
 			}
 			Redis struct {

@@ -80,6 +80,7 @@ func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.R
 		if err := a.RoleDAL.Create(ctx, role); err != nil {
 			return err
 		}
+
 		for _, roleMenu := range formItem.Menus {
 			roleMenu.ID = util.NewXID()
 			roleMenu.RoleID = role.ID
@@ -93,6 +94,8 @@ func (a *Role) Create(ctx context.Context, formItem *schema.RoleForm) (*schema.R
 	if err != nil {
 		return nil, err
 	}
+	role.Menus = formItem.Menus
+
 	return role, nil
 }
 

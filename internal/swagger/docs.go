@@ -1375,7 +1375,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "status": {
-                    "description": "Status of menu (disabled, enabled)",
+                    "description": "Status of menu (enabled, disabled)",
                     "type": "string"
                 },
                 "type": {
@@ -1435,7 +1435,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "status": {
-                    "description": "Status of menu (disabled, enabled)",
+                    "description": "Status of menu (enabled, disabled)",
                     "type": "string",
                     "enum": [
                         "disabled",
@@ -1560,7 +1560,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "status": {
-                    "description": "Status of role (disabled, enabled)",
+                    "description": "Status of role (enabled, disabled)",
                     "type": "string",
                     "enum": [
                         "disabled",

@@ -91,7 +91,7 @@ definitions:
         description: Sequence for sorting (Order by desc)
         type: integer
       status:
-        description: Status of menu (disabled, enabled)
+        description: Status of menu (enabled, disabled)
         type: string
       type:
         description: Type of menu (group, page, button)
@@ -131,7 +131,7 @@ definitions:
         description: Sequence for sorting (Order by desc)
         type: integer
       status:
-        description: Status of menu (disabled, enabled)
+        description: Status of menu (enabled, disabled)
         enum:
         - disabled
         - enabled
@@ -224,7 +224,7 @@ definitions:
         description: Sequence for sorting
         type: integer
       status:
-        description: Status of role (disabled, enabled)
+        description: Status of role (enabled, disabled)
         enum:
         - disabled
         - enabled

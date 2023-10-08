@@ -53,7 +53,7 @@ type RoleForm struct {
 	Name        string    `json:"name" binding:"required,max=128"`                  // Display name of role
 	Description string    `json:"description"`                                      // Details about role
 	Sequence    int       `json:"sequence"`                                         // Sequence for sorting
-	Status      string    `json:"status" binding:"required,oneof=disabled enabled"` // Status of role (disabled, enabled)
+	Status      string    `json:"status" binding:"required,oneof=disabled enabled"` // Status of role (enabled, disabled)
 	Menus       RoleMenus `json:"menus"`                                            // Role menu list
 }
 

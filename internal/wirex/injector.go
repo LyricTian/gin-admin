@@ -115,6 +115,10 @@ func InitAuth(ctx context.Context) (jwtx.Auther, func(), error) {
 		cache = cachex.NewBadgerCache(cachex.BadgerConfig{
 			Path: cfg.Store.Badger.Path,
 		}, cachex.WithDelimiter(cfg.Store.Delimiter))
+	default:
+		cache = cachex.NewMemoryCache(cachex.MemoryConfig{
+			CleanupInterval: time.Second * time.Duration(cfg.Store.Memory.CleanupInterval),
+		}, cachex.WithDelimiter(cfg.Store.Delimiter))
 	}
 
 	auth := jwtx.New(jwtx.NewStoreWithCache(cache), opts...)

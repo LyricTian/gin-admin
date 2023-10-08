@@ -62,12 +62,12 @@ type Storage struct {
 	}
 	DB struct {
 		Debug        bool
-		Type         string `default:"sqlite3"`                 // sqlite3/mysql/postgres
-		DSN          string `default:"data/sqlite/ginadmin.db"` // database source name
-		MaxLifetime  int    `default:"86400"`                   // seconds
-		MaxIdleTime  int    `default:"3600"`                    // seconds
-		MaxOpenConns int    `default:"100"`                     // connections
-		MaxIdleConns int    `default:"50"`                      // connections
+		Type         string `default:"sqlite3"`          // sqlite3/mysql/postgres
+		DSN          string `default:"data/ginadmin.db"` // database source name
+		MaxLifetime  int    `default:"86400"`            // seconds
+		MaxIdleTime  int    `default:"3600"`             // seconds
+		MaxOpenConns int    `default:"100"`              // connections
+		MaxIdleConns int    `default:"50"`               // connections
 		TablePrefix  string `default:""`
 		AutoMigrate  bool
 		Resolver     []struct {

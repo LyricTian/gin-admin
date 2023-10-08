@@ -105,6 +105,7 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 		if err := a.UserDAL.Create(ctx, user); err != nil {
 			return err
 		}
+
 		for _, userRole := range formItem.Roles {
 			userRole.ID = util.NewXID()
 			userRole.UserID = user.ID
@@ -118,6 +119,7 @@ func (a *User) Create(ctx context.Context, formItem *schema.UserForm) (*schema.U
 	if err != nil {
 		return nil, err
 	}
+	user.Roles = formItem.Roles
 
 	return user, nil
 }
