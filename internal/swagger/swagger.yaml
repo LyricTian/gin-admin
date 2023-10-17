@@ -94,7 +94,7 @@ definitions:
         description: Status of menu (enabled, disabled)
         type: string
       type:
-        description: Type of menu (group, page, button)
+        description: Type of menu (page, button)
         type: string
       updated_at:
         description: Update time
@@ -137,9 +137,8 @@ definitions:
         - enabled
         type: string
       type:
-        description: Type of menu (group, page, button)
+        description: Type of menu (page, button)
         enum:
-        - group
         - page
         - button
         type: string
@@ -251,6 +250,27 @@ definitions:
       updated_at:
         description: Update time
         type: string
+    type: object
+  schema.UpdateCurrentUser:
+    properties:
+      email:
+        description: Email of user
+        maxLength: 128
+        type: string
+      name:
+        description: Name of user
+        maxLength: 64
+        type: string
+      phone:
+        description: Phone number of user
+        maxLength: 32
+        type: string
+      remark:
+        description: Remark of user
+        maxLength: 1024
+        type: string
+    required:
+    - name
     type: object
   schema.UpdateLoginPassword:
     properties:
@@ -541,6 +561,36 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get current user info
+      tags:
+      - LoginAPI
+    put:
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.UpdateCurrentUser'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update current user info
       tags:
       - LoginAPI
   /api/v1/login:

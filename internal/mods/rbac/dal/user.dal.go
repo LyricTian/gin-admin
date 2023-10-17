@@ -108,8 +108,14 @@ func (a *User) Create(ctx context.Context, item *schema.User) error {
 }
 
 // Update the specified user in the database.
-func (a *User) Update(ctx context.Context, item *schema.User) error {
-	result := GetUserDB(ctx, a.DB).Where("id=?", item.ID).Select("*").Omit("created_at").Updates(item)
+func (a *User) Update(ctx context.Context, item *schema.User, selectFields ...string) error {
+	db := GetUserDB(ctx, a.DB).Where("id=?", item.ID)
+	if len(selectFields) > 0 {
+		db = db.Select(selectFields)
+	} else {
+		db = db.Select("*").Omit("created_at")
+	}
+	result := db.Updates(item)
 	return errors.WithStack(result.Error)
 }
 

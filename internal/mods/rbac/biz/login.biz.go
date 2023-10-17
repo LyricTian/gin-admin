@@ -246,6 +246,7 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.User, error) {
 		return &schema.User{
 			ID:       config.C.General.Root.ID,
 			Username: config.C.General.Root.Username,
+			Name:     config.C.General.Root.Name,
 			Status:   schema.UserStatusActivated,
 		}, nil
 	}
@@ -349,4 +350,25 @@ func (a *Login) QueryMenus(ctx context.Context) (schema.Menus, error) {
 	}
 
 	return menuResult.Data.ToTree(), nil
+}
+
+// Update current user info
+func (a *Login) UpdateUser(ctx context.Context, updateItem *schema.UpdateCurrentUser) error {
+	if util.FromIsRootUser(ctx) {
+		return errors.BadRequest("", "Root user cannot update")
+	}
+
+	userID := util.FromUserID(ctx)
+	user, err := a.UserDAL.Get(ctx, userID)
+	if err != nil {
+		return err
+	} else if user == nil {
+		return errors.NotFound("", "User not found")
+	}
+
+	user.Name = updateItem.Name
+	user.Phone = updateItem.Phone
+	user.Email = updateItem.Email
+	user.Remark = updateItem.Remark
+	return a.UserDAL.Update(ctx, user, "name", "phone", "email", "remark")
 }

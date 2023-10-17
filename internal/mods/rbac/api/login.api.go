@@ -155,3 +155,28 @@ func (a *Login) QueryMenus(c *gin.Context) {
 	}
 	util.ResSuccess(c, data)
 }
+
+// @Tags LoginAPI
+// @Security ApiKeyAuth
+// @Summary Update current user info
+// @Param body body schema.UpdateCurrentUser true "Request body"
+// @Success 200 {object} util.ResponseResult
+// @Failure 400 {object} util.ResponseResult
+// @Failure 401 {object} util.ResponseResult
+// @Failure 500 {object} util.ResponseResult
+// @Router /api/v1/current/user [put]
+func (a *Login) UpdateUser(c *gin.Context) {
+	ctx := c.Request.Context()
+	item := new(schema.UpdateCurrentUser)
+	if err := util.ParseJSON(c, item); err != nil {
+		util.ResError(c, err)
+		return
+	}
+
+	err := a.LoginBIZ.UpdateUser(ctx, item)
+	if err != nil {
+		util.ResError(c, err)
+		return
+	}
+	util.ResOK(c)
+}

@@ -66,6 +66,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		current.GET("user", a.LoginAPI.GetUserInfo)
 		current.GET("menus", a.LoginAPI.QueryMenus)
 		current.PUT("password", a.LoginAPI.UpdatePassword)
+		current.PUT("user", a.LoginAPI.UpdateUser)
 		current.POST("logout", a.LoginAPI.Logout)
 	}
 	menu := v1.Group("menus")

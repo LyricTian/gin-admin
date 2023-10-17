@@ -293,6 +293,54 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "LoginAPI"
+                ],
+                "summary": "Update current user info",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.UpdateCurrentUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/util.ResponseResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/util.ResponseResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/util.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/util.ResponseResult"
+                        }
+                    }
+                }
             }
         },
         "/api/v1/login": {
@@ -1379,7 +1427,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "description": "Type of menu (group, page, button)",
+                    "description": "Type of menu (page, button)",
                     "type": "string"
                 },
                 "updated_at": {
@@ -1443,10 +1491,9 @@ const docTemplate = `{
                     ]
                 },
                 "type": {
-                    "description": "Type of menu (group, page, button)",
+                    "description": "Type of menu (page, button)",
                     "type": "string",
                     "enum": [
-                        "group",
                         "page",
                         "button"
                     ]
@@ -1591,6 +1638,34 @@ const docTemplate = `{
                 "updated_at": {
                     "description": "Update time",
                     "type": "string"
+                }
+            }
+        },
+        "schema.UpdateCurrentUser": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "email": {
+                    "description": "Email of user",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "name": {
+                    "description": "Name of user",
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "phone": {
+                    "description": "Phone number of user",
+                    "type": "string",
+                    "maxLength": 32
+                },
+                "remark": {
+                    "description": "Remark of user",
+                    "type": "string",
+                    "maxLength": 1024
                 }
             }
         },

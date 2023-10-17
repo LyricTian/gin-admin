@@ -43,6 +43,10 @@ DB = 1
 Debug = true
 Type = "sqlite3" # sqlite3/mysql/postgres
 DSN = "data/ginadmin.db"
+# MySQL DSN
+# DSN = "root:123@tcp(127.0.0.1:3306)/ginadmin?charset=utf8mb4&parseTime=True&loc=Local"
+# PostgreSQL DSN
+# DSN = "host=localhost user=gorm password=gorm dbname=gorm port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 MaxLifetime = 86400
 MaxIdleTime = 3600
 MaxOpenConns = 100

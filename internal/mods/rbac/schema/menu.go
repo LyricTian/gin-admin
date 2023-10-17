@@ -28,7 +28,7 @@ type Menu struct {
 	Name        string        `json:"name" gorm:"size:128;index"`         // Display name of menu
 	Description string        `json:"description" gorm:"size:1024"`       // Details about menu
 	Sequence    int           `json:"sequence" gorm:"index;"`             // Sequence for sorting (Order by desc)
-	Type        string        `json:"type" gorm:"size:20;index"`          // Type of menu (group, page, button)
+	Type        string        `json:"type" gorm:"size:20;index"`          // Type of menu (page, button)
 	Path        string        `json:"path" gorm:"size:255;"`              // Access path of menu
 	Properties  string        `json:"properties" gorm:"type:text;"`       // Properties of menu (JSON)
 	Status      string        `json:"status" gorm:"size:20;index"`        // Status of menu (enabled, disabled)
@@ -141,7 +141,7 @@ type MenuForm struct {
 	Name        string        `json:"name" binding:"required,max=128"`                  // Display name of menu
 	Description string        `json:"description"`                                      // Details about menu
 	Sequence    int           `json:"sequence"`                                         // Sequence for sorting (Order by desc)
-	Type        string        `json:"type" binding:"required,oneof=group page button"`  // Type of menu (group, page, button)
+	Type        string        `json:"type" binding:"required,oneof=page button"`        // Type of menu (page, button)
 	Path        string        `json:"path"`                                             // Access path of menu
 	Properties  string        `json:"properties"`                                       // Properties of menu (JSON)
 	Status      string        `json:"status" binding:"required,oneof=disabled enabled"` // Status of menu (enabled, disabled)

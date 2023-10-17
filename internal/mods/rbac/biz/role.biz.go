@@ -24,7 +24,13 @@ type Role struct {
 
 // Query roles from the data access object based on the provided parameters and options.
 func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam) (*schema.RoleQueryResult, error) {
-	params.Pagination = false
+	params.Pagination = true
+
+	var selectFields []string
+	if params.ResultType == schema.RoleResultTypeSelect {
+		params.Pagination = false
+		selectFields = []string{"id", "name"}
+	}
 
 	result, err := a.RoleDAL.Query(ctx, params, schema.RoleQueryOptions{
 		QueryOptions: util.QueryOptions{
@@ -32,6 +38,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam) (*schema
 				{Field: "sequence", Direction: util.DESC},
 				{Field: "created_at", Direction: util.DESC},
 			},
+			SelectFields: selectFields,
 		},
 	})
 	if err != nil {

@@ -20,7 +20,7 @@
         "name": "System",
         "description": "",
         "sequence": 8,
-        "type": "group",
+        "type": "page",
         "path": "/system",
         "properties": "",
         "status": "enabled",
@@ -30,7 +30,7 @@
             {
                 "id": "ckamv9r32jla3vdvpsf0",
                 "code": "menu",
-                "name": "Menu management",
+                "name": "Menu",
                 "description": "",
                 "sequence": 9,
                 "type": "page",
@@ -125,7 +125,7 @@
             {
                 "id": "ckamvf332jla3vdvpsgg",
                 "code": "role",
-                "name": "Role management",
+                "name": "Role",
                 "description": "",
                 "sequence": 8,
                 "type": "page",
@@ -220,7 +220,7 @@
             {
                 "id": "ckamvir32jla3vdvpsi0",
                 "code": "user",
-                "name": "User management",
+                "name": "User",
                 "description": "",
                 "sequence": 7,
                 "type": "page",
