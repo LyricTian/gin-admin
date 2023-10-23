@@ -385,8 +385,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "user name",
+                        "name": "userName",
                         "in": "query"
                     },
                     {
@@ -1446,6 +1446,10 @@ const docTemplate = `{
                 },
                 "level": {
                     "description": "Log level",
+                    "type": "string"
+                },
+                "login_name": {
+                    "description": "From User.Username",
                     "type": "string"
                 },
                 "message": {

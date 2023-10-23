@@ -30,6 +30,9 @@ definitions:
       level:
         description: Log level
         type: string
+      login_name:
+        description: From User.Username
+        type: string
       message:
         description: Log message
         type: string
@@ -649,9 +652,9 @@ paths:
         in: query
         name: traceID
         type: string
-      - description: user ID
+      - description: user name
         in: query
-        name: userID
+        name: userName
         type: string
       - description: log tag
         in: query

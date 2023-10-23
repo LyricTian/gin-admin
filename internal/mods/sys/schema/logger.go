@@ -17,6 +17,7 @@ type Logger struct {
 	Stack     string    `gorm:"type:text;" json:"stack"`        // Error stack
 	Data      string    `gorm:"type:text;" json:"data"`         // Log data
 	CreatedAt time.Time `gorm:"index;" json:"created_at"`       // Create time
+	LoginName string    `json:"login_name" gorm:"<-:false"`     // From User.Username
 	UserName  string    `json:"user_name" gorm:"<-:false"`      // From User.Name
 }
 
@@ -27,13 +28,13 @@ func (a *Logger) TableName() string {
 // Defining the query parameters for the `Logger` struct.
 type LoggerQueryParam struct {
 	util.PaginationParam
-	Level       string `form:"level"`     // Log level
-	TraceID     string `form:"traceID"`   // Trace ID
-	UserID      string `form:"userID"`    // User ID
-	Tag         string `form:"tag"`       // Log tag
-	LikeMessage string `form:"message"`   // Log message
-	StartTime   string `form:"startTime"` // Start time
-	EndTime     string `form:"endTime"`   // End time
+	Level        string `form:"level"`     // Log level
+	TraceID      string `form:"traceID"`   // Trace ID
+	LikeUserName string `form:"userName"`  // User Name
+	Tag          string `form:"tag"`       // Log tag
+	LikeMessage  string `form:"message"`   // Log message
+	StartTime    string `form:"startTime"` // Start time
+	EndTime      string `form:"endTime"`   // End time
 }
 
 // Defining the query options for the `Logger` struct.

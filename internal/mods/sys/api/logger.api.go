@@ -19,7 +19,7 @@ type Logger struct {
 // @Param pageSize query int true "pagination size" default(10)
 // @Param level query string false "log level"
 // @Param traceID query string false "trace ID"
-// @Param userID query string false "user ID"
+// @Param userName query string false "user name"
 // @Param tag query string false "log tag"
 // @Param message query string false "log message"
 // @Param startTime query string false "start time"

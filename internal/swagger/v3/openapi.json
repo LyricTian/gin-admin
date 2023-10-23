@@ -344,6 +344,115 @@
         "x-codegen-request-body-name" : "body"
       }
     },
+    "/api/v1/loggers" : {
+      "get" : {
+        "parameters" : [ {
+          "description" : "pagination index",
+          "in" : "query",
+          "name" : "current",
+          "required" : true,
+          "schema" : {
+            "default" : 1,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "pagination size",
+          "in" : "query",
+          "name" : "pageSize",
+          "required" : true,
+          "schema" : {
+            "default" : 10,
+            "type" : "integer"
+          }
+        }, {
+          "description" : "log level",
+          "in" : "query",
+          "name" : "level",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "trace ID",
+          "in" : "query",
+          "name" : "traceID",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "user ID",
+          "in" : "query",
+          "name" : "userID",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "log tag",
+          "in" : "query",
+          "name" : "tag",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "log message",
+          "in" : "query",
+          "name" : "message",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "start time",
+          "in" : "query",
+          "name" : "startTime",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "end time",
+          "in" : "query",
+          "name" : "endTime",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/_api_v1_loggers_get_200_response"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/util.ResponseResult"
+                }
+              }
+            },
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/util.ResponseResult"
+                }
+              }
+            },
+            "description" : "Internal Server Error"
+          }
+        },
+        "security" : [ {
+          "ApiKeyAuth" : [ ]
+        } ],
+        "summary" : "Query logger list",
+        "tags" : [ "LoggerAPI" ]
+      }
+    },
     "/api/v1/login" : {
       "post" : {
         "requestBody" : {
@@ -1378,6 +1487,51 @@
         },
         "type" : "object"
       },
+      "schema.Logger" : {
+        "properties" : {
+          "created_at" : {
+            "description" : "Create time",
+            "type" : "string"
+          },
+          "data" : {
+            "description" : "Log data",
+            "type" : "string"
+          },
+          "id" : {
+            "description" : "Unique ID",
+            "type" : "string"
+          },
+          "level" : {
+            "description" : "Log level",
+            "type" : "string"
+          },
+          "message" : {
+            "description" : "Log message",
+            "type" : "string"
+          },
+          "stack" : {
+            "description" : "Error stack",
+            "type" : "string"
+          },
+          "tag" : {
+            "description" : "Log tag",
+            "type" : "string"
+          },
+          "trace_id" : {
+            "description" : "Trace ID",
+            "type" : "string"
+          },
+          "user_id" : {
+            "description" : "User ID",
+            "type" : "string"
+          },
+          "user_name" : {
+            "description" : "From User.Name",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
       "schema.LoginForm" : {
         "properties" : {
           "captcha_code" : {
@@ -1903,6 +2057,21 @@
           "properties" : {
             "data" : {
               "$ref" : "#/components/schemas/schema.User"
+            }
+          },
+          "type" : "object"
+        } ]
+      },
+      "_api_v1_loggers_get_200_response" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/util.ResponseResult"
+        }, {
+          "properties" : {
+            "data" : {
+              "items" : {
+                "$ref" : "#/components/schemas/schema.Logger"
+              },
+              "type" : "array"
             }
           },
           "type" : "object"
