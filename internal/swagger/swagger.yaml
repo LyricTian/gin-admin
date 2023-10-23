@@ -16,6 +16,39 @@ definitions:
         description: Captcha ID
         type: string
     type: object
+  schema.Logger:
+    properties:
+      created_at:
+        description: Create time
+        type: string
+      data:
+        description: Log data
+        type: string
+      id:
+        description: Unique ID
+        type: string
+      level:
+        description: Log level
+        type: string
+      message:
+        description: Log message
+        type: string
+      stack:
+        description: Error stack
+        type: string
+      tag:
+        description: Log tag
+        type: string
+      trace_id:
+        description: Trace ID
+        type: string
+      user_id:
+        description: User ID
+        type: string
+      user_name:
+        description: From User.Name
+        type: string
+    type: object
   schema.LoginForm:
     properties:
       captcha_code:
@@ -593,6 +626,74 @@ paths:
       summary: Update current user info
       tags:
       - LoginAPI
+  /api/v1/loggers:
+    get:
+      parameters:
+      - default: 1
+        description: pagination index
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: pagination size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: log level
+        in: query
+        name: level
+        type: string
+      - description: trace ID
+        in: query
+        name: traceID
+        type: string
+      - description: user ID
+        in: query
+        name: userID
+        type: string
+      - description: log tag
+        in: query
+        name: tag
+        type: string
+      - description: log message
+        in: query
+        name: message
+        type: string
+      - description: start time
+        in: query
+        name: startTime
+        type: string
+      - description: end time
+        in: query
+        name: endTime
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.ResponseResult'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/schema.Logger'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/util.ResponseResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Query logger list
+      tags:
+      - LoggerAPI
   /api/v1/login:
     post:
       parameters:

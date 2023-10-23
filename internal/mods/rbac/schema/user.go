@@ -3,6 +3,7 @@ package schema
 import (
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
@@ -27,6 +28,10 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" gorm:"index;"`      // Create time
 	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`      // Update time
 	Roles     UserRoles `json:"roles" gorm:"-"`                // Roles of user
+}
+
+func (a *User) TableName() string {
+	return config.C.FormatTableName("user")
 }
 
 // Defining the query parameters for the `User` struct.

@@ -14,13 +14,6 @@ func GetRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.Role))
 }
 
-// Get role table name
-func GetRoleTableName(defDB *gorm.DB) string {
-	stat := gorm.Statement{DB: defDB}
-	_ = stat.Parse(&schema.Role{})
-	return stat.Table
-}
-
 // Role management for RBAC
 type Role struct {
 	DB *gorm.DB

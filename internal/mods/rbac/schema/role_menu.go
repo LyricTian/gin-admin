@@ -3,6 +3,7 @@ package schema
 import (
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
@@ -13,6 +14,10 @@ type RoleMenu struct {
 	MenuID    string    `json:"menu_id" gorm:"size:20;index"` // From Menu.ID
 	CreatedAt time.Time `json:"created_at" gorm:"index;"`     // Create time
 	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`     // Update time
+}
+
+func (a *RoleMenu) TableName() string {
+	return config.C.FormatTableName("role_menu")
 }
 
 // Defining the query parameters for the `RoleMenu` struct.

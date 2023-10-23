@@ -335,6 +335,114 @@
                 }
             }
         },
+        "/api/v1/loggers": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "LoggerAPI"
+                ],
+                "summary": "Query logger list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "pagination index",
+                        "name": "current",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "pagination size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "log level",
+                        "name": "level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "trace ID",
+                        "name": "traceID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user ID",
+                        "name": "userID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "log tag",
+                        "name": "tag",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "log message",
+                        "name": "message",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "start time",
+                        "name": "startTime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "end time",
+                        "name": "endTime",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/util.ResponseResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/schema.Logger"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/util.ResponseResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/util.ResponseResult"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/login": {
             "post": {
                 "tags": [
@@ -1309,6 +1417,51 @@
             "properties": {
                 "captcha_id": {
                     "description": "Captcha ID",
+                    "type": "string"
+                }
+            }
+        },
+        "schema.Logger": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "Create time",
+                    "type": "string"
+                },
+                "data": {
+                    "description": "Log data",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Unique ID",
+                    "type": "string"
+                },
+                "level": {
+                    "description": "Log level",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "Log message",
+                    "type": "string"
+                },
+                "stack": {
+                    "description": "Error stack",
+                    "type": "string"
+                },
+                "tag": {
+                    "description": "Log tag",
+                    "type": "string"
+                },
+                "trace_id": {
+                    "description": "Trace ID",
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "User ID",
+                    "type": "string"
+                },
+                "user_name": {
+                    "description": "From User.Name",
                     "type": "string"
                 }
             }

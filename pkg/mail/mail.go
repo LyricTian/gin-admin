@@ -13,7 +13,7 @@ var (
 	once         sync.Once
 )
 
-// Set a global smpt sender
+// Set a global SMTP sender
 func SetSender(sender *SmtpSender) {
 	once.Do(func() {
 		globalSender = sender

@@ -9,15 +9,15 @@ import (
 )
 
 type Logger struct {
-	ID        string    `gorm:"size:20;primaryKey;"`
-	Level     string    `gorm:"size:20;index;"`
-	TraceID   string    `gorm:"size:64;index;"`
-	UserID    string    `gorm:"size:20;index;"`
-	Tag       string    `gorm:"size:32;index;"`
-	Message   string    `gorm:"size:1024;"`
-	Stack     string    `gorm:"type:text;"`
-	Data      string    `gorm:"type:text;"`
-	CreatedAt time.Time `gorm:"index;"`
+	ID        string    `gorm:"size:20;primaryKey;" json:"id"`  // Unique ID
+	Level     string    `gorm:"size:20;index;" json:"level"`    // Log level
+	TraceID   string    `gorm:"size:64;index;" json:"trace_id"` // Trace ID
+	UserID    string    `gorm:"size:20;index;" json:"user_id"`  // User ID
+	Tag       string    `gorm:"size:32;index;" json:"tag"`      // Log tag
+	Message   string    `gorm:"size:1024;" json:"message"`      // Log message
+	Stack     string    `gorm:"type:text;" json:"stack"`        // Error stack
+	Data      string    `gorm:"type:text;" json:"data"`         // Log data
+	CreatedAt time.Time `gorm:"index;" json:"created_at"`       // Create time
 }
 
 func NewGormHook(db *gorm.DB) *GormHook {
@@ -74,6 +74,7 @@ func (h *GormHook) Exec(extra map[string]string, b []byte) error {
 		msg.Stack = v.(string)
 		delete(data, "stack")
 	}
+	delete(data, "caller")
 
 	for k, v := range extra {
 		data[k] = v

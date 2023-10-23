@@ -3,6 +3,7 @@ package schema
 import (
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
@@ -14,6 +15,10 @@ type UserRole struct {
 	CreatedAt time.Time `json:"created_at" gorm:"index;"`     // Create time
 	UpdatedAt time.Time `json:"updated_at" gorm:"index;"`     // Update time
 	RoleName  string    `json:"role_name" gorm:"<-:false"`    // From Role.Name
+}
+
+func (a *UserRole) TableName() string {
+	return config.C.FormatTableName("user_role")
 }
 
 // Defining the query parameters for the `UserRole` struct.

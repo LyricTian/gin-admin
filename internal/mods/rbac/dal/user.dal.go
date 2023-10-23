@@ -14,13 +14,6 @@ func GetUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.User))
 }
 
-// Get user table name
-func GetUserTableName(defDB *gorm.DB) string {
-	stat := gorm.Statement{DB: defDB}
-	_ = stat.Parse(&schema.User{})
-	return stat.Table
-}
-
 // User management for RBAC
 type User struct {
 	DB *gorm.DB

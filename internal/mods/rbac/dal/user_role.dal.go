@@ -15,13 +15,6 @@ func GetUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.UserRole))
 }
 
-// Get user role table name
-func GetUserRoleTableName(defDB *gorm.DB) string {
-	stat := gorm.Statement{DB: defDB}
-	_ = stat.Parse(&schema.UserRole{})
-	return stat.Table
-}
-
 // User roles for RBAC
 type UserRole struct {
 	DB *gorm.DB
@@ -34,9 +27,9 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 		opt = opts[0]
 	}
 
-	db := a.DB.Table(fmt.Sprintf("%s AS a", GetUserRoleTableName(a.DB)))
+	db := a.DB.Table(fmt.Sprintf("%s AS a", new(schema.UserRole).TableName()))
 	if opt.JoinRole {
-		db = db.Joins(fmt.Sprintf("left join %s b on a.role_id=b.id", GetRoleTableName(a.DB)))
+		db = db.Joins(fmt.Sprintf("left join %s b on a.role_id=b.id", new(schema.Role).TableName()))
 		db = db.Select("a.*,b.name as role_name")
 	}
 

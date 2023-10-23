@@ -13,6 +13,10 @@ import (
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/api"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/biz"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
+	"github.com/LyricTian/gin-admin/v10/internal/mods/sys"
+	api2 "github.com/LyricTian/gin-admin/v10/internal/mods/sys/api"
+	biz2 "github.com/LyricTian/gin-admin/v10/internal/mods/sys/biz"
+	dal2 "github.com/LyricTian/gin-admin/v10/internal/mods/sys/dal"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
@@ -108,8 +112,22 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		LoginAPI: apiLogin,
 		Casbinx:  casbinx,
 	}
+	logger := &dal2.Logger{
+		DB: db,
+	}
+	bizLogger := &biz2.Logger{
+		LoggerDAL: logger,
+	}
+	apiLogger := &api2.Logger{
+		LoggerBIZ: bizLogger,
+	}
+	sysSYS := &sys.SYS{
+		DB:        db,
+		LoggerAPI: apiLogger,
+	}
 	modsMods := &mods.Mods{
 		RBAC: rbacRBAC,
+		SYS:  sysSYS,
 	}
 	injector := &Injector{
 		DB:    db,

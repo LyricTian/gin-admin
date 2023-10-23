@@ -14,13 +14,6 @@ func GetRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.RoleMenu))
 }
 
-// Get role menu table name
-func GetRoleMenuTableName(defDB *gorm.DB) string {
-	stat := gorm.Statement{DB: defDB}
-	_ = stat.Parse(&schema.RoleMenu{})
-	return stat.Table
-}
-
 // Role permissions for RBAC
 type RoleMenu struct {
 	DB *gorm.DB

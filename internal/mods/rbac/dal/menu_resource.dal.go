@@ -14,13 +14,6 @@ func GetMenuResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.MenuResource))
 }
 
-// Get menu resource table name
-func GetMenuResourceTableName(defDB *gorm.DB) string {
-	stat := gorm.Statement{DB: defDB}
-	_ = stat.Parse(&schema.MenuResource{})
-	return stat.Table
-}
-
 // Menu resource management for RBAC
 type MenuResource struct {
 	DB *gorm.DB
