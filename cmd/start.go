@@ -26,7 +26,6 @@ func StartCmd() *cli.Command {
 				Usage:       "Working directory",
 				DefaultText: "configs",
 				Value:       "configs",
-				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:        "config",
