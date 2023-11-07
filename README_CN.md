@@ -4,7 +4,12 @@
 
 [English](README.md) | 中文
 
-[![ReportCard][reportcard-image]][reportcard-url] [![GoDoc][godoc-image]][godoc-url] [![License][license-image]][license-url]
+[![LICENSE](https://img.shields.io/github/license/LyricTian/gin-admin.svg)](https://github.com/LyricTian/gin-admin/blob/main/LICENSE)
+[![Language](https://img.shields.io/badge/Language-Go-blue.svg)](https://golang.org/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/LyricTian/gin-admin)](https://goreportcard.com/report/github.com/LyricTian/gin-admin)
+[![GitHub release](https://img.shields.io/github/tag/LyricTian/gin-admin.svg?label=release)](https://github.com/LyricTian/gin-admin/releases)
+[![GitHub release date](https://img.shields.io/github/release-date/LyricTian/gin-admin.svg)](https://github.com/LyricTian/gin-admin/releases)
+[![GoDoc](https://img.shields.io/badge/Godoc-reference-blue.svg)](https://godoc.org/github.com/LyricTian/gin-admin)
 
 ## Features
 
@@ -94,36 +99,36 @@ wire gen ./internal/wirex
 
 ```text
 ├── cmd
-│   ├── start.go
-│   ├── stop.go
+│   ├── start.go                    (启动命令)
+│   ├── stop.go                     (停止命令)
 │   └── version.go
 ├── configs
 │   ├── dev
-│   │   ├── logging.toml
-│   │   ├── middleware.toml
-│   │   └── server.toml
-│   ├── menu.json
-│   └── rbac_model.conf
+│   │   ├── logging.toml            (日志配置文件)
+│   │   ├── middleware.toml         (中间件配置文件)
+│   │   └── server.toml             (服务配置文件)
+│   ├── menu.json                   (初始化菜单文件)
+│   └── rbac_model.conf             (Casbin RBAC 模型配置文件)
 ├── internal
 │   ├── bootstrap
-│   │   ├── bootstrap.go
-│   │   ├── http.go
-│   │   └── logger.go
-│   ├── config
+│   │   ├── bootstrap.go           (初始化)
+│   │   ├── http.go                (HTTP 服务)
+│   │   └── logger.go              (日志服务)
+│   ├── config                     (配置文件)
 │   │   ├── config.go
 │   │   ├── consts.go
 │   │   ├── middleware.go
 │   │   └── parse.go
 │   ├── mods
-│   │   ├── rbac
-│   │   │   ├── api
-│   │   │   ├── biz
-│   │   │   ├── dal
-│   │   │   ├── schema
-│   │   │   ├── casbin.go
-│   │   │   ├── main.go
-│   │   │   └── wire.go
-│   │   ├── sys
+│   │   ├── rbac                   (RBAC 模块)
+│   │   │   ├── api                (API层)
+│   │   │   ├── biz                (业务逻辑层)
+│   │   │   ├── dal                (数据访问层)
+│   │   │   ├── schema             (数据模型层)
+│   │   │   ├── casbin.go          (Casbin 初始化)
+│   │   │   ├── main.go            (模块入口)
+│   │   │   └── wire.go            (依赖注入初始化)
+│   │   ├── sys                    (系统模块)
 │   │   │   ├── api
 │   │   │   ├── biz
 │   │   │   ├── dal
@@ -133,12 +138,12 @@ wire gen ./internal/wirex
 │   │   └── mods.go
 │   ├── utility
 │   │   └── prom
-│   │       └── prom.go
-│   └── wirex
+│   │       └── prom.go           (Prometheus 监控)
+│   └── wirex                     (依赖注入)
 │       ├── injector.go
 │       ├── wire.go
 │       └── wire_gen.go
-├── test
+├── test                          (单元测试)
 │   ├── menu_test.go
 │   ├── role_test.go
 │   ├── test.go
@@ -148,25 +153,21 @@ wire gen ./internal/wirex
 ├── README.md
 ├── go.mod
 ├── go.sum
-└── main.go
+└── main.go                       (入口文件)
 ```
 
 ## Contact Us
 
-<div>
-    <img src="https://store.zixinwangluo.cn/screenshots/gin-admin/wechat.jpeg" width="256"alt="wechat" />
-    <img src="https://store.zixinwangluo.cn/screenshots/gin-admin/qqgroup.jpeg" width="256" alt="qqgroup" />
-</div>
+### 微信群
 
-## MIT License
+> 扫码加微信群
 
-```text
-Copyright (c) 2023 Lyric
-```
+![wechat](https://store.zixinwangluo.cn/screenshots/gin-admin/wechat.pic.jpg-thumb320x480)
 
-[reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
-[reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
-[godoc-url]: https://pkg.go.dev/github.com/LyricTian/gin-admin/v10
-[godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin?status.svg
-[license-url]: http://opensource.org/licenses/MIT
-[license-image]: https://img.shields.io/npm/l/express.svg
+### 飞书群
+
+![feishu](https://store.zixinwangluo.cn/screenshots/gin-admin/feishu.png-thumb320x480)
+
+### QQ 群
+
+![qq](https://store.zixinwangluo.cn/screenshots/gin-admin/qqgroup.jpeg-thumb320x480)

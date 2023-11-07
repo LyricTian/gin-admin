@@ -4,7 +4,12 @@
 
 English | [中文](README_CN.md)
 
-[![ReportCard][reportcard-image]][reportcard-url] [![GoDoc][godoc-image]][godoc-url] [![License][license-image]][license-url]
+[![LICENSE](https://img.shields.io/github/license/LyricTian/gin-admin.svg)](https://github.com/LyricTian/gin-admin/blob/main/LICENSE)
+[![Language](https://img.shields.io/badge/Language-Go-blue.svg)](https://golang.org/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/LyricTian/gin-admin)](https://goreportcard.com/report/github.com/LyricTian/gin-admin)
+[![GitHub release](https://img.shields.io/github/tag/LyricTian/gin-admin.svg?label=release)](https://github.com/LyricTian/gin-admin/releases)
+[![GitHub release date](https://img.shields.io/github/release-date/LyricTian/gin-admin.svg)](https://github.com/LyricTian/gin-admin/releases)
+[![GoDoc](https://img.shields.io/badge/Godoc-reference-blue.svg)](https://godoc.org/github.com/LyricTian/gin-admin)
 
 ## Features
 
@@ -99,30 +104,30 @@ wire gen ./internal/wirex
 │   └── version.go
 ├── configs
 │   ├── dev
-│   │   ├── logging.toml
-│   │   ├── middleware.toml
-│   │   └── server.toml
-│   ├── menu.json
-│   └── rbac_model.conf
+│   │   ├── logging.toml           (Log configuration file)
+│   │   ├── middleware.toml        (Middleware configuration file)
+│   │   └── server.toml            (Service configuration file)
+│   ├── menu.json                  (Initialize menu file)
+│   └── rbac_model.conf            (Casbin RBAC model configuration file)
 ├── internal
 │   ├── bootstrap
-│   │   ├── bootstrap.go
-│   │   ├── http.go
-│   │   └── logger.go
-│   ├── config
+│   │   ├── bootstrap.go          (Initialization)
+│   │   ├── http.go               (HTTP service)
+│   │   └── logger.go             (Log service)
+│   ├── config                    (Configuration file)
 │   │   ├── config.go
 │   │   ├── consts.go
 │   │   ├── middleware.go
 │   │   └── parse.go
 │   ├── mods
-│   │   ├── rbac
-│   │   │   ├── api
-│   │   │   ├── biz
-│   │   │   ├── dal
-│   │   │   ├── schema
-│   │   │   ├── casbin.go
-│   │   │   ├── main.go
-│   │   │   └── wire.go
+│   │   ├── rbac                  (RBAC module)
+│   │   │   ├── api               (API layer)
+│   │   │   ├── biz               (Business logic layer)
+│   │   │   ├── dal               (Data access layer)
+│   │   │   ├── schema            (Data model layer)
+│   │   │   ├── casbin.go         (Casbin initialization)
+│   │   │   ├── main.go           (Module initialization)
+│   │   │   └── wire.go           (Dependency injection)
 │   │   ├── sys
 │   │   │   ├── api
 │   │   │   ├── biz
@@ -133,12 +138,12 @@ wire gen ./internal/wirex
 │   │   └── mods.go
 │   ├── utility
 │   │   └── prom
-│   │       └── prom.go
-│   └── wirex
+│   │       └── prom.go           (Prometheus)
+│   └── wirex                     (Dependency injection)
 │       ├── injector.go
 │       ├── wire.go
 │       └── wire_gen.go
-├── test
+├── test                          (Unit test)
 │   ├── menu_test.go
 │   ├── role_test.go
 │   ├── test.go
@@ -148,22 +153,9 @@ wire gen ./internal/wirex
 ├── README.md
 ├── go.mod
 ├── go.sum
-└── main.go
+└── main.go                       (Entry)
 ```
 
 ## Community
 
 - [Discord](https://discord.gg/UCnpActY)
-
-## MIT License
-
-```text
-Copyright (c) 2023 Lyric
-```
-
-[reportcard-url]: https://goreportcard.com/report/github.com/LyricTian/gin-admin
-[reportcard-image]: https://goreportcard.com/badge/github.com/LyricTian/gin-admin
-[godoc-url]: https://pkg.go.dev/github.com/LyricTian/gin-admin/v10
-[godoc-image]: https://godoc.org/github.com/LyricTian/gin-admin?status.svg
-[license-url]: http://opensource.org/licenses/MIT
-[license-image]: https://img.shields.io/npm/l/express.svg
