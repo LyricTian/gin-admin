@@ -34,6 +34,12 @@ SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login"]
 [Middleware.Auth.Store]
 Type = "badger" # badger/redis
 
+[Middleware.Auth.Store.Redis]
+Addr = ""
+Username = ""
+Password = ""
+DB = 2
+
 [Middleware.RateLimiter]
 Enable = false
 MaxRequestsPerIP = 30
