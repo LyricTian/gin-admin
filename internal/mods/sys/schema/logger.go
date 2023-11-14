@@ -3,6 +3,7 @@ package schema
 import (
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
@@ -22,7 +23,7 @@ type Logger struct {
 }
 
 func (a *Logger) TableName() string {
-	return "logger"
+	return config.C.FormatTableName("logger")
 }
 
 // Defining the query parameters for the `Logger` struct.

@@ -26,7 +26,7 @@ func initLoggerHook(_ context.Context, cfg *logging.HookConfig) (*logging.Hook, 
 			MaxIdleTime:  cast.ToInt(cfg.Options["MaxIdleTime"]),
 			MaxOpenConns: cast.ToInt(cfg.Options["MaxOpenConns"]),
 			MaxIdleConns: cast.ToInt(cfg.Options["MaxIdleConns"]),
-			TablePrefix:  cast.ToString(cfg.Options["TablePrefix"]),
+			TablePrefix:  config.C.Storage.DB.TablePrefix,
 		})
 		if err != nil {
 			return nil, err

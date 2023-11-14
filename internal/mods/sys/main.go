@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/sys/api"
-	"github.com/LyricTian/gin-admin/v10/internal/mods/sys/schema"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -15,7 +14,7 @@ type SYS struct {
 }
 
 func (a *SYS) AutoMigrate(ctx context.Context) error {
-	return a.DB.AutoMigrate(new(schema.Logger))
+	return a.DB.AutoMigrate()
 }
 
 func (a *SYS) Init(ctx context.Context) error {
