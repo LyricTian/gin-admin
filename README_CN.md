@@ -21,7 +21,7 @@
 - :electric_plug: 基于 `WIRE` 的依赖注入 -- 依赖注入本身的作用是解决了各个模块间层级依赖繁琐的初始化过程
 - :zap: 基于 `Zap & Context` 实现了日志输出，通过结合 Context 实现了统一的 TraceID/UserID 等关键字段的输出(同时支持日志钩子写入到`GORM`)
 - :key: 基于 `JWT` 的用户认证
-- :microscope: 基于 `Swaggo` 自动生成 `Swagger` 文档 - [Preview](http://101.42.232.163:8040/swagger/index.html)
+- :microscope: 基于 `Swaggo` 自动生成 `Swagger` 文档 - [预览](http://101.42.232.163:8040/swagger/index.html)
 - :test_tube: 基于 `testify` 实现了 API 的单元测试
 - :100: 无状态服务，可水平扩展，提高服务的可用性 - 通过定时任务和 Redis 实现了 Casbin 的动态权限管理
 - :hammer: 完善的效率工具，通过配置可以开发完整的代码模块 - [gin-admin-cli](https://github.com/gin-admin/gin-admin-cli)
@@ -30,8 +30,8 @@
 
 ## Frontend
 
-- [基于 Ant Design React 实现的前端项目](https://github.com/gin-admin/gin-admin-frontend) - [Preview](http://101.42.232.163:8040/): admin/abc-123
-- [基于 Vue.js 实现的前端项目](https://github.com/gin-admin/gin-admin-vue) - [Preview](http://101.42.232.163:8080/): admin/abc-123
+- [基于 Ant Design React 实现的前端项目](https://github.com/gin-admin/gin-admin-frontend) - [预览](http://101.42.232.163:8040/): admin/abc-123
+- [基于 Vue.js 实现的前端项目](https://github.com/gin-admin/gin-admin-vue) - [预览](http://101.42.232.163:8080/): admin/abc-123
 
 ## Dependencies
 
@@ -163,10 +163,6 @@ wire gen ./internal/wirex
 > 扫码加微信群
 
 ![wechat](https://store.zixinwangluo.cn/screenshots/gin-admin/wechat.pic.jpg-thumb320x480)
-
-### 飞书群
-
-![feishu](https://store.zixinwangluo.cn/screenshots/gin-admin/feishu.png-thumb320x480)
 
 ### QQ 群
 
