@@ -99,6 +99,23 @@ func (a *Menu) GetByCodeAndParentID(ctx context.Context, code, parentID string, 
 	return item, nil
 }
 
+// GetByNameAndParentID get the specified menu from the database.
+func (a *Menu) GetByNameAndParentID(ctx context.Context, name, parentID string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
+	var opt schema.MenuQueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+
+	item := new(schema.Menu)
+	ok, err := util.FindOne(ctx, GetMenuDB(ctx, a.DB).Where("name=? AND parent_id=?", name, parentID), opt.QueryOptions, item)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	} else if !ok {
+		return nil, nil
+	}
+	return item, nil
+}
+
 // Checks if the specified menu exists in the database.
 func (a *Menu) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id))
@@ -106,14 +123,14 @@ func (a *Menu) Exists(ctx context.Context, id string) (bool, error) {
 }
 
 // Checks if a menu with the specified `code` exists under the specified `parentID` in the database.
-func (a *Menu) ExistsCodeByParentID(ctx context.Context, parentID, code string) (bool, error) {
-	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("parent_id=? AND code=?", parentID, code))
+func (a *Menu) ExistsCodeByParentID(ctx context.Context, code, parentID string) (bool, error) {
+	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("code=? AND parent_id=?", code, parentID))
 	return ok, errors.WithStack(err)
 }
 
 // Checks if a menu with the specified `name` exists under the specified `parentID` in the database.
-func (a *Menu) ExistsNameByParentID(ctx context.Context, parentID, name string) (bool, error) {
-	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("parent_id=? AND name=?", parentID, name))
+func (a *Menu) ExistsNameByParentID(ctx context.Context, name, parentID string) (bool, error) {
+	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("name=? AND parent_id=?", name, parentID))
 	return ok, errors.WithStack(err)
 }
 

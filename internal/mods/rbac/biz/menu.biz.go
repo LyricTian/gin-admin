@@ -62,48 +62,65 @@ func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, pa
 			parentID = parent.ID
 		}
 
+		exist := false
+
 		if item.ID != "" {
 			exists, err := a.MenuDAL.Exists(ctx, item.ID)
 			if err != nil {
 				return err
 			} else if exists {
-				continue
+				exist = true
 			}
-		}
-		if item.Code != "" {
+		} else if item.Code != "" {
 			exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, item.Code, parentID)
 			if err != nil {
 				return err
 			} else if exists {
-				continue
+				exist = true
+				existItem, err := a.MenuDAL.GetByCodeAndParentID(ctx, item.Code, parentID)
+				if err != nil {
+					return err
+				}
+				if existItem != nil {
+					item.ID = existItem.ID
+				}
 			}
-		}
-		if item.Name != "" {
+		} else if item.Name != "" {
 			exists, err := a.MenuDAL.ExistsNameByParentID(ctx, item.Name, parentID)
 			if err != nil {
 				return err
 			} else if exists {
-				continue
+				exist = true
+				existItem, err := a.MenuDAL.GetByNameAndParentID(ctx, item.Name, parentID)
+				if err != nil {
+					return err
+				}
+				if existItem != nil {
+					item.ID = existItem.ID
+				}
 			}
 		}
 
-		if item.ID == "" {
-			item.ID = util.NewXID()
-		}
-		if item.Status == "" {
-			item.Status = schema.MenuStatusEnabled
-		}
-		if item.Sequence == 0 {
-			item.Sequence = total - i
-		}
+		if !exist {
+			if item.ID == "" {
+				item.ID = util.NewXID()
+			}
+			if item.Status == "" {
+				item.Status = schema.MenuStatusEnabled
+			}
+			if item.Sequence == 0 {
+				item.Sequence = total - i
+			}
 
-		item.ParentID = parentID
-		if parent != nil {
-			item.ParentPath = parent.ParentPath + parentID + util.TreePathDelimiter
-		}
-		item.CreatedAt = time.Now()
-		if err := a.MenuDAL.Create(ctx, item); err != nil {
-			return err
+			item.ParentID = parentID
+			if parent != nil {
+				item.ParentPath = parent.ParentPath + parentID + util.TreePathDelimiter
+			}
+			item.CreatedAt = time.Now()
+
+			if err := a.MenuDAL.Create(ctx, item); err != nil {
+				return err
+			}
 		}
 
 		for _, res := range item.Resources {
@@ -115,6 +132,16 @@ func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, pa
 					continue
 				}
 			}
+
+			if res.Path != "" {
+				exists, err := a.MenuResourceDAL.ExistsMethodPathByMenuID(ctx, res.Method, res.Path, item.ID)
+				if err != nil {
+					return err
+				} else if exists {
+					continue
+				}
+			}
+
 			if res.ID == "" {
 				res.ID = util.NewXID()
 			}

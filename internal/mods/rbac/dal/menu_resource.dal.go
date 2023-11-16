@@ -70,6 +70,12 @@ func (a *MenuResource) Exists(ctx context.Context, id string) (bool, error) {
 	return ok, errors.WithStack(err)
 }
 
+// ExistsMethodPathByMenuID checks if the specified menu resource exists in the database.
+func (a *MenuResource) ExistsMethodPathByMenuID(ctx context.Context, method, path, menuID string) (bool, error) {
+	ok, err := util.Exists(ctx, GetMenuResourceDB(ctx, a.DB).Where("method=? AND path=? AND menu_id=?", method, path, menuID))
+	return ok, errors.WithStack(err)
+}
+
 // Create a new menu resource.
 func (a *MenuResource) Create(ctx context.Context, item *schema.MenuResource) error {
 	result := GetMenuResourceDB(ctx, a.DB).Create(item)
