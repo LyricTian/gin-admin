@@ -79,7 +79,7 @@ func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, pa
 				exist = true
 				existItem, err := a.MenuDAL.GetByCodeAndParentID(ctx, item.Code, parentID)
 				if err != nil {
-					continue
+					return err
 				}
 				if existItem != nil {
 					item.ID = existItem.ID
@@ -93,7 +93,7 @@ func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, pa
 				exist = true
 				existItem, err := a.MenuDAL.GetByNameAndParentID(ctx, item.Name, parentID)
 				if err != nil {
-					continue
+					return err
 				}
 				if existItem != nil {
 					item.ID = existItem.ID
@@ -101,7 +101,7 @@ func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, pa
 			}
 		}
 
-		if exist == false {
+		if !exist {
 			if item.ID == "" {
 				item.ID = util.NewXID()
 			}
