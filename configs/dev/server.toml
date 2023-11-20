@@ -42,6 +42,7 @@ DB = 1
 [Storage.DB]
 Debug = true
 Type = "sqlite3" # sqlite3/mysql/postgres
+# SQLite3 DSN
 DSN = "data/ginadmin.db"
 # MySQL DSN
 # DSN = "root:123@tcp(127.0.0.1:3306)/ginadmin?charset=utf8mb4&parseTime=True&loc=Local"
@@ -53,4 +54,3 @@ MaxOpenConns = 100
 MaxIdleConns = 50
 TablePrefix = ""
 AutoMigrate = true
-

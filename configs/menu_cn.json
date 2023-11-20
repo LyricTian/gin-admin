@@ -1,0 +1,219 @@
+[
+    {
+        "code": "home",
+        "name": "首页",
+        "sequence": 9,
+        "type": "page",
+        "path": "/home",
+        "status": "enabled"
+    },
+    {
+        "code": "system",
+        "name": "系统管理",
+        "sequence": 8,
+        "type": "page",
+        "path": "/system",
+        "status": "enabled",
+        "children": [
+            {
+                "code": "menu",
+                "name": "菜单管理",
+                "sequence": 9,
+                "type": "page",
+                "path": "/system/menu",
+                "status": "enabled",
+                "children": [
+                    {
+                        "code": "add",
+                        "name": "增加",
+                        "sequence": 9,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "POST",
+                                "path": "/api/v1/menus"
+                            }
+                        ]
+                    },
+                    {
+                        "code": "edit",
+                        "name": "编辑",
+                        "sequence": 8,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "PUT",
+                                "path": "/api/v1/menus/{id}"
+                            }
+                        ]
+                    },
+                    {
+                        "code": "delete",
+                        "name": "删除",
+                        "sequence": 7,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "DELETE",
+                                "path": "/api/v1/menus/{id}"
+                            }
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/menus"
+                    },
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/menus/{id}"
+                    }
+                ]
+            },
+            {
+                "code": "role",
+                "name": "角色管理",
+                "sequence": 8,
+                "type": "page",
+                "path": "/system/role",
+                "status": "enabled",
+                "children": [
+                    {
+                        "code": "add",
+                        "name": "增加",
+                        "sequence": 9,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "POST",
+                                "path": "/api/v1/roles"
+                            }
+                        ]
+                    },
+                    {
+                        "code": "edit",
+                        "name": "编辑",
+                        "sequence": 8,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "PUT",
+                                "path": "/api/v1/roles/{id}"
+                            }
+                        ]
+                    },
+                    {
+                        "code": "delete",
+                        "name": "删除",
+                        "sequence": 7,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "DELETE",
+                                "path": "/api/v1/roles/{id}"
+                            }
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/menus"
+                    },
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/roles"
+                    },
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/roles/{id}"
+                    }
+                ]
+            },
+            {
+                "code": "user",
+                "name": "用户管理",
+                "sequence": 7,
+                "type": "page",
+                "path": "/system/user",
+                "status": "enabled",
+                "children": [
+                    {
+                        "code": "add",
+                        "name": "增加",
+                        "sequence": 9,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "POST",
+                                "path": "/api/v1/users"
+                            }
+                        ]
+                    },
+                    {
+                        "code": "edit",
+                        "name": "编辑",
+                        "sequence": 8,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "PUT",
+                                "path": "/api/v1/users/{id}"
+                            }
+                        ]
+                    },
+                    {
+                        "code": "delete",
+                        "name": "删除",
+                        "sequence": 7,
+                        "type": "button",
+                        "status": "enabled",
+                        "resources": [
+                            {
+                                "method": "DELETE",
+                                "path": "/api/v1/users/{id}"
+                            }
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/roles"
+                    },
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/users"
+                    },
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/users/{id}"
+                    }
+                ]
+            },
+            {
+                "code": "logger",
+                "name": "日志查询",
+                "sequence": 1,
+                "type": "page",
+                "path": "/system/logger",
+                "status": "enabled",
+                "resources": [
+                    {
+                        "method": "GET",
+                        "path": "/api/v1/loggers"
+                    }
+                ]
+            }
+        ]
+    }
+]
