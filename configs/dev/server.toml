@@ -15,11 +15,14 @@ ShutdownTimeout = 10
 CertFile = ""
 KeyFile = ""
 
-[General.Root]
-ID = "root"
-Username = "admin"
-Password = "6351623c8cef86fefabfa7da046fc619" # abc-123
-Name = "Admin"
+[General.SuperAdministrator]
+Enable = true
+Email = "root@root.com"
+Password = "abc-123"
+UserName = "Admin"
+RealName = "Administrator"
+RoleName = "Super Administrator"
+RoleCode = "super-administrator"
 
 [Storage]
 

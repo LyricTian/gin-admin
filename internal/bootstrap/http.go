@@ -169,8 +169,7 @@ func useHTTPMiddlewares(_ context.Context, e *gin.Engine, injector *wirex.Inject
 		AllowedPathPrefixes: allowedPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.Casbin.SkippedPathPrefixes,
 		Skipper: func(c *gin.Context) bool {
-			if config.C.Middleware.Casbin.Disable ||
-				util.FromIsRootUser(c.Request.Context()) {
+			if config.C.Middleware.Casbin.Disable {
 				return true
 			}
 			return false

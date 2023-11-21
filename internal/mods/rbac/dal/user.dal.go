@@ -2,6 +2,9 @@ package dal
 
 import (
 	"context"
+	"github.com/LyricTian/gin-admin/v10/internal/config"
+	"github.com/LyricTian/gin-admin/v10/pkg/crypto/hash"
+	"time"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
@@ -121,4 +124,90 @@ func (a *User) Delete(ctx context.Context, id string) error {
 func (a *User) UpdatePasswordByID(ctx context.Context, id string, password string) error {
 	result := GetUserDB(ctx, a.DB).Where("id=?", id).Select("password").Updates(schema.User{Password: password})
 	return errors.WithStack(result.Error)
+}
+
+// InitSuperAdministrator Example Initialize a system administrator
+func (a *User) InitSuperAdministrator(ctx context.Context) error {
+	var menus []*schema.Menu
+	err := a.DB.WithContext(ctx).Model(&schema.Menu{}).
+		Find(&menus).Error
+	if err != nil {
+		return err
+	}
+
+	timeNow := time.Now()
+	return a.DB.Transaction(func(db *gorm.DB) error {
+		hashPass, err := hash.GeneratePassword(config.C.General.SuperAdministrator.Password)
+		if err != nil {
+			return errors.BadRequest("", "Failed to generate hash password: %s", err.Error())
+		}
+		user := schema.User{
+			ID:        util.NewXID(),
+			Username:  config.C.General.SuperAdministrator.UserName,
+			Name:      config.C.General.SuperAdministrator.RealName,
+			Password:  hashPass,
+			Phone:     "",
+			Email:     config.C.General.SuperAdministrator.Email,
+			Status:    schema.UserStatusActivated,
+			CreatedAt: timeNow,
+			UpdatedAt: timeNow,
+		}
+		err = db.Create(&user).Error
+		if err != nil {
+			return err
+		}
+
+		role := schema.Role{
+			ID:          util.NewXID(),
+			Name:        config.C.General.SuperAdministrator.RoleName,
+			Sequence:    0,
+			Status:      schema.RoleStatusEnabled,
+			Code:        config.C.General.SuperAdministrator.RoleCode,
+			Description: config.C.General.SuperAdministrator.RoleName,
+			CreatedAt:   timeNow,
+			UpdatedAt:   timeNow,
+		}
+		err = db.Create(&role).Error
+		if err != nil {
+			return err
+		}
+
+		roleID := role.ID
+
+		var roleMenus []*schema.RoleMenu
+		for _, menu := range menus {
+			AdminRoleMenuRelation := schema.RoleMenu{
+				ID:        util.NewXID(),
+				RoleID:    roleID,
+				MenuID:    menu.ID,
+				CreatedAt: timeNow,
+				UpdatedAt: timeNow,
+			}
+			roleMenus = append(roleMenus, &AdminRoleMenuRelation)
+		}
+		err = db.CreateInBatches(roleMenus, len(roleMenus)).Error
+		if err != nil {
+			return err
+		}
+
+		userRole := schema.UserRole{
+			ID:        util.NewXID(),
+			UserID:    user.ID,
+			RoleID:    roleID,
+			CreatedAt: timeNow,
+			UpdatedAt: timeNow,
+			RoleName:  role.Name,
+		}
+		return db.Create(&userRole).Error
+	})
+}
+
+// Count Obtain the total number of system administrators
+func (a *User) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := GetUserDB(ctx, a.DB).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

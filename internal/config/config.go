@@ -35,11 +35,15 @@ type General struct {
 		CertFile        string
 		KeyFile         string
 	}
-	Root struct {
-		ID       string `default:"root"`
-		Username string `default:"admin"`
+
+	SuperAdministrator struct {
+		Enable   bool   `default:"false"`
+		UserName string `default:"Admin"`
+		Email    string `default:"root@root.com"`
 		Password string
-		Name     string `default:"Admin"`
+		RealName string `default:"Administrator"`
+		RoleName string `default:"Super Administrator"`
+		RoleCode string `default:"super-administrator"`
 	}
 }
 

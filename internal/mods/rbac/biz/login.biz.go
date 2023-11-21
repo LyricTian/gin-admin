@@ -31,11 +31,6 @@ type Login struct {
 }
 
 func (a *Login) ParseUserID(c *gin.Context) (string, error) {
-	rootID := config.C.General.Root.ID
-	if config.C.Middleware.Auth.Disable {
-		return rootID, nil
-	}
-
 	invalidToken := errors.Unauthorized(config.ErrInvalidTokenID, "Invalid access token")
 	token := util.GetToken(c)
 	if token == "" {
@@ -51,9 +46,6 @@ func (a *Login) ParseUserID(c *gin.Context) (string, error) {
 			return "", invalidToken
 		}
 		return "", err
-	} else if userID == rootID {
-		c.Request = c.Request.WithContext(util.NewIsRootUser(ctx))
-		return userID, nil
 	}
 
 	userCacheVal, ok, err := a.Cache.Get(ctx, config.CacheNSForUser, userID)
@@ -148,18 +140,6 @@ func (a *Login) Login(ctx context.Context, formItem *schema.LoginForm) (*schema.
 
 	ctx = logging.NewTag(ctx, logging.TagKeyLogin)
 
-	// login by root
-	if formItem.Username == config.C.General.Root.Username {
-		if formItem.Password != config.C.General.Root.Password {
-			return nil, errors.BadRequest(config.ErrInvalidUsernameOrPassword, "Incorrect username or password")
-		}
-
-		userID := config.C.General.Root.ID
-		ctx = logging.NewUserID(ctx, userID)
-		logging.Context(ctx).Info("Login by root")
-		return a.genUserToken(ctx, userID)
-	}
-
 	// get user info
 	user, err := a.UserDAL.GetByUsername(ctx, formItem.Username, schema.UserQueryOptions{
 		QueryOptions: util.QueryOptions{
@@ -242,15 +222,6 @@ func (a *Login) Logout(ctx context.Context) error {
 
 // Get user info
 func (a *Login) GetUserInfo(ctx context.Context) (*schema.User, error) {
-	if util.FromIsRootUser(ctx) {
-		return &schema.User{
-			ID:       config.C.General.Root.ID,
-			Username: config.C.General.Root.Username,
-			Name:     config.C.General.Root.Name,
-			Status:   schema.UserStatusActivated,
-		}, nil
-	}
-
 	userID := util.FromUserID(ctx)
 	user, err := a.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
 		QueryOptions: util.QueryOptions{
@@ -278,10 +249,6 @@ func (a *Login) GetUserInfo(ctx context.Context) (*schema.User, error) {
 
 // Change login password
 func (a *Login) UpdatePassword(ctx context.Context, updateItem *schema.UpdateLoginPassword) error {
-	if util.FromIsRootUser(ctx) {
-		return errors.BadRequest("", "Root user cannot change password")
-	}
-
 	userID := util.FromUserID(ctx)
 	user, err := a.UserDAL.Get(ctx, userID, schema.UserQueryOptions{
 		QueryOptions: util.QueryOptions{
@@ -313,10 +280,8 @@ func (a *Login) QueryMenus(ctx context.Context) (schema.Menus, error) {
 		Status: schema.MenuStatusEnabled,
 	}
 
-	isRoot := util.FromIsRootUser(ctx)
-	if !isRoot {
-		menuQueryParams.UserID = util.FromUserID(ctx)
-	}
+	menuQueryParams.UserID = util.FromUserID(ctx)
+
 	menuResult, err := a.MenuDAL.Query(ctx, menuQueryParams, schema.MenuQueryOptions{
 		QueryOptions: util.QueryOptions{
 			OrderFields: schema.MenusOrderParams,
@@ -324,8 +289,6 @@ func (a *Login) QueryMenus(ctx context.Context) (schema.Menus, error) {
 	})
 	if err != nil {
 		return nil, err
-	} else if isRoot {
-		return menuResult.Data.ToTree(), nil
 	}
 
 	// fill parent menus
@@ -354,10 +317,6 @@ func (a *Login) QueryMenus(ctx context.Context) (schema.Menus, error) {
 
 // Update current user info
 func (a *Login) UpdateUser(ctx context.Context, updateItem *schema.UpdateCurrentUser) error {
-	if util.FromIsRootUser(ctx) {
-		return errors.BadRequest("", "Root user cannot update")
-	}
-
 	userID := util.FromUserID(ctx)
 	user, err := a.UserDAL.Get(ctx, userID)
 	if err != nil {

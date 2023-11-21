@@ -8,13 +8,12 @@ import (
 )
 
 type (
-	traceIDCtx    struct{}
-	transCtx      struct{}
-	rowLockCtx    struct{}
-	userIDCtx     struct{}
-	userTokenCtx  struct{}
-	isRootUserCtx struct{}
-	userCacheCtx  struct{}
+	traceIDCtx   struct{}
+	transCtx     struct{}
+	rowLockCtx   struct{}
+	userIDCtx    struct{}
+	userTokenCtx struct{}
+	userCacheCtx struct{}
 )
 
 func NewTraceID(ctx context.Context, traceID string) context.Context {
@@ -72,15 +71,6 @@ func FromUserToken(ctx context.Context) string {
 		return v.(string)
 	}
 	return ""
-}
-
-func NewIsRootUser(ctx context.Context) context.Context {
-	return context.WithValue(ctx, isRootUserCtx{}, true)
-}
-
-func FromIsRootUser(ctx context.Context) bool {
-	v := ctx.Value(isRootUserCtx{})
-	return v != nil && v.(bool)
 }
 
 // Set user cache object

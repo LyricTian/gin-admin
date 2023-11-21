@@ -49,6 +49,13 @@ func (a *RBAC) Init(ctx context.Context) error {
 		}
 	}
 
+	// Init Admin User
+	if config.C.General.SuperAdministrator.Enable {
+		if err := a.UserAPI.UserBIZ.InitSuperAdministrator(ctx); err != nil {
+			logging.Context(ctx).Error("failed to init super administrator data", zap.Error(err))
+		}
+	}
+	
 	return nil
 }
 

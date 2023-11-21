@@ -225,3 +225,19 @@ func (a *User) GetRoleIDs(ctx context.Context, id string) ([]string, error) {
 	}
 	return userRoleResult.Data.ToRoleIDs(), nil
 }
+
+// InitSuperAdministrator Example Initialize a system administrator
+func (a *User) InitSuperAdministrator(ctx context.Context) error {
+	count, err := a.UserDAL.Count(ctx)
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return nil
+	}
+	err = a.UserDAL.InitSuperAdministrator(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
