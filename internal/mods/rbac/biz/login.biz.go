@@ -277,10 +277,9 @@ func (a *Login) UpdatePassword(ctx context.Context, updateItem *schema.UpdateLog
 // Query menus based on user permissions
 func (a *Login) QueryMenus(ctx context.Context) (schema.Menus, error) {
 	menuQueryParams := schema.MenuQueryParam{
+		UserID: util.FromUserID(ctx),
 		Status: schema.MenuStatusEnabled,
 	}
-
-	menuQueryParams.UserID = util.FromUserID(ctx)
 
 	menuResult, err := a.MenuDAL.Query(ctx, menuQueryParams, schema.MenuQueryOptions{
 		QueryOptions: util.QueryOptions{
