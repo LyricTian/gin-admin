@@ -69,7 +69,9 @@ func (c *MinioClient) PutObject(ctx context.Context, bucketName, objectName stri
 
 	return &PutObjectResult{
 		URL:  c.config.Domain + "/" + objectName,
+		Key:  output.Key,
 		ETag: output.ETag,
+		Size: output.Size,
 	}, nil
 }
 

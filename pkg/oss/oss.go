@@ -39,8 +39,10 @@ type PutObjectOptions struct {
 }
 
 type PutObjectResult struct {
-	URL  string `json:"url"`
-	ETag string `json:"etag"`
+	URL  string `json:"url,omitempty"`
+	Key  string `json:"key,omitempty"`
+	ETag string `json:"e_tag,omitempty"`
+	Size int64  `json:"size,omitempty"`
 }
 
 type ObjectStat struct {

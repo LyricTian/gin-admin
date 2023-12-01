@@ -61,6 +61,13 @@
                                 "path": "/api/v1/menus/{id}"
                             }
                         ]
+                    },
+                    {
+                        "code": "search",
+                        "name": "Search",
+                        "sequence": 6,
+                        "type": "button",
+                        "status": "enabled"
                     }
                 ],
                 "resources": [
@@ -120,6 +127,13 @@
                                 "path": "/api/v1/roles/{id}"
                             }
                         ]
+                    },
+                    {
+                        "code": "search",
+                        "name": "Search",
+                        "sequence": 6,
+                        "type": "button",
+                        "status": "enabled"
                     }
                 ],
                 "resources": [
@@ -183,6 +197,13 @@
                                 "path": "/api/v1/users/{id}"
                             }
                         ]
+                    },
+                    {
+                        "code": "search",
+                        "name": "Search",
+                        "sequence": 6,
+                        "type": "button",
+                        "status": "enabled"
                     }
                 ],
                 "resources": [

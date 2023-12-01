@@ -78,7 +78,9 @@ func (c *S3Client) PutObject(ctx context.Context, bucketName, objectName string,
 
 	return &PutObjectResult{
 		URL:  c.config.Domain + "/" + objectName,
+		Key:  *input.Key,
 		ETag: *output.ETag,
+		Size: objectSize,
 	}, nil
 }
 
