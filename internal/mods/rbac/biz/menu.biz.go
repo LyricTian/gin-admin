@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
@@ -440,6 +441,10 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 
 // Delete the specified menu from the data access object.
 func (a *Menu) Delete(ctx context.Context, id string) error {
+	if config.C.General.DenyDeleteMenu {
+		return errors.BadRequest("", "Menu deletion is not allowed")
+	}
+
 	menu, err := a.MenuDAL.Get(ctx, id)
 	if err != nil {
 		return err
