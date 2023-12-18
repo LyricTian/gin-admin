@@ -3,20 +3,6 @@
 [Middleware.Recovery]
 Skip = 3
 
-[Middleware.Trace]
-RequestHeaderKey = "X-Request-Id"
-ResponseTraceKey = "X-Trace-Id"
-
-[Middleware.Logger]
-MaxOutputRequestBodyLen = 4096  # bytes
-MaxOutputResponseBodyLen = 1024 # bytes
-
-[Middleware.TokenAuth]
-Enable = true
-
-[Middleware.CopyBody]
-MaxContentLen = 134217728 # 128MB
-
 [Middleware.CORS]
 Enable = false
 AllowOrigins = ["*"]
@@ -27,23 +13,46 @@ AllowWildcard = true
 AllowWebSockets = true
 AllowFiles = true
 
+[Middleware.Trace]
+RequestHeaderKey = "X-Request-Id"
+ResponseTraceKey = "X-Trace-Id"
+
+[Middleware.Logger]
+MaxOutputRequestBodyLen = 4096 # bytes
+MaxOutputResponseBodyLen = 4096 # bytes
+
+[Middleware.CopyBody]
+MaxContentLen = 134217728 # 128MB
+
 [Middleware.Auth]
 Disable = false
 SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login"]
+SigningMethod = "HS512" # HS256/HS384/HS512
+SigningKey = "XnEsT0S@" # Secret key
+OldSigningKey = "" # Old secret key (For change secret key)
+Expired = 86400 # seconds
 
 [Middleware.Auth.Store]
-Type = "badger" # badger/redis
+Type = "badger" # memory/badger/redis
+Delimiter = ":"
+
+[Middleware.Auth.Store.Memory]
+CleanupInterval = 60 # seconds
+
+[Middleware.Auth.Store.Badger]
+Path = "data/auth"
 
 [Middleware.Auth.Store.Redis]
-Addr = ""
+Addr = "" # If empty, then use the same configuration as Storage.Cache.Redis
 Username = ""
 Password = ""
 DB = 2
 
 [Middleware.RateLimiter]
 Enable = false
-MaxRequestsPerIP = 30
-MaxRequestsPerUser = 30
+Period = 10 # seconds
+MaxRequestsPerIP = 1000
+MaxRequestsPerUser = 500
 
 [Middleware.RateLimiter.Store]
 Type = "memory" # memory/redis
@@ -53,7 +62,7 @@ Expiration = 3600
 CleanupInterval = 60
 
 [Middleware.RateLimiter.Store.Redis]
-Addr = ""
+Addr = "" # If empty, then use the same configuration as Storage.Cache.Redis
 Username = ""
 Password = ""
 DB = 10
@@ -61,6 +70,7 @@ DB = 10
 [Middleware.Casbin]
 Disable = false
 SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login", "/api/v1/current/"]
-
-[Middleware.Static]
-SkippedPathPrefixes = ["/api"]
+LoadThread = 2
+AutoLoadInterval = 3 # seconds
+ModelFile = "rbac_model.conf"
+GenPolicyFile = "gen_rbac_policy.csv"

@@ -1,30 +1,33 @@
 [General]
 AppName = "ginadmin"
-DebugMode = true
-PprofAddr = "localhost:6060"
+Version = "v10.0.2"
+Debug = true
+PprofAddr = "" # Pprof monitor address, "localhost:6060"
 DisableSwagger = false
 DisablePrintConfig = false
-MenuFile = "menu.json"
+DefaultLoginPwd = "6351623c8cef86fefabfa7da046fc619" # MD5("abc-123")
+MenuFile = "menu.json" # Or use "menu_cn.json"
+DenyDeleteMenu = false
 
 [General.HTTP]
 Addr = ":8040"
+ShutdownTimeout = 10
 ReadTimeout = 60
 WriteTimeout = 60
 IdleTimeout = 10
-ShutdownTimeout = 10
 CertFile = ""
 KeyFile = ""
 
-[General.Root]
+[General.Root] # Super Administrator Account
 ID = "root"
 Username = "admin"
-Password = "6351623c8cef86fefabfa7da046fc619" # abc-123
+Password = "6351623c8cef86fefabfa7da046fc619" # MD5("abc-123")
 Name = "Admin"
 
 [Storage]
 
 [Storage.Cache]
-Type = "badger" # badger/redis
+Type = "badger" # memory/badger/redis
 Delimiter = ":"
 
 [Storage.Cache.Memory]
@@ -54,3 +57,30 @@ MaxOpenConns = 100
 MaxIdleConns = 50
 TablePrefix = ""
 AutoMigrate = true
+
+[Util]
+
+[Util.Captcha]
+Length = 4
+Width = 400
+Height = 160
+CacheType = "memory" # memory/redis
+
+[Util.Captcha.Redis]
+Addr = "" # If empty, then use the same configuration as Storage.Cache.Redis
+Username = ""
+Password = ""
+DB = 1
+KeyPrefix = "captcha:"
+
+[Util.Prometheus]
+Enable = false
+Port = 9100
+BasicUsername = "admin"
+BasicPassword = "admin"
+LogApis = [] # Log APIs, e.g. ["/api/v1/users"]
+LogMethods = [] # Log HTTP methods, e.g. ["GET"]
+DefaultCollect = true
+
+[Dictionary]
+UserCacheExp = 4 # hours

@@ -18,17 +18,17 @@ type Config struct {
 
 type General struct {
 	AppName            string `default:"ginadmin"`
-	Version            string `default:"v1.0.0"`
+	Version            string `default:"v10.0.2"`
 	Debug              bool
 	PprofAddr          string
 	DisableSwagger     bool
 	DisablePrintConfig bool
-	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // abc-123
+	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // MD5(abc-123)
 	WorkDir            string // From command arguments
 	MenuFile           string // From schema.Menus (JSON/YAML)
 	DenyDeleteMenu     bool
 	HTTP               struct {
-		Addr            string `default:":8080"`
+		Addr            string `default:":8040"`
 		ShutdownTimeout int    `default:"10"` // seconds
 		ReadTimeout     int    `default:"60"` // seconds
 		WriteTimeout    int    `default:"60"` // seconds
@@ -125,6 +125,12 @@ func (c *Config) PreLoad() {
 	if addr := c.Storage.Cache.Redis.Addr; addr != "" {
 		username := c.Storage.Cache.Redis.Username
 		password := c.Storage.Cache.Redis.Password
+		if c.Util.Captcha.CacheType == "redis" &&
+			c.Util.Captcha.Redis.Addr == "" {
+			c.Util.Captcha.Redis.Addr = addr
+			c.Util.Captcha.Redis.Username = username
+			c.Util.Captcha.Redis.Password = password
+		}
 		if c.Middleware.RateLimiter.Store.Type == "redis" &&
 			c.Middleware.RateLimiter.Store.Redis.Addr == "" {
 			c.Middleware.RateLimiter.Store.Redis.Addr = addr
