@@ -31,3 +31,7 @@ func (a *SYS) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error 
 	}
 	return nil
 }
+
+func (a *SYS) Release(ctx context.Context) error {
+	return nil
+}

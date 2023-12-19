@@ -60,5 +60,8 @@ func (a *Mods) Release(ctx context.Context) error {
 	if err := a.RBAC.Release(ctx); err != nil {
 		return err
 	}
+	if err := a.SYS.Release(ctx); err != nil {
+		return err
+	}
 	return nil
 }
