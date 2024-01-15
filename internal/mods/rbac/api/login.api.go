@@ -11,6 +11,7 @@ type Login struct {
 	LoginBIZ *biz.Login
 }
 
+// GetCaptcha
 // @Tags LoginAPI
 // @Summary Get captcha ID
 // @Success 200 {object} util.ResponseResult{data=schema.Captcha}
@@ -25,6 +26,7 @@ func (a *Login) GetCaptcha(c *gin.Context) {
 	util.ResSuccess(c, data)
 }
 
+// ResponseCaptcha
 // @Tags LoginAPI
 // @Summary Response captcha image
 // @Param id query string true "Captcha ID"
@@ -41,6 +43,7 @@ func (a *Login) ResponseCaptcha(c *gin.Context) {
 	}
 }
 
+// Login
 // @Tags LoginAPI
 // @Summary Login system with username and password
 // @Param body body schema.LoginForm true "Request body"
@@ -64,6 +67,7 @@ func (a *Login) Login(c *gin.Context) {
 	util.ResSuccess(c, data)
 }
 
+// Logout
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Logout system
@@ -80,6 +84,7 @@ func (a *Login) Logout(c *gin.Context) {
 	util.ResOK(c)
 }
 
+// RefreshToken
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Refresh current access token
@@ -97,6 +102,7 @@ func (a *Login) RefreshToken(c *gin.Context) {
 	util.ResSuccess(c, data)
 }
 
+// GetUserInfo
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Get current user info
@@ -114,6 +120,7 @@ func (a *Login) GetUserInfo(c *gin.Context) {
 	util.ResSuccess(c, data)
 }
 
+// UpdatePassword
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Change current user password
@@ -139,6 +146,7 @@ func (a *Login) UpdatePassword(c *gin.Context) {
 	util.ResOK(c)
 }
 
+// QueryMenus
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Query current user menus based on the current user role
@@ -156,6 +164,7 @@ func (a *Login) QueryMenus(c *gin.Context) {
 	util.ResSuccess(c, data)
 }
 
+// UpdateUser
 // @Tags LoginAPI
 // @Security ApiKeyAuth
 // @Summary Update current user info

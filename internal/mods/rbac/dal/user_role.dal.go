@@ -10,12 +10,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// Get user role storage instance
+// GetUserRoleDB Get user role storage instance
 func GetUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.UserRole))
 }
 
-// User roles for RBAC
+// UserRole User roles for RBAC
 type UserRole struct {
 	DB *gorm.DB
 }
@@ -73,7 +73,7 @@ func (a *UserRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQu
 	return item, nil
 }
 
-// Exist checks if the specified user role exists in the database.
+// Exists Exist checks if the specified user role exists in the database.
 func (a *UserRole) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := util.Exists(ctx, GetUserRoleDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)

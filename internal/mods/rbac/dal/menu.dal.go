@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Get menu storage instance
+// GetMenuDB Get menu storage instance
 func GetMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.Menu))
 }
@@ -116,19 +116,19 @@ func (a *Menu) GetByNameAndParentID(ctx context.Context, name, parentID string, 
 	return item, nil
 }
 
-// Checks if the specified menu exists in the database.
+// Exists Checks if the specified menu exists in the database.
 func (a *Menu) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
 }
 
-// Checks if a menu with the specified `code` exists under the specified `parentID` in the database.
+// ExistsCodeByParentID Checks if a menu with the specified `code` exists under the specified `parentID` in the database.
 func (a *Menu) ExistsCodeByParentID(ctx context.Context, code, parentID string) (bool, error) {
 	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("code=? AND parent_id=?", code, parentID))
 	return ok, errors.WithStack(err)
 }
 
-// Checks if a menu with the specified `name` exists under the specified `parentID` in the database.
+// ExistsNameByParentID Checks if a menu with the specified `name` exists under the specified `parentID` in the database.
 func (a *Menu) ExistsNameByParentID(ctx context.Context, name, parentID string) (bool, error) {
 	ok, err := util.Exists(ctx, GetMenuDB(ctx, a.DB).Where("name=? AND parent_id=?", name, parentID))
 	return ok, errors.WithStack(err)
@@ -152,13 +152,13 @@ func (a *Menu) Delete(ctx context.Context, id string) error {
 	return errors.WithStack(result.Error)
 }
 
-// Updates the parent path of the specified menu.
+// UpdateParentPath Updates the parent path of the specified menu.
 func (a *Menu) UpdateParentPath(ctx context.Context, id, parentPath string) error {
 	result := GetMenuDB(ctx, a.DB).Where("id=?", id).Update("parent_path", parentPath)
 	return errors.WithStack(result.Error)
 }
 
-// Updates the status of all menus whose parent path starts with the provided parent path.
+// UpdateStatusByParentPath Updates the status of all menus whose parent path starts with the provided parent path.
 func (a *Menu) UpdateStatusByParentPath(ctx context.Context, parentPath, status string) error {
 	result := GetMenuDB(ctx, a.DB).Where("parent_path like ?", parentPath+"%").Update("status", status)
 	return errors.WithStack(result.Error)

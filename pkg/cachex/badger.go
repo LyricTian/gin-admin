@@ -14,7 +14,7 @@ type BadgerConfig struct {
 	Path string
 }
 
-// Create badger-based cache
+// NewBadgerCache Create badger-based cache
 func NewBadgerCache(cfg BadgerConfig, opts ...Option) Cacher {
 	defaultOpts := &options{
 		Delimiter: defaultDelimiter,

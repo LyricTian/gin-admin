@@ -7,7 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
-// Menu resource management for RBAC
+// MenuResource Menu resource management for RBAC
 type MenuResource struct {
 	ID        string    `json:"id" gorm:"size:20;primarykey"` // Unique ID
 	MenuID    string    `json:"menu_id" gorm:"size:20;index"` // From Menu.ID
@@ -21,32 +21,32 @@ func (a *MenuResource) TableName() string {
 	return config.C.FormatTableName("menu_resource")
 }
 
-// Defining the query parameters for the `MenuResource` struct.
+// MenuResourceQueryParam Defining the query parameters for the `MenuResource` struct.
 type MenuResourceQueryParam struct {
 	util.PaginationParam
 	MenuID  string   `form:"-"` // From Menu.ID
 	MenuIDs []string `form:"-"` // From Menu.ID
 }
 
-// Defining the query options for the `MenuResource` struct.
+// MenuResourceQueryOptions Defining the query options for the `MenuResource` struct.
 type MenuResourceQueryOptions struct {
 	util.QueryOptions
 }
 
-// Defining the query result for the `MenuResource` struct.
+// MenuResourceQueryResult Defining the query result for the `MenuResource` struct.
 type MenuResourceQueryResult struct {
 	Data       MenuResources
 	PageResult *util.PaginationResult
 }
 
-// Defining the slice of `MenuResource` struct.
+// MenuResources Defining the slice of `MenuResource` struct.
 type MenuResources []*MenuResource
 
-// Defining the data structure for creating a `MenuResource` struct.
+// MenuResourceForm Defining the data structure for creating a `MenuResource` struct.
 type MenuResourceForm struct {
 }
 
-// A validation function for the `MenuResourceForm` struct.
+// Validate A validation function for the `MenuResourceForm` struct.
 func (a *MenuResourceForm) Validate() error {
 	return nil
 }

@@ -22,7 +22,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Load rbac permissions to casbin
+// Casbinx Load rbac permissions to casbin
 type Casbinx struct {
 	enforcer        *atomic.Value `wire:"-"`
 	ticker          *time.Ticker  `wire:"-"`

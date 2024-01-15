@@ -25,7 +25,7 @@ func MustLoad(dir string, names ...string) {
 	})
 }
 
-// Loads configuration files in various formats from a directory and parses them into
+// Load configuration files in various formats from a directory and parses them into
 // a struct.
 func Load(dir string, names ...string) error {
 	// Set default values

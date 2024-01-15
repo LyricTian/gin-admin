@@ -23,9 +23,9 @@ var (
 	upperCaseLetters = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
-// definition error
+// ErrInvalidFlag definition error
 var (
-	ErrInvalidFlag = errors.New("Invalid flag")
+	ErrInvalidFlag = errors.New("invalid flag")
 )
 
 // Random generate a random string specifying the length of the random number

@@ -26,7 +26,7 @@ func (a *Logger) TableName() string {
 	return config.C.FormatTableName("logger")
 }
 
-// Defining the query parameters for the `Logger` struct.
+// LoggerQueryParam Defining the query parameters for the `Logger` struct.
 type LoggerQueryParam struct {
 	util.PaginationParam
 	Level        string `form:"level"`     // Log level
@@ -38,16 +38,16 @@ type LoggerQueryParam struct {
 	EndTime      string `form:"endTime"`   // End time
 }
 
-// Defining the query options for the `Logger` struct.
+// LoggerQueryOptions Defining the query options for the `Logger` struct.
 type LoggerQueryOptions struct {
 	util.QueryOptions
 }
 
-// Defining the query result for the `Logger` struct.
+// LoggerQueryResult Defining the query result for the `Logger` struct.
 type LoggerQueryResult struct {
 	Data       Loggers
 	PageResult *util.PaginationResult
 }
 
-// Defining the slice of `Logger` struct.
+// Loggers Defining the slice of `Logger` struct.
 type Loggers []*Logger

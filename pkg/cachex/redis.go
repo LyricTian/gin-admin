@@ -16,7 +16,7 @@ type RedisConfig struct {
 	DB       int
 }
 
-// Create redis-based cache
+// NewRedisCache Create redis-based cache
 func NewRedisCache(cfg RedisConfig, opts ...Option) Cacher {
 	cli := redis.NewClient(&redis.Options{
 		Addr:     cfg.Addr,
@@ -28,12 +28,12 @@ func NewRedisCache(cfg RedisConfig, opts ...Option) Cacher {
 	return newRedisCache(cli, opts...)
 }
 
-// Use redis client create cache
+// NewRedisCacheWithClient Use redis client create cache
 func NewRedisCacheWithClient(cli *redis.Client, opts ...Option) Cacher {
 	return newRedisCache(cli, opts...)
 }
 
-// Use redis cluster client create cache
+// NewRedisCacheWithClusterClient Use redis cluster client create cache
 func NewRedisCacheWithClusterClient(cli *redis.ClusterClient, opts ...Option) Cacher {
 	return newRedisCache(cli, opts...)
 }
