@@ -34,8 +34,10 @@ func (a *RBAC) AutoMigrate(ctx context.Context) error {
 }
 
 func (a *RBAC) Init(ctx context.Context) error {
-	if err := a.AutoMigrate(ctx); err != nil {
-		return err
+	if config.C.Storage.DB.AutoMigrate {
+		if err := a.AutoMigrate(ctx); err != nil {
+			return err
+		}
 	}
 
 	if err := a.Casbinx.Load(ctx); err != nil {

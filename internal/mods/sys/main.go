@@ -2,6 +2,7 @@ package sys
 
 import (
 	"context"
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 
 	"github.com/LyricTian/gin-admin/v10/internal/mods/sys/api"
 	"github.com/gin-gonic/gin"
@@ -18,8 +19,10 @@ func (a *SYS) AutoMigrate(ctx context.Context) error {
 }
 
 func (a *SYS) Init(ctx context.Context) error {
-	if err := a.AutoMigrate(ctx); err != nil {
-		return err
+	if config.C.Storage.DB.AutoMigrate {
+		if err := a.AutoMigrate(ctx); err != nil {
+			return err
+		}
 	}
 	return nil
 }
