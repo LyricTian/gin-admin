@@ -65,7 +65,7 @@ addStruct: installCli
 		echo "补充参数： c=[结构注释]"; \
 		exit 1; \
 	fi;
-	gin-admin-cli gen -d . -m ${m} -s ${s} --structs-comment '${s} ${c}'
+	gin-admin-cli gen -d . -m ${m} --structs ${s} --structs-comment '${s} ${c}'
 	git add .
 
 rmStruct: installCli
@@ -77,7 +77,7 @@ rmStruct: installCli
 		echo "补充参数： s=[结构名]"; \
 		exit 1; \
 	fi;
-	gin-admin-cli rm -d . -m ${m} -s ${s}
+	gin-admin-cli rm -d . -m ${m} --structs ${s}
 
 rmModule:
 	@if [ ! -n "${m}" ]; then \
