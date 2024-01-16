@@ -15,15 +15,14 @@ type SYS struct {
 }
 
 func (a *SYS) AutoMigrate(ctx context.Context) error {
-	if !config.C.Storage.DB.AutoMigrate {
-		return nil
-	}
 	return a.DB.AutoMigrate()
 }
 
 func (a *SYS) Init(ctx context.Context) error {
-	if err := a.AutoMigrate(ctx); err != nil {
-		return err
+	if config.C.Storage.DB.AutoMigrate {
+		if err := a.AutoMigrate(ctx); err != nil {
+			return err
+		}
 	}
 	return nil
 }
