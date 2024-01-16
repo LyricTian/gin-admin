@@ -3,6 +3,7 @@ package sys
 import (
 	"context"
 
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/sys/api"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -14,6 +15,9 @@ type SYS struct {
 }
 
 func (a *SYS) AutoMigrate(ctx context.Context) error {
+	if !config.C.Storage.DB.AutoMigrate {
+		return nil
+	}
 	return a.DB.AutoMigrate()
 }
 

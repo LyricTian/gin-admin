@@ -23,6 +23,9 @@ type RBAC struct {
 }
 
 func (a *RBAC) AutoMigrate(ctx context.Context) error {
+	if !config.C.Storage.DB.AutoMigrate {
+		return nil
+	}
 	return a.DB.AutoMigrate(
 		new(schema.Menu),
 		new(schema.MenuResource),
