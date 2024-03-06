@@ -62,7 +62,7 @@ go run main.go start
 > For more detailed usage instructions, please refer to [gin-admin-cli](https://github.com/gin-admin/gin-admin-cli)
 
 ```bash
-gin-admin-cli gen -d . -m CMS -s Article --structs-comment 'Article management'
+gin-admin-cli gen -d . -m CMS --structs Article --structs-comment 'Article management'
 ```
 
 ### Remove a module
