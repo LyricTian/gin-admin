@@ -68,7 +68,7 @@ gin-admin-cli gen -d . -m CMS --structs Article --structs-comment 'Article manag
 ### Remove a module
 
 ```bash
-gin-admin-cli rm -d . -m CMS -s Article
+gin-admin-cli rm -d . -m CMS --structs Article
 ```
 
 ### Build the service
@@ -159,3 +159,4 @@ wire gen ./internal/wirex
 ## Community
 
 - [Discord](https://discord.gg/UCnpActY)
+- [Issues](https://github.com/LyricTian/gin-admin/issues)

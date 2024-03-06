@@ -81,7 +81,7 @@ sudo docker build -f ./Dockerfile -t testapp:v1.0.0 .
 > 支持通过配置文件生成代码，更加详细的使用说明请参考 [gin-admin-cli](https://github.com/gin-admin/gin-admin-cli)
 
 ```bash
-gin-admin-cli gen -d . -m CMS -s Article --structs-comment 'Article management'
+gin-admin-cli gen -d . -m CMS --structs Article --structs-comment 'Article management'
 ```
 
 ### Remove a module
@@ -89,7 +89,7 @@ gin-admin-cli gen -d . -m CMS -s Article --structs-comment 'Article management'
 > 可通过 `gin-admin-cli help remove` 查看命令的详细说明
 
 ```bash
-gin-admin-cli rm -d . -m CMS -s Article
+gin-admin-cli rm -d . -m CMS --structs Article
 ```
 
 ### 生成 Swagger 文档
