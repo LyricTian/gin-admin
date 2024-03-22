@@ -1,0 +1,9 @@
+{
+    "name": "ginadmin",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+    "forwardPorts": [
+        8040
+    ]
+}
