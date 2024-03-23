@@ -34,7 +34,7 @@ func (a *User) TableName() string {
 	return config.C.FormatTableName("user")
 }
 
-// Defining the query parameters for the `User` struct.
+// UserQueryParam Defining the query parameters for the `User` struct.
 type UserQueryParam struct {
 	util.PaginationParam
 	LikeUsername string `form:"username"`                                    // Username for login
@@ -42,18 +42,18 @@ type UserQueryParam struct {
 	Status       string `form:"status" binding:"oneof=activated freezed ''"` // Status of user (activated, freezed)
 }
 
-// Defining the query options for the `User` struct.
+// UserQueryOptions Defining the query options for the `User` struct.
 type UserQueryOptions struct {
 	util.QueryOptions
 }
 
-// Defining the query result for the `User` struct.
+// UserQueryResult Defining the query result for the `User` struct.
 type UserQueryResult struct {
 	Data       Users
 	PageResult *util.PaginationResult
 }
 
-// Defining the slice of `User` struct.
+// Users Defining the slice of `User` struct.
 type Users []*User
 
 func (a Users) ToIDs() []string {
@@ -64,7 +64,7 @@ func (a Users) ToIDs() []string {
 	return ids
 }
 
-// Defining the data structure for creating a `User` struct.
+// UserForm Defining the data structure for creating a `User` struct.
 type UserForm struct {
 	Username string    `json:"username" binding:"required,max=64"`                // Username for login
 	Name     string    `json:"name" binding:"required,max=64"`                    // Name of user
@@ -76,7 +76,7 @@ type UserForm struct {
 	Roles    UserRoles `json:"roles" binding:"required"`                          // Roles of user
 }
 
-// A validation function for the `UserForm` struct.
+// Validate A validation function for the `UserForm` struct.
 func (a *UserForm) Validate() error {
 	if a.Email != "" && validator.New().Var(a.Email, "email") != nil {
 		return errors.BadRequest("", "Invalid email address")
@@ -84,7 +84,7 @@ func (a *UserForm) Validate() error {
 	return nil
 }
 
-// Convert `UserForm` to `User` object.
+// FillTo Convert `UserForm` to `User` object.
 func (a *UserForm) FillTo(user *User) error {
 	user.Username = a.Username
 	user.Name = a.Name

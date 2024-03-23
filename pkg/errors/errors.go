@@ -1,5 +1,5 @@
 // Package errors provides a way to return detailed information
-// for an request error. The error is normally JSON encoded.
+// for a request error. The error is normally JSON encoded.
 package errors
 
 import (
@@ -33,7 +33,7 @@ const (
 	DefaultRequestTimeoutID        = "request_timeout"
 )
 
-// Customize the error structure for implementation errors.Error interface
+// Error Customize the error structure for implementation errors.Error interface
 type Error struct {
 	ID     string `json:"id,omitempty"`
 	Code   int32  `json:"code,omitempty"`
@@ -229,7 +229,7 @@ func FromError(err error) *Error {
 	return Parse(err.Error())
 }
 
-// As finds the first error in err's chain that matches *Error
+// As finds the first error in errs chain that matches *Error
 func As(err error) (*Error, bool) {
 	if err == nil {
 		return nil, false

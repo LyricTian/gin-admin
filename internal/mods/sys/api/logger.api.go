@@ -12,6 +12,7 @@ type Logger struct {
 	LoggerBIZ *biz.Logger
 }
 
+// Query
 // @Tags LoggerAPI
 // @Security ApiKeyAuth
 // @Summary Query logger list

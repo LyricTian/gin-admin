@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Get user storage instance
+// GetUserDB Get user storage instance
 func GetUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.User))
 }
@@ -83,7 +83,7 @@ func (a *User) GetByUsername(ctx context.Context, username string, opts ...schem
 	return item, nil
 }
 
-// Exist checks if the specified user exists in the database.
+// Exists Exist checks if the specified user exists in the database.
 func (a *User) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := util.Exists(ctx, GetUserDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)

@@ -45,7 +45,7 @@ func (a *Menu) TableName() string {
 	return config.C.FormatTableName("menu")
 }
 
-// Defining the query parameters for the `Menu` struct.
+// MenuQueryParam Defining the query parameters for the `Menu` struct.
 type MenuQueryParam struct {
 	util.PaginationParam
 	CodePath         string   `form:"code"`             // Code path (like xxx.xxx.xxx)
@@ -59,18 +59,18 @@ type MenuQueryParam struct {
 	RoleID           string   `form:"-"`                // Role ID
 }
 
-// Defining the query options for the `Menu` struct.
+// MenuQueryOptions Defining the query options for the `Menu` struct.
 type MenuQueryOptions struct {
 	util.QueryOptions
 }
 
-// Defining the query result for the `Menu` struct.
+// MenuQueryResult Defining the query result for the `Menu` struct.
 type MenuQueryResult struct {
 	Data       Menus
 	PageResult *util.PaginationResult
 }
 
-// Defining the slice of `Menu` struct.
+// Menus Defining the slice of `Menu` struct.
 type Menus []*Menu
 
 func (a Menus) Len() int {
@@ -140,7 +140,7 @@ func (a Menus) ToTree() Menus {
 	return list
 }
 
-// Defining the data structure for creating a `Menu` struct.
+// MenuForm Defining the data structure for creating a `Menu` struct.
 type MenuForm struct {
 	Code        string        `json:"code" binding:"required,max=32"`                   // Code of menu (unique for each level)
 	Name        string        `json:"name" binding:"required,max=128"`                  // Display name of menu
@@ -154,7 +154,7 @@ type MenuForm struct {
 	Resources   MenuResources `json:"resources"`                                        // Resources of menu
 }
 
-// A validation function for the `MenuForm` struct.
+// Validate A validation function for the `MenuForm` struct.
 func (a *MenuForm) Validate() error {
 	if v := a.Properties; v != "" {
 		if !json.Valid([]byte(v)) {

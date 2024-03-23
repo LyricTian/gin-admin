@@ -12,6 +12,7 @@ type Menu struct {
 	MenuBIZ *biz.Menu
 }
 
+// Query
 // @Tags MenuAPI
 // @Security ApiKeyAuth
 // @Summary Query menu tree data
@@ -38,6 +39,7 @@ func (a *Menu) Query(c *gin.Context) {
 	util.ResPage(c, result.Data, result.PageResult)
 }
 
+// Get
 // @Tags MenuAPI
 // @Security ApiKeyAuth
 // @Summary Get menu record by ID
@@ -56,6 +58,7 @@ func (a *Menu) Get(c *gin.Context) {
 	util.ResSuccess(c, item)
 }
 
+// Create
 // @Tags MenuAPI
 // @Security ApiKeyAuth
 // @Summary Create menu record
@@ -84,6 +87,7 @@ func (a *Menu) Create(c *gin.Context) {
 	util.ResSuccess(c, result)
 }
 
+// Update
 // @Tags MenuAPI
 // @Security ApiKeyAuth
 // @Summary Update menu record by ID
@@ -113,6 +117,7 @@ func (a *Menu) Update(c *gin.Context) {
 	util.ResOK(c)
 }
 
+// Delete
 // @Tags MenuAPI
 // @Security ApiKeyAuth
 // @Summary Delete menu record by ID

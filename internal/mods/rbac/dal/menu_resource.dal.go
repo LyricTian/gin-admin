@@ -9,12 +9,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// Get menu resource storage instance
+// GetMenuResourceDB Get menu resource storage instance
 func GetMenuResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.MenuResource))
 }
 
-// Menu resource management for RBAC
+// MenuResource Menu resource management for RBAC
 type MenuResource struct {
 	DB *gorm.DB
 }
@@ -64,7 +64,7 @@ func (a *MenuResource) Get(ctx context.Context, id string, opts ...schema.MenuRe
 	return item, nil
 }
 
-// Exist checks if the specified menu resource exists in the database.
+// Exists Exist checks if the specified menu resource exists in the database.
 func (a *MenuResource) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := util.Exists(ctx, GetMenuResourceDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
@@ -94,7 +94,7 @@ func (a *MenuResource) Delete(ctx context.Context, id string) error {
 	return errors.WithStack(result.Error)
 }
 
-// Deletes the menu resource by menu id.
+// DeleteByMenuID Deletes the menu resource by menu id.
 func (a *MenuResource) DeleteByMenuID(ctx context.Context, menuID string) error {
 	result := GetMenuResourceDB(ctx, a.DB).Where("menu_id=?", menuID).Delete(new(schema.MenuResource))
 	return errors.WithStack(result.Error)

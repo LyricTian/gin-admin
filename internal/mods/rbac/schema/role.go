@@ -31,7 +31,7 @@ func (a *Role) TableName() string {
 	return config.C.FormatTableName("role")
 }
 
-// Defining the query parameters for the `Role` struct.
+// RoleQueryParam Defining the query parameters for the `Role` struct.
 type RoleQueryParam struct {
 	util.PaginationParam
 	LikeName    string     `form:"name"`                                       // Display name of role
@@ -41,21 +41,21 @@ type RoleQueryParam struct {
 	GtUpdatedAt *time.Time `form:"-"`                                          // Update time is greater than
 }
 
-// Defining the query options for the `Role` struct.
+// RoleQueryOptions Defining the query options for the `Role` struct.
 type RoleQueryOptions struct {
 	util.QueryOptions
 }
 
-// Defining the query result for the `Role` struct.
+// RoleQueryResult Defining the query result for the `Role` struct.
 type RoleQueryResult struct {
 	Data       Roles
 	PageResult *util.PaginationResult
 }
 
-// Defining the slice of `Role` struct.
+// Roles Defining the slice of `Role` struct.
 type Roles []*Role
 
-// Defining the data structure for creating a `Role` struct.
+// RoleForm Defining the data structure for creating a `Role` struct.
 type RoleForm struct {
 	Code        string    `json:"code" binding:"required,max=32"`                   // Code of role (unique)
 	Name        string    `json:"name" binding:"required,max=128"`                  // Display name of role
@@ -65,7 +65,7 @@ type RoleForm struct {
 	Menus       RoleMenus `json:"menus"`                                            // Role menu list
 }
 
-// A validation function for the `RoleForm` struct.
+// Validate A validation function for the `RoleForm` struct.
 func (a *RoleForm) Validate() error {
 	return nil
 }

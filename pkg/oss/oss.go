@@ -15,7 +15,7 @@ var (
 	once sync.Once
 )
 
-// Set the global oss client
+// SetGlobal Set the global oss client
 func SetGlobal(h func() IClient) {
 	once.Do(func() {
 		Ins = h()

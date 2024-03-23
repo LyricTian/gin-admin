@@ -83,7 +83,7 @@ func FromIsRootUser(ctx context.Context) bool {
 	return v != nil && v.(bool)
 }
 
-// Set user cache object
+// UserCache Set user cache object
 type UserCache struct {
 	RoleIDs []string `json:"rids"`
 }

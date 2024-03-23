@@ -13,7 +13,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// The function defines a CLI command to start a server with various flags and options, including the
+// StartCmd The function defines a CLI command to start a server with various flags and options, including the
 // ability to run as a daemon.
 func StartCmd() *cli.Command {
 	return &cli.Command{

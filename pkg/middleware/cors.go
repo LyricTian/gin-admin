@@ -17,7 +17,7 @@ type CORSConfig struct {
 	// AllowMethods is a list of methods the client is allowed to use with
 	// cross-domain requests. Default value is simple methods (GET, POST, PUT, PATCH, DELETE, HEAD, and OPTIONS)
 	AllowMethods []string
-	// AllowHeaders is list of non simple headers the client is allowed to use with
+	// AllowHeaders is list of non-simple headers the client is allowed to use with
 	// cross-domain requests.
 	AllowHeaders []string
 	// AllowCredentials indicates whether the request can include user credentials like

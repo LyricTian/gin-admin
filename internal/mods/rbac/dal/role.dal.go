@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Get role storage instance
+// GetRoleDB Get role storage instance
 func GetRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.Role))
 }
@@ -70,7 +70,7 @@ func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 	return item, nil
 }
 
-// Exist checks if the specified role exists in the database.
+// Exists Exist checks if the specified role exists in the database.
 func (a *Role) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := util.Exists(ctx, GetRoleDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)

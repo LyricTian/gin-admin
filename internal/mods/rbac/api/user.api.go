@@ -12,6 +12,7 @@ type User struct {
 	UserBIZ *biz.User
 }
 
+// Query
 // @Tags UserAPI
 // @Security ApiKeyAuth
 // @Summary Query user list
@@ -40,6 +41,7 @@ func (a *User) Query(c *gin.Context) {
 	util.ResPage(c, result.Data, result.PageResult)
 }
 
+// Get
 // @Tags UserAPI
 // @Security ApiKeyAuth
 // @Summary Get user record by ID
@@ -58,6 +60,7 @@ func (a *User) Get(c *gin.Context) {
 	util.ResSuccess(c, item)
 }
 
+// Create
 // @Tags UserAPI
 // @Security ApiKeyAuth
 // @Summary Create user record
@@ -86,6 +89,7 @@ func (a *User) Create(c *gin.Context) {
 	util.ResSuccess(c, result)
 }
 
+// Update
 // @Tags UserAPI
 // @Security ApiKeyAuth
 // @Summary Update user record by ID
@@ -115,6 +119,7 @@ func (a *User) Update(c *gin.Context) {
 	util.ResOK(c)
 }
 
+// Delete
 // @Tags UserAPI
 // @Security ApiKeyAuth
 // @Summary Delete user record by ID
@@ -133,6 +138,7 @@ func (a *User) Delete(c *gin.Context) {
 	util.ResOK(c)
 }
 
+// ResetPassword
 // @Tags UserAPI
 // @Security ApiKeyAuth
 // @Summary Reset user password by ID

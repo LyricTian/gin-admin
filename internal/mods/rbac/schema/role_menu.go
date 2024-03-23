@@ -7,7 +7,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 )
 
-// Role permissions for RBAC
+// RoleMenu Role permissions for RBAC
 type RoleMenu struct {
 	ID        string    `json:"id" gorm:"size:20;primarykey"` // Unique ID
 	RoleID    string    `json:"role_id" gorm:"size:20;index"` // From Role.ID
@@ -20,31 +20,31 @@ func (a *RoleMenu) TableName() string {
 	return config.C.FormatTableName("role_menu")
 }
 
-// Defining the query parameters for the `RoleMenu` struct.
+// RoleMenuQueryParam Defining the query parameters for the `RoleMenu` struct.
 type RoleMenuQueryParam struct {
 	util.PaginationParam
 	RoleID string `form:"-"` // From Role.ID
 }
 
-// Defining the query options for the `RoleMenu` struct.
+// RoleMenuQueryOptions Defining the query options for the `RoleMenu` struct.
 type RoleMenuQueryOptions struct {
 	util.QueryOptions
 }
 
-// Defining the query result for the `RoleMenu` struct.
+// RoleMenuQueryResult Defining the query result for the `RoleMenu` struct.
 type RoleMenuQueryResult struct {
 	Data       RoleMenus
 	PageResult *util.PaginationResult
 }
 
-// Defining the slice of `RoleMenu` struct.
+// RoleMenus Defining the slice of `RoleMenu` struct.
 type RoleMenus []*RoleMenu
 
-// Defining the data structure for creating a `RoleMenu` struct.
+// RoleMenuForm Defining the data structure for creating a `RoleMenu` struct.
 type RoleMenuForm struct {
 }
 
-// A validation function for the `RoleMenuForm` struct.
+// Validate A validation function for the `RoleMenuForm` struct.
 func (a *RoleMenuForm) Validate() error {
 	return nil
 }

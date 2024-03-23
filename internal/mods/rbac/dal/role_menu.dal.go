@@ -9,12 +9,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// Get role menu storage instance
+// GetRoleMenuDB Get role menu storage instance
 func GetRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.RoleMenu))
 }
 
-// Role permissions for RBAC
+// RoleMenu Role permissions for RBAC
 type RoleMenu struct {
 	DB *gorm.DB
 }
@@ -61,7 +61,7 @@ func (a *RoleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQu
 	return item, nil
 }
 
-// Exist checks if the specified role menu exists in the database.
+// Exists Exist checks if the specified role menu exists in the database.
 func (a *RoleMenu) Exists(ctx context.Context, id string) (bool, error) {
 	ok, err := util.Exists(ctx, GetRoleMenuDB(ctx, a.DB).Where("id=?", id))
 	return ok, errors.WithStack(err)
@@ -85,13 +85,13 @@ func (a *RoleMenu) Delete(ctx context.Context, id string) error {
 	return errors.WithStack(result.Error)
 }
 
-// Deletes role menus by role id.
+// DeleteByRoleID Deletes role menus by role id.
 func (a *RoleMenu) DeleteByRoleID(ctx context.Context, roleID string) error {
 	result := GetRoleMenuDB(ctx, a.DB).Where("role_id=?", roleID).Delete(new(schema.RoleMenu))
 	return errors.WithStack(result.Error)
 }
 
-// Deletes role menus by menu id.
+// DeleteByMenuID Deletes role menus by menu id.
 func (a *RoleMenu) DeleteByMenuID(ctx context.Context, menuID string) error {
 	result := GetRoleMenuDB(ctx, a.DB).Where("menu_id=?", menuID).Delete(new(schema.RoleMenu))
 	return errors.WithStack(result.Error)

@@ -9,11 +9,11 @@ import (
 )
 
 type Auther interface {
-	// Generate a JWT (JSON Web Token) with the provided subject.
+	// GenerateToken Generate a JWT (JSON Web Token) with the provided subject.
 	GenerateToken(ctx context.Context, subject string) (TokenInfo, error)
-	// Invalidate a token by removing it from the token store.
+	// DestroyToken Invalidate a token by removing it from the token store.
 	DestroyToken(ctx context.Context, accessToken string) error
-	// Parse the subject (or user identifier) from a given access token.
+	// ParseSubject Parse the subject (or user identifier) from a given access token.
 	ParseSubject(ctx context.Context, accessToken string) (string, error)
 	// Release any resources held by the JWTAuth instance.
 	Release(ctx context.Context) error
@@ -21,7 +21,7 @@ type Auther interface {
 
 const defaultKey = "CG24SDVP8OHPK395GB5G"
 
-var ErrInvalidToken = errors.New("Invalid token")
+var ErrInvalidToken = errors.New("invalid token")
 
 type options struct {
 	signingMethod jwt.SigningMethod

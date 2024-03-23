@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Get logger storage instance
+// GetLoggerDB Get logger storage instance
 func GetLoggerDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return util.GetDB(ctx, defDB).Model(new(schema.Logger))
 }
