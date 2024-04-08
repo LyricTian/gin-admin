@@ -315,7 +315,7 @@ func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.M
 		menu.ParentPath = parent.ParentPath + parent.ID + util.TreePathDelimiter
 	}
 
-	if exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, menu.Code, menu.ParentID); err != nil {
+	if exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, formItem.Code, formItem.ParentID); err != nil {
 		return nil, err
 	} else if exists {
 		return nil, errors.BadRequest("", "Menu code already exists at the same level")
