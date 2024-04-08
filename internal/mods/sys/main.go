@@ -2,6 +2,7 @@ package sys
 
 import (
 	"context"
+	"github.com/LyricTian/gin-admin/v10/internal/config"
 
 	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/sys/api"

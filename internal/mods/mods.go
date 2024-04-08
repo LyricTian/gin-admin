@@ -13,7 +13,7 @@ const (
 	apiPrefix = "/api/"
 )
 
-// Collection of wire providers
+// Set Collection of wire providers
 var Set = wire.NewSet(
 	wire.Struct(new(Mods), "*"),
 	rbac.Set,

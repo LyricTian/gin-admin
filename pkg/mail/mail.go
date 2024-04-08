@@ -13,24 +13,24 @@ var (
 	once         sync.Once
 )
 
-// Set a global SMTP sender
+// SetSender Set a global SMTP sender
 func SetSender(sender *SmtpSender) {
 	once.Do(func() {
 		globalSender = sender
 	})
 }
 
-// Use smtp client send email with to/cc/bcc
+// Send Use smtp client send email with to/cc/bcc
 func Send(ctx context.Context, to []string, cc []string, bcc []string, subject string, body string, file ...string) error {
 	return globalSender.Send(ctx, to, cc, bcc, subject, body, file...)
 }
 
-// Use smtp client send email, use to specify recipients
+// SendTo Use smtp client send email, use to specify recipients
 func SendTo(ctx context.Context, to []string, subject string, body string, file ...string) error {
 	return globalSender.SendTo(ctx, to, subject, body, file...)
 }
 
-// A smtp email client
+// SmtpSender A smtp email client
 type SmtpSender struct {
 	SmtpHost string
 	Port     int

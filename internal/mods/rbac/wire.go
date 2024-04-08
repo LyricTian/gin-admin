@@ -7,7 +7,7 @@ import (
 	"github.com/google/wire"
 )
 
-// Collection of wire providers
+// Set Collection of wire providers
 var Set = wire.NewSet(
 	wire.Struct(new(RBAC), "*"),
 	wire.Struct(new(Casbinx), "*"),

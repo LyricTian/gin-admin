@@ -24,7 +24,7 @@ var DefaultLoggerConfig = LoggerConfig{
 	MaxOutputResponseBodyLen: 1024 * 1024,
 }
 
-// Record detailed request logs for quick troubleshooting.
+// Logger Record detailed request logs for quick troubleshooting.
 func Logger() gin.HandlerFunc {
 	return LoggerWithConfig(DefaultLoggerConfig)
 }
