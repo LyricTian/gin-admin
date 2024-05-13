@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -11,6 +12,7 @@ import (
 	"github.com/LyricTian/gin-admin/v10/internal/config"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/dal"
 	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
+	"github.com/LyricTian/gin-admin/v10/pkg/cachex"
 	"github.com/LyricTian/gin-admin/v10/pkg/encoding/json"
 	"github.com/LyricTian/gin-admin/v10/pkg/encoding/yaml"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
@@ -21,6 +23,7 @@ import (
 
 // Menu management for RBAC
 type Menu struct {
+	Cache           cachex.Cacher
 	Trans           *util.Trans
 	MenuDAL         *dal.Menu
 	MenuResourceDAL *dal.MenuResource
@@ -435,7 +438,7 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 			}
 		}
 
-		return nil
+		return a.syncToCasbin(ctx)
 	})
 }
 
@@ -473,7 +476,8 @@ func (a *Menu) Delete(ctx context.Context, id string) error {
 				return err
 			}
 		}
-		return nil
+
+		return a.syncToCasbin(ctx)
 	})
 }
 
@@ -488,4 +492,8 @@ func (a *Menu) delete(ctx context.Context, id string) error {
 		return err
 	}
 	return nil
+}
+
+func (a *Menu) syncToCasbin(ctx context.Context) error {
+	return a.Cache.Set(ctx, config.CacheNSForRole, config.CacheKeyForSyncToCasbin, fmt.Sprintf("%d", time.Now().Unix()))
 }

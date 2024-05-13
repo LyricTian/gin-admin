@@ -51,6 +51,7 @@ func BuildInjector(ctx context.Context) (*Injector, func(), error) {
 		DB: db,
 	}
 	bizMenu := &biz.Menu{
+		Cache:           cacher,
 		Trans:           trans,
 		MenuDAL:         menu,
 		MenuResourceDAL: menuResource,
