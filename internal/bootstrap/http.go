@@ -143,6 +143,7 @@ func useHTTPMiddlewares(_ context.Context, e *gin.Engine, injector *wirex.Inject
 		AllowedPathPrefixes: allowedPrefixes,
 		SkippedPathPrefixes: config.C.Middleware.Auth.SkippedPathPrefixes,
 		ParseUserID:         injector.M.RBAC.LoginAPI.LoginBIZ.ParseUserID,
+		RootID:              config.C.General.Root.ID,
 	}))
 
 	e.Use(middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
