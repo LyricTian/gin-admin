@@ -28,6 +28,7 @@ type ResolverConfig struct {
 
 type Config struct {
 	Debug        bool
+	PrepareStmt  bool
 	DBType       string // mysql/postgres/sqlite3
 	DSN          string
 	MaxLifetime  int
@@ -61,7 +62,8 @@ func New(cfg Config) (*gorm.DB, error) {
 			TablePrefix:   cfg.TablePrefix,
 			SingularTable: true,
 		},
-		Logger: logger.Discard,
+		Logger:      logger.Discard,
+		PrepareStmt: cfg.PrepareStmt,
 	}
 
 	if cfg.Debug {

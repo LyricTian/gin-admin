@@ -36,6 +36,7 @@ func InitDB(ctx context.Context) (*gorm.DB, func(), error) {
 
 	db, err := gormx.New(gormx.Config{
 		Debug:        cfg.Debug,
+		PrepareStmt:  cfg.PrepareStmt,
 		DBType:       cfg.Type,
 		DSN:          cfg.DSN,
 		MaxLifetime:  cfg.MaxLifetime,
