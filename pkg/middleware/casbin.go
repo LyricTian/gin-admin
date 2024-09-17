@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var ErrCasbinDenied = errors.Unauthorized("com.casbin.denied", "Permission denied")
+var ErrCasbinDenied = errors.Forbidden("com.casbin.denied", "Permission denied")
 
 type CasbinConfig struct {
 	AllowedPathPrefixes []string
