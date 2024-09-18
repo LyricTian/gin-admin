@@ -34,6 +34,7 @@ func RecoveryWithConfig(config RecoveryConfig) gin.HandlerFunc {
 				ctx = logging.NewTag(ctx, logging.TagKeyRecovery)
 
 				var fields []zap.Field
+				fields = append(fields, zap.Strings("error", []string{fmt.Sprintf("%v", rv)}))
 				fields = append(fields, zap.StackSkip("stack", config.Skip))
 
 				if gin.IsDebugging() {
