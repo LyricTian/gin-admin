@@ -71,6 +71,7 @@ type Storage struct {
 		MaxIdleConns int    `default:"50"`               // connections
 		TablePrefix  string `default:""`
 		AutoMigrate  bool
+		PrepareStmt  bool
 		Resolver     []struct {
 			DBType   string   // sqlite3/mysql/postgres
 			Sources  []string // DSN
