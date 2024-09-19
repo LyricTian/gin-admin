@@ -5,6 +5,7 @@ NOW = $(shell date -u '+%Y%m%d%I%M%S')
 RELEASE_VERSION = v10.0.2
 
 APP 			= ginadmin
+APPEXT          = $(go env | grep GOEXE | awk -F '=' '{print $2}' | sed 's/"//g' )
 SERVER_BIN  	= ${APP}
 GIT_COUNT 		= $(shell git rev-list --all --count)
 GIT_HASH        = $(shell git rev-parse --short HEAD)
@@ -21,7 +22,7 @@ start:
 	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" main.go start $(START_ARGS)
 
 build:
-	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)
+	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)$(APPEXT)
 
 # go install github.com/google/wire/cmd/wire@latest
 wire:
