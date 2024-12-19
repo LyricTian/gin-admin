@@ -2,7 +2,7 @@
 
 NOW = $(shell date -u '+%Y%m%d%I%M%S')
 
-RELEASE_VERSION = v10.0.2
+RELEASE_VERSION = v10.1.0
 
 APP 			= ginadmin
 SERVER_BIN  	= ${APP}
@@ -22,6 +22,9 @@ start:
 
 build:
 	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)
+
+build-linux:
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC="zig cc -target x86_64-linux-musl" CXX="zig c++ -target x86_64-linux-musl" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)_linux_amd64
 
 # go install github.com/google/wire/cmd/wire@latest
 wire:

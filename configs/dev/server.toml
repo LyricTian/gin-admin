@@ -1,13 +1,13 @@
 [General]
 AppName = "ginadmin"
-Version = "v10.0.2"
+Version = "v10.1.0"
 Debug = true
 PprofAddr = "" # Pprof monitor address, "localhost:6060"
 DisableSwagger = false
 DisablePrintConfig = false
 DefaultLoginPwd = "6351623c8cef86fefabfa7da046fc619" # MD5("abc-123")
 MenuFile = "menu.json" # Or use "menu_cn.json"
-DenyDeleteMenu = false
+DenyOperateMenu = true
 
 [General.HTTP]
 Addr = ":8040"
@@ -27,7 +27,7 @@ Name = "Admin"
 [Storage]
 
 [Storage.Cache]
-Type = "badger" # memory/badger/redis
+Type = "memory" # memory/badger/redis
 Delimiter = ":"
 
 [Storage.Cache.Memory]

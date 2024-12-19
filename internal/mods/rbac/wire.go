@@ -25,4 +25,7 @@ var Set = wire.NewSet(
 	wire.Struct(new(dal.UserRole), "*"),
 	wire.Struct(new(biz.Login), "*"),
 	wire.Struct(new(api.Login), "*"),
+	wire.Struct(new(api.Logger), "*"),
+	wire.Struct(new(biz.Logger), "*"),
+	wire.Struct(new(dal.Logger), "*"),
 )

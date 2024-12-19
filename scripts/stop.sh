@@ -1,0 +1,1 @@
+./ginadmin stop

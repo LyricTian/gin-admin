@@ -2,7 +2,7 @@
     {
         "code": "home",
         "name": "Home",
-        "sequence": 9,
+        "sequence": 90,
         "type": "page",
         "path": "/home",
         "status": "enabled"
@@ -10,7 +10,7 @@
     {
         "code": "system",
         "name": "System",
-        "sequence": 8,
+        "sequence": 10,
         "type": "page",
         "path": "/system",
         "status": "enabled",
@@ -18,7 +18,7 @@
             {
                 "code": "menu",
                 "name": "Menu",
-                "sequence": 9,
+                "sequence": 90,
                 "type": "page",
                 "path": "/system/menu",
                 "status": "enabled",
@@ -84,7 +84,7 @@
             {
                 "code": "role",
                 "name": "Role",
-                "sequence": 8,
+                "sequence": 80,
                 "type": "page",
                 "path": "/system/role",
                 "status": "enabled",
@@ -154,7 +154,7 @@
             {
                 "code": "user",
                 "name": "User",
-                "sequence": 7,
+                "sequence": 70,
                 "type": "page",
                 "path": "/system/user",
                 "status": "enabled",
@@ -224,7 +224,7 @@
             {
                 "code": "logger",
                 "name": "Logger",
-                "sequence": 1,
+                "sequence": 10,
                 "type": "page",
                 "path": "/system/logger",
                 "status": "enabled",

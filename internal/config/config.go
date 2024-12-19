@@ -18,7 +18,7 @@ type Config struct {
 
 type General struct {
 	AppName            string `default:"ginadmin"`
-	Version            string `default:"v10.0.2"`
+	Version            string `default:"v10.1.0"`
 	Debug              bool
 	PprofAddr          string
 	DisableSwagger     bool
@@ -26,7 +26,7 @@ type General struct {
 	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // MD5(abc-123)
 	WorkDir            string // From command arguments
 	MenuFile           string // From schema.Menus (JSON/YAML)
-	DenyDeleteMenu     bool
+	DenyOperateMenu    bool
 	HTTP               struct {
 		Addr            string `default:":8040"`
 		ShutdownTimeout int    `default:"10"` // seconds

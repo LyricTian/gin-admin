@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	rbacSchema "github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
-	"github.com/LyricTian/gin-admin/v10/internal/mods/sys/schema"
+	"github.com/LyricTian/gin-admin/v10/internal/mods/rbac/schema"
 	"github.com/LyricTian/gin-admin/v10/pkg/errors"
 	"github.com/LyricTian/gin-admin/v10/pkg/util"
 	"gorm.io/gorm"
@@ -29,7 +28,7 @@ func (a *Logger) Query(ctx context.Context, params schema.LoggerQueryParam, opts
 	}
 
 	db := a.DB.Table(fmt.Sprintf("%s AS a", new(schema.Logger).TableName()))
-	db = db.Joins(fmt.Sprintf("left join %s b on a.user_id=b.id", new(rbacSchema.User).TableName()))
+	db = db.Joins(fmt.Sprintf("left join %s b on a.user_id=b.id", new(schema.User).TableName()))
 	db = db.Select("a.*,b.name as user_name,b.username as login_name")
 
 	if v := params.Level; v != "" {

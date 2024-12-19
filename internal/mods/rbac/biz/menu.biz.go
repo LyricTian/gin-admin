@@ -60,68 +60,78 @@ func (a *Menu) InitFromFile(ctx context.Context, menuFile string) error {
 
 func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, parent *schema.Menu) error {
 	total := len(items)
+
 	for i, item := range items {
 		var parentID string
 		if parent != nil {
 			parentID = parent.ID
 		}
 
-		exist := false
+		var (
+			menuItem *schema.Menu
+			err      error
+		)
 
 		if item.ID != "" {
-			exists, err := a.MenuDAL.Exists(ctx, item.ID)
-			if err != nil {
-				return err
-			} else if exists {
-				exist = true
-			}
+			menuItem, err = a.MenuDAL.Get(ctx, item.ID)
 		} else if item.Code != "" {
-			exists, err := a.MenuDAL.ExistsCodeByParentID(ctx, item.Code, parentID)
-			if err != nil {
-				return err
-			} else if exists {
-				exist = true
-				existItem, err := a.MenuDAL.GetByCodeAndParentID(ctx, item.Code, parentID)
-				if err != nil {
-					return err
-				}
-				if existItem != nil {
-					item.ID = existItem.ID
-				}
-			}
+			menuItem, err = a.MenuDAL.GetByCodeAndParentID(ctx, item.Code, parentID)
 		} else if item.Name != "" {
-			exists, err := a.MenuDAL.ExistsNameByParentID(ctx, item.Name, parentID)
-			if err != nil {
-				return err
-			} else if exists {
-				exist = true
-				existItem, err := a.MenuDAL.GetByNameAndParentID(ctx, item.Name, parentID)
-				if err != nil {
-					return err
-				}
-				if existItem != nil {
-					item.ID = existItem.ID
-				}
-			}
+			menuItem, err = a.MenuDAL.GetByNameAndParentID(ctx, item.Name, parentID)
 		}
 
-		if !exist {
+		if err != nil {
+			return err
+		}
+
+		if item.Status == "" {
+			item.Status = schema.MenuStatusEnabled
+		}
+
+		if menuItem != nil {
+			changed := false
+			if menuItem.Name != item.Name {
+				menuItem.Name = item.Name
+				changed = true
+			}
+			if menuItem.Description != item.Description {
+				menuItem.Description = item.Description
+				changed = true
+			}
+			if menuItem.Path != item.Path {
+				menuItem.Path = item.Path
+				changed = true
+			}
+			if menuItem.Type != item.Type {
+				menuItem.Type = item.Type
+				changed = true
+			}
+			if menuItem.Sequence != item.Sequence {
+				menuItem.Sequence = item.Sequence
+				changed = true
+			}
+			if menuItem.Status != item.Status {
+				menuItem.Status = item.Status
+				changed = true
+			}
+			if changed {
+				menuItem.UpdatedAt = time.Now()
+				if err := a.MenuDAL.Update(ctx, menuItem); err != nil {
+					return err
+				}
+			}
+		} else {
 			if item.ID == "" {
 				item.ID = util.NewXID()
-			}
-			if item.Status == "" {
-				item.Status = schema.MenuStatusEnabled
 			}
 			if item.Sequence == 0 {
 				item.Sequence = total - i
 			}
-
 			item.ParentID = parentID
 			if parent != nil {
 				item.ParentPath = parent.ParentPath + parentID + util.TreePathDelimiter
 			}
-			item.CreatedAt = time.Now()
-
+			menuItem = item
 			if err := a.MenuDAL.Create(ctx, item); err != nil {
 				return err
 			}
@@ -138,26 +148,24 @@ func (a *Menu) createInBatchByParent(ctx context.Context, items schema.Menus, pa
 			}
 
 			if res.Path != "" {
-				exists, err := a.MenuResourceDAL.ExistsMethodPathByMenuID(ctx, res.Method, res.Path, item.ID)
+				exists, err := a.MenuResourceDAL.ExistsMethodPathByMenuID(ctx, res.Method, res.Path, menuItem.ID)
 				if err != nil {
 					return err
 				} else if exists {
 					continue
 				}
 			}
-
 			if res.ID == "" {
 				res.ID = util.NewXID()
 			}
-			res.MenuID = item.ID
-			res.CreatedAt = time.Now()
+			res.MenuID = menuItem.ID
 			if err := a.MenuResourceDAL.Create(ctx, res); err != nil {
 				return err
 			}
 		}
 
 		if item.Children != nil {
-			if err := a.createInBatchByParent(ctx, *item.Children, item); err != nil {
+			if err := a.createInBatchByParent(ctx, *item.Children, menuItem); err != nil {
 				return err
 			}
 		}
@@ -303,6 +311,10 @@ func (a *Menu) Get(ctx context.Context, id string) (*schema.Menu, error) {
 
 // Create a new menu in the data access object.
 func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.Menu, error) {
+	if config.C.General.DenyOperateMenu {
+		return nil, errors.BadRequest("", "Menu creation is not allowed")
+	}
+
 	menu := &schema.Menu{
 		ID:        util.NewXID(),
 		CreatedAt: time.Now(),
@@ -352,6 +364,10 @@ func (a *Menu) Create(ctx context.Context, formItem *schema.MenuForm) (*schema.M
 
 // Update the specified menu in the data access object.
 func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm) error {
+	if config.C.General.DenyOperateMenu {
+		return errors.BadRequest("", "Menu update is not allowed")
+	}
+
 	menu, err := a.MenuDAL.Get(ctx, id)
 	if err != nil {
 		return err
@@ -444,7 +460,7 @@ func (a *Menu) Update(ctx context.Context, id string, formItem *schema.MenuForm)
 
 // Delete the specified menu from the data access object.
 func (a *Menu) Delete(ctx context.Context, id string) error {
-	if config.C.General.DenyDeleteMenu {
+	if config.C.General.DenyOperateMenu {
 		return errors.BadRequest("", "Menu deletion is not allowed")
 	}
 

@@ -1,7 +1,7 @@
 FROM golang:alpine as builder
 
 ARG APP=ginadmin
-ARG VERSION=v10.0.2
+ARG VERSION=v10.1.0
 ARG RELEASE_TAG=$(VERSION)
 
 # Install the required packages
@@ -10,7 +10,7 @@ RUN apk add --no-cache gcc musl-dev sqlite-dev
 # Set CGO_CFLAGS to enable large file support
 ENV CGO_CFLAGS "-D_LARGEFILE64_SOURCE"
 
-# ENV GOPROXY="https://goproxy.cn"
+ENV GOPROXY="https://goproxy.cn"
 
 WORKDIR /go/src/${APP}
 COPY . .

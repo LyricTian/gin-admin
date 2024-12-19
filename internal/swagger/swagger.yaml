@@ -434,7 +434,7 @@ info:
   description: A lightweight, flexible, elegant and full-featured RBAC scaffolding
     based on GIN + GORM 2.0 + Casbin 2.0 + Wire DI.
   title: ginadmin
-  version: v10.0.2
+  version: v10.1.0
 paths:
   /api/v1/captcha/id:
     get:

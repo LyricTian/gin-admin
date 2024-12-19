@@ -14,12 +14,13 @@ import (
 )
 
 type RBAC struct {
-	DB       *gorm.DB
-	MenuAPI  *api.Menu
-	RoleAPI  *api.Role
-	UserAPI  *api.User
-	LoginAPI *api.Login
-	Casbinx  *Casbinx
+	DB        *gorm.DB
+	MenuAPI   *api.Menu
+	RoleAPI   *api.Role
+	UserAPI   *api.User
+	LoginAPI  *api.Login
+	LoggerAPI *api.Logger
+	Casbinx   *Casbinx
 }
 
 func (a *RBAC) AutoMigrate(ctx context.Context) error {
@@ -60,6 +61,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		captcha.GET("id", a.LoginAPI.GetCaptcha)
 		captcha.GET("image", a.LoginAPI.ResponseCaptcha)
 	}
+
 	v1.POST("login", a.LoginAPI.Login)
 
 	current := v1.Group("current")
@@ -71,6 +73,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		current.PUT("user", a.LoginAPI.UpdateUser)
 		current.POST("logout", a.LoginAPI.Logout)
 	}
+
 	menu := v1.Group("menus")
 	{
 		menu.GET("", a.MenuAPI.Query)
@@ -79,6 +82,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		menu.PUT(":id", a.MenuAPI.Update)
 		menu.DELETE(":id", a.MenuAPI.Delete)
 	}
+
 	role := v1.Group("roles")
 	{
 		role.GET("", a.RoleAPI.Query)
@@ -87,6 +91,7 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		role.PUT(":id", a.RoleAPI.Update)
 		role.DELETE(":id", a.RoleAPI.Delete)
 	}
+
 	user := v1.Group("users")
 	{
 		user.GET("", a.UserAPI.Query)
@@ -96,6 +101,12 @@ func (a *RBAC) RegisterV1Routers(ctx context.Context, v1 *gin.RouterGroup) error
 		user.DELETE(":id", a.UserAPI.Delete)
 		user.PATCH(":id/reset-pwd", a.UserAPI.ResetPassword)
 	}
+
+	logger := v1.Group("loggers")
+	{
+		logger.GET("", a.LoggerAPI.Query)
+	}
+
 	return nil
 }
 
