@@ -110,6 +110,13 @@ func (a *JWTAuth) GenerateToken(ctx context.Context, subject string) (TokenInfo,
 		return nil, err
 	}
 
+	if err = a.callStore(func(store Storer) error {
+		expired := time.Until(time.Unix(expiresAt, 0))
+		return store.Set(ctx, tokenStr, expired)
+	}); err != nil {
+		return nil, err
+	}
+
 	tokenInfo := &tokenInfo{
 		ExpiresAt:   expiresAt,
 		TokenType:   a.opts.tokenType,
@@ -147,14 +154,13 @@ func (a *JWTAuth) callStore(fn func(Storer) error) error {
 }
 
 func (a *JWTAuth) DestroyToken(ctx context.Context, tokenStr string) error {
-	claims, err := a.parseToken(tokenStr)
+	_, err := a.parseToken(tokenStr)
 	if err != nil {
 		return err
 	}
 
 	return a.callStore(func(store Storer) error {
-		expired := time.Until(time.Unix(claims.ExpiresAt, 0))
-		return store.Set(ctx, tokenStr, expired)
+		return store.Delete(ctx, tokenStr)
 	})
 }
 
@@ -171,7 +177,7 @@ func (a *JWTAuth) ParseSubject(ctx context.Context, tokenStr string) (string, er
 	err = a.callStore(func(store Storer) error {
 		if exists, err := store.Check(ctx, tokenStr); err != nil {
 			return err
-		} else if exists {
+		} else if !exists {
 			return ErrInvalidToken
 		}
 		return nil
