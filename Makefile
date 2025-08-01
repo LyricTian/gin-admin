@@ -5,6 +5,7 @@ NOW = $(shell date -u '+%Y%m%d%I%M%S')
 RELEASE_VERSION = v10.1.0
 
 APP 			= ginadmin
+APPEXT          = $(shell go env | grep GOEXE | grep -Eo '\.[a-z]+' )
 SERVER_BIN  	= ${APP}
 GIT_COUNT 		= $(shell git rev-list --all --count)
 GIT_HASH        = $(shell git rev-parse --short HEAD)
@@ -21,7 +22,7 @@ start:
 	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" main.go start $(START_ARGS)
 
 build:
-	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)
+	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)$(APPEXT)
 
 build-linux:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC="zig cc -target x86_64-linux-musl" CXX="zig c++ -target x86_64-linux-musl" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN)_linux_amd64
