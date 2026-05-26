@@ -36,7 +36,7 @@ type Middleware struct {
 		Disable             bool
 		SkippedPathPrefixes []string
 		SigningMethod       string `default:"HS512"`    // HS256/HS384/HS512
-		SigningKey          string `default:"XnEsT0S@"` // secret key
+		SigningKey          string `default:""` // change to a secure random key
 		OldSigningKey       string // old secret key (for migration)
 		Expired             int    `default:"86400"` // seconds
 		Store               struct {

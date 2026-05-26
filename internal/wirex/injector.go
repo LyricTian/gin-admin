@@ -1,6 +1,7 @@
 package wirex
 
 import (
+	"fmt"
 	"context"
 	"time"
 
@@ -87,6 +88,9 @@ func InitCacher(ctx context.Context) (cachex.Cacher, func(), error) {
 }
 
 func InitAuth(ctx context.Context) (jwtx.Auther, func(), error) {
+	if config.C.Middleware.Auth.SigningKey == "" {
+		return nil, nil, fmt.Errorf("middleware.auth.signingKey is required, please set a secure random key")
+	}
 	cfg := config.C.Middleware.Auth
 	var opts []jwtx.Option
 	opts = append(opts, jwtx.SetExpired(cfg.Expired))
