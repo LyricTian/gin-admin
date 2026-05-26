@@ -131,7 +131,7 @@ func (a *Login) genUserToken(ctx context.Context, userID string) (*schema.LoginT
 	if err != nil {
 		return nil, err
 	}
-	logging.Context(ctx).Info("Generate user token", zap.Any("token", string(tokenBuf)))
+	logging.Context(ctx).Info("Generate user token")
 
 	return &schema.LoginToken{
 		AccessToken: token.GetAccessToken(),

@@ -19,7 +19,7 @@ type Auther interface {
 	Release(ctx context.Context) error
 }
 
-const defaultKey = "CG24SDVP8OHPK395GB5G"
+
 
 var ErrInvalidToken = errors.New("Invalid token")
 
@@ -60,7 +60,7 @@ func New(store Storer, opts ...Option) Auther {
 		tokenType:     "Bearer",
 		expired:       7200,
 		signingMethod: jwt.SigningMethodHS512,
-		signingKey:    []byte(defaultKey),
+		signingKey:    []byte{},
 	}
 
 	for _, opt := range opts {

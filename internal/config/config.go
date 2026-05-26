@@ -23,7 +23,7 @@ type General struct {
 	PprofAddr          string
 	DisableSwagger     bool
 	DisablePrintConfig bool
-	DefaultLoginPwd    string `default:"6351623c8cef86fefabfa7da046fc619"` // MD5(abc-123)
+	DefaultLoginPwd    string `default:""` // change default password
 	WorkDir            string // From command arguments
 	MenuFile           string // From schema.Menus (JSON/YAML)
 	DenyOperateMenu    bool
@@ -98,8 +98,8 @@ type Util struct {
 	Prometheus struct {
 		Enable         bool
 		Port           int    `default:"9100"`
-		BasicUsername  string `default:"admin"`
-		BasicPassword  string `default:"admin"`
+		BasicUsername  string `default:""`
+		BasicPassword  string `default:""`
 		LogApis        []string
 		LogMethods     []string
 		DefaultCollect bool

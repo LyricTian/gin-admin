@@ -28,7 +28,7 @@ MaxContentLen = 134217728 # 128MB
 Disable = false
 SkippedPathPrefixes = ["/api/v1/captcha/", "/api/v1/login"]
 SigningMethod = "HS512" # HS256/HS384/HS512
-SigningKey = "XnEsT0S@" # Secret key
+SigningKey = "" # CHANGE_ME: generate a secure random key # Secret key
 OldSigningKey = "" # Old secret key (For change secret key)
 Expired = 86400 # seconds
 
